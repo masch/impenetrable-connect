@@ -223,21 +223,58 @@ erDiagram
 When generating UI components or screens, adhere strictly to the following constraints tailored for low-end Android devices and non-technical users.
 6.1 Global Design Guidelines
 
-    Visual & Accessible: Use high-contrast colors, extremely large buttons (wide touch areas), and highly legible typography.
+    Visual & Accessible: Use high-contrast colors, extremely large buttons (wide touch areas), and highly legible typography. Use the colors of the Impenetrable Chaco: 
     Performance: The UI must be lightweight. Strictly avoid complex animations, heavy shadows, or overlapping elements that consume RAM on low-end phones.
     Navigation: Avoid complex hamburger menus or multi-step wizard flows. Keep actions flat and immediate.
 
 6.2 Tourist Flow (Zero Friction Journey)
 
-    Screen 1: Welcome & Access (QR Scan):
+    Screen 1: Welcome & Access:
         Spec: No traditional login/signup forms.
-        UI Elements: A single, prominent text input asking for an "Alias" (e.g., "Gomez Family") followed by a massive "Start" button.
+        UI Elements: 
+         - A single required input field, prominent text input asking for an "Alias" (e.g., "Gomez Family").
+         - Optional secondaries inputs fields:
+            - Whatsapp number.
+            - First name.
+            - Last name.
+         - A massive "Start" button.
+         - Without bottom navigation bar.
     Screen 2: Service Catalog:
-        Spec: A simple list to request an activity or meal.
-        UI Elements: Visual cards for available dishes/activities. Hidden entirely if under an "Individual Pause" or "Global Pause".
-    Screen 3: Order Status (Waiting Room):
-        Spec: Interactive waiting screen while the cascading engine works.
-        UI Elements: A friendly loading indicator informing the tourist that the system is finding an available entrepreneur (accommodating the 30-minute algorithm timeout).
+        Spec: A simple list to request multiple activities or meals.
+        UI Elements:
+         - Visual cards for available dishes/activities. Hidden entirely if under an "Individual Pause" or "Global Pause".
+         - When the user clicks on a card, a modal opens to :
+            - Time of day: breakfast, lunch, snack, dinner.
+            - Quantity of people.
+            - A "Confirm" button.
+         - With bottom navigation bar with the following tabs:
+            - Home: Service Catalog (selected)
+            - Orders: Orders Status
+            - Settings: Settings
+    Screen 3: Orders Status (Waiting Room):
+        Spec: Interactive waiting screen while the cascading engine works on each order.
+        UI Elements for each order:
+            - Display the order details (date, time of day, quantity of people, items).
+            - Display the status of the order (waiting for entrepreneur, accepted, rejected, timeout).
+            - A "Cancel" button.
+         - With bottom navigation bar with the following tabs:
+            - Home: Service Catalog
+            - Orders: Orders Status (selected)
+            - Settings: Settings
+    Screen 4: Settings:
+        Spec: Settings screen for the tourist.
+        UI Elements:
+         - A single required input field, prominent text input asking for an "Alias" (e.g., "Gomez Family").
+         - Optional secondaries inputs fields:
+            - Whatsapp number.
+            - First name.
+            - Last name.
+         - A button to save changes.
+         - A "Logout" button.
+         - With bottom navigation bar with the following tabs:
+            - Home: Service Catalog
+            - Orders: Orders Status
+            - Settings: Settings (selected)
 
 6.3 Entrepreneur Flow (Operational Journey)
 
