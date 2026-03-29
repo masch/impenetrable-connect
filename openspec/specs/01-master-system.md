@@ -1,5 +1,7 @@
 # OpenSpec: Multi-Destination Impenetrable Reservation Platform
 
+> **Tech Stack:** Bun (runtime) + Bun (package manager) — No npm/pnpm/yarn
+
 ## 1. System Overview
 The platform is a reservation application designed for local residents and entrepreneurs within conservation projects, starting with the IMPE (Impenetrable) region [1]. The main goal is to manage requests for activities and gastronomic services using a fair and equitable rotation logic [1]. 
 
@@ -675,20 +677,20 @@ volumes:
 
 **Dockerfile (Production)**
 ```dockerfile
-FROM node:20-alpine AS builder
+FROM oven/bun:1-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN bun install --frozen-lockfile
 COPY . .
-RUN npm run build
+RUN bun run build
 
-FROM node:20-alpine AS runner
+FROM oven/bun:1-alpine AS runner
 WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 ENV NODE_ENV=production
 EXPOSE 3000
-CMD ["node", "dist/main.js"]
+CMD ["bun", "run", "dist/main.js"]
 ```
 
 ### 4.5.2 Database Migrations
@@ -707,19 +709,19 @@ migrations/
 **Commands:**
 ```bash
 # Run migrations
-npm run migrate
+bun run migrate
 
 # Rollback last migration
-npm run migrate:rollback
+bun run migrate:rollback
 
 # Create new migration
-npm run migrate:make create_new_table
+bun run migrate:make create_new_table
 ```
 
 **Seeding:**
 ```bash
 # Seed database with initial data
-npm run db:seed
+bun run db:seed
 ```
 
 ### 4.5.3 Environments
@@ -757,22 +759,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v1
         with:
-          node-version: '20'
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bun run typecheck
 
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v1
         with:
-          node-version: '20'
-      - run: npm ci
-      - run: npm run test
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun test
       - uses: codecov/codecov-action@v3
 
   build:
@@ -781,11 +783,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v1
         with:
-          node-version: '20'
-      - run: npm ci
-      - run: npm run build
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run build
       - run: docker build -t app:${{ github.sha }} .
 
   deploy-staging:
@@ -876,7 +878,7 @@ pg_dump -h $DB_HOST -U $DB_USER $DB_NAME | gzip > backup_$(date +%Y%m%d).sql.gz
 
 ### 4.6.2 Unit Tests
 
-**Framework:** Vitest
+**Framework:** Bun Test (Vitest-compatible)
 
 **Coverage Target:** 80% minimum
 
@@ -1074,7 +1076,7 @@ export default function () {
 ### 4.6.6 Test Database Strategy
 
 **Development:**
-- Use `testcontainers-node` for isolated PostgreSQL
+- Use `testcontainers` for isolated PostgreSQL
 - Each test gets clean database state
 
 **CI/CD:**
@@ -1103,7 +1105,7 @@ beforeEach(async () => {
 
 | Type | Minimum Coverage | Tools |
 |------|-----------------|-------|
-| Unit | 80% | Vitest/Jest + coverage report |
+| Unit | 80% | Bun Test + coverage report |
 | Integration | All API endpoints | Supertest |
 | E2E | Critical paths only | Playwright |
 | Load | Key endpoints | k6 |
@@ -1112,19 +1114,10 @@ beforeEach(async () => {
 
 ```bash
 # Unit tests (fast, runs on every commit)
-npm run test:unit
-
-# Integration tests (slower, runs on PR)
-npm run test:integration
-
-# E2E tests (slowest, runs on staging)
-npm run test:e2e
-
-# All tests
-npm run test:all
+bun test
 
 # With coverage
-npm run test:coverage
+bun test --coverage
 ```
 
 ---
