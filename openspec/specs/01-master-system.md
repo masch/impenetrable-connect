@@ -1677,11 +1677,9 @@ erDiagram
     }
 
     Venture_Paused_Item {
-        int venture_id FK "References Venture"
-        int catalog_item_id FK "References Catalog_Item"
+        int venture_id PK,FK "References Venture"
+        int catalog_item_id PK,FK "References Catalog_Item"
         timestamp paused_at "When the item was paused"
-        
-        PK(venture_id, catalog_item_id)
     }
 
     Venture_Schedule {
@@ -1806,7 +1804,7 @@ erDiagram
 
     Order ||--o{ Cascade_Assignment : "processed by engine"
     Order ||--o{ Notification : "triggers"
-
+```
 
 --------------------------------------------------------------------------------
 ## 6. UI/UX Mockup Specifications (Google Stitch / Design Guidelines) **[MVP]**
