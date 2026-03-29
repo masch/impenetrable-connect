@@ -48,10 +48,26 @@ To achieve this, the system features an automated engine that replaces manual as
 
 ### 3.1. Cascading Routing Flow (Project-Isolated)
 When a tourist submits a request:
-1.  The engine looks up Ventures that belong *exclusively* to that project (e.g., Impenetrable) [5].
-2.  Evaluates the rotation order, automatically skipping ventures with an active "General Pause" or those lacking the requested item ("Individual Pause") [5].
-3.  Sends the offer and triggers a waiting Timeout (e.g., 30 minutes) [5].
-4.  If the venture rejects the request or the timeout expires, the offer is automatically forwarded to the next venture in the rotation list for that project [5].
+1.  **Order Init**: Order is created with status `SEARCHING`. The engine starts iterating through ventures sorted by `cascade_order` (ascending).
+2.  **Filter Phase**: For each venture in rotation order:
+    - Skip if `general_pause = true` → record `skip_reason = GENERAL_PAUSE`
+    - Skip if Venture_Item has `individual_pause = true` for requested Catalog_Item → record `skip_reason = INDIVIDUAL_PAUSE`
+    - Skip if `guest_count > venture.max_capacity` → record `skip_reason = CAPACITY_EXCEEDED`
+3.  **Offer Phase**: First venture that passes filters gets the offer:
+    - Create Cascade_Assignment with `offer_status = WAITING_FOR_RESPONSE`
+    - Set `response_deadline = now + project.cascade_timeout_minutes`
+    - Send notification to entrepreneur
+4.  **Response Handling**:
+    - **Accept**: Update Order status to `CONFIRMED`, set `confirmed_venture_id`, mark assignment as `ACCEPTED`
+    - **Reject**: Mark assignment as `REJECTED`, continue to next venture in rotation
+    - **Timeout**: Mark assignment as `TIMEOUT`, continue to next venture
+5.  **Termination Conditions**:
+    - **Success**: Venture accepts → Order becomes `CONFIRMED`
+    - **Max Attempts**: After `project.max_cascade_attempts` rejections/timeouts → Order becomes `EXPIRED` with cancel_reason `NO_VENTURE_AVAILABLE`
+    - **All Paused**: If ALL ventures are skipped (General/Individual Pause) → Order becomes `EXPIRED` with cancel_reason `NO_VENTURE_AVAILABLE`
+    - **Tourist Cancel**: Order becomes `CANCELLED` with cancel_reason `BY_TOURIST`
+
+**Initial Cascade Order**: Default is creation order (1, 2, 3...). Admin can manually reorder ventures in the Admin Panel to change rotation priority.
 
 ### 3.2. Internationalization (i18n)
 *   Dynamic Catalog data (dish and activity names) are stored in the database using PostgreSQL's native `JSONB` type [6].
@@ -82,6 +98,8 @@ erDiagram
     Project {
         int id PK
         string name "e.g. 'Impenetrable', 'Patagonia'"
+        int cascade_timeout_minutes "Default: 30. Timeout per attempt before cascading to next venture"
+        int max_cascade_attempts "Default: 10. Maximum times the engine will try before marking order as EXPIRED"
         boolean is_active
     }
 
@@ -137,7 +155,9 @@ erDiagram
         int entrepreneur_id FK
         string name "e.g. Parador Don Esteban"
         int role_type_id FK
-        int cascade_order "Isolated rotation per project"
+        int cascade_order "Isolated rotation per project. Default: creation order (1, 2, 3...)"
+        int max_capacity "Maximum number of guests per service (e.g. 20 seats)"
+        jsonb opening_hours "e.g. {'mon': '08:00-20:00', 'tue': '08:00-20:00'}"
         boolean general_pause "Default FALSE"
         boolean is_active
     }
@@ -148,6 +168,8 @@ erDiagram
         jsonb name_i18n "e.g. {'es':'Guiso','en':'Stew'}"
         int category_id FK
         decimal price
+        int max_participants "Maximum participants for activities (null for gastronomy)"
+        string image_url "Optional: URL to dish/activity photo"
         boolean global_pause 
     }
 
@@ -169,7 +191,9 @@ erDiagram
         date service_date "Used for Calendar view"
         int time_of_day_id FK "Used for Calendar view"
         int guest_count 
-        enum global_status "SEARCHING, CONFIRMED, COMPLETED, NO_SHOW"
+        enum global_status "SEARCHING, CONFIRMED, COMPLETED, NO_SHOW, CANCELLED, EXPIRED"
+        enum cancel_reason "null, BY_TOURIST, NO_VENTURE_AVAILABLE, SYSTEM_ERROR"
+        timestamp cancelled_at "Nullable. Set when status becomes CANCELLED or EXPIRED"
         timestamp created_at
     }
 
@@ -187,7 +211,7 @@ erDiagram
         int venture_id FK "Assigned to the business, not the person"
         int attempt_number
         enum offer_status "WAITING_FOR_RESPONSE, ACCEPTED, REJECTED, TIMEOUT, AUTO_REJECTED"
-        enum skip_reason "null, GENERAL_PAUSE, INDIVIDUAL_PAUSE, NOT_OFFERED"
+        enum skip_reason "null, GENERAL_PAUSE, INDIVIDUAL_PAUSE, CAPACITY_EXCEEDED, NOT_OFFERED"
         timestamp offer_sent_at
         timestamp response_deadline 
         timestamp resolved_at
