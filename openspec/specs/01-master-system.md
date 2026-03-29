@@ -15,7 +15,7 @@ To achieve this, the system features an automated engine that replaces manual as
     *   Eliminates the need for traditional user account creation to avoid friction [2].
     *   Accesses the platform by scanning a QR code (which already contains the Project ID, e.g., Impenetrable) [2].
     *   Identifies themselves using a mandatory "Alias" [2].
-    *   The system uses a device Token (Local Storage) to recognize them for future requests [2].
+    *   The system uses a JWT auth_token (stored in secure storage) to recognize them for future requests [2]. Token auto-refreshes before expiration (7 days).
 
 ### 2.2. Entrepreneur & Venture (Business)
 *   **Intention:** Organize daily work and receive clients equitably through the rotation system [1, 2].
@@ -393,7 +393,7 @@ When generating UI components or screens, adhere strictly to the following const
          - Individual Pause: List of Venture_Items with individual toggles for "Individual Pause" (out of stock). Each item shows the catalog item name.
          - Logout button at the bottom
 
-    Screen 4: Create/Edit Venture (Modal):
+    Screen 5: Create/Edit Venture (Modal):
         Spec: Form to create a new venture or edit existing one.
         UI Elements:
          - Venture name input
