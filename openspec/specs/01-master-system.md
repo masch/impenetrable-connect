@@ -24,9 +24,9 @@ To achieve this, the system features an automated engine that replaces manual as
 ### 2.2. Entrepreneur & Venture (Business) **[MVP]**
 *   **Intention:** Organize daily work and receive clients equitably through the rotation system [1, 2].
 *   **Behavior & UX Constraints:**
-    *   Registers their venture [2]. A single entrepreneur (owner) can manage multiple physical ventures (businesses) associated with a Project [2].
-    *   Registers activities or gastronomic services [2].
-    *   The engine routes orders to their business, and from their dashboard, they can accept or reject the request [2].
+    *   One entrepreneur = one venture (their business). No multi-venture support [2].
+    *   The entrepreneur can only offer items from the **Master Catalog** defined by the Admin for that Project [2].
+    *   The engine routes orders to the entrepreneur, and from their dashboard, they can accept or reject the request [2].
     *   **Calendar View:** The dashboard includes a simple calendar view to track assigned orders based on the service date and the specific time of day [2].
     *   **Individual Pause (Stock Control):** Can pause a specific catalog item if they run out of ingredients [2].
     *   **General Pause (Capacity Control):** Can disable the reception of all new requests if their business is full or closed [2].
@@ -52,31 +52,32 @@ To achieve this, the system features an automated engine that replaces manual as
 
 ### 3.1. Cascading Routing Flow (Project-Isolated) **[MVP]**
 
-> **Note:** Individual Pause (Venture_Item level) is **[POST-MVP]**. Only General Pause at venture level for MVP.
+> **Note:** One entrepreneur = One venture. The cascade iterates through **entrepreneurs** (each with 1 venture). Individual Pause (Venture_Item level) is **[POST-MVP]**. Only General Pause at venture level for MVP.
+
 When a tourist submits a request:
-1.  **Order Init**: Order is created with status `SEARCHING`. The engine starts iterating through ventures sorted by `cascade_order` (ascending).
-2.  **Filter Phase**: For each venture in rotation order:
+1.  **Order Init**: Order is created with status `SEARCHING`. The engine starts iterating through **entrepreneurs** sorted by `cascade_order` (ascending). Each entrepreneur has exactly one venture.
+2.  **Filter Phase**: For each entrepreneur in rotation order:
     - Skip if `venture.is_active = false` → record `skip_reason = VENTURE_INACTIVE`
-    - Skip if `general_pause = true` → record `skip_reason = GENERAL_PAUSE`
+    - Skip if `entrepreneur.is_paused = true` → record `skip_reason = GENERAL_PAUSE`
     - Skip if Venture_Item has `individual_pause = true` for requested Catalog_Item → record `skip_reason = INDIVIDUAL_PAUSE`
     - Skip if `guest_count > venture.max_capacity` → record `skip_reason = CAPACITY_EXCEEDED`
     - Skip if `service_date` day is not in `venture.opening_hours` → record `skip_reason = CLOSED_THAT_DAY`
     - Skip if requested time is outside `venture.opening_hours` range → record `skip_reason = OUTSIDE_OPENING_HOURS`
-3.  **Offer Phase**: First venture that passes filters gets the offer:
+3.  **Offer Phase**: First entrepreneur that passes filters gets the offer:
     - Create Cascade_Assignment with `offer_status = WAITING_FOR_RESPONSE`
     - Set `response_deadline = now + project.cascade_timeout_minutes`
     - Send notification to entrepreneur
 4.  **Response Handling**:
     - **Accept**: Update Order status to `CONFIRMED`, set `confirmed_venture_id`, mark assignment as `ACCEPTED`
-    - **Reject**: Mark assignment as `REJECTED`, continue to next venture in rotation
-    - **Timeout**: Mark assignment as `TIMEOUT`, continue to next venture
+    - **Reject**: Mark assignment as `REJECTED`, continue to next entrepreneur in rotation
+    - **Timeout**: Mark assignment as `TIMEOUT`, continue to next entrepreneur
 5.  **Termination Conditions**:
-    - **Success**: Venture accepts → Order becomes `CONFIRMED`
+    - **Success**: Entrepreneur accepts → Order becomes `CONFIRMED`
     - **Max Attempts**: After `project.max_cascade_attempts` rejections/timeouts → Order becomes `EXPIRED` with cancel_reason `NO_VENTURE_AVAILABLE`
-    - **All Paused**: If ALL ventures are skipped (General/Individual Pause) → Order becomes `EXPIRED` with cancel_reason `NO_VENTURE_AVAILABLE`
+    - **All Paused**: If ALL entrepreneurs are skipped (General/Individual Pause) → Order becomes `EXPIRED` with cancel_reason `NO_VENTURE_AVAILABLE`
     - **Tourist Cancel**: Order becomes `CANCELLED` with cancel_reason `BY_TOURIST`
 
-**Initial Cascade Order**: Default is creation order (1, 2, 3...). Admin can manually reorder ventures in the Admin Panel to change rotation priority.
+**Initial Cascade Order**: Default is creation order (1, 2, 3...). Admin can manually reorder entrepreneurs in the Admin Panel to change rotation priority.
 
 ### 3.2. Internationalization (i18n) **[POST-MVP]**
 
@@ -121,14 +122,17 @@ When a tourist creates an order, the following validations must pass:
 | `items` | Max 10 unique items | "Maximum 10 items per order" |
 | `time_of_day_id` | Required | "Time of day is required" |
 
-#### 3.3.2 Venture Availability Validations (Filter Phase)
+#### 3.3.2 Entrepreneur/Venture Availability Validations (Filter Phase)
 
-Before offering an order to a venture, the engine validates:
+> **Note:** The cascade iterates through **entrepreneurs**. Each entrepreneur has exactly one venture. The checks apply to both.
+
+Before offering an order to an entrepreneur, the engine validates:
 
 | Check | Condition | Skip Reason |
 |-------|-----------|-------------|
+| Entrepreneur Active | `entrepreneur.is_active = true` | `VENTURE_INACTIVE` |
 | Venture Active | `venture.is_active = true` | `VENTURE_INACTIVE` |
-| General Pause | `venture.general_pause = false` | `GENERAL_PAUSE` |
+| General Pause | `entrepreneur.is_paused = false` | `GENERAL_PAUSE` |
 | Capacity | `order.guest_count <= venture.max_capacity` | `CAPACITY_EXCEEDED` |
 | Individual Pause | `venture_item.individual_pause = false` for all items | `INDIVIDUAL_PAUSE` |
 | **Opening Hours** | Order time within `venture.opening_hours` for the day | `CLOSED_THAT_DAY` |
@@ -193,20 +197,24 @@ If such order exists with status `SEARCHING` or `CONFIRMED`, the system returns 
 
 #### 3.3.6 Capacity Calculation
 
-When checking if a venture can accept an order:
+> **Note:** Capacity is checked per entrepreneur (via their venture).
+
+When checking if an entrepreneur can accept an order:
 
 ```typescript
-function getCurrentGuestCount(ventureId: number, serviceDate: Date, timeOfDayId: number): number {
+function getCurrentGuestCount(entrepreneurId: number, serviceDate: Date, timeOfDayId: number): number {
     // Sum of guest_count for CONFIRMED orders at same date/time
     return SUM(o.guest_count) FROM Order o
-    WHERE o.confirmed_venture_id = ventureId
+    JOIN Venture v ON o.confirmed_venture_id = v.id
+    WHERE v.entrepreneur_id = entrepreneurId
       AND o.service_date = serviceDate
       AND o.time_of_day_id = timeOfDayId
       AND o.status IN ('SEARCHING', 'CONFIRMED');
 }
 
-function canAcceptOrder(venture: Venture, order: Order): boolean {
-    const currentGuests = getCurrentGuestCount(venture.id, order.service_date, order.time_of_day_id);
+function canAcceptOrder(entrepreneur: Entrepreneur, order: Order): boolean {
+    const venture = entrepreneur.venture;
+    const currentGuests = getCurrentGuestCount(entrepreneur.id, order.service_date, order.time_of_day_id);
     return (currentGuests + order.guest_count) <= venture.max_capacity;
 }
 ```
@@ -386,15 +394,18 @@ Response (200):
 
 #### 4.2.3 Entrepreneur Endpoints (Auth Required) **[MVP]**
 
+> **Note:** One entrepreneur = One venture. All venture endpoints are at `/entrepreneur` prefix.
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/orders/pending` | Get pending orders for entrepreneur's ventures |
+| GET | `/entrepreneur/me` | Get my venture details |
+| GET | `/entrepreneur/me/items` | Get my available catalog items |
+| PUT | `/entrepreneur/me/items/:item_id/pause` | Toggle individual pause for item |
+| PUT | `/entrepreneur/me/pause` | Toggle general pause (business full/closed) |
+| GET | `/orders/pending` | Get pending orders for my venture |
 | POST | `/orders/:id/accept` | Accept an order |
 | POST | `/orders/:id/reject` | Reject an order |
 | GET | `/calendar` | Get confirmed orders by date range |
-| GET | `/ventures` | Get entrepreneur's ventures |
-| PUT | `/ventures/:id/pause` | Toggle general pause |
-| PUT | `/ventures/:id/items/:item_id/pause` | Toggle individual pause |
 | PUT | `/profile` | Update entrepreneur profile |
 
 **GET /orders/pending**
@@ -472,20 +483,78 @@ Response (200):
 }
 ```
 
+**GET /entrepreneur/me**
+```
+Response (200):
+{
+  "venture": {
+    "id": 1,
+    "name": "Parador Don Esteban",
+    "address": "Calle Principal 123",
+    "max_capacity": 20,
+    "opening_hours": {"mon": "08:00-20:00", "tue": "08:00-20:00"},
+    "is_active": true
+  },
+  "entrepreneur": {
+    "id": 1,
+    "full_name": "Juan Perez",
+    "whatsapp_contact": "+54911...",
+    "is_paused": false,
+    "cascade_order": 1
+  }
+}
+```
+
+**PUT /entrepreneur/me/pause**
+```
+Request:
+{ "is_paused": true }
+
+Response (200):
+{
+  "id": 1,
+  "is_paused": true
+}
+```
+
+**GET /entrepreneur/me/items**
+```
+Response (200):
+{
+  "items": [
+    {
+      "catalog_item_id": 1,
+      "name": "Guiso",
+      "price": 15.00,
+      "individual_pause": false
+    },
+    {
+      "catalog_item_id": 2,
+      "name": "Empanadas",
+      "price": 12.00,
+      "individual_pause": true
+    }
+  ]
+}
+```
+
 #### 4.2.4 Admin Endpoints (Auth Required + ADMIN role) **[POST-MVP]**
+
+> **Note:** Cascade order is now at Entrepreneur level (each has one venture).
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/admin/entrepreneurs` | List all entrepreneurs |
 | PUT | `/admin/entrepreneurs/:id/enable` | Enable/disable entrepreneur |
-| POST | `/admin/entrepreneurs` | Create new entrepreneur + access_user |
-| GET | `/admin/ventures` | List all ventures |
-| PUT | `/admin/ventures/:id` | Update venture |
-| PUT | `/admin/ventures/reorder` | Reorder cascade |
-| GET | `/admin/catalog` | List catalog items |
+| PUT | `/admin/entrepreneurs/:id/pause` | Toggle entrepreneur's general pause |
+| PUT | `/admin/entrepreneurs/reorder` | Reorder cascade (cascade_order on entrepreneurs) |
+| POST | `/admin/entrepreneurs` | Create new entrepreneur + venture |
+| GET | `/admin/ventures/:id` | Get venture details (one per entrepreneur) |
+| PUT | `/admin/ventures/:id` | Update venture (capacity, hours, etc.) |
+| GET | `/admin/catalog` | List master catalog items (project-level) |
 | POST | `/admin/catalog` | Create catalog item |
 | PUT | `/admin/catalog/:id` | Update catalog item |
-| PUT | `/admin/catalog/:id/pause` | Toggle global pause |
+| PUT | `/admin/catalog/:id/pause` | Toggle global pause (all entrepreneurs) |
 | DELETE | `/admin/catalog/:id` | Delete catalog item |
 | GET | `/admin/kpis` | Get KPIs dashboard data |
 | GET | `/admin/projects` | List projects |
@@ -1202,12 +1271,15 @@ erDiagram
         int id PK
         string full_name "Physical Person / Owner"
         string whatsapp_contact "Used for Morning Reminder"
+        int cascade_order "Isolated rotation per project. Default: creation order (1, 2, 3...)"
+        boolean is_paused "General pause - entrepreneur cannot receive orders"
+        boolean is_active "Enabled by admin"
     }
 
     Venture {
         int id PK
         int project_id FK
-        int entrepreneur_id FK
+        int entrepreneur_id FK "1:1 with Entrepreneur - one venture per entrepreneur"
         string name "e.g. Parador Don Esteban"
         string description "Optional venture description"
         string address "Physical address"
@@ -1215,10 +1287,8 @@ erDiagram
         decimal longitude "Geolocation"
         string image_url "Optional venture photo"
         int role_type_id FK
-        int cascade_order "Isolated rotation per project. Default: creation order (1, 2, 3...)"
         int max_capacity "Maximum number of guests per service (e.g. 20 seats)"
         jsonb opening_hours "e.g. {'mon': '08:00-20:00', 'tue': '08:00-20:00'}"
-        boolean general_pause "Default FALSE"
         boolean is_active
     }
 
@@ -1276,7 +1346,7 @@ erDiagram
     Cascade_Assignment {
         int id PK
         int order_id FK
-        int venture_id FK "Assigned to the business, not the person"
+        int entrepreneur_id FK "Cascade iterates through entrepreneurs (each has one venture)"
         int attempt_number
         enum offer_status "WAITING_FOR_RESPONSE, ACCEPTED, REJECTED, TIMEOUT, AUTO_REJECTED"
         enum skip_reason "null, GENERAL_PAUSE, INDIVIDUAL_PAUSE, CAPACITY_EXCEEDED, CLOSED_THAT_DAY, OUTSIDE_OPENING_HOURS, VENTURE_INACTIVE, NOT_OFFERED"
@@ -1320,7 +1390,8 @@ erDiagram
     Venture ||--o{ Order : "confirmed in"
 
     Access_User |o--|| Entrepreneur : "authenticates"
-    Entrepreneur ||--o{ Venture : "manages"
+    Entrepreneur ||--|| Venture : "has one"
+    Entrepreneur ||--o{ Cascade_Assignment : "receives offers (cascade iterates entrepreneurs)"
     
     Role_Type ||--o{ Venture : "classifies"
     Catalog_Category ||--o{ Catalog_Item : "categorizes"
@@ -1336,7 +1407,7 @@ erDiagram
     Catalog_Item ||--o{ Order_Detail : "includes"
     
     Order ||--o{ Cascade_Assignment : "processed by engine"
-    Venture ||--o{ Cascade_Assignment : "receives offer"
+    Entrepreneur ||--o{ Cascade_Assignment : "receives offer (cascade iterates entrepreneurs)"
 
     Person ||--o{ Notification : "receives"
     Venture ||--o{ Notification : "receives"
@@ -1413,11 +1484,12 @@ When generating UI components or screens, adhere strictly to the following const
 
 ### 6.3 Entrepreneur Flow (Operational Journey) **[MVP]**
 
-    Navigation: Bottom tab bar with 4 large icons:
+> **Note:** One entrepreneur = One venture. Simplified from multi-venture to single venture.
+
+    Navigation: Bottom tab bar with 3 large icons (simplified from 4):
         - Orders: Order Reception Dashboard (selected by default)
         - Calendar: Daily Agenda
-        - Ventures: My Ventures List
-        - Settings: Availability & Profile
+        - Settings: My Venture, Availability & Profile
         - Badge indicator on Orders tab when General Pause is active
 
     Screen 0: Login:
@@ -1452,24 +1524,18 @@ When generating UI components or screens, adhere strictly to the following const
          - Visual occupation indicator (e.g., "12/20 seats filled")
          - Color coding: confirmed (green), completed (gray), no-show (red)
 
-    Screen 3: My Ventures (Ventures Tab):
-        Spec: List of ventures managed by the entrepreneur. Quick access to pause controls.
+    Screen 3: My Venture & Settings:
+        Spec: Single venture details, pause controls, and profile.
         UI Elements:
-         - List of venture cards
-         - Each card shows: Name, Role, Capacity, Status badge (Active/Paused)
-         - Quick toggle: General Pause switch on each card
-         - "Add Venture" floating action button (FAB)
-         - Empty state: "You don't have any ventures yet"
-
-    Screen 4: Settings & Availability Control Panel:
-        Spec: Quick toggles for capacity, stock management, and profile.
-        UI Elements:
+         - Venture card (single, not a list):
+             - Name, Address, Role, Capacity, Status badge
+         - General Pause: Large toggle switch for "Business Full/Closed"
+         - Individual Pause: List of available items with toggles for "Out of Stock"
+         - Edit Venture button (to update name, address, capacity, hours)
          - Profile section:
-             - Full name (read-only, from Entrepreneur record)
-             - WhatsApp contact (editable, used for Morning Reminder)
+             - Full name (read-only)
+             - WhatsApp contact (editable)
              - Email (read-only)
-         - General Pause: Large toggle switch at the top for "General Pause" (business full/closed). When active, shows a badge indicator on the bottom nav.
-         - Individual Pause: List of Venture_Items with individual toggles for "Individual Pause" (out of stock). Each item shows the catalog item name.
          - Logout button at the bottom
 
     Screen 5: Create/Edit Venture (Modal):
