@@ -690,8 +690,6 @@ erDiagram
         string first_name "Nullable"
         string last_name "Nullable"
         string whatsapp "Nullable. For order notifications"
-        string auth_token "JWT token stored in secure storage (not LocalStorage). Expires in 7 days."
-        timestamp token_expires_at
         timestamp created_at
     }
 
@@ -738,6 +736,7 @@ erDiagram
         int venture_id FK
         int catalog_item_id FK
         boolean individual_pause "Venture-level stock control"
+        decimal price_override "Nullable. If null, uses Catalog_Item.price. Allows ventures to offer discounts."
     }
 
     %% ==========================================
@@ -799,7 +798,9 @@ erDiagram
     }
 
     Notification_Preference {
-        uuid person_id PK "For tourists"
+        int id PK
+        uuid person_id FK "Nullable. For tourists"
+        int entrepreneur_id FK "Nullable. For entrepreneurs"
         boolean push_enabled default TRUE
         boolean whatsapp_enabled default FALSE
         boolean email_enabled default FALSE
@@ -836,7 +837,8 @@ erDiagram
     Venture ||--o{ Notification : "receives"
     Order ||--o{ Notification : "triggers"
 
-    Person ||--|| Notification_Preference : "has"
+    Person ||--o{ Notification_Preference : "has"
+    Entrepreneur ||--o{ Notification_Preference : "has"
 
 
 --------------------------------------------------------------------------------
