@@ -73,9 +73,10 @@ When a tourist submits a request:
     - **Timeout**: Mark assignment as `TIMEOUT`, continue to next venture
 5.  **Termination Conditions**:
     - **Success**: Linked entrepreneur accepts → Order becomes `CONFIRMED`
-    - **Max Attempts**: After `project.max_cascade_attempts` rejections/timeouts → Order becomes `EXPIRED` with cancel_reason `NO_VENTURE_AVAILABLE`
+    - **Max Attempts**: After `project.max_cascade_steps` rejections/timeouts → Order becomes `EXPIRED` with cancel_reason `NO_VENTURE_AVAILABLE`
     - **All Paused**: If ALL ventures are skipped (General/Individual Pause) → Order becomes `EXPIRED` with cancel_reason `NO_VENTURE_AVAILABLE`
     - **Tourist Cancel**: Order becomes `CANCELLED` with cancel_reason `BY_TOURIST`
+    - **Entrepreneur Cancel**: Confirmed order cancelled by entrepreneur → Order becomes `SEARCHING` (cascade restarts), cancel_reason = `BY_ENTREPRENEUR`
 
 **Initial Cascade Order**: Default is creation order (1, 2, 3...). Admin can manually reorder ventures in the Admin Panel to change rotation priority.
 
@@ -307,9 +308,9 @@ Valid transitions between order states:
 
 ```
 SEARCHING ──offer──> OFFER_PENDING ──accept──> CONFIRMED ──complete──> COMPLETED
-    │                     │                      │
+    │                     │                      │              │
     ├──cancel──> CANCELLED ├──cancel──> CANCELLED ├──cancel──> SEARCHING
-    │                     │                      │
+    │                     │                      │              │
     └──expire──> EXPIRED  └──expire──> EXPIRED   └──no_show──> NO_SHOW
 ```
 
@@ -320,9 +321,11 @@ SEARCHING ──offer──> OFFER_PENDING ──accept──> CONFIRMED ──c
 - `OFFER_PENDING` → `CANCELLED`: When tourist cancels while venture has pending offer
 - `SEARCHING` → `CANCELLED`: When tourist cancels (only if status = SEARCHING)
 - `SEARCHING` → `EXPIRED`: When max cascade attempts reached or all ventures skipped
-- `CONFIRMED` → `SEARCHING`: When linked entrepreneur cancels (cascade restarts from next venture)
-- `CONFIRMED` → `COMPLETED`: When service date passes + no NO_SHOW reported
+- `CONFIRMED` → `SEARCHING`: When linked entrepreneur cancels (cascade restarts from next venture), sets cancel_reason = BY_ENTREPRENEUR
+- `CONFIRMED` → `COMPLETED`: (1) When entrepreneur explicitly marks as complete via `/orders/:id/complete`, OR (2) When service date passes + no NO_SHOW reported
 - `CONFIRMED` → `NO_SHOW`: When linked entrepreneur marks tourist as no-show
+
+> **UX Note:** The explicit `/complete` action is the PREFERRED flow. Entrepreneurs should mark the order as complete when they finish preparing the dish or when the service is delivered. The automatic completion (date-based) is a fallback for cases where the entrepreneur forgets to mark it.
 
 #### 3.3.4 Cascade Skip Reasons
 
@@ -748,6 +751,8 @@ Response (200) - Entrepreneur/Admin View:
 | GET | `/orders/pending` | Get pending orders for my venture |
 | POST | `/orders/:id/accept` | Accept an order (only if SEARCHING) |
 | POST | `/orders/:id/reject` | Reject an order (only if SEARCHING) |
+| POST | `/orders/:id/complete` | Mark order as completed - dish prepared/served (only if CONFIRMED) |
+| POST | `/orders/:id/no-show` | Mark tourist as no-show - did not arrive (only if CONFIRMED) |
 | POST | `/orders/:id/cancel` | Cancel confirmed order (only if CONFIRMED, restarts cascade) |
 | GET | `/calendar` | Get confirmed orders by date range |
 | PUT | `/profile` | Update entrepreneur profile |
@@ -794,6 +799,36 @@ Response (200):
   "next_venture_triggered": true
 }
 ```
+
+**POST /orders/:id/complete**
+```json
+Response (200):
+{
+  "order_id": 123,
+  "status": "COMPLETED",
+  "completed_at": "2024-01-15T13:30:00Z"
+}
+```
+
+> **Note:** Only available when order status is `CONFIRMED` and the entrepreneur's venture is the `confirmed_venture`. Marks the dish as prepared/served. This triggers `ORDER_COMPLETED` notification to tourist.
+
+**Error Responses:**
+| Scenario | HTTP Status | Message |
+|----------|-------------|---------|
+| Order already COMPLETED | 409 Conflict | "Este pedido ya fue completado" |
+| Order not CONFIRMED | 400 Bad Request | "Solo se pueden completar pedidos confirmados" |
+| Venture is not the confirmed one | 403 Forbidden | "No tenés autorización para completar este pedido" |
+
+**POST /orders/:id/no-show**
+```json
+Response (200):
+{
+  "order_id": 123,
+  "status": "NO_SHOW"
+}
+```
+
+> **Note:** Only available when order status is `CONFIRMED` and the entrepreneur's venture is the `confirmed_venture`. Marks tourist as no-show (did not arrive).
 
 **POST /orders/:id/cancel**
 ```json
@@ -985,6 +1020,8 @@ Response: { "success": true }
 | `ORDER_RECEIVED` | Entrepreneur | Push | "Nuevo pedido: X personas, [items]" |
 | `ORDER_CANCELLED` | Entrepreneur | Push | "El cliente canceló el pedido #X" |
 | `ORDER_CONFIRMED` | Tourist | Push + WhatsApp | "Tu reserva está confirmada para [fecha] en [venture]" |
+| `ORDER_COMPLETED` | Tourist | Push | "Tu experiencia en [venture] fue completada. ¡Gracias por visitar!" |
+| `ORDER_NO_SHOW` | Tourist | Push | "El emprendimiento reportó que no te presentaste. ¿Qué pasó?" |
 | `ORDER_EXPIRED` | Tourist | Push | "Lo sentimos, no hay disponibilidad para tu solicitud" |
 | `MORNING_REMINDER` | Entrepreneur | Push + WhatsApp | "Hoy tienes X pedidos confirmados" |
 
@@ -1728,8 +1765,10 @@ erDiagram
         int guest_count 
         string notes "Special requests or dietary restrictions from tourist"
         enum global_status "SEARCHING, OFFER_PENDING, CONFIRMED, COMPLETED, NO_SHOW, CANCELLED, EXPIRED"
-        enum cancel_reason "null, BY_TOURIST, NO_VENTURE_AVAILABLE, SYSTEM_ERROR"
+        enum cancel_reason "null, BY_TOURIST, BY_ENTREPRENEUR, NO_VENTURE_AVAILABLE, SYSTEM_ERROR"
         timestamp cancelled_at "Nullable. Set when status becomes CANCELLED or EXPIRED"
+        timestamp completed_at "Nullable. Set when status becomes COMPLETED (explicit or auto)"
+        timestamp confirmed_at "Nullable. Set when status becomes CONFIRMED"
         timestamp created_at
         
         %% Notification preferences for this order
@@ -1756,7 +1795,7 @@ erDiagram
         uuid user_id FK "Nullable. Links to User (any type: tourist, entrepreneur, admin)"
         int order_id FK "Nullable. Associated order"
         enum channel "PUSH, WHATSAPP, EMAIL, IN_APP"
-        enum event_type "ORDER_RECEIVED, ORDER_CONFIRMED, ORDER_EXPIRED, ORDER_CANCELLED, MORNING_REMINDER"
+        enum event_type "ORDER_RECEIVED, ORDER_CONFIRMED, ORDER_COMPLETED, ORDER_NO_SHOW, ORDER_EXPIRED, ORDER_CANCELLED, MORNING_REMINDER"
         jsonb payload "Message content and metadata"
         boolean is_sent default FALSE
         timestamp sent_at "Nullable. Set when notification is sent"
@@ -1900,13 +1939,15 @@ When generating UI components or screens, adhere strictly to the following const
     Screen 1: Order Reception Dashboard:
         Spec: The main hub where the engine routes incoming requests to the business.
         UI Elements:
-         - Alert cards for incoming orders featuring two huge, contrasting buttons: "Accept" and "Reject"
+         - Two sections: "Pending" (awaiting response) and "Confirmed" (accepted, awaiting completion)
+         - Pending orders: Alert cards featuring two huge, contrasting buttons: "Accept" and "Reject"
+         - Confirmed orders: Cards with "Complete" button to mark dish as prepared/served
          - Each card displays:
              - Order items (dish/activity names)
              - Guest count (e.g., "4 people")
              - Service date and time of day (e.g., "Today - Lunch")
              - Customer alias
-         - Visual countdown timer showing remaining time before timeout (30 min)
+         - For pending orders: Visual countdown timer showing remaining time before timeout (30 min)
          - Sound/vibration notification on new order arrival
          - Empty state: "No pending orders" message when the queue is empty
 
@@ -1917,6 +1958,7 @@ When generating UI components or screens, adhere strictly to the following const
          - Tap on a day to expand confirmed orders for that date
          - Orders grouped by time of day (Breakfast, Lunch, Snack, Dinner)
          - Each order shows: customer alias, guest count, items
+         - Tap on confirmed order to reveal "Mark Complete" action
          - Visual occupation indicator (e.g., "12/20 seats filled")
          - Color coding: confirmed (green), completed (gray), no-show (red)
 
