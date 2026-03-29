@@ -629,6 +629,236 @@ All errors follow a consistent format:
 
 ---
 
+## 4.5 Infrastructure & DevOps
+
+### 4.5.1 Docker Configuration
+
+The application runs in Docker containers for consistency across environments.
+
+**docker-compose.yml**
+```yaml
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://user:pass@postgres:5432/db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./src:/app/src
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+**Dockerfile (Production)**
+```dockerfile
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+ENV NODE_ENV=production
+EXPOSE 3000
+CMD ["node", "dist/main.js"]
+```
+
+### 4.5.2 Database Migrations
+
+**Tool:** Knex.js or Prisma Migrate
+
+**Migration Files Structure:**
+```
+migrations/
+  20240101000000_create_users.sql
+  20240102000000_create_projects.sql
+  20240103000000_create_orders.sql
+  ...
+```
+
+**Commands:**
+```bash
+# Run migrations
+npm run migrate
+
+# Rollback last migration
+npm run migrate:rollback
+
+# Create new migration
+npm run migrate:make create_new_table
+```
+
+**Seeding:**
+```bash
+# Seed database with initial data
+npm run db:seed
+```
+
+### 4.5.3 Environments
+
+| Environment | Purpose | URL | Database |
+|------------|---------|-----|----------|
+| **development** | Local dev | http://localhost:3000 | Local Postgres |
+| **staging** | Pre-production testing | https://staging.api.elimpenetrable.org | Staging DB |
+| **production** | Live production | https://api.elimpenetrable.org | Production DB |
+
+**Environment Variables:**
+
+| Variable | development | staging | production |
+|----------|-------------|---------|------------|
+| `NODE_ENV` | development | staging | production |
+| `DATABASE_URL` | localhost | staging-db | production-db |
+| `REDIS_URL` | localhost | staging-redis | production-redis |
+| `JWT_SECRET` | dev-secret | staging-secret | (from secrets manager) |
+| `WHATSAPP_API_KEY` | test-key | staging-key | (from secrets manager) |
+| `FCM_SERVER_KEY` | test-key | staging-key | (from secrets manager) |
+
+### 4.5.4 CI/CD Pipeline (GitHub Actions)
+
+```yaml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run test
+      - uses: codecov/codecov-action@v3
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck, test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run build
+      - run: docker build -t app:${{ github.sha }} .
+
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Deploying to staging..."
+      # Add your deployment steps here
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Deploying to production..."
+      # Add your deployment steps here
+```
+
+### 4.5.5 Monitoring & Logging
+
+**Logging:**
+- Use `pino` or `winston` for structured JSON logging
+- Log levels: ERROR, WARN, INFO, DEBUG
+
+**Monitoring:**
+- **Metrics:** Prometheus + Grafana
+- **Errors:** Sentry or Datadog
+- **Uptime:** UptimeRobot or Grafana synthetic checks
+
+**Key Metrics to Track:**
+| Metric | Description | Alert Threshold |
+|--------|-------------|-----------------|
+| `orders_per_minute` | Order creation rate | > 100/min |
+| `cascade_avg_attempts` | Average cascade attempts | > 8 |
+| `response_time_p95` | API response time (95th percentile) | > 500ms |
+| `error_rate` | Percentage of 5xx errors | > 1% |
+| `db_connections` | Active PostgreSQL connections | > 80% of max |
+
+### 4.5.6 Backup & Recovery
+
+**Database Backups:**
+- **Frequency:** Daily at 3am UTC
+- **Retention:** 30 days
+- **Storage:** AWS S3 or equivalent
+
+**Backup Command:**
+```bash
+pg_dump -h $DB_HOST -U $DB_USER $DB_NAME | gzip > backup_$(date +%Y%m%d).sql.gz
+```
+
+**Recovery Procedure:**
+1. Stop application
+2. Drop existing database
+3. Restore from latest backup: `gunzip < backup.sql.gz | psql`
+4. Verify data integrity
+5. Restart application
+
+### 4.5.7 Security
+
+| Practice | Implementation |
+|----------|----------------|
+| Secrets | Use environment variables or secrets manager (AWS Secrets Manager, Doppler) |
+| HTTPS | TLS 1.3 required for all environments |
+| CORS | Whitelist only allowed domains |
+| Rate Limiting | Applied at API Gateway level |
+| SQL Injection | Parameterized queries only |
+| XSS | Output encoding + CSP headers |
+
+---
+
 ## 5. Data Structure (Multi-Project ERD)
 
 Below is the relational data model prepared for AI generation using PostgreSQL. Operational states are kept as Enums to protect the cascading engine's strict logic, while expansible categories use parametric tables [6].
