@@ -583,8 +583,8 @@ Response (200):
     { "date": "2024-01-14", "orders": 8, "acceptance_rate": 0.87 }
   ],
   "by_venture": [
-    { "entrepreneur_id": 1, "name": "Parador A", "orders": 45, "acceptance_rate": 0.95 },
-    { "entrepreneur_id": 2, "name": "Parador B", "orders": 38, "acceptance_rate": 0.82 }
+    { "venture_id": 1, "name": "Parador A", "orders": 45, "acceptance_rate": 0.95 },
+    { "venture_id": 2, "name": "Parador B", "orders": 38, "acceptance_rate": 0.82 }
   ]
 }
 ```
@@ -1121,8 +1121,8 @@ test('tourist creates order', async ({ page }) => {
 | Scenario | Target |
 |----------|--------|
 | **Order Creation** | 100 orders/minute |
-| **Cascade Engine** | 50 entrepreneurs, 10 attempts each |
-| **Concurrent Accepts** | 10 entrepreneurs accepting simultaneously |
+| **Cascade Engine** | 50 ventures, 10 attempts each |
+| **Concurrent Accepts** | 10 ventures accepting simultaneously |
 | **Calendar View** | 1000 confirmed orders |
 
 **Example (k6):**
@@ -1274,8 +1274,7 @@ erDiagram
 
     Venture {
         int id PK
-        int project_id FK "Project this venture belongs to"
-        int catalog_type_id FK "Determines which catalog items this venture can offer"
+        int catalog_type_id FK "Determines which catalog items this venture can offer (inherits project from type)"
         string name "Business name (e.g. Parador Don Esteban)"
         string description "Optional business description"
         string address "Physical address"
@@ -1301,7 +1300,6 @@ erDiagram
 
     Entrepreneur {
         int id PK
-        int project_id FK "Project this entrepreneur belongs to"
         uuid person_id FK "Links to Person (user account)"
         string whatsapp_contact "Used for Morning Reminder"
         boolean is_active "Enabled by admin"
@@ -1309,8 +1307,7 @@ erDiagram
 
     Catalog_Item {
         int id PK
-        int catalog_type_id FK "Catalog type this item belongs to"
-        int project_id FK "Project this catalog item belongs to"
+        int catalog_type_id FK "Catalog type this item belongs to (inherits project from type)"
         jsonb name_i18n "e.g. {'es':'Guiso','en':'Stew'}"
         jsonb description_i18n "Optional description (e.g. {'es':'Delicious stew'})"
         jsonb allergens_i18n "Allergen info (e.g. {'es':'Contiene gluten'})"
@@ -1327,7 +1324,7 @@ erDiagram
     Order {
         int id PK
         uuid person_id FK
-        int project_id FK "Order origin"
+        int catalog_item_id FK "The requested item (determines type/project for cascade)"
         int confirmed_venture_id FK "Nullable. Set when status becomes CONFIRMED"
         date service_date "Used for Calendar view"
         int time_of_day_id FK "Used for Calendar view"
@@ -1393,10 +1390,6 @@ erDiagram
     %% RELATIONSHIPS
     %% ==========================================
     Project ||--o{ Catalog_Type : "has catalog types"
-    Project ||--o{ Catalog_Item : "has catalog items"
-    Project ||--o{ Venture : "has ventures"
-    Project ||--o{ Entrepreneur : "has entrepreneurs"
-    Project ||--o{ Order : "receives requests"
 
     Catalog_Type ||--o{ Catalog_Item : "contains items"
     Catalog_Type ||--o{ Venture : "defines venture type"
@@ -1589,8 +1582,8 @@ This interface will be accessed primarily via Web (Desktop).
          - Project filter dropdown
          - "Add Item" button (opens modal)
          - Search/filter bar
-         - Table columns: Name (i18n), Category, Price, Global Pause toggle, Actions
-         - Each row has: Name, Category badge, Price, Global Pause toggle (high-contrast)
+         - Table columns: Name (i18n), Catalog Type, Price, Global Pause toggle, Actions
+         - Each row has: Name, Catalog Type badge, Price, Global Pause toggle (high-contrast)
          - Actions: Edit, Delete
 
     Screen 3: Entrepreneur Management:
