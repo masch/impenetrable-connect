@@ -11,7 +11,9 @@ To achieve this, the system features an automated engine that replaces manual as
 
 ## 2. Actors and Intentions (Roles)
 
-### 2.1. Tourist (Zero Friction)
+> **MVP Scope:** Tourist (2.1), Entrepreneur (2.2), Engine Core (2.4 without Morning Reminder)
+
+### 2.1. Tourist (Zero Friction) **[MVP]**
 *   **Intention:** Request an activity or service quickly [1].
 *   **Behavior & UX Constraints:**
     *   Eliminates the need for traditional user account creation to avoid friction [2].
@@ -19,7 +21,7 @@ To achieve this, the system features an automated engine that replaces manual as
     *   Identifies themselves using a mandatory "Alias" [2].
     *   The system uses a JWT auth_token (stored in secure storage) to recognize them for future requests [2]. Token auto-refreshes before expiration (7 days).
 
-### 2.2. Entrepreneur & Venture (Business)
+### 2.2. Entrepreneur & Venture (Business) **[MVP]**
 *   **Intention:** Organize daily work and receive clients equitably through the rotation system [1, 2].
 *   **Behavior & UX Constraints:**
     *   Registers their venture [2]. A single entrepreneur (owner) can manage multiple physical ventures (businesses) associated with a Project [2].
@@ -30,7 +32,7 @@ To achieve this, the system features an automated engine that replaces manual as
     *   **General Pause (Capacity Control):** Can disable the reception of all new requests if their business is full or closed [2].
     *   *UX Priority:* The dashboard must be native-feeling on Android, avoiding complex menus. Actions like "Accept/Reject" must be prominent and error-proof.
 
-### 2.3. Impenetrable Admin
+### 2.3. Impenetrable Admin **[POST-MVP]**
 *   **Intention:** Audit the ecosystems, enable local hosts, and control regional catalogs [3].
 *   **Behavior:**
     *   Enables the entrepreneur in the platform [3].
@@ -38,17 +40,19 @@ To achieve this, the system features an automated engine that replaces manual as
     *   Manages the master catalog separated *by project* [3]. Can apply a **Global Pause** to an item across an entire region [3].
     *   Consumes a Monthly Reporting Dashboard (KPIs for acceptance rates, timeouts, and completed services) [3].
 
-### 2.4. Autonomous Engine (Platform Backend)
+### 2.4. Autonomous Engine (Platform Backend) **[MVP]**
 *   **Intention:** Guarantee the fair distribution of work per region without human intervention [4].
 *   **Behavior:** 
     *   **Router:** Executes the Cascading Routing Algorithm, isolating the rotation lists for each Project [4].
-    *   **Morning Reminder (Cron Job):** Runs a scheduled task early in the morning to find confirmed orders for the current day and sends the entrepreneur an automated reminder (via WhatsApp/Email) with their daily agenda [4].
+    *   **Morning Reminder (Cron Job):** **[POST-MVP]** Runs a scheduled task early in the morning to find confirmed orders for the current day and sends the entrepreneur an automated reminder (via WhatsApp/Email) with their daily agenda [4].
 
 ---
 
 ## 3. Business Rules (Core Workflows)
 
-### 3.1. Cascading Routing Flow (Project-Isolated)
+### 3.1. Cascading Routing Flow (Project-Isolated) **[MVP]**
+
+> **Note:** Individual Pause (Venture_Item level) is **[POST-MVP]**. Only General Pause at venture level for MVP.
 When a tourist submits a request:
 1.  **Order Init**: Order is created with status `SEARCHING`. The engine starts iterating through ventures sorted by `cascade_order` (ascending).
 2.  **Filter Phase**: For each venture in rotation order:
@@ -74,7 +78,9 @@ When a tourist submits a request:
 
 **Initial Cascade Order**: Default is creation order (1, 2, 3...). Admin can manually reorder ventures in the Admin Panel to change rotation priority.
 
-### 3.2. Internationalization (i18n)
+### 3.2. Internationalization (i18n) **[POST-MVP]**
+
+> **MVP:** Only Spanish (`es`) is required. i18n structure in place but not active.
 *   Dynamic Catalog data (dish and activity names) are stored in the database using PostgreSQL's native `JSONB` type [6].
 *   This allows the system to quickly extract translations (e.g., `{"es": "Guiso", "en": "Stew"}) based on the tourist's browser `Accept-Language` header [6].
 
@@ -97,7 +103,7 @@ function getTranslation(translations: Record<string, string>, acceptLanguage: st
 
 **Supported Languages per Project:** Each project defines its supported languages in `Project.supported_languages` (JSON array, e.g., `["es", "en", "pt"]`). The first language in the array is the default.
 
-### 3.3. Validation Rules
+### 3.3. Validation Rules **[MVP]**
 
 #### 3.3.1 Order Creation Validations
 
@@ -234,7 +240,9 @@ To meet the requirement of running smoothly on low-end devices while serving Web
 
 All endpoints follow RESTful conventions. Base URL: `https://api.elimpenetrable.org/v1`
 
-#### 4.2.1 Public Endpoints (No Authentication Required)
+> **MVP:** Only Tourist + Entrepreneur endpoints (4.2.1 - 4.2.3). Admin endpoints (4.2.4) are **[POST-MVP]**.
+
+#### 4.2.1 Public Endpoints (No Authentication Required) **[MVP]**
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -299,7 +307,7 @@ Response (200):
 }
 ```
 
-#### 4.2.2 Tourist Endpoints (Auth Required)
+#### 4.2.2 Tourist Endpoints (Auth Required) **[MVP]**
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -376,7 +384,7 @@ Response (200):
 }
 ```
 
-#### 4.2.3 Entrepreneur Endpoints (Auth Required)
+#### 4.2.3 Entrepreneur Endpoints (Auth Required) **[MVP]**
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -464,7 +472,7 @@ Response (200):
 }
 ```
 
-#### 4.2.4 Admin Endpoints (Auth Required + ADMIN role)
+#### 4.2.4 Admin Endpoints (Auth Required + ADMIN role) **[POST-MVP]**
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -512,9 +520,9 @@ Response (200):
 
 ### 4.3 Real-Time Notifications
 
-The system uses a hybrid approach: **Push Notifications** (primary) + **Polling** (fallback).
+> **MVP:** Push Notifications only (4.3.1). WhatsApp (4.3.3) and Polling fallback (4.3.2) are **[POST-MVP]**.
 
-#### 4.3.1 Push Notifications (Primary)
+#### 4.3.1 Push Notifications (Primary) **[MVP]**
 
 **Providers:** Firebase Cloud Messaging (FCM) or Expo Push Notifications
 
@@ -540,7 +548,7 @@ Response: { "success": true }
 | `ORDER_EXPIRED` | Tourist | Push | "Lo sentimos, no hay disponibilidad para tu solicitud" |
 | `MORNING_REMINDER` | Entrepreneur | Push + WhatsApp | "Hoy tienes X pedidos confirmados" |
 
-#### 4.3.2 Polling (Fallback)
+#### 4.3.2 Polling (Fallback) **[POST-MVP]**
 
 For devices without push token or when push fails, the app polls periodically.
 
@@ -570,7 +578,7 @@ const startPolling = () => {
 };
 ```
 
-#### 4.3.3 WhatsApp Notifications
+#### 4.3.3 WhatsApp Notifications **[POST-MVP]**
 
 For high-priority notifications to tourists (confirmation, expiration).
 
@@ -861,7 +869,9 @@ pg_dump -h $DB_HOST -U $DB_USER $DB_NAME | gzip > backup_$(date +%Y%m%d).sql.gz
 
 ---
 
-## 4.6 Testing Strategy
+## 4.6 Testing Strategy **[MVP]**
+
+> **MVP:** Only Unit Tests for Cascade Engine required. Integration/E2E are **[POST-MVP]**.
 
 ### 4.6.1 Testing Pyramid
 
@@ -1122,7 +1132,9 @@ bun test --coverage
 
 ---
 
-## 5. Data Structure (Multi-Project ERD)
+## 5. Data Structure (Multi-Project ERD) **[MVP - Partial]**
+
+> **MVP:** Only single Project (Impenetrable). Multi-project support is **[POST-MVP]**.
 
 Below is the relational data model prepared for AI generation using PostgreSQL. Operational states are kept as Enums to protect the cascading engine's strict logic, while expansible categories use parametric tables [6].
 
@@ -1335,7 +1347,9 @@ erDiagram
 
 
 --------------------------------------------------------------------------------
-6. UI/UX Mockup Specifications (Google Stitch / Design Guidelines)
+## 6. UI/UX Mockup Specifications (Google Stitch / Design Guidelines) **[MVP]**
+
+> **MVP:** Tourist Flow (6.2) + Entrepreneur Flow (6.3). Admin Flow (6.4) is **[POST-MVP]**.
 When generating UI components or screens, adhere strictly to the following constraints tailored for low-end Android devices and non-technical users.
 6.1 Global Design Guidelines
 
@@ -1343,7 +1357,7 @@ When generating UI components or screens, adhere strictly to the following const
     Performance: The UI must be lightweight. Strictly avoid complex animations, heavy shadows, or overlapping elements that consume RAM on low-end phones.
     Navigation: Avoid complex hamburger menus or multi-step wizard flows. Keep actions flat and immediate.
 
-6.2 Tourist Flow (Zero Friction Journey)
+### 6.2 Tourist Flow (Zero Friction Journey) **[MVP]**
 
     Navigation: Bottom tab bar with 3 large icons:
         - Home: Service Catalog (selected by default after first visit)
@@ -1397,7 +1411,7 @@ When generating UI components or screens, adhere strictly to the following const
              - "Clear my data" button (deletes Person record)
              - "Logout" button (clears auth_token but keeps Person)
 
-6.3 Entrepreneur Flow (Operational Journey)
+### 6.3 Entrepreneur Flow (Operational Journey) **[MVP]**
 
     Navigation: Bottom tab bar with 4 large icons:
         - Orders: Order Reception Dashboard (selected by default)
@@ -1468,7 +1482,7 @@ When generating UI components or screens, adhere strictly to the following const
          - "Add to Catalog" section: Multi-select from available Catalog_Items
          - Save / Cancel buttons
 
-6.4 Admin Impenetrable Flow (Management & Auditing)
+### 6.4 Admin Impenetrable Flow (Management & Auditing) **[POST-MVP]**
 This interface will be accessed primarily via Web (Desktop).
 
     Navigation: Left sidebar (collapsible) with menu items:
