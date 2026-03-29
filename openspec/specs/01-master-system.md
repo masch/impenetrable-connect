@@ -165,6 +165,7 @@ erDiagram
         int id PK
         uuid person_id FK
         int project_id FK "Order origin"
+        int confirmed_venture_id FK "Nullable. Set when status becomes CONFIRMED"
         date service_date "Used for Calendar view"
         int time_of_day_id FK "Used for Calendar view"
         int guest_count 
@@ -185,7 +186,8 @@ erDiagram
         int order_id FK
         int venture_id FK "Assigned to the business, not the person"
         int attempt_number
-        enum offer_status "WAITING_FOR_RESPONSE, ACCEPTED, REJECTED, TIMEOUT"
+        enum offer_status "WAITING_FOR_RESPONSE, ACCEPTED, REJECTED, TIMEOUT, AUTO_REJECTED"
+        enum skip_reason "null, GENERAL_PAUSE, INDIVIDUAL_PAUSE, NOT_OFFERED"
         timestamp offer_sent_at
         timestamp response_deadline 
         timestamp resolved_at
@@ -197,6 +199,7 @@ erDiagram
     Project ||--o{ Venture : "groups businesses"
     Project ||--o{ Catalog_Item : "defines regional catalog"
     Project ||--o{ Order : "receives requests"
+    Venture ||--o{ Order : "confirmed in"
 
     Access_User |o--|| Entrepreneur : "authenticates"
     Entrepreneur ||--o{ Venture : "manages"
@@ -278,15 +281,53 @@ When generating UI components or screens, adhere strictly to the following const
 
 6.3 Entrepreneur Flow (Operational Journey)
 
+    Navigation: Bottom tab bar with 3 large icons:
+        - Orders: Order Reception Dashboard (selected by default)
+        - Calendar: Daily Agenda
+        - Settings: Availability & Profile
+
+    Screen 0: Login:
+        Spec: Secure access for entrepreneurs.
+        UI Elements:
+         - Email input field (keyboard type: email)
+         - Password input field (with show/hide toggle)
+         - "Remember me" checkbox
+         - Large "Login" button
+         - Error messages for invalid credentials or account disabled
+
     Screen 1: Order Reception Dashboard:
         Spec: The main hub where the engine routes incoming requests to the business.
-        UI Elements: Alert cards for incoming orders featuring two huge, contrasting, error-proof buttons: "Accept" and "Reject".
+        UI Elements:
+         - Alert cards for incoming orders featuring two huge, contrasting buttons: "Accept" and "Reject"
+         - Each card displays:
+             - Order items (dish/activity names)
+             - Guest count (e.g., "4 people")
+             - Service date and time of day (e.g., "Today - Lunch")
+             - Customer alias
+         - Visual countdown timer showing remaining time before timeout (30 min)
+         - Sound/vibration notification on new order arrival
+         - Empty state: "No pending orders" message when the queue is empty
+
     Screen 2: Daily Agenda / Calendar:
         Spec: Visual tool to organize the workday.
-        UI Elements: A calendar or timeline view grouping confirmed orders by date and time of day (e.g., Breakfast, Lunch).
-    Screen 3: Availability Control Panel (Pauses):
-        Spec: Quick toggles for capacity and stock management.
-        UI Elements: A master Toggle Switch at the very top for "General Pause" (business full/closed). Below it, a simple list of their products with individual toggles for "Individual Pause" (out of stock).
+        UI Elements:
+         - Weekly view with date pills at the top
+         - Tap on a day to expand confirmed orders for that date
+         - Orders grouped by time of day (Breakfast, Lunch, Snack, Dinner)
+         - Each order shows: customer alias, guest count, items
+         - Visual occupation indicator (e.g., "12/20 seats filled")
+         - Color coding: confirmed (green), completed (gray), no-show (red)
+
+    Screen 3: Settings & Availability Control Panel:
+        Spec: Quick toggles for capacity, stock management, and profile.
+        UI Elements:
+         - Profile section:
+             - Full name (read-only, from Entrepreneur record)
+             - WhatsApp contact (editable, used for Morning Reminder)
+             - Email (read-only)
+         - General Pause: Large toggle switch at the top for "General Pause" (business full/closed). When active, shows a badge indicator on the bottom nav.
+         - Individual Pause: List of Venture_Items with individual toggles for "Individual Pause" (out of stock). Each item shows the catalog item name.
+         - Logout button at the bottom
 
 6.4 Admin Impenetrable Flow (Management & Auditing)
 This interface will be accessed primarily via Web (Desktop) but must remain uncluttered.
