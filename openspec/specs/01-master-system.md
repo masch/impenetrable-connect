@@ -79,6 +79,58 @@ When a tourist submits a request:
 
 **Initial Cascade Order**: Default is creation order (1, 2, 3...). Admin can manually reorder ventures in the Admin Panel to change rotation priority.
 
+### 3.1.1. Offline Handling & Timeout Management **[POST-MVP]**
+
+> **Problem:** In conservation areas, entrepreneurs have intermittent connectivity. A venture may be offline when the timeout expires, causing confusion and lost business opportunities.
+
+**Timeout Processor (Background Job):**
+
+A scheduled job runs every 30 seconds to process expired offers:
+
+1. **Scan**: Find all `Cascade_Assignment` where `offer_status = WAITING_FOR_RESPONSE` AND `response_deadline < now()`
+2. **Mark Timeout**: Update assignment to `offer_status = TIMEOUT`, set `resolved_at = now()`
+3. **Continue Cascade**: Trigger next attempt (move to next venture in rotation order)
+4. **Log**: Record the timeout for analytics and debugging
+
+**Entrepreneur Reconnection Flow:**
+
+When an entrepreneur returns online:
+
+1. **Pull State**: App calls `GET /orders/pending` with `last_known_status` parameter
+2. **Compare**: Server compares client's known state with actual state
+3. **Delta Response**: Return only changes (accepted, rejected, expired, new offers)
+4. **UI Update**: Show current status - if offer expired, display "Expirado" with reason
+
+**Lost Offer Notification:**
+
+When an offer expires due to timeout:
+
+1. Mark assignment as `TIMEOUT`
+2. Create notification record: `event_type = OFFER_EXPIRED`
+3. Send push notification: "Tu respuesta expiró. El pedido fue reenviado a otro emprendimiento."
+4. Continue cascade to next venture
+
+**Offline Detection Strategy:**
+
+| Scenario | Detection | Action |
+|----------|-----------|--------|
+| App in foreground | Heartbeat every 30s | Mark as ONLINE |
+| App in background | Push token active | Mark as PENDING |
+| App closed | No heartbeat > 2 minutes | Mark as OFFLINE |
+| Network error on accept | HTTP 0 / timeout | Show retry UI, queue locally |
+
+**Entrepreneur Dashboard - Status Indicators:**
+
+The dashboard MUST show clear visual states:
+
+| State | Color | Message |
+|-------|-------|---------|
+| `WAITING_FOR_RESPONSE` | Yellow | "Esperando tu respuesta..." |
+| `ACCEPTED` | Green | "¡Confirmado! El cliente fue notificado" |
+| `REJECTED` | Gray | "Rechazaste este pedido" |
+| `TIMEOUT` | Red | "Expirado - El pedido fue reenviado" |
+| `EXPIRED` (final) | Red | "Lo sentimos, no hay disponibilidad" |
+
 ### 3.2. Internationalization (i18n) **[POST-MVP]**
 
 > **MVP:** Only Spanish (`es`) is required. i18n structure in place but not active.
