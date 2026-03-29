@@ -1775,6 +1775,7 @@ erDiagram
 
     Idempotency_Key {
         varchar key PK "Client-provided unique key (UUID)"
+        uuid user_id FK "User who made the request"
         int response_status "HTTP status code of original response"
         jsonb response_body "Cached response body"
         timestamp created_at
@@ -1784,6 +1785,12 @@ erDiagram
     %% ==========================================
     %% RELATIONSHIPS
     %% ==========================================
+    User ||--o{ User_Session : "has active sessions"
+    User ||--o{ Idempotency_Key : "has idempotency keys"
+
+    Role_Type ||--o{ Venture : "defines venture category"
+    Time_Of_Day ||--o{ Order : "schedules order time"
+
     Project ||--o{ Catalog_Type : "has catalog types"
 
     Catalog_Type ||--o{ Catalog_Item : "contains items"
