@@ -161,16 +161,17 @@ Valid transitions between order states:
 
 ```
 SEARCHING ──accept──> CONFIRMED ──complete──> COMPLETED
-   │
-   ├──cancel──> CANCELLED (by tourist)
-   │
-   └──expire──> EXPIRED (no venture available / all skipped)
+   │                     │
+   ├──cancel──> CANCELLED   ├──cancel──> SEARCHING (cascade restarts)
+   │                     │
+   └──expire──> EXPIRED    ├──no_show──> NO_SHOW
 ```
 
 **State Transition Rules:**
 - `SEARCHING` → `CONFIRMED`: When linked entrepreneur accepts for their venture
 - `SEARCHING` → `CANCELLED`: When tourist cancels (only if status = SEARCHING)
 - `SEARCHING` → `EXPIRED`: When max cascade attempts reached or all ventures skipped
+- `CONFIRMED` → `SEARCHING`: When linked entrepreneur cancels (cascade restarts from next venture)
 - `CONFIRMED` → `COMPLETED`: When service date passes + no NO_SHOW reported
 - `CONFIRMED` → `NO_SHOW`: When linked entrepreneur marks tourist as no-show
 
@@ -203,11 +204,12 @@ When checking if a venture can accept an order:
 ```typescript
 function getCurrentGuestCount(ventureId: number, serviceDate: Date, timeOfDayId: number): number {
     // Sum of guest_count for CONFIRMED orders at same date/time
+    // Only CONFIRMED orders count toward capacity - SEARCHING orders are not yet assigned
     return SUM(o.guest_count) FROM Order o
     WHERE o.confirmed_venture_id = ventureId
       AND o.service_date = serviceDate
       AND o.time_of_day_id = time_of_day_id
-      AND o.status IN ('SEARCHING', 'CONFIRMED');
+      AND o.status = 'CONFIRMED';
 }
 
 function canAcceptOrder(venture: Venture, order: Order): boolean {
@@ -239,7 +241,7 @@ To meet the requirement of running smoothly on low-end devices while serving Web
     *   Auth endpoints: 5 attempts/minute per IP
 *   **Account Lockout:** After 5 failed login attempts, lock account for 15 minutes.
 *   **Input Validation:** All inputs sanitized. SQL injection prevented via parameterized queries (Knex/Prisma). XSS prevented via output encoding.
-*   **API Security:** All endpoints require authentication except: `POST /auth/login`, `POST /orders` (tourist), `GET /catalog`.
+*   **API Security:** All endpoints require authentication except: `POST /auth/login`, `POST /auth/tourist/create`, `POST /auth/tourist/refresh`, `POST /auth/tourist/revoke`, `POST /orders` (tourist), `GET /catalog`, `GET /ventures`.
 
 ### 4.2 API Design
 
@@ -253,7 +255,9 @@ All endpoints follow RESTful conventions. Base URL: `https://api.elimpenetrable.
 |--------|----------|-------------|
 | POST | `/auth/tourist/create` | Create tourist identity with alias |
 | POST | `/auth/tourist/refresh` | Refresh tourist JWT token |
+| POST | `/auth/tourist/revoke` | Revoke tourist JWT token (logout/lost device) |
 | GET | `/catalog` | Get all catalog items for a project |
+| GET | `/ventures` | List ventures (businesses) for a project |
 
 **POST /auth/tourist/create**
 ```json
@@ -288,6 +292,21 @@ Response (200):
 }
 ```
 
+**POST /auth/tourist/revoke**
+```json
+Request:
+{
+  "auth_token": "string (token to revoke)"
+}
+
+Response (200):
+{
+  "message": "Token revoked successfully"
+}
+```
+
+> **Note:** Use this endpoint when tourist loses device or wants to logout. Invalidates the token immediately.
+
 **GET /catalog**
 ```json
 Query Parameters:
@@ -307,6 +326,27 @@ Response (200):
       "price": 15.00,
       "image_url": "https://...",
       "max_participants": null
+    }
+  ]
+}
+```
+
+**GET /ventures**
+```json
+Query Parameters:
+- project_id (required): integer "Filter by project"
+- catalog_type_id (optional): integer "Filter by type (Gastronomy, Guide, etc.)"
+
+Response (200):
+{
+  "ventures": [
+    {
+      "id": 1,
+      "name": "Parador Don Esteban",
+      "description": "Traditional food by the river",
+      "catalog_type": "Gastronomy",
+      "address": "Ruta 40 km 1234",
+      "image_url": "https://..."
     }
   ]
 }
@@ -388,6 +428,8 @@ Response (200):
 }
 ```
 
+> **Security Note:** `cascade_history` exposes venture names and their decisions. Consider obfuscating venture names for tourist-facing responses (e.g., show only attempt count) if revealing rejection patterns is a concern.
+
 #### 4.2.3 Entrepreneur Endpoints (Auth Required) **[MVP]**
 
 > **Note:** Each entrepreneur manages ONE venture. Cascade iterates through Ventures.
@@ -399,8 +441,9 @@ Response (200):
 | PUT | `/venture/me/items/:item_id/pause` | Toggle individual pause for item |
 | PUT | `/venture/me/pause` | Toggle general pause (business full/closed) |
 | GET | `/orders/pending` | Get pending orders for my venture |
-| POST | `/orders/:id/accept` | Accept an order |
-| POST | `/orders/:id/reject` | Reject an order |
+| POST | `/orders/:id/accept` | Accept an order (only if SEARCHING) |
+| POST | `/orders/:id/reject` | Reject an order (only if SEARCHING) |
+| POST | `/orders/:id/cancel` | Cancel confirmed order (only if CONFIRMED, restarts cascade) |
 | GET | `/calendar` | Get confirmed orders by date range |
 | PUT | `/profile` | Update entrepreneur profile |
 
@@ -446,6 +489,24 @@ Response (200):
   "next_venture_triggered": true
 }
 ```
+
+**POST /orders/:id/cancel**
+```json
+Request:
+{
+  "reason": "string (required, max 500 chars)"
+}
+
+Response (200):
+{
+  "order_id": 123,
+  "status": "SEARCHING",
+  "cascade_restarted": true,
+  "message": "Order returned to cascade queue"
+}
+```
+
+> **Note:** Only available when order status is `CONFIRMED` and the entrepreneur's venture is the `confirmed_venture`. When cancelled, the order restarts the cascade from the next venture (not from the beginning).
 
 **GET /calendar**
 ```json
