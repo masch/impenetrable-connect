@@ -402,7 +402,9 @@ To meet the requirement of running smoothly on low-end devices while serving Web
 
 *   **Frontend Framework:** **React Native using Expo**. This allows writing a single codebase that compiles into a lightweight Android application (APK/AAB) and a responsive Web application.
 *   **Performance Constraint:** Avoid heavy UI animations and large client-side bundle sizes to ensure performance on low-end hardware.
-*   **Backend Framework:** **Node.js with TypeScript**. This enables sharing interfaces and type definitions between the frontend and backend, ensuring end-to-end type safety.
+*   **Runtime:** **Bun**. High-performance JavaScript/TypeScript runtime used as both the package manager (`bun install`) and the execution environment (`bun run`). Chosen for native TypeScript support without transpilation, built-in test runner, and superior performance over Node.js for this workload.
+*   **Backend Framework:** **Hono** (on Bun). Ultralight (~14KB, zero deps) web framework built on Web Standards (Request/Response). Runs natively on `Bun.serve()` without compatibility layers, providing Express-like DX (routing, middleware, path params) at near-raw performance. Enables sharing TypeScript interfaces and type definitions between frontend and backend for end-to-end type safety.
+*   **ORM:** **Drizzle ORM**. Type-safe SQL-first ORM with zero runtime overhead. Generates TypeScript types directly from the schema, complementing the end-to-end type safety goal.
 *   **Database:** PostgreSQL (ERD defined below).
 
 ### 4.1 Security Requirements

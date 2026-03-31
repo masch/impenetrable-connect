@@ -11,6 +11,6 @@
 - All images must have alt text for accessibility
 
 ## Styling
-- Use Tailwind CSS utilities only
+- Use NativeWindd CSS utilities only
 - No inline styles or CSS-in-JS
 - No hardcoded colors - use design system tokens
