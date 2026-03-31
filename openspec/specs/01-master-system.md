@@ -82,11 +82,28 @@ When a tourist submits a request:
 
 **Initial Cascade Order**: Default is creation order (1, 2, 3...). Admin can manually reorder ventures in the Admin Panel to change rotation priority.
 
+#### Timeout Processor (MVP — Simple Auto-Assignment)
+
+> **MVP Scope:** Uses a lightweight in-process timer (`setInterval` every 30 seconds) running inside the Hono server. When an offer times out, the engine **auto-assigns** the order to the next available venture — no additional offer/wait cycle.
+
+**MVP Timeout Flow:**
+1. `setInterval` runs every 30 seconds inside Hono process
+2. Scan `Cascade_Assignment` where `offer_status = WAITING_FOR_RESPONSE` AND `response_deadline < now()`
+3. Mark timed-out assignment as `offer_status = TIMEOUT`
+4. Find the **next available venture** in cascade order that passes all filter checks (active, not paused, has capacity, is open)
+5. **Auto-assign:** Set order `status = CONFIRMED`, set `confirmed_venture_id`, create `Cascade_Assignment` with `offer_status = ACCEPTED`
+6. Notify entrepreneur of the auto-assigned order
+7. If no venture is available → Mark order as `EXPIRED` with `cancel_reason = NO_VENTURE_AVAILABLE`
+
+> **POST-MVP Evolution:** Replace `setInterval` with a proper job queue (BullMQ + Redis) for reliability and persistence across restarts. Add full cascade retry (offer → wait → timeout → next) instead of auto-assignment. See §3.1.1 for offline handling details.
+
 ### 3.1.1. Offline Handling & Timeout Management **[POST-MVP]**
 
 > **Problem:** In conservation areas, entrepreneurs have intermittent connectivity. A venture may be offline when the timeout expires, causing confusion and lost business opportunities.
 
 ### 3.1.2. Race Condition Prevention in Cascade Accept **[POST-MVP]**
+
+> **MVP Note:** The MVP includes **basic state validation** in accept/reject endpoints: before processing, the server verifies that the order is in `OFFER_PENDING` status and that the requesting venture matches the current offer. If conditions are not met, it returns HTTP 409 (Conflict) or 410 (Gone). Full atomic transactions with `FOR UPDATE` locks and `SERIALIZABLE` isolation level are deferred to POST-MVP.
 
 > **Problem:** When an entrepreneur accepts an order while another is processing, or when an accept request arrives after the timeout has already expired, the system must handle this gracefully without leaving the order in an inconsistent state.
 
@@ -285,7 +302,7 @@ Before offering an order to a venture, the engine validates:
 | General Pause | `venture.is_paused = false` | `GENERAL_PAUSE` |
 | Capacity | `(current_occupation + order.guest_count) <= venture.max_capacity` | `CAPACITY_EXCEEDED` |
 
-> **Note:** Capacity is measured by **number of guests (personas)**, not by number of items/dishes. A Venture with `max_capacity = 20` can serve 20 people regardless of how many dishes they order.
+> **⚠️ IMPORTANT — Capacity Unit:** Capacity is ALWAYS measured by **number of guests (personas/guest_count)**, NEVER by number of items or dishes ordered. A Venture with `max_capacity = 20` can serve 20 **people** regardless of how many dishes each person orders. All capacity checks (`CAPACITY_EXCEEDED`), occupation calculations (`getCurrentOccupation`), and calendar displays (`occupied_seats / max_capacity`) use `guest_count` as the unit.
 | Individual Pause | `catalog_item_id NOT IN (SELECT catalog_item_id FROM venture_paused_item WHERE venture_id = venture.id)` | `INDIVIDUAL_PAUSE` |
 | **Opening Hours** | Order time within `venture.opening_hours` for the day | `CLOSED_THAT_DAY` |
 
@@ -351,7 +368,7 @@ A tourist cannot have multiple active orders for the same:
 
 If such order exists with status `SEARCHING` or `CONFIRMED`, the system returns error: "You already have an order for this time slot"
 
-#### 3.3.6 Capacity Calculation (Occupation Tracking)
+#### 3.3.6 Capacity Calculation — Unit: Guest Count (Occupation Tracking)
 
 When checking if a venture can accept an order, the system calculates **accumulated occupation** from all CONFIRMED orders for that time slot:
 
@@ -470,7 +487,7 @@ rewilding-connect/
 ├── package.json                 # Bun workspaces root
 ├── tsconfig.base.json           # Shared TypeScript config
 ├── bunfig.toml                  # Bun configuration
-├── docker-compose.yml           # PostgreSQL + Redis (local dev)
+├── docker-compose.yml           # PostgreSQL (local dev). Redis added POST-MVP for job queues.
 └── .env.example
 ```
 
@@ -484,7 +501,43 @@ apps/mobile  ──imports──► packages/ui     (CSS-wrapped components, tok
 
 > **Key rule:** Types and validation schemas are defined ONCE in `@repo/shared` and consumed by both apps. This guarantees end-to-end type safety: if a field changes in the backend schema, TypeScript will flag mismatches in the mobile app at compile time.
 
-#### 4.0.2 AI Agent Skills (Development Tooling)
+#### 4.0.2 Architecture Dependency Graph
+
+```mermaid
+graph TD
+    A["📦 Monorepo Setup<br/>Bun Workspaces"] --> B["🔧 Shared Package<br/>Types + Validators + Constants"]
+    A --> C["🗄️ DB Schema<br/>Drizzle + Migrations"]
+    
+    B --> D["🔐 Auth System<br/>Tourist + Entrepreneur"]
+    C --> D
+    
+    B --> E["📋 Catalog & Ventures<br/>Public API"]
+    C --> E
+    
+    D --> F["🛒 Orders API<br/>CRUD + Validations"]
+    E --> F
+    
+    F --> G["⚡ Cascade Engine<br/>Core Algorithm"]
+    C --> G
+    
+    G --> H["🔔 Push Notifications<br/>Expo Push"]
+    
+    D --> I["📱 Mobile - Tourist Flow<br/>Welcome + Catalog + Orders"]
+    E --> I
+    F --> I
+    
+    D --> J["📱 Mobile - Entrepreneur Flow<br/>Login + Dashboard + Calendar"]
+    F --> J
+    G --> J
+    H --> J
+    
+    G --> K["⏰ Timeout Processor<br/>setInterval - MVP"]
+    
+    B --> L["🌱 Seed Scripts<br/>CLI Data Loading"]
+    C --> L
+```
+
+#### 4.0.3 AI Agent Skills (Development Tooling)
 
 The following agent skills are installed to enforce patterns and best practices during development. These are NOT runtime dependencies — they guide the AI coding assistant.
 
@@ -843,8 +896,8 @@ Response (200) - Entrepreneur/Admin View:
 | PUT | `/venture/me/items/:item_id/pause` | Toggle individual pause for item |
 | PUT | `/venture/me/pause` | Toggle general pause (business full/closed) |
 | GET | `/orders/pending` | Get pending orders for my venture |
-| POST | `/orders/:id/accept` | Accept an order (only if SEARCHING) |
-| POST | `/orders/:id/reject` | Reject an order (only if SEARCHING) |
+| POST | `/orders/:id/accept` | Accept an order (only if OFFER_PENDING and venture matches current offer) |
+| POST | `/orders/:id/reject` | Reject an order (only if OFFER_PENDING and venture matches current offer) |
 | POST | `/orders/:id/complete` | Mark order as completed - dish prepared/served (only if CONFIRMED) |
 | POST | `/orders/:id/no-show` | Mark tourist as no-show - did not arrive (only if CONFIRMED) |
 | POST | `/orders/:id/cancel` | Cancel confirmed order (only if CONFIRMED, restarts cascade) |
@@ -1093,12 +1146,12 @@ Response (200):
 
 #### 4.3.1 Push Notifications (Primary) **[MVP]**
 
-**Providers:** Firebase Cloud Messaging (FCM) or Expo Push Notifications
+**Provider:** Expo Push Notifications (no Firebase configuration required)
 
 **Flow:**
-1. App registers with FCM → obtains device push token
-2. Push token stored in `Notification_Preference`
-3. When event occurs → backend sends to FCM → FCM delivers to device
+1. App registers with Expo Push → obtains `ExponentPushToken[xxx]`
+2. Push token stored in `Notification_Preference` / `Tourist_Device.push_token`
+3. When event occurs → backend sends to Expo Push API (`https://exp.host/--/api/v2/push/send`) → Expo delivers to device
 
 **Device Registration Endpoint:**
 ```
@@ -1228,10 +1281,8 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://user:pass@postgres:5432/db
-      - REDIS_URL=redis://redis:6379
     depends_on:
       - postgres
-      - redis
     volumes:
       - ./src:/app/src
 
@@ -1244,14 +1295,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  redis:
-    image: redis:7-alpine
-    volumes:
-      - redis_data:/data
+  # Redis: Added in POST-MVP for BullMQ job queues, idempotency cache,
+  # and distributed rate limiting. Not required for MVP.
+  # redis:
+  #   image: redis:7-alpine
+  #   volumes:
+  #     - redis_data:/data
 
 volumes:
   postgres_data:
-  redis_data:
 ```
 
 **Dockerfile (Production)**
@@ -1365,10 +1417,10 @@ export const seedData = {
 |----------|-------------|---------|------------|
 | `NODE_ENV` | development | staging | production |
 | `DATABASE_URL` | localhost | staging-db | production-db |
-| `REDIS_URL` | localhost | staging-redis | production-redis |
+| `REDIS_URL` | *(POST-MVP)* | staging-redis | production-redis |
 | `JWT_SECRET` | dev-secret | staging-secret | (from secrets manager) |
-| `WHATSAPP_API_KEY` | test-key | staging-key | (from secrets manager) |
-| `FCM_SERVER_KEY` | test-key | staging-key | (from secrets manager) |
+| `WHATSAPP_API_KEY` | *(POST-MVP)* | staging-key | (from secrets manager) |
+| `EXPO_ACCESS_TOKEN` | test-token | staging-token | (from secrets manager) |
 
 ### 4.5.4 CI/CD Pipeline (GitHub Actions)
 
