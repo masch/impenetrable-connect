@@ -406,8 +406,98 @@ To meet the requirement of running smoothly on low-end devices while serving Web
 *   **Performance Constraint:** Avoid heavy UI animations and large client-side bundle sizes to ensure performance on low-end hardware.
 *   **Runtime:** **Bun**. High-performance JavaScript/TypeScript runtime used as both the package manager (`bun install`) and the execution environment (`bun run`). Chosen for native TypeScript support without transpilation, built-in test runner, and superior performance over Node.js for this workload.
 *   **Backend Framework:** **Hono** (on Bun). Ultralight (~14KB, zero deps) web framework built on Web Standards (Request/Response). Runs natively on `Bun.serve()` without compatibility layers, providing Express-like DX (routing, middleware, path params) at near-raw performance. Enables sharing TypeScript interfaces and type definitions between frontend and backend for end-to-end type safety.
-*   **ORM:** **Drizzle ORM**. Type-safe SQL-first ORM with zero runtime overhead. Generates TypeScript types directly from the schema, complementing the end-to-end type safety goal.
+*   **ORM:** **Drizzle ORM**. Type-safe SQL-first ORM with zero runtime overhead. Schema defined in TypeScript with `pgEnum`, `pgTable`, and type inference via `$inferSelect`/`$inferInsert`.
 *   **Database:** PostgreSQL (ERD defined below).
+*   **State Management:** **Zustand**. Minimal, performant state management for React Native.
+*   **Styling:** **NativeWind v5** + Tailwind CSS v4 + `react-native-css`. CSS-first configuration with `@theme` tokens in CSS (not JS config). Components wrapped with `useCssElement` for `className` support.
+*   **Monorepo:** **Bun Workspaces**. Single repository with multiple projects sharing types and validators.
+
+#### 4.0.1 Project Structure (Bun Workspaces Monorepo)
+
+```
+rewilding-connect/
+├── apps/
+│   ├── backend/                 # Hono API server (Bun runtime)
+│   │   ├── src/
+│   │   │   ├── routes/          # Hono route handlers (/v1/auth, /v1/orders, etc.)
+│   │   │   ├── services/        # Business logic (CascadeEngine, etc.)
+│   │   │   ├── db/
+│   │   │   │   ├── schema/      # Drizzle ORM table definitions (pgEnum, pgTable)
+│   │   │   │   └── migrations/  # Generated SQL migrations (drizzle-kit)
+│   │   │   └── middleware/      # Auth (jwt), error handling, rate limiting
+│   │   ├── seeds/               # CLI seed scripts (MVP replacement for Admin Panel)
+│   │   ├── drizzle.config.ts    # Drizzle Kit configuration
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
+│   └── mobile/                  # Expo + React Native (Web + Android)
+│       ├── app/                 # Expo Router file-based routing
+│       │   ├── (tourist)/       # Tourist flow screens
+│       │   ├── (entrepreneur)/  # Entrepreneur flow screens
+│       │   └── _layout.tsx      # Root layout with native tabs
+│       ├── components/          # Screen-specific components
+│       ├── stores/              # Zustand stores (auth, orders, catalog)
+│       ├── services/            # Backend API communication layer
+│       │   ├── api-client.ts    # HTTP client (fetch + auth interceptor + token refresh)
+│       │   ├── auth.service.ts  # Tourist/Entrepreneur auth endpoints
+│       │   ├── catalog.service.ts # Catalog & ventures endpoints
+│       │   └── orders.service.ts  # Orders CRUD + cascade actions
+│       ├── metro.config.js      # Metro + NativeWind v5 (withNativewind)
+│       ├── postcss.config.mjs   # @tailwindcss/postcss
+│       ├── src/global.css       # Tailwind v4 imports + @theme tokens
+│       ├── app.json             # Expo config
+│       ├── package.json
+│       └── tsconfig.json
+│
+├── packages/
+│   ├── shared/                  # Shared code between backend and mobile
+│   │   ├── src/
+│   │   │   ├── types/           # TypeScript interfaces (Order, Venture, User, etc.)
+│   │   │   ├── validators/      # Zod schemas (OrderCreateSchema, etc.)
+│   │   │   ├── constants/       # Status machine, enums, error codes
+│   │   │   └── i18n/            # Translation helper with fallback
+│   │   └── package.json         # name: "@repo/shared"
+│   │
+│   └── ui/                      # Design system (consumed by mobile only)
+│       ├── src/
+│       │   ├── tw/              # CSS-wrapped components (useCssElement)
+│       │   │   ├── index.tsx    # View, Text, Pressable, ScrollView, TextInput
+│       │   │   ├── image.tsx    # expo-image wrapper with CSS support
+│       │   │   └── animated.tsx # Animated component wrappers
+│       │   └── tokens/          # Colors, typography, spacing (exported for global.css)
+│       └── package.json         # name: "@repo/ui"
+│
+├── package.json                 # Bun workspaces root
+├── tsconfig.base.json           # Shared TypeScript config
+├── bunfig.toml                  # Bun configuration
+├── docker-compose.yml           # PostgreSQL + Redis (local dev)
+└── .env.example
+```
+
+**Dependency flow:**
+
+```
+apps/backend ──imports──► packages/shared (types, validators)
+apps/mobile  ──imports──► packages/shared (types, validators)
+apps/mobile  ──imports──► packages/ui     (CSS-wrapped components, tokens)
+```
+
+> **Key rule:** Types and validation schemas are defined ONCE in `@repo/shared` and consumed by both apps. This guarantees end-to-end type safety: if a field changes in the backend schema, TypeScript will flag mismatches in the mobile app at compile time.
+
+#### 4.0.2 AI Agent Skills (Development Tooling)
+
+The following agent skills are installed to enforce patterns and best practices during development. These are NOT runtime dependencies — they guide the AI coding assistant.
+
+| Skill | Purpose | Applies To |
+|-------|---------|------------|
+| `drizzle-orm` | Schema patterns, relations, transactions, migration workflow | Backend DB layer |
+| `hono` | Routing, middleware (jwt, cors, zValidator), RPC client, `app.request()` testing | Backend API layer |
+| `expo-tailwind-setup` | NativeWind v5 + TW v4 + `react-native-css` wrapper setup | Mobile styling |
+| `expo-deployment` | EAS Build, Submit, Workflows for CI/CD | DevOps |
+| `expo-dev-client` | Development builds for TestFlight (only when custom native code needed) | DevOps |
+| `frontend-design` | Bold aesthetic direction — NO generic AI aesthetics | Mobile UI design |
+| `vercel-react-native-skills` | 38 RN best practices: FlashList, native navigators, Pressable, GPU animations | Mobile performance |
+| `web-design-guidelines` | UI audit against Vercel Web Interface Guidelines (a11y, usability) | Mobile QA |
 
 ### 4.1 Security Requirements
 
