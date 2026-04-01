@@ -2318,3 +2318,52 @@ Redis is introduced in POST-MVP for:
 - **Idempotency Cache:** 24h TTL for request deduplication
 - **Distributed Rate Limiting:** Required when running multiple server instances
 - **Pub/Sub:** Real-time event distribution across instances
+
+### 7.5 Implementation Task Checklist (MVP)
+
+> **Note:** Use this checklist as your day-to-day reference. Every task is small, actionable, and designed to support the **Frontend-First** strategy.
+
+#### Phase 1: Foundation (UI & Contracts)
+- [ ] **1.1 Monorepo**: Initialize Bun workspace root (`package.json`, `bunfig.toml`, `tsconfig.base.json`).
+- [ ] **1.2 Shared**: Create `@repo/shared` package with `package.json` and `tsconfig.json`.
+- [ ] **1.3 Shared**: Define Zod validators/Types for `Tourist`, `Entrepreneur`, `Venture`, `CatalogItem`.
+- [ ] **1.4 Shared**: Define Zod validators/Types for `Order`, `Order_Item`, `Cascade_Assignment`.
+- [ ] **1.5 Shared**: Export Enums (`Order_Status`, `Cancel_Reason`) from `constants.ts`.
+- [ ] **1.6 Mobile**: Initialize Expo React Native app in `apps/mobile` (`npx create-expo-app`).
+- [ ] **1.7 Mobile**: Configure `NativeWind v5` and `Tailwind CSS`.
+- [ ] **1.8 UI**: Create `@repo/ui` package with base components (Button, Card, Input) styled with NativeWind.
+- [ ] **1.9 Workspace**: Link `@repo/ui` and `@repo/shared` as dependencies in `apps/mobile`.
+
+#### Phase 2: Mobile Mocks (UX Validation)
+- [ ] **2.1 Store**: Setup Zustand `useTouristStore` with mock ventures and active orders data.
+- [ ] **2.2 Store**: Setup Zustand `useEntrepreneurStore` with mock incoming orders and calendar data.
+- [ ] **2.3 UI/Tourist**: Build Welcome & Authentication screen (Mock magic link).
+- [ ] **2.4 UI/Tourist**: Build Catalog list and Venture Detail views.
+- [ ] **2.5 UI/Tourist**: Build Order Creation modal and Order Tracking screen.
+- [ ] **2.6 UI/Entrepreneur**: Build Dashboard (Incoming order cards, Accept/Reject buttons).
+- [ ] **2.7 UI/Entrepreneur**: Build Calendar (Slots, Occupancy bars based on `guest_count`).
+- [ ] **2.8 UI/Entrepreneur**: Build Configuration view (Toggle pause statuses).
+- [ ] **2.9 Interactive Flow**: Wire Zustand stores so Tourist creating an order triggers an incoming order on Entrepreneur dashboard.
+
+> **Stop here:** Validate the interactive Mobile APK/Web prototype with the client before proceeding to Phase 3.
+
+#### Phase 3: Core Backend (The Engine)
+- [ ] **3.1 Backend**: Initialize Hono app in `apps/backend`.
+- [ ] **3.2 Infra**: Setup PostgreSQL via `docker-compose.yml` (NO Redis yet).
+- [ ] **3.3 DB**: Setup Drizzle ORM in `apps/backend/src/db` connecting to Postgres.
+- [ ] **3.4 DB**: Translate `@repo/shared` Zod schemas into Drizzle tables and relations.
+- [ ] **3.5 DB**: Create `bun run db:seed` script with initial Patagonia test data.
+- [ ] **3.6 API**: Implement JWT Auth middleware and in-memory rate limiting Map.
+- [ ] **3.7 API/Catalog**: Build public GET endpoints (`/ventures`, `/ventures/:id`).
+- [ ] **3.8 API/Orders**: Build Tourist endpoints (POST `/orders`, GET `/orders/me`).
+- [ ] **3.9 Engine**: Implement `filterVenture` logic (Validating capacity strictly via `guest_count`, pause status).
+- [ ] **3.10 Engine**: Implement cascade assignment creation (`OFFER_PENDING` status).
+- [ ] **3.11 API/Orders**: Build Entrepreneur endpoints (POST `/orders/:id/accept` and `reject` validating `OFFER_PENDING`).
+- [ ] **3.12 Engine**: Implement Timeout Processor MVP (`setInterval` every 30s to auto-assign expired offers).
+
+#### Phase 4: Integration & Polish
+- [ ] **4.1 Mobile**: Setup Expo Push Notification tokens and update backend schema `Notification_Preference`.
+- [ ] **4.2 Backend**: Implement push notification service to call Expo Push API.
+- [ ] **4.3 Mobile**: Replace Zustand mock actions with real `fetch` calls to the Hono API.
+- [ ] **4.4 Mobile**: Implement global error boundary and HTTP error toast notifications.
+- [ ] **4.5 Testing**: E2E manual flow test: db:seed -> start backend -> place order on mobile -> cascade engine auto-assigns.
