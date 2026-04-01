@@ -1,8 +1,10 @@
 import { z } from "zod";
+import { CatalogTypeSchema } from "./catalog-type";
 
 export const VentureSchema = z.object({
   id: z.number().int().positive(),
   catalog_type_id: z.number().int().positive(),
+  catalog_type: CatalogTypeSchema.optional(),
   name: z.string().min(2),
   description: z.string().optional(),
   address: z.string(),
@@ -16,4 +18,4 @@ export const VentureSchema = z.object({
   is_active: z.boolean().default(true),
 });
 
-export type Venture = z.infer<typeof VentureSchema>;
+export interface Venture extends z.infer<typeof VentureSchema> {}

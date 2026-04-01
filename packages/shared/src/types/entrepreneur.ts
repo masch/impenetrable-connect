@@ -10,7 +10,7 @@ export const EntrepreneurSchema = z.object({
   user_type: UserRoleSchema.default("ENTREPRENEUR"),
   is_active: z.boolean().default(true),
   last_login_at: z.date().optional(),
-  created_at: z.date().optional(),
+  created_at: z.date(),
 });
 
-export type Entrepreneur = z.infer<typeof EntrepreneurSchema>;
+export interface Entrepreneur extends z.infer<typeof EntrepreneurSchema> {}

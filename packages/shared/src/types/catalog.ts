@@ -1,9 +1,11 @@
 import { z } from "zod";
 import { I18nStringSchema } from "./common";
+import { CatalogTypeSchema } from "./catalog-type";
 
 export const CatalogItemSchema = z.object({
   id: z.number().int().positive(),
   catalog_type_id: z.number().int().positive(),
+  catalog_type: CatalogTypeSchema.optional(),
   name_i18n: I18nStringSchema,
   description_i18n: I18nStringSchema.optional(),
   allergens_i18n: I18nStringSchema.optional(),
@@ -15,4 +17,4 @@ export const CatalogItemSchema = z.object({
 });
 
 // Infer TypeScript type directly from the Zod Schema
-export type CatalogItem = z.infer<typeof CatalogItemSchema>;
+export interface CatalogItem extends z.infer<typeof CatalogItemSchema> {}

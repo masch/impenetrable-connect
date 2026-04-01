@@ -11,4 +11,4 @@ export const ProjectSchema = z.object({
   is_active: z.boolean().default(true),
 });
 
-export type Project = z.infer<typeof ProjectSchema>;
+export interface Project extends z.infer<typeof ProjectSchema> {}

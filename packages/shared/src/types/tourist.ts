@@ -8,11 +8,11 @@ export const TouristSchema = z.object({
   email: z.string().email("Invalid email format"),
   phone: z.string().min(8, "Phone number is too short"),
   language: LanguageSchema.default("es"),
-  created_at: z.date().optional(),
+  created_at: z.date(),
 });
 
-// Infer TypeScript type directly from the Zod Schema
-export type Tourist = z.infer<typeof TouristSchema>;
+// Infer TypeScript interface directly from the Zod Schema
+export interface Tourist extends z.infer<typeof TouristSchema> {}
 
 // Example of a smaller schema for creation (omitting DB-generated fields)
 export const CreateTouristSchema = TouristSchema.omit({
@@ -20,4 +20,4 @@ export const CreateTouristSchema = TouristSchema.omit({
   created_at: true,
 });
 
-export type CreateTouristInput = z.infer<typeof CreateTouristSchema>;
+export interface CreateTouristInput extends z.infer<typeof CreateTouristSchema> {}

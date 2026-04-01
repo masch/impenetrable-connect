@@ -10,4 +10,4 @@ export const CatalogTypeSchema = z.object({
   is_active: z.boolean().default(true),
 });
 
-export type CatalogType = z.infer<typeof CatalogTypeSchema>;
+export interface CatalogType extends z.infer<typeof CatalogTypeSchema> {}
