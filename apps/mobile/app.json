@@ -12,6 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "plugins": ["expo-localization"],
     "ios": {
       "supportsTablet": true
     },

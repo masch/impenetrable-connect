@@ -1,4 +1,4 @@
-.PHONY: setup install dev mobile mobile-android mobile-ios mobile-web backend clean lint format
+.PHONY: setup install dev mobile mobile-android mobile-ios mobile-web backend clean lint format check
 
 # Install all dependencies and setup monorepo symlinks
 setup:
@@ -17,6 +17,9 @@ lint:
 # Format the entire monorepo
 format:
 	bun run format
+
+# Run linter and then format
+check: lint format
 
 
 # ==========================================

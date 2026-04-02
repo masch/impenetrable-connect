@@ -1,0 +1,10 @@
+{
+  "app_title": "Impenetrable Connect",
+  "mock_mode": "[Modo Mock Frontend-First]",
+  "loading": "Cargando...",
+  "error": "Error",
+  "no_projects": "No se encontraron proyectos",
+  "default_language": "Idioma predeterminado",
+  "active": "Activo",
+  "inactive": "Inactivo"
+}

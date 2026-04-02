@@ -455,7 +455,37 @@ To meet the requirement of running smoothly on low-end devices while serving Web
 - **Styling:** **NativeWind v5** + Tailwind CSS v4 + `react-native-css`. CSS-first configuration with `@theme` tokens in CSS (not JS config). Components wrapped with `useCssElement` for `className` support.
 - **Monorepo:** **Bun Workspaces**. Single repository with multiple projects sharing types and validators.
 
-#### 4.0.1 Project Structure (Bun Workspaces Monorepo)
+#### 4.0.2 Internationalization (i18n) **[MVP]**
+
+> **MVP Scope:** UI text only. Backend error messages and Admin Panel are out of scope.
+
+The app uses `expo-localization` for device locale detection and `i18n-js` for runtime translation lookups.
+
+- **Library Stack:**
+  - `expo-localization` — Detects device language via `getLocales()[0].languageCode`
+  - `i18n-js` — Key-based translation lookup with interpolation and fallback
+- **Locale Files:** JSON files in `app/src/i18n/locales/{locale}.json`
+- **Supported Locales (MVP):** `en` (default), `es` (Spanish), `ca` (Catalan)
+- **Fallback:** Missing translations fall back to English
+- **Interpolation:** Variables passed as second argument, e.g., `i18n.t('guest_count', { count: 5 })`
+
+```tsx
+// app/src/i18n/index.ts
+import { getLocales } from "expo-localization";
+import { I18n } from "i18n-js";
+
+const translations = {
+  en: { welcome: "Hello", guest_count: "{{count}} guests" },
+  es: { welcome: "Hola", guest_count: "{{count}} invitados" },
+  ca: { welcome: "Hola", guest_count: "{{count}} hostes" },
+};
+
+export const i18n = new I18n(translations);
+i18n.locale = getLocales()[0].languageCode ?? "en";
+i18n.enableFallback = true;
+```
+
+#### 4.0.3 Project Structure (Bun Workspaces Monorepo)
 
 ```
 impenetrable-connect/

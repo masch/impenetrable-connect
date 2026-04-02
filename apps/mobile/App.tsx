@@ -1,68 +1,28 @@
 import { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, ActivityIndicator, FlatList } from "react-native";
+import { Text, View, ActivityIndicator, FlatList } from "react-native";
 import { useProjectStore } from "./src/stores/project.store";
+import { useI18n } from "./src/hooks/useI18n";
 
-export default function App() {
-  const { projects, isLoading, error, fetchProjects } = useProjectStore();
-
-  useEffect(() => {
-    fetchProjects();
-  }, [fetchProjects]);
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Impenetrable Connect</Text>
-      <Text style={styles.subtitle}>[Frontend-First Mock Mode]</Text>
-
-      {isLoading && <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 20 }} />}
-
-      {error && <Text style={styles.error}>{error}</Text>}
-
-      {!isLoading && !error && (
-        <FlatList
-          data={projects}
-          keyExtractor={(item) => item.id.toString()}
-          style={styles.list}
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Text style={styles.projectName}>{item.name}</Text>
-              <Text style={styles.projectLang}>
-                Default Language: {item.default_language.toUpperCase()}
-              </Text>
-              <Text style={styles.projectStatus}>
-                {item.is_active ? "🟢 Active" : "🔴 Inactive"}
-              </Text>
-            </View>
-          )}
-          ListEmptyComponent={<Text>No projects found in mocks.</Text>}
-        />
-      )}
-
-      <StatusBar style="auto" />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
     backgroundColor: "#f9f9f9",
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
     paddingTop: 80,
     paddingHorizontal: 20,
   },
   title: {
     fontSize: 28,
-    fontWeight: "bold",
+    fontWeight: "bold" as const,
     color: "#1a1a1a",
   },
   subtitle: {
     fontSize: 14,
     color: "#666",
     marginBottom: 20,
-    fontStyle: "italic",
+    fontStyle: "italic" as const,
   },
   error: {
     color: "red",
@@ -86,7 +46,7 @@ const styles = StyleSheet.create({
   },
   projectName: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "600" as const,
     marginBottom: 4,
   },
   projectLang: {
@@ -95,7 +55,56 @@ const styles = StyleSheet.create({
   },
   projectStatus: {
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "500" as const,
     marginTop: 6,
   },
-});
+  loading: {
+    marginTop: 20,
+  },
+};
+
+export default function App() {
+  const { projects, isLoading, error, fetchProjects } = useProjectStore();
+  const { t } = useI18n();
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>{t("app_title")}</Text>
+      <Text style={styles.subtitle}>{t("mock_mode")}</Text>
+
+      {isLoading && <ActivityIndicator size="large" color="#0000ff" style={styles.loading} />}
+
+      {error && (
+        <Text style={styles.error}>
+          {t("error")}: {error}
+        </Text>
+      )}
+
+      {!isLoading && !error && (
+        <FlatList
+          data={projects}
+          keyExtractor={(item) => item.id.toString()}
+          style={styles.list}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Text style={styles.projectName}>{item.name}</Text>
+              <Text style={styles.projectLang}>
+                {t("default_language")}: {item.default_language.toUpperCase()}
+              </Text>
+              <Text style={styles.projectStatus}>
+                {item.is_active ? `🟢 ${t("active")}` : `🔴 ${t("inactive")}`}
+              </Text>
+            </View>
+          )}
+          ListEmptyComponent={<Text>{t("no_projects")}</Text>}
+        />
+      )}
+
+      <StatusBar style="auto" />
+    </View>
+  );
+}

@@ -13,8 +13,8 @@ export const MOCK_PROJECTS: Project[] = [
   {
     id: 2,
     name: "Iberá Discovery",
-    default_language: "es",
-    supported_languages: ["es"],
+    default_language: "en",
+    supported_languages: ["es", "en"],
     cascade_timeout_minutes: 60,
     max_cascade_attempts: 5,
     is_active: false,
