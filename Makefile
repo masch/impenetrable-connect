@@ -65,6 +65,7 @@ dev:
 
 # Clean node_modules in case Metro bundler breaks with symlink cache
 clean:
+	rm -rf apps/mobile/.expo
 	rm -rf node_modules apps/*/node_modules packages/*/node_modules
 	bun pm cache rm
 	@echo "🧼 All clean. Run 'make setup' again."

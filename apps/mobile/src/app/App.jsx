@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { Text, View, ActivityIndicator, FlatList } from "react-native";
-import { useProjectStore } from "./src/stores/project.store";
-import { useI18n } from "./src/hooks/useI18n";
+import { useProjectStore } from "../stores/project.store";
+import { useI18n } from "../hooks/useI18n";
 
 const styles = {
   container: {
