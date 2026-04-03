@@ -1,16 +1,19 @@
-import { Pressable, Text, ActivityIndicator, ViewStyle, TextStyle } from "react-native";
+import { Pressable, Text } from "react-native";
 
-type ButtonVariant = "primary" | "secondary" | "danger";
+interface ButtonVariant {
+  container: string;
+  text: string;
+}
 
 interface ButtonProps {
   title: string;
-  variant?: ButtonVariant;
+  variant?: "primary" | "secondary" | "danger";
   onPress: () => void;
   disabled?: boolean;
   icon?: string;
 }
 
-const variantStyles: Record<ButtonVariant, { container: string; text: string }> = {
+const variantStyles: Record<string, ButtonVariant> = {
   primary: {
     container: "bg-green-600",
     text: "text-white",

@@ -3,7 +3,7 @@ import { useFocusEffect, useRouter, Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Text, View, ActivityIndicator } from "react-native";
 import { useProjectStore } from "../../stores/project.store";
-import { useI18n, useLocale } from "../../hooks/useI18n";
+import { useI18n } from "../../hooks/useI18n";
 import { Project } from "@repo/shared";
 import { Button } from "../../components/Button";
 import { LanguageSwitcher } from "../../components/LanguageSwitcher";

@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
-import { View, Text, TextInput, Switch, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useProjectStore } from "../../stores/project.store";
 import { useI18n } from "../../hooks/useI18n";
 import { Project, Language, PROJECT_CONSTRAINTS, CreateProjectSchema } from "@repo/shared";
 import { Button } from "../../components/Button";
 import { ConfirmModal } from "../../components/ConfirmModal";
+import { FormInput } from "../../components/FormInput";
+import { FormSwitch } from "../../components/FormSwitch";
+import { FormLanguageSelector } from "../../components/FormLanguageSelector";
 
 interface ProjectFormData extends Omit<Project, "id"> {}
 
@@ -144,12 +147,6 @@ export default function ProjectFormScreen() {
     setFormData({ ...formData, supported_languages: newLanguages });
   };
 
-  // Helper for border class
-  const getBorderClass = (fieldName: string) => {
-    if (fieldErrors[fieldName]) return "border-red-500";
-    return "border-gray-300";
-  };
-
   if (isLoading) {
     return (
       <View className="flex-1 bg-gray-50 p-5 pt-20 items-center justify-center">
@@ -167,96 +164,54 @@ export default function ProjectFormScreen() {
           </Text>
         </View>
 
-        <View className="mb-5">
-          <Text className="text-sm font-medium text-gray-700 mb-2">{t("project_name")}</Text>
-          <TextInput
-            className={`bg-white border p-3 rounded-lg ${getBorderClass("name")}`}
-            value={formData.name}
-            onChangeText={(text) => setFormData({ ...formData, name: text })}
-            placeholder={t("project_name")}
-          />
-          {fieldErrors.name && (
-            <Text className="text-red-500 text-xs mt-1">{fieldErrors.name}</Text>
-          )}
-        </View>
+        <FormInput
+          label={t("project_name")}
+          value={formData.name}
+          onChangeText={(text) => setFormData({ ...formData, name: text })}
+          placeholder={t("project_name")}
+          error={fieldErrors.name}
+        />
 
         <View className="mb-5 flex-row gap-4">
           <View className="flex-1">
-            <Text className="text-sm font-medium text-gray-700 mb-2">{t("max_attempts")}</Text>
-            <TextInput
-              className={`bg-white border p-3 rounded-lg ${getBorderClass("max_cascade_attempts")}`}
+            <FormInput
+              label={t("max_attempts")}
               value={formData.max_cascade_attempts.toString()}
               onChangeText={(text) =>
                 setFormData({ ...formData, max_cascade_attempts: parseInt(text) || 0 })
               }
               keyboardType="numeric"
+              helperText={`${PROJECT_CONSTRAINTS.MAX_CASCADE_ATTEMPTS_MIN}-${PROJECT_CONSTRAINTS.MAX_CASCADE_ATTEMPTS_MAX}`}
+              error={fieldErrors.max_cascade_attempts}
             />
-            <Text className="text-xs text-gray-500 mt-1">
-              {PROJECT_CONSTRAINTS.MAX_CASCADE_ATTEMPTS_MIN}-
-              {PROJECT_CONSTRAINTS.MAX_CASCADE_ATTEMPTS_MAX}
-            </Text>
-            {fieldErrors.max_cascade_attempts && (
-              <Text className="text-red-500 text-xs mt-1">{fieldErrors.max_cascade_attempts}</Text>
-            )}
           </View>
           <View className="flex-1">
-            <Text className="text-sm font-medium text-gray-700 mb-2">{t("cascade_timeout")}</Text>
-            <TextInput
-              className={`bg-white border p-3 rounded-lg ${getBorderClass("cascade_timeout_minutes")}`}
+            <FormInput
+              label={t("cascade_timeout")}
               value={formData.cascade_timeout_minutes.toString()}
               onChangeText={(text) =>
                 setFormData({ ...formData, cascade_timeout_minutes: parseInt(text) || 0 })
               }
               keyboardType="numeric"
+              helperText={`${PROJECT_CONSTRAINTS.CASCADE_TIMEOUT_MINUTES_MIN}-${PROJECT_CONSTRAINTS.CASCADE_TIMEOUT_MINUTES_MAX} min`}
+              error={fieldErrors.cascade_timeout_minutes}
             />
-            <Text className="text-xs text-gray-500 mt-1">
-              {PROJECT_CONSTRAINTS.CASCADE_TIMEOUT_MINUTES_MIN}-
-              {PROJECT_CONSTRAINTS.CASCADE_TIMEOUT_MINUTES_MAX} min
-            </Text>
-            {fieldErrors.cascade_timeout_minutes && (
-              <Text className="text-red-500 text-xs mt-1">
-                {fieldErrors.cascade_timeout_minutes}
-              </Text>
-            )}
           </View>
         </View>
 
-        <View className="mb-5">
-          <Text className="text-sm font-medium text-gray-700 mb-2">{t("supported_languages")}</Text>
-          <View className="flex-row gap-4 items-center">
-            <View className="flex-row gap-2">
-              {(["es", "en"] as Language[]).map((lang) => (
-                <Pressable
-                  key={lang}
-                  className={`px-4 py-2 rounded-lg border ${
-                    formData.supported_languages.includes(lang)
-                      ? "bg-green-600 border-green-600"
-                      : "bg-white border-gray-300"
-                  }`}
-                  onPress={() => toggleLanguage(lang)}
-                >
-                  <Text
-                    className={
-                      formData.supported_languages.includes(lang) ? "text-white" : "text-gray-700"
-                    }
-                  >
-                    {lang.toUpperCase()}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-            <View className="flex-row items-center gap-2 ml-auto">
-              <Text className="text-sm text-gray-700">{t("active")}</Text>
-              <Switch
-                value={formData.is_active}
-                onValueChange={(value) => setFormData({ ...formData, is_active: value })}
-              />
-            </View>
-          </View>
-          {fieldErrors.supported_languages && (
-            <Text className="text-red-500 text-xs mt-2">{fieldErrors.supported_languages}</Text>
-          )}
-        </View>
+        <FormLanguageSelector
+          label={t("supported_languages")}
+          selectedLanguages={formData.supported_languages}
+          onToggle={toggleLanguage}
+          extra={
+            <FormSwitch
+              label={t("active")}
+              value={formData.is_active}
+              onValueChange={(value) => setFormData({ ...formData, is_active: value })}
+            />
+          }
+          error={fieldErrors.supported_languages}
+        />
 
         <View className="mt-6 gap-3">
           <Button
