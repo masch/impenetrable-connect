@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { Text, View, ActivityIndicator, FlatList } from "react-native";
-import { useProjectStore } from "../stores/project.store";
-import { useI18n } from "../hooks/useI18n";
+import { Text, View, ActivityIndicator, FlatList, StyleSheet } from "react-native";
+import { useProjectStore } from "../../stores/project.store";
+import { useI18n } from "../../hooks/useI18n";
 
-const styles = {
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f9f9f9",
@@ -61,9 +61,9 @@ const styles = {
   loading: {
     marginTop: 20,
   },
-};
+});
 
-export default function App() {
+export default function ProjectsScreen() {
   const { projects, isLoading, error, fetchProjects } = useProjectStore();
   const { t } = useI18n();
 

@@ -36,7 +36,7 @@ export default [
       "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
 
       // React
-      "react/react-in-jsx-scope": "error",
+      "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
       "react/jsx-key": "error",
 

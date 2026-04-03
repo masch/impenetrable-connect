@@ -6,22 +6,6 @@ setup:
 
 install: setup
 
-# ===========================================
-# 🧹 UTILS
-# ===========================================
-
-# Run ESLint on mobile app
-lint:
-	cd apps/mobile && bun run lint
-
-# Format the entire monorepo
-format:
-	bun run format
-
-# Run linter and then format
-check: lint format
-
-
 # ==========================================
 # 📱 MOBILE APP (Expo)
 # ==========================================
@@ -69,3 +53,18 @@ clean:
 	rm -rf node_modules apps/*/node_modules packages/*/node_modules
 	bun pm cache rm
 	@echo "🧼 All clean. Run 'make setup' again."
+
+# Run ESLint on mobile app
+lint:
+	cd apps/mobile && bun run lint
+
+# Format the entire monorepo
+format:
+	bun run format
+
+# Run linter and then format
+check: lint format
+
+# Run expo fix deps
+fix-deps:
+	cd apps/mobile && bun run expo-fix-deps
