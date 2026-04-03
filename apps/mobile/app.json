@@ -1,9 +1,10 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "Impenetrable Connect",
+    "slug": "impenetrable-connect",
     "version": "1.0.0",
     "orientation": "portrait",
+    "scheme": "impenetrable-connect",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -12,7 +13,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "plugins": ["expo-localization"],
+    "plugins": ["expo-localization", "expo-router"],
     "ios": {
       "supportsTablet": true
     },
