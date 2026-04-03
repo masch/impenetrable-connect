@@ -3,9 +3,10 @@ import { useFocusEffect, useRouter, Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Text, View, ActivityIndicator } from "react-native";
 import { useProjectStore } from "../../stores/project.store";
-import { useI18n } from "../../hooks/useI18n";
+import { useI18n, useLocale } from "../../hooks/useI18n";
 import { Project } from "@repo/shared";
 import { Button } from "../../components/Button";
+import { LanguageSwitcher } from "../../components/LanguageSwitcher";
 
 interface ProjectCardProps {
   project: Project;
@@ -67,9 +68,12 @@ export default function ProjectsScreen() {
   return (
     <View className="flex-1 bg-gray-50 pt-20 px-5">
       <View className="flex-1 max-w-md w-full mx-auto">
-        <View className="mb-5">
-          <Text className="text-3xl font-bold text-gray-900 text-center">{t("app_title")}</Text>
-          <Text className="text-sm text-gray-500 italic text-center mt-1">{t("mock_mode")}</Text>
+        <View className="mb-5 flex-row justify-between items-center">
+          <View className="flex-1">
+            <Text className="text-3xl font-bold text-gray-900">{t("app_title")}</Text>
+            <Text className="text-sm text-gray-500 italic">{t("mock_mode")}</Text>
+          </View>
+          <LanguageSwitcher />
         </View>
 
         {isLoading && (

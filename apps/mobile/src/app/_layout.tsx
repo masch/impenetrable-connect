@@ -1,7 +1,24 @@
+import { useEffect } from "react";
 import { Stack } from "expo-router";
 import { DEFAULT_SCREEN_OPTIONS } from "../constants/nav.constants";
-import "../../global.css"
+import { useLocale } from "../hooks/useI18n";
+import "../../global.css";
+
+function LocaleInitializer() {
+  const { initializeLocale } = useLocale();
+
+  useEffect(() => {
+    initializeLocale();
+  }, [initializeLocale]);
+
+  return null;
+}
 
 export default function RootLayout() {
-  return <Stack screenOptions={DEFAULT_SCREEN_OPTIONS} />;
+  return (
+    <>
+      <LocaleInitializer />
+      <Stack screenOptions={DEFAULT_SCREEN_OPTIONS} />
+    </>
+  );
 }
