@@ -1,4 +1,4 @@
-import { Project } from "@repo/shared";
+import { Project, CreateProjectSchema, UpdateProjectSchema } from "@repo/shared";
 import { MOCK_PROJECTS } from "../mocks/projects";
 import { logger } from "./logger.service";
 
@@ -13,9 +13,24 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
 interface ProjectServiceInterface {
   getProjects(): Promise<Project[]>;
   getProjectById(id: number): Promise<Project | null>;
-  createProject(project: Omit<Project, "id">): Promise<Project>;
-  updateProject(id: number, project: Partial<Project>): Promise<Project>;
+  createProject(project: CreateProjectSchema.infer): Promise<Project>;
+  updateProject(id: number, project: UpdateProjectSchema.infer): Promise<Project>;
   deleteProject(id: number): Promise<boolean>;
+}
+
+/**
+ * Validate project data using Zod schemas
+ */
+function validateProjectData(
+  data: unknown,
+  schema: typeof CreateProjectSchema | typeof UpdateProjectSchema,
+) {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    const errors = result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join(", ");
+    throw new Error(`Validation failed: ${errors}`);
+  }
+  return result.data;
 }
 
 /**
@@ -35,10 +50,12 @@ const MockProjectService: ProjectServiceInterface = {
     return mockProjects.find((p) => p.id === id) || null;
   },
 
-  createProject: async (project: Omit<Project, "id">) => {
+  createProject: async (project: CreateProjectSchema.infer) => {
     await new Promise((r) => setTimeout(r, 800));
+    // Validate input
+    const validated = validateProjectData(project, CreateProjectSchema);
     const newProject: Project = {
-      ...project,
+      ...validated,
       id: nextId++,
     };
     mockProjects = [...mockProjects, newProject];
@@ -46,13 +63,15 @@ const MockProjectService: ProjectServiceInterface = {
     return newProject;
   },
 
-  updateProject: async (id: number, project: Partial<Project>) => {
+  updateProject: async (id: number, project: UpdateProjectSchema.infer) => {
     await new Promise((r) => setTimeout(r, 800));
     const index = mockProjects.findIndex((p) => p.id === id);
     if (index === -1) {
       throw new Error("Project not found");
     }
-    const updatedProject = { ...mockProjects[index], ...project };
+    // Validate input
+    const validated = validateProjectData(project, UpdateProjectSchema);
+    const updatedProject = { ...mockProjects[index], ...validated };
     mockProjects = mockProjects.map((p) => (p.id === id ? updatedProject : p));
     logger.info("[MOCK API] Updated project:", updatedProject);
     return updatedProject;

@@ -19,5 +19,17 @@
   "cancel": "Cancel",
   "delete": "Delete",
   "confirm_delete": "Confirm Delete",
-  "delete_confirm_message": "Are you sure you want to delete"
+  "delete_confirm_message": "Are you sure you want to delete",
+  "validation": {
+    "name_required": "Name is required",
+    "name_min_length": "Name must be at least 2 characters",
+    "name_max_length": "Name must be at most 100 characters",
+    "max_attempts_required": "Max attempts is required",
+    "max_attempts_min": "Max attempts must be at least 1",
+    "max_attempts_max": "Max attempts must be at most 10",
+    "timeout_required": "Timeout is required",
+    "timeout_min": "Timeout must be at least 1 minute",
+    "timeout_max": "Timeout must be at most 120 minutes",
+    "supported_languages_required": "At least one language is required"
+  }
 }
