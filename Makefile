@@ -1,45 +1,106 @@
-.PHONY: setup install dev mobile mobile-android mobile-ios mobile-web backend clean lint format check
+.PHONY: help setup install dev clean lint format check mobile mobile-native mobile-clean mobile-web mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-fix-deps backend seed android-reset android-stop android-restart
 
-# Install all dependencies and setup monorepo symlinks
+# ==========================================
+# 📋 HELP
+# ==========================================
+
+help:
+	@echo ""
+	@echo "  🔧 SETUP"
+	@echo "    make setup                   - Install dependencies"
+	@echo "    make install                 - Same as setup"
+	@echo "    make dev                     - Start full monorepo"
+	@echo ""
+	@echo "  📱 MOBILE"
+	@echo "    make mobile                  - Start mobile with Expo"
+	@echo "    make mobile-native           - Start mobile native"
+	@echo "    make mobile-clean            - Start mobile clean"
+	@echo "    make mobile-web              - Start mobile web"
+	@echo "    make mobile-android          - Start mobile Android"
+	@echo "    make mobile-android-native   - Start mobile Android native"
+	@echo "    make mobile-ios              - Start mobile iOS"
+	@echo "    make mobile-ios-native       - Start mobile iOS native"
+	@echo "    make mobile-fix-deps         - Fix mobile dependencies"
+	@echo ""
+	@echo "  🖥️ BACKEND"
+	@echo "    make backend                 - Start backend API"
+	@echo "    make seed                    - Seed database"
+	@echo ""
+	@echo "  🔧 UTILS"
+	@echo "    make clean                   - Clean node_modules"
+	@echo "    make lint                    - Run ESLint"
+	@echo "    make format                  - Format code"
+	@echo "    make check                   - Lint + format"
+	@echo ""
+	@echo "  🤖 ANDROID EMULATOR"
+	@echo "    make android-reset           - Reset emulator"
+	@echo "    make android-stop            - Stop emulator"
+	@echo "    make android-restart         - Restart emulator"
+
+# ==========================================
+# 🔧 CONFIG
+# ==========================================
+
+ANDROID_HOME ?= $(HOME)/dev/android/sdk
+ANDROID_EMULATOR = $(ANDROID_HOME)/emulator/emulator
+ANDROID_FIRST_AVD = $(shell $(ANDROID_EMULATOR) -list-avds | head -n 1)
+MOBILE_DIR = apps/mobile
+BACKEND_DIR = apps/backend
+
+# ==========================================
+# 🚀 SETUP
+# ==========================================
+
 setup:
 	bun install
 
 install: setup
 
 # ==========================================
-# 📱 MOBILE APP (Expo)
+# 📱 MOBILE APP
 # ==========================================
 
-# Start Expo and display QR code
 mobile:
-	cd apps/mobile && bun run start
+	cd $(MOBILE_DIR) && bun run start
 
-# Start Expo directly in the browser
+mobile-native:
+	cd $(MOBILE_DIR) && bun run start:native
+
+mobile-clean:
+	cd $(MOBILE_DIR) && bun run start:clean
+
 mobile-web:
-	cd apps/mobile && bun run web
+	cd $(MOBILE_DIR) && bun run web
 
-# Start Expo directly in the Android / iOS Emulator
 mobile-android:
-	cd apps/mobile && bun run android
+	cd $(MOBILE_DIR) && bun run android
+
+mobile-android-native:
+	cd $(MOBILE_DIR) && bun run android:native
 
 mobile-ios:
-	cd apps/mobile && bun run ios
+	cd $(MOBILE_DIR) && bun run ios
+
+mobile-ios-native:
+	cd $(MOBILE_DIR) && bun run ios:native
+
+mobile-fix-deps:
+	cd $(MOBILE_DIR) && bun run expo-fix-deps
 
 # ==========================================
-# 🖥️ BACKEND (Hono API)
+# 🖥️ BACKEND
 # ==========================================
 
 backend:
-	cd apps/backend && bun run dev
+	cd $(BACKEND_DIR) && bun run dev
 
 seed:
-	cd apps/backend && bun run db:seed
+	cd $(BACKEND_DIR) && bun run db:seed
 
 # ==========================================
 # 🚀 FULL MONOREPO
 # ==========================================
 
-# Start everything (if configured in root package.json)
 dev:
 	bun run dev
 
@@ -47,24 +108,34 @@ dev:
 # 🧹 UTILS
 # ==========================================
 
-# Clean node_modules in case Metro bundler breaks with symlink cache
 clean:
-	rm -rf apps/mobile/.expo
+	rm -rf $(MOBILE_DIR)/.expo
 	rm -rf node_modules apps/*/node_modules packages/*/node_modules
 	bun pm cache rm
 	@echo "🧼 All clean. Run 'make setup' again."
 
-# Run ESLint on mobile app
 lint:
-	cd apps/mobile && bun run lint
+	cd $(MOBILE_DIR) && bun run lint
 
-# Format the entire monorepo
 format:
 	bun run format
 
-# Run linter and then format
 check: lint format
 
-# Run expo fix deps
-fix-deps:
-	cd apps/mobile && bun run expo-fix-deps
+# ==========================================
+# 🤖 ANDROID EMULATOR
+# ==========================================
+
+android-reset:
+	@echo "🚀 Resetting the emulator: $(ANDROID_FIRST_AVD)..."
+	$(ANDROID_EMULATOR) @$(ANDROID_FIRST_AVD) -wipe-data &
+
+android-stop:
+	@echo "🛑 Stopping the emulator..."
+	-pkill -9 emulator || true
+	-pkill -9 qemu-system || true
+
+android-restart: android-stop
+	@echo "🔄 Restarting the emulator: $(ANDROID_FIRST_AVD)..."
+	@sleep 1
+	$(ANDROID_EMULATOR) @$(ANDROID_FIRST_AVD) &

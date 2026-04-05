@@ -4,12 +4,16 @@
   "main": "expo-router/entry",
   "type": "module",
   "scripts": {
+    "start": "expo start --go",
+    "start:native": "expo start",
+    "start:clean": "expo start -c --go",
+    "web": "expo start --web",
+    "android": "expo start --go --android",
+    "android:native": "expo run:android",
+    "ios": "expo start --go --ios",
+    "ios:native": "expo run:ios",
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier --write src",
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
     "expo-fix-deps": "expo install --fix"
   },
   "dependencies": {
