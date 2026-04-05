@@ -1,4 +1,4 @@
-.PHONY: help setup install dev clean lint format check mobile mobile-native mobile-clean mobile-web mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-fix-deps backend seed android-reset android-stop android-restart
+.PHONY: help setup install dev clean lint format check mobile mobile-native mobile-clean mobile-web mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-fix-deps backend seed android-reset android-stop android-kill android-restart
 
 # ==========================================
 # 📋 HELP
@@ -33,8 +33,9 @@ help:
 	@echo "    make check                   - Lint + format"
 	@echo ""
 	@echo "  🤖 ANDROID EMULATOR"
-	@echo "    make android-reset           - Reset emulator"
-	@echo "    make android-stop            - Stop emulator"
+	@echo "    make android-reset           - Reset emulator (wipe data)"
+	@echo "    make android-stop            - Stop emulator (graceful)"
+	@echo "    make android-kill            - Kill emulator (force)"
 	@echo "    make android-restart         - Restart emulator"
 
 # ==========================================
@@ -131,7 +132,12 @@ android-reset:
 	$(ANDROID_EMULATOR) @$(ANDROID_FIRST_AVD) -wipe-data &
 
 android-stop:
-	@echo "🛑 Stopping the emulator..."
+	@echo "🛑 Stopping the emulator (graceful): $(ANDROID_FIRST_AVD)..."
+	-pkill -TERM -f "emulator.*$(ANDROID_FIRST_AVD)" || true
+	-pkill -TERM -f "qemu-system.*$(ANDROID_FIRST_AVD)" || true
+
+android-kill:
+	@echo "💀 Killing the emulator (force): $(ANDROID_FIRST_AVD)..."
 	-pkill -9 emulator || true
 	-pkill -9 qemu-system || true
 
