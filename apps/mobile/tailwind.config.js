@@ -38,6 +38,9 @@ module.exports = {
 
         // Outline
         "outline-variant": "#dbc1bb",
+
+        // Tab bar colors
+        "tab-inactive": "#666666",
       },
       fontFamily: {
         // Section 3: Manrope for headlines, Inter for body

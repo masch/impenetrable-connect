@@ -13,6 +13,7 @@
       "version": "1.0.0",
       "dependencies": {
         "@expo/metro-config": "~55.0.9",
+        "@expo/vector-icons": "^15.1.1",
         "@repo/shared": "workspace:*",
         "expo": "~55.0.0",
         "expo-constants": "~55.0.11",

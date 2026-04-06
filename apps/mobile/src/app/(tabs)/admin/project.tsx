@@ -2,11 +2,11 @@ import { useCallback } from "react";
 import { useFocusEffect, useRouter, Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Text, View, ActivityIndicator, ScrollView } from "react-native";
-import { useProjectStore } from "../../stores/project.store";
-import { useI18n } from "../../hooks/useI18n";
+import { useProjectStore } from "../../../stores/project.store";
+import { useI18n } from "../../../hooks/useI18n";
 import { Project } from "@repo/shared";
-import { Button } from "../../components/Button";
-import { LanguageSwitcher } from "../../components/LanguageSwitcher";
+import { Button } from "../../../components/Button";
+import { LanguageSwitcher } from "../../../components/LanguageSwitcher";
 
 interface ProjectCardProps {
   project: Project;
@@ -156,7 +156,17 @@ export default function ProjectsScreen() {
 
   return (
     <View className="flex-1 bg-surface pt-20 px-5">
-      <View className="flex-1 max-w-md w-full mx-auto">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          flexGrow: 1,
+          maxWidth: 448,
+          width: "100%",
+          alignSelf: "center",
+          paddingBottom: 24,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <View className="mb-8 flex-row justify-between items-center">
           <View className="flex-1">
@@ -170,63 +180,56 @@ export default function ProjectsScreen() {
           <LanguageSwitcher />
         </View>
 
-        {/* Content - scrollable */}
-        <ScrollView
-          className="pt-8 flex-1"
-          contentContainerStyle={{ flexGrow: 1 }}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Loading State */}
-          {isLoading && (
-            <View className="py-12 items-center">
-              <ActivityIndicator size="large" color="#2b868c" />
-              <Text className="text-on-surface mt-4">{t("loading")}</Text>
-            </View>
-          )}
+        {/* Loading State */}
+        {isLoading && (
+          <View className="py-12 items-center">
+            <ActivityIndicator size="large" color="#2b868c" />
+            <Text className="text-on-surface mt-4">{t("loading")}</Text>
+          </View>
+        )}
 
-          {/* Active Projects */}
-          {!isLoading && !error && activeProjects.length > 0 && (
-            <View className="mb-8">
-              <Text className="text-lg font-bold text-on-surface mb-4">{t("active_projects")}</Text>
-              <View className="items-center">
-                {activeProjects.map((project) => (
-                  <ActiveProjectCard key={project.id} project={project} />
-                ))}
-              </View>
+        {/* Active Projects */}
+        {!isLoading && !error && activeProjects.length > 0 && (
+          <View className="mb-8">
+            <Text className="text-lg font-bold text-on-surface mb-4">{t("active_projects")}</Text>
+            <View className="items-center">
+              {activeProjects.map((project) => (
+                <ActiveProjectCard key={project.id} project={project} />
+              ))}
             </View>
-          )}
+          </View>
+        )}
 
-          {/* Inactive Projects */}
-          {!isLoading && !error && inactiveProjects.length > 0 && (
-            <View className="mb-8">
-              <Text className="text-lg font-bold text-on-surface opacity-50 mb-4">
-                {t("inactive_projects")}
-              </Text>
-              <View className="items-center">
-                {inactiveProjects.map((project) => (
-                  <InactiveProjectCard key={project.id} project={project} />
-                ))}
-              </View>
+        {/* Inactive Projects */}
+        {!isLoading && !error && inactiveProjects.length > 0 && (
+          <View className="mb-8">
+            <Text className="text-lg font-bold text-on-surface opacity-50 mb-4">
+              {t("inactive_projects")}
+            </Text>
+            <View className="items-center">
+              {inactiveProjects.map((project) => (
+                <InactiveProjectCard key={project.id} project={project} />
+              ))}
             </View>
-          )}
+          </View>
+        )}
 
-          {/* Empty State */}
-          {!isLoading && !error && projects.length === 0 && (
-            <Text className="text-on-surface text-center mb-6 opacity-60">{t("no_projects")}</Text>
-          )}
+        {/* Empty State */}
+        {!isLoading && !error && projects.length === 0 && (
+          <Text className="text-on-surface text-center mb-6 opacity-60">{t("no_projects")}</Text>
+        )}
 
-          {/* Action Button */}
-          {!isLoading && (
-            <View className="pt-8 pb-8">
-              <Button
-                title={t("add_project")}
-                icon="+"
-                onPress={() => router.push("/projects/new")}
-              />
-            </View>
-          )}
-        </ScrollView>
-      </View>
+        {/* Action Button */}
+        {!isLoading && (
+          <View className="pt-8 pb-8">
+            <Button
+              title={t("add_project")}
+              icon="+"
+              onPress={() => router.push("/projects/new")}
+            />
+          </View>
+        )}
+      </ScrollView>
 
       <StatusBar style="auto" />
     </View>
