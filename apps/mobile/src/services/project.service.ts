@@ -1,7 +1,34 @@
-import { Project, CreateProjectInput, UpdateProjectInput } from "@repo/shared";
-import { USE_MOCKS, API_URL } from "../config/env";
+import {
+  Project,
+  CreateProjectSchema,
+  CreateProjectInput,
+  UpdateProjectSchema,
+  UpdateProjectInput,
+} from "@repo/shared";
+import env from "../config/env";
 import { MOCK_PROJECTS } from "../mocks/projects";
 import { logger } from "./logger.service";
+
+/**
+ * Validate data using Zod schemas
+ */
+function validateData<T>(
+  data: unknown,
+  schema: {
+    safeParse: (data: unknown) => {
+      success: boolean;
+      data?: T;
+      error?: { issues: { path: { join: (arg: string) => string }[]; message: string }[] };
+    };
+  },
+): T {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    const errors = result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join(", ");
+    throw new Error(`Validation failed: ${errors}`);
+  }
+  return result.data as T;
+}
 
 /**
  * Common interface for our service implementations.
@@ -34,10 +61,12 @@ const MockProjectService: ProjectServiceInterface = {
 
   createProject: async (project: CreateProjectInput) => {
     await new Promise((r) => setTimeout(r, 800));
+    // Validate input using Zod
+    const validated = validateData(project, CreateProjectSchema);
     const newProject: Project = {
-      ...project,
+      ...validated,
       id: nextId++,
-    } as Project;
+    };
     mockProjects = [...mockProjects, newProject];
     logger.info("[MOCK API] Created project:", newProject);
     return newProject;
@@ -49,10 +78,12 @@ const MockProjectService: ProjectServiceInterface = {
     if (index === -1) {
       throw new Error("Project not found");
     }
+    // Validate input using Zod
+    const validated = validateData(project, UpdateProjectSchema);
     // Merge with existing - filter out undefined values
     const updatedProject = {
       ...mockProjects[index],
-      ...Object.fromEntries(Object.entries(project).filter(([, v]) => v !== undefined)),
+      ...Object.fromEntries(Object.entries(validated).filter(([, v]) => v !== undefined)),
     };
     mockProjects = mockProjects.map((p) => (p.id === id ? updatedProject : p));
     logger.info("[MOCK API] Updated project:", updatedProject);
@@ -76,19 +107,19 @@ const MockProjectService: ProjectServiceInterface = {
  */
 const RestProjectService: ProjectServiceInterface = {
   getProjects: async () => {
-    const response = await fetch(`${API_URL}/projects`);
+    const response = await fetch(`${env.API_URL}/projects`);
     if (!response.ok) throw new Error("API error fetching projects");
     return response.json();
   },
 
   getProjectById: async (id: number) => {
-    const response = await fetch(`${API_URL}/projects/${id}`);
+    const response = await fetch(`${env.API_URL}/projects/${id}`);
     if (!response.ok) throw new Error("API error fetching project by ID");
     return response.json();
   },
 
   createProject: async (project: CreateProjectInput) => {
-    const response = await fetch(`${API_URL}/projects`, {
+    const response = await fetch(`${env.API_URL}/projects`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(project),
@@ -98,7 +129,7 @@ const RestProjectService: ProjectServiceInterface = {
   },
 
   updateProject: async (id: number, project: UpdateProjectInput) => {
-    const response = await fetch(`${API_URL}/projects/${id}`, {
+    const response = await fetch(`${env.API_URL}/projects/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(project),
@@ -108,7 +139,7 @@ const RestProjectService: ProjectServiceInterface = {
   },
 
   deleteProject: async (id: number) => {
-    const response = await fetch(`${API_URL}/projects/${id}`, {
+    const response = await fetch(`${env.API_URL}/projects/${id}`, {
       method: "DELETE",
     });
     return response.ok;
@@ -118,4 +149,4 @@ const RestProjectService: ProjectServiceInterface = {
 /**
  * EXPORT: The smart switch
  */
-export const ProjectService = USE_MOCKS ? MockProjectService : RestProjectService;
+export const ProjectService = env.USE_MOCKS ? MockProjectService : RestProjectService;
