@@ -1,4 +1,4 @@
-.PHONY: help setup install dev clean lint format check mobile mobile-native mobile-clean mobile-web mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed android-reset android-stop android-kill android-restart eas-login eas-whoami eas-init eas-build-configure eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator
+.PHONY: help setup install dev clean lint format check typecheck mobile mobile-native mobile-clean mobile-web mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed android-reset android-stop android-kill android-restart eas-login eas-whoami eas-init eas-build-configure eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator
 
 # ==========================================
 # 📋 HELP
@@ -32,7 +32,8 @@ help:
 	@echo "    make clean                   - Clean node_modules"
 	@echo "    make lint                    - Run ESLint"
 	@echo "    make format                  - Format code"
-	@echo "    make check                   - Lint + format"
+	@echo "    make typecheck               - Run TypeScript check"
+	@echo "    make check                   - Typecheck + lint + format"
 	@echo ""
 	@echo "  🤖 ANDROID EMULATOR"
 	@echo "    make android-reset           - Reset emulator (wipe data)"
@@ -140,7 +141,10 @@ lint:
 format:
 	bun run format
 
-check: lint format
+typecheck:
+	cd $(MOBILE_DIR) && bun run typecheck
+
+check: typecheck lint format
 
 # ==========================================
 # 🤖 EAS

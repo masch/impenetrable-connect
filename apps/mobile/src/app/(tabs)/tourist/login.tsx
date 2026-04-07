@@ -1,34 +1,75 @@
 import { useState } from "react";
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import Screen from "../../../components/Screen";
 import { Button } from "../../../components/Button";
 import { FormInput } from "../../../components/FormInput";
 import { useI18n } from "../../../hooks/useI18n";
+import { useAuthStore } from "../../../stores/auth.store";
+import { CreateUserInput } from "@repo/shared";
 import jaguarHero from "../../../../assets/jaguar-hero.png";
 
 interface LoginFormData {
   alias: string;
   whatsapp: string;
-  nombre: string;
-  apellido: string;
+  first_name: string;
+  last_name: string;
+}
+
+interface FormErrors {
+  alias?: string;
 }
 
 export default function LoginScreen() {
   const { t } = useI18n();
+  const router = useRouter();
+  const login = useAuthStore((state) => state.login);
   const [formData, setFormData] = useState<LoginFormData>({
     alias: "",
     whatsapp: "",
-    nombre: "",
-    apellido: "",
+    first_name: "",
+    last_name: "",
   });
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!formData.alias.trim()) {
+      newErrors.alias = t("login.alias_required");
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = () => {
-    console.log("Form submitted:", formData);
+    if (!validateForm()) {
+      return;
+    }
+
+    // Convert undefined to null for nullable fields (per User schema)
+    const toNullable = (v: string | undefined) => (v ? v : null);
+
+    const userData: CreateUserInput = {
+      alias: formData.alias.trim(),
+      first_name: toNullable(formData.first_name.trim()) || null,
+      last_name: toNullable(formData.last_name.trim()) || null,
+      whatsapp: toNullable(formData.whatsapp.trim()) || null,
+      user_type: "TOURIST",
+      email: null,
+    };
+
+    login(userData);
+    router.push("/tourist/catalog");
   };
 
   const updateField = (field: keyof LoginFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field as keyof FormErrors]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
   };
 
   return (
@@ -72,6 +113,8 @@ export default function LoginScreen() {
                     placeholder={t("login.alias_placeholder")}
                     value={formData.alias}
                     onChangeText={(value) => updateField("alias", value)}
+                    required
+                    error={errors.alias}
                   />
 
                   <View className="pt-2 space-y-3">
@@ -94,13 +137,13 @@ export default function LoginScreen() {
                     <View className="grid grid-cols-2 gap-3">
                       <FormInput
                         label={t("login.first_name_label")}
-                        value={formData.nombre}
-                        onChangeText={(value) => updateField("nombre", value)}
+                        value={formData.first_name}
+                        onChangeText={(value) => updateField("first_name", value)}
                       />
                       <FormInput
                         label={t("login.last_name_label")}
-                        value={formData.apellido}
-                        onChangeText={(value) => updateField("apellido", value)}
+                        value={formData.last_name}
+                        onChangeText={(value) => updateField("last_name", value)}
                       />
                     </View>
                   </View>

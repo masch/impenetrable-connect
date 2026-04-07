@@ -41,6 +41,6 @@ export const UpdateProjectSchema = CreateProjectSchema.partial();
 
 export interface Project extends z.infer<typeof ProjectSchema> {}
 
-export interface CreateProjectInput extends z.infer<typeof CreateProjectSchema> {}
+export interface CreateProjectInput extends z.input<typeof CreateProjectSchema> {}
 
-export interface UpdateProjectInput extends z.infer<typeof UpdateProjectSchema> {}
+export interface UpdateProjectInput extends z.input<typeof UpdateProjectSchema> {}

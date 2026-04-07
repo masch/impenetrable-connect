@@ -27,6 +27,7 @@
     "welcome_subtitle": "Crea tu identidad para explorar el corazón del Chaco.",
     "alias_label": "Alias (Obligatorio)",
     "alias_placeholder": "Ej: Familia Gómez",
+    "alias_required": "El alias es requerido",
     "optional_section": "Opcional",
     "whatsapp_label": "WhatsApp",
     "whatsapp_placeholder": "3624 000000",

@@ -1,5 +1,5 @@
 export * from "./types/common";
-export * from "./types/tourist";
+export * from "./types/user";
 export * from "./types/entrepreneur";
 export * from "./types/venture";
 export * from "./types/catalog";

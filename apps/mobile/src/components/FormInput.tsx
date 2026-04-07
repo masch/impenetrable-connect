@@ -4,12 +4,14 @@ interface FormInputProps extends Omit<TextInputProps, "className"> {
   label: string;
   error?: string;
   helperText?: string;
+  required?: boolean;
 }
 
 export function FormInput({
   label,
   error,
   helperText,
+  required,
   value,
   onChangeText,
   keyboardType,
@@ -18,7 +20,10 @@ export function FormInput({
 }: FormInputProps) {
   return (
     <View className="mb-3">
-      <Text className="text-sm font-medium text-on-surface mb-2">{label}</Text>
+      <Text className="text-sm font-medium text-on-surface mb-2">
+        {label}
+        {required && <Text className="text-error"> *</Text>}
+      </Text>
       <TextInput
         className={`
           bg-surface-container-highest p-4 min-h-touch

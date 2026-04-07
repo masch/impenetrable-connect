@@ -1,5 +1,10 @@
+import { Text } from "react-native";
 import Screen from "../../components/Screen";
 
 export default function ProfileScreen() {
-  return <Screen title="Profile"></Screen>;
+  return (
+    <Screen>
+      <Text>Profile</Text>
+    </Screen>
+  );
 }

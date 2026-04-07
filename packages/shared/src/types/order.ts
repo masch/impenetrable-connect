@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { OrderStatusSchema, CancelReasonSchema, TimeOfDaySchema } from "./common";
-import { TouristSchema } from "./tourist";
+import { UserSchema } from "./user";
 import { CatalogItemSchema } from "./catalog";
 import { VentureSchema } from "./venture";
 
@@ -8,8 +8,8 @@ export const OrderSchema = z.object({
   id: z.number().int().positive(),
   // DB level: Links to the unified User table
   user_id: z.string().uuid(),
-  // Drizzle eager-loading projection: strictly typed as Tourist for frontend safety (no passwords/admin data)
-  tourist: TouristSchema.optional(),
+  // Drizzle eager-loading projection: typed as User (tourist data)
+  user: UserSchema.optional(),
   catalog_item_id: z.number().int().positive(),
   catalog_item: CatalogItemSchema.optional(),
   quantity: z.number().int().positive().default(1),
