@@ -16,6 +16,7 @@ interface TabItem {
 const tabsByRole: Record<UserRole, TabItem[]> = {
   TOURIST: [
     { name: "role-selector", label: "Dev", icon: "wrench" },
+    { name: "tourist/login", label: "Login", icon: "login" },
     { name: "tourist/catalog", label: "Catalog", icon: "view-grid" },
     { name: "tourist/order", label: "Order", icon: "cart" },
     { name: "profile", label: "Profile", icon: "account-circle" },

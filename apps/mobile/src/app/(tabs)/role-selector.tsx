@@ -2,6 +2,7 @@ import { useAuthStore } from "../../stores/auth.store";
 import { UserRole } from "@repo/shared";
 import { Button } from "../../components/Button";
 import { View, Text } from "react-native";
+import Screen, { ScreenContent } from "../../components/Screen";
 
 const ROLES: { role: UserRole; label: string; description: string }[] = [
   {
@@ -25,8 +26,8 @@ export default function RoleSelectorScreen() {
   const { userRole, setUserRole } = useAuthStore();
 
   return (
-    <View className="flex-1 bg-surface pt-20 px-5">
-      <View className="flex-1 max-w-md w-full mx-auto">
+    <Screen>
+      <ScreenContent>
         <Text className="text-2xl font-bold text-on-surface mb-1">Select User Role</Text>
         <Text className="text-sm text-on-surface opacity-60 mb-6">Development mode only</Text>
 
@@ -47,7 +48,7 @@ export default function RoleSelectorScreen() {
           <Text className="text-on-surface opacity-60">Current role:</Text>
           <Text className="font-bold text-on-surface">{userRole}</Text>
         </View>
-      </View>
-    </View>
+      </ScreenContent>
+    </Screen>
   );
 }

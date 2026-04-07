@@ -22,6 +22,18 @@
   "delete": "Delete",
   "confirm_delete": "Confirm Delete",
   "delete_confirm_message": "Are you sure you want to delete",
+  "login": {
+    "welcome_title": "Welcome to Impenetrable Connect",
+    "welcome_subtitle": "Create your identity to explore the heart of the Chaco.",
+    "alias_label": "Alias (Required)",
+    "alias_placeholder": "Ej: Familia Gómez",
+    "optional_section": "Optional",
+    "whatsapp_label": "WhatsApp",
+    "whatsapp_placeholder": "3624 000000",
+    "first_name_label": "First Name",
+    "last_name_label": "Last Name",
+    "submit_button": "Get Started"
+  },
   "validation": {
     "name_required": "Name is required",
     "name_min_length": "Name must be at least 2 characters",

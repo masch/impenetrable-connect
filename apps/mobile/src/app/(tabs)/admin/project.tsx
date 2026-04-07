@@ -7,6 +7,7 @@ import { useI18n } from "../../../hooks/useI18n";
 import { Project } from "@repo/shared";
 import { Button } from "../../../components/Button";
 import { LanguageSwitcher } from "../../../components/LanguageSwitcher";
+import Screen from "../../../components/Screen";
 
 interface ProjectCardProps {
   project: Project;
@@ -155,16 +156,9 @@ export default function ProjectsScreen() {
   const inactiveProjects = sortedProjects.filter((p) => !p.is_active);
 
   return (
-    <View className="flex-1 bg-surface pt-20 px-5">
+    <Screen>
       <ScrollView
-        className="flex-1"
-        contentContainerStyle={{
-          flexGrow: 1,
-          maxWidth: 448,
-          width: "100%",
-          alignSelf: "center",
-          paddingBottom: 24,
-        }}
+        className="flex-1 w-full self-center max-w-sm pb-6"
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
@@ -183,7 +177,7 @@ export default function ProjectsScreen() {
         {/* Loading State */}
         {isLoading && (
           <View className="py-12 items-center">
-            <ActivityIndicator size="large" color="#2b868c" />
+            <ActivityIndicator size="large" color="primary" />
             <Text className="text-on-surface mt-4">{t("loading")}</Text>
           </View>
         )}
@@ -232,6 +226,6 @@ export default function ProjectsScreen() {
       </ScrollView>
 
       <StatusBar style="auto" />
-    </View>
+    </Screen>
   );
 }

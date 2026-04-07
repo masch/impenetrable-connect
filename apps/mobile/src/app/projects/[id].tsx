@@ -9,6 +9,7 @@ import { ConfirmModal } from "../../components/ConfirmModal";
 import { FormInput } from "../../components/FormInput";
 import { FormSwitch } from "../../components/FormSwitch";
 import { FormLanguageSelector } from "../../components/FormLanguageSelector";
+import Screen from "../../components/Screen";
 
 interface ProjectFormData extends Omit<Project, "id"> {}
 
@@ -149,15 +150,17 @@ export default function ProjectFormScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-surface p-5 pt-20 items-center justify-center">
-        <ActivityIndicator size="large" color="primary" accessibilityLabel="Loading" />
-      </View>
+      <Screen>
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="primary" accessibilityLabel="Loading" />
+        </View>
+      </Screen>
     );
   }
 
   return (
-    <View className="flex-1 bg-surface p-5 pt-20">
-      <View className="flex-1 max-w-md w-full mx-auto">
+    <Screen>
+      <View className="flex-1 max-w-md w-full mx-auto px-5">
         <View className="mb-5">
           <Text className="text-2xl font-bold text-on-surface text-center">
             {isEditMode ? t("edit_project") : t("create_project")}
@@ -242,6 +245,6 @@ export default function ProjectFormScreen() {
         variant="danger"
         isLoading={isSaving}
       />
-    </View>
+    </Screen>
   );
 }

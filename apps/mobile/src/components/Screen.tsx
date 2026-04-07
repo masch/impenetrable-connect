@@ -1,18 +1,29 @@
 import { ReactNode } from "react";
-import { View, Text } from "react-native";
+import { View, Platform } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface ScreenProps {
-  title: string;
-  children?: ReactNode;
+  children: ReactNode;
+  className?: string;
 }
 
-export default function Screen({ title, children }: ScreenProps) {
+export default function Screen({ children, className = "" }: ScreenProps) {
+  // Use Tailwind classes for horizontal padding based on platform
+  // Android/Web: px-4 (16px), iOS: no horizontal padding (handled by safe area)
+  const horizontalPadding = Platform.OS === "web" || Platform.OS === "android" ? "px-4" : "";
+
   return (
-    <View className="flex-1 bg-surface pt-20 px-5">
-      <View className="flex-1 max-w-md w-full mx-auto">
-        <Text className="text-2xl font-bold text-primary mb-6">{title}</Text>
-        {children}
-      </View>
-    </View>
+    <SafeAreaView className={`flex-1 bg-surface ${horizontalPadding} ${className}`}>
+      {children}
+    </SafeAreaView>
   );
+}
+
+interface ScreenContentProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export function ScreenContent({ children, className = "" }: ScreenContentProps) {
+  return <View className={`flex-1 w-full max-w-md mx-auto ${className}`}>{children}</View>;
 }
