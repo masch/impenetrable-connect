@@ -1,3 +1,5 @@
+import { z } from "zod";
+import type { ZodIssue, ZodSchema } from "zod";
 import {
   Project,
   CreateProjectSchema,
@@ -12,22 +14,15 @@ import { logger } from "./logger.service";
 /**
  * Validate data using Zod schemas
  */
-function validateData<T>(
-  data: unknown,
-  schema: {
-    safeParse: (data: unknown) => {
-      success: boolean;
-      data?: T;
-      error?: { issues: { path: { join: (arg: string) => string }[]; message: string }[] };
-    };
-  },
-): T {
+function validateData<S extends ZodSchema>(data: unknown, schema: S): z.output<S> {
   const result = schema.safeParse(data);
   if (!result.success) {
-    const errors = result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join(", ");
+    const errors = result.error.issues
+      .map((i: ZodIssue) => `${i.path.join(".")}: ${i.message}`)
+      .join(", ");
     throw new Error(`Validation failed: ${errors}`);
   }
-  return result.data as T;
+  return result.data;
 }
 
 /**

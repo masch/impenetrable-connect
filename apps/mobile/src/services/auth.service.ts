@@ -1,6 +1,22 @@
-import { User, CreateUserInput } from "@repo/shared";
-import { USE_MOCKS, API_URL } from "../config/env";
+import { z } from "zod";
+import type { ZodIssue, ZodSchema } from "zod";
+import { User, CreateUserSchema, CreateUserInput } from "@repo/shared";
+import env from "../config/env";
 import { MOCK_USERS, findUserByAlias } from "../mocks/users";
+
+/**
+ * Validate data using Zod schemas
+ */
+function validateData<S extends ZodSchema>(data: unknown, schema: S): z.output<S> {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    const errors = result.error.issues
+      .map((i: ZodIssue) => `${i.path.join(".")}: ${i.message}`)
+      .join(", ");
+    throw new Error(`Validation failed: ${errors}`);
+  }
+  return result.data;
+}
 
 interface AuthServiceInterface {
   login(userData: CreateUserInput): Promise<User>;
@@ -15,8 +31,10 @@ let nextId = 3;
 const MockAuthService: AuthServiceInterface = {
   login: async (userData: CreateUserInput) => {
     await new Promise((r) => setTimeout(r, 500));
+    // Validate input using Zod
+    const validated = validateData(userData, CreateUserSchema);
     // Check if user exists in mock data
-    const alias = userData.alias ?? "";
+    const alias = validated.alias ?? "";
     const existingUser = findUserByAlias(alias);
     if (existingUser) {
       currentUser = {
@@ -28,12 +46,12 @@ const MockAuthService: AuthServiceInterface = {
     // Create new user
     const newUser: User = {
       id: `user_${nextId++}`,
-      alias: userData.alias,
-      email: userData.email,
-      first_name: userData.first_name,
-      last_name: userData.last_name,
-      whatsapp: userData.whatsapp,
-      user_type: userData.user_type ?? "TOURIST",
+      alias: validated.alias,
+      email: validated.email,
+      first_name: validated.first_name,
+      last_name: validated.last_name,
+      whatsapp: validated.whatsapp,
+      user_type: validated.user_type ?? "TOURIST",
       failed_login_attempts: 0,
       locked_until: null,
       last_login_at: new Date(),
@@ -58,7 +76,7 @@ const MockAuthService: AuthServiceInterface = {
 
 const RestAuthService: AuthServiceInterface = {
   login: async (userData: CreateUserInput) => {
-    const response = await fetch(`${API_URL}/auth/tourist/create`, {
+    const response = await fetch(`${env.API_URL}/auth/tourist/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),
@@ -68,18 +86,18 @@ const RestAuthService: AuthServiceInterface = {
   },
 
   getCurrentUser: async () => {
-    const response = await fetch(`${API_URL}/auth/me`);
+    const response = await fetch(`${env.API_URL}/auth/me`);
     if (response.status === 401) return null;
     if (!response.ok) throw new Error("API error fetching user");
     return response.json();
   },
 
   logout: async () => {
-    await fetch(`${API_URL}/auth/logout`, { method: "POST" });
+    await fetch(`${env.API_URL}/auth/logout`, { method: "POST" });
   },
 };
 
-export const AuthService = USE_MOCKS ? MockAuthService : RestAuthService;
+export const AuthService = env.USE_MOCKS ? MockAuthService : RestAuthService;
 
 /**
  * Mock login - searches in mock users or creates new one

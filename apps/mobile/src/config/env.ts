@@ -3,7 +3,7 @@
 // - Mock: for frontend development without real backend
 // - Prod: for connecting to the real backend
 
-export const ENV = {
+export const env = {
   // Set to 'false' to use the real backend
   USE_MOCKS: true,
 
@@ -11,8 +11,8 @@ export const ENV = {
   API_URL: "http://localhost:3000",
 } as const;
 
-// Convenience export for services/stores
-export const { USE_MOCKS, API_URL } = ENV;
+// Default export for cleaner imports
+export default env;
 
 // Development mode check
 export const isDev = process.env.NODE_ENV !== "production";

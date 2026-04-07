@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { User, CreateUserInput, UserRole } from "@repo/shared";
-import { USE_MOCKS } from "../config/env";
+import env from "../config/env";
 import { mockLogin, mockLogout } from "../services/auth.service";
 
 interface AuthState {
@@ -29,7 +29,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   setUserRole: (role) => set({ userRole: role }),
 
   login: (userData) => {
-    if (USE_MOCKS) {
+    if (env.USE_MOCKS) {
       const user = mockLogin(userData);
       set({ currentUser: user, isAuthenticated: true, isLoading: false, userRole: user.user_type });
     } else {
@@ -53,7 +53,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: () => {
-    if (USE_MOCKS) {
+    if (env.USE_MOCKS) {
       mockLogout();
     }
     set({ currentUser: null, isAuthenticated: false, userRole: "TOURIST" });
