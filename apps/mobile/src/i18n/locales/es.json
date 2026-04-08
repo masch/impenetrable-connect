@@ -46,5 +46,38 @@
     "timeout_min": "El timeout debe ser de al menos 1 minuto",
     "timeout_max": "El timeout debe ser como máximo 120 minutos",
     "supported_languages_required": "Se requiere al menos un idioma"
+  },
+  "catalog": {
+    "title": "Catálogo",
+    "subtitle": "Descubrí experiencias únicas en el Chaco",
+    "gastronomy": "Gastronomía",
+    "gastronomy_subtitle": "Sabores tradicionales del Chaco",
+    "excursions": "Excursiones",
+    "excursions_subtitle": "Explorá la naturaleza chaqueña",
+    "empty": "No hay servicios disponibles",
+    "category": {
+      "gastronomy": "Gastronomía",
+      "excursion": "Excursión"
+    },
+    "includes": "Incluye:",
+    "reserve": "Reservar",
+    "reservation": {
+      "title": "Reservar",
+      "moment_of_day": "Momento del día",
+      "quantity": "Cantidad de personas",
+      "total": "Total",
+      "notes": "Notas adicionales (opcional)",
+      "notes_placeholder": "Alguna request especial...",
+      "confirm": "Confirmar Reserva",
+      "confirming": "Confirmando...",
+      "success": "Reserva confirmada",
+      "error": "Error al crear la reserva",
+      "moments": {
+        "breakfast": "Desayuno",
+        "lunch": "Almuerzo",
+        "afternoon": "Merienda",
+        "dinner": "Cena"
+      }
+    }
   }
 }

@@ -2000,8 +2000,8 @@ erDiagram
     Catalog_Type {
         int id PK
         int project_id FK "Project this catalog type belongs to"
-        string name "e.g. Gastronomy, Guide Services"
-        string description "Optional description"
+        jsonb name_i18n "e.g. {'es':'Gastronomía','en':'Gastronomy'}"
+        jsonb description_i18n "Optional description (e.g. {'es':'Comidas típicas','en':'Typical dishes'})"
         boolean is_active "Whether this type is available"
     }
 
