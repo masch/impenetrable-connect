@@ -55,6 +55,9 @@
     "excursions": "Excursiones",
     "excursions_subtitle": "Explorá la naturaleza chaqueña",
     "empty": "No hay servicios disponibles",
+    "no_name": "Servicio sin nombre",
+    "participants": "personas",
+    "no_description": "Sin descripción disponible",
     "category": {
       "gastronomy": "Gastronomía",
       "excursion": "Excursión"
@@ -79,5 +82,30 @@
         "dinner": "Cena"
       }
     }
+  },
+  "roles": {
+    "tourist": {
+      "label": "Turista",
+      "description": "Explorá el catálogo y hacé pedidos"
+    },
+    "entrepreneur": {
+      "label": "Emprendedor",
+      "description": "Gestioná solicitudes y tu agenda"
+    },
+    "admin": {
+      "label": "Administrador",
+      "description": "Gestioná los proyectos"
+    }
+  },
+  "tabs": {
+    "roles": "Roles",
+    "dev": "Dev",
+    "login": "Ingresar",
+    "catalog": "Catálogo",
+    "order": "Pedido",
+    "profile": "Perfil",
+    "projects": "Proyectos",
+    "request": "Solicitudes",
+    "agenda": "Agenda"
   }
 }

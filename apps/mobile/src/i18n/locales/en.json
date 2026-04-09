@@ -55,6 +55,9 @@
     "excursions": "Excursions",
     "excursions_subtitle": "Explore the Chaco nature",
     "empty": "No services available",
+    "no_name": "Unnamed service",
+    "participants": "people",
+    "no_description": "No description available",
     "category": {
       "gastronomy": "Gastronomy",
       "excursion": "Excursion"
@@ -79,5 +82,30 @@
         "dinner": "Dinner"
       }
     }
+  },
+  "roles": {
+    "tourist": {
+      "label": "Tourist",
+      "description": "Browse catalog and place orders"
+    },
+    "entrepreneur": {
+      "label": "Entrepreneur",
+      "description": "Manage requests and agenda"
+    },
+    "admin": {
+      "label": "Admin",
+      "description": "Manage projects"
+    }
+  },
+  "tabs": {
+    "roles": "Roles",
+    "dev": "Dev",
+    "login": "Login",
+    "catalog": "Catalog",
+    "order": "Order",
+    "profile": "Profile",
+    "projects": "Projects",
+    "request": "Request",
+    "agenda": "Agenda"
   }
 }

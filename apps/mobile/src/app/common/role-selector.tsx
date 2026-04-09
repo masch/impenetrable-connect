@@ -1,29 +1,13 @@
 import { useAuthStore } from "../../stores/auth.store";
-import { UserRole } from "@repo/shared";
 import { Button } from "../../components/Button";
 import { View, Text } from "react-native";
 import Screen, { ScreenContent } from "../../components/Screen";
-
-const ROLES: { role: UserRole; label: string; description: string }[] = [
-  {
-    role: "TOURIST",
-    label: "Tourist",
-    description: "Browse catalog and place orders",
-  },
-  {
-    role: "ENTREPRENEUR",
-    label: "Entrepreneur",
-    description: "Manage requests and agenda",
-  },
-  {
-    role: "ADMIN",
-    label: "Admin",
-    description: "Manage projects",
-  },
-];
+import { ROLES } from "../../constants/roles";
+import { useI18n } from "../../hooks/useI18n";
 
 export default function RoleSelectorScreen() {
   const { userRole, setUserRole } = useAuthStore();
+  const { t } = useI18n();
 
   return (
     <Screen>
@@ -35,11 +19,13 @@ export default function RoleSelectorScreen() {
           {ROLES.map((item) => (
             <View key={item.role} className="mb-4">
               <Button
-                title={item.label}
+                title={t(item.labelKey)}
                 variant={userRole === item.role ? "primary" : "secondary"}
                 onPress={() => setUserRole(item.role)}
               />
-              <Text className="text-xs text-on-surface opacity-60 mt-1">{item.description}</Text>
+              <Text className="text-xs text-on-surface opacity-60 mt-1">
+                {t(item.descriptionKey)}
+              </Text>
             </View>
           ))}
         </View>

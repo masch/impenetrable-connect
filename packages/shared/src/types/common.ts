@@ -16,6 +16,22 @@ export type I18nString = z.infer<typeof I18nStringSchema>;
 export const UserRoleSchema = z.enum(["TOURIST", "ADMIN", "ENTREPRENEUR"]);
 export type UserRole = z.infer<typeof UserRoleSchema>;
 
+// i18n translation keys for role labels — app-agnostic, each consumer resolves with its own i18n system
+export const USER_ROLE_KEYS = {
+  TOURIST: {
+    labelKey: "roles.tourist.label",
+    descriptionKey: "roles.tourist.description",
+  },
+  ENTREPRENEUR: {
+    labelKey: "roles.entrepreneur.label",
+    descriptionKey: "roles.entrepreneur.description",
+  },
+  ADMIN: {
+    labelKey: "roles.admin.label",
+    descriptionKey: "roles.admin.description",
+  },
+} satisfies Record<UserRole, { labelKey: string; descriptionKey: string }>;
+
 export const OrderStatusSchema = z.enum([
   "SEARCHING",
   "OFFER_PENDING",

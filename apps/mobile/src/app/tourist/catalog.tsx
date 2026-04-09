@@ -5,13 +5,13 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Text, View, ScrollView, RefreshControl, ActivityIndicator } from "react-native";
-import { useI18n } from "../../../hooks/useI18n";
-import Screen, { ScreenContent } from "../../../components/Screen";
-import { ServiceCard } from "../../../components/ServiceCard";
-import { SectionHeader } from "../../../components/SectionHeader";
-import { ReservationModal } from "../../../components/ReservationModal";
-import { useCatalogStore } from "../../../stores/catalog.store";
-import type { CatalogServiceItem } from "../../../mocks/catalog";
+import { useI18n } from "../../hooks/useI18n";
+import Screen, { ScreenContent } from "../../components/Screen";
+import { ServiceCard } from "../../components/ServiceCard";
+import { SectionHeader } from "../../components/SectionHeader";
+import { ReservationModal } from "../../components/ReservationModal";
+import { useCatalogStore } from "../../stores/catalog.store";
+import type { CatalogServiceItem } from "../../mocks/catalog";
 
 export default function CatalogScreen() {
   const { t } = useI18n();

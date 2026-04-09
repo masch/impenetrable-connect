@@ -2,13 +2,13 @@ import { useState } from "react";
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import Screen from "../../../components/Screen";
-import { Button } from "../../../components/Button";
-import { FormInput } from "../../../components/FormInput";
-import { useI18n } from "../../../hooks/useI18n";
-import { useAuthStore } from "../../../stores/auth.store";
+import Screen from "../../components/Screen";
+import { Button } from "../../components/Button";
+import { FormInput } from "../../components/FormInput";
+import { useI18n } from "../../hooks/useI18n";
+import { useAuthStore } from "../../stores/auth.store";
 import { CreateUserInput } from "@repo/shared";
-import jaguarHero from "../../../../assets/jaguar-hero.png";
+import jaguarHero from "../../../assets/jaguar-hero.png";
 
 interface LoginFormData {
   alias: string;
@@ -62,7 +62,7 @@ export default function LoginScreen() {
     };
 
     login(userData);
-    router.push("/tourist/catalog");
+    router.push("/tourist");
   };
 
   const updateField = (field: keyof LoginFormData, value: string) => {
