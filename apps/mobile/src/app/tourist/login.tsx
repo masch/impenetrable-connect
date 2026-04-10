@@ -62,7 +62,7 @@ export default function LoginScreen() {
     };
 
     login(userData);
-    router.push("/tourist");
+    router.push("/tourist/catalog");
   };
 
   const updateField = (field: keyof LoginFormData, value: string) => {
