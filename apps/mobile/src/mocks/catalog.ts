@@ -42,46 +42,52 @@ export const MOCK_CATALOG_TYPES: CatalogType[] = [
 ];
 
 // Catalog Items - each has catalog_type_id referencing CatalogType
+export const MOCK_CATALOG_FORST_STEW: CatalogItem = {
+  id: 1,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Guiso de Monte", en: "Forest Stew" },
+  description_i18n: {
+    es: "Auténtico guiso tradicional chaqueño preparado con ingredientes locales.",
+    en: "Traditional Chaco stew made with local ingredients.",
+  },
+  price: 2500,
+  max_participants: null,
+  image_url: "https://images.unsplash.com/photo-1547592180-85f173990554?w=400",
+  global_pause: false,
+};
+
+export const MOCK_CATALOG_RIVER_EXCURSION: CatalogItem = {
+  id: 3,
+  catalog_type_id: CATALOG_TYPE_IDS.EXCURSION,
+  name_i18n: { es: "Excursión por el Río", en: "River Excursion" },
+  description_i18n: {
+    es: "Navegación por el río Paraguay en canoa tradicional.",
+    en: "Navigate the Paraguay River in a traditional canoe.",
+  },
+  price: 4500,
+  max_participants: 8,
+  image_url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",
+  global_pause: false,
+};
+
+export const MOCK_CATALOG_REGIONAL_GRILL: CatalogItem = {
+  id: 2,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Parrillada Regional", en: "Regional Grill" },
+  description_i18n: {
+    es: "Variedad de carnes asadas a la parrilla del Chaco.",
+    en: "Assorted grilled meats from the Chaco.",
+  },
+  price: 3500,
+  max_participants: null,
+  image_url: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400",
+  global_pause: false,
+};
+
 export const MOCK_CATALOG_ITEMS: CatalogItem[] = [
-  {
-    id: 1,
-    catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
-    name_i18n: { es: "Guiso de Monte", en: "Forest Stew" },
-    description_i18n: {
-      es: "Auténtico guiso tradicional chaqueño preparado con ingredientes locales.",
-      en: "Traditional Chaco stew made with local ingredients.",
-    },
-    price: 2500,
-    max_participants: null,
-    image_url: "https://images.unsplash.com/photo-1547592180-85f173990554?w=400",
-    global_pause: false,
-  },
-  {
-    id: 2,
-    catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
-    name_i18n: { es: "Parrillada Regional", en: "Regional Grill" },
-    description_i18n: {
-      es: "Variedad de carnes asadas a la parrilla del Chaco.",
-      en: "Assorted grilled meats from the Chaco.",
-    },
-    price: 3500,
-    max_participants: null,
-    image_url: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400",
-    global_pause: false,
-  },
-  {
-    id: 3,
-    catalog_type_id: CATALOG_TYPE_IDS.EXCURSION,
-    name_i18n: { es: "Excursión por el Río", en: "River Excursion" },
-    description_i18n: {
-      es: "Navegación por el río Paraguay en canoa tradicional.",
-      en: "Navigate the Paraguay River in a traditional canoe.",
-    },
-    price: 4500,
-    max_participants: 8,
-    image_url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",
-    global_pause: false,
-  },
+  MOCK_CATALOG_FORST_STEW,
+  MOCK_CATALOG_REGIONAL_GRILL,
+  MOCK_CATALOG_RIVER_EXCURSION,
 ];
 
 // Derive additional UI fields from CatalogItem

@@ -7,10 +7,11 @@
 import { create } from "zustand";
 import {
   CatalogServiceItem,
-  Reservation,
+  Order,
   CreateReservationInput,
   CatalogService,
 } from "../services/catalog.service";
+import { useOrdersStore } from "./orders.store";
 import { logger } from "../services/logger.service";
 
 interface CatalogState {
@@ -18,8 +19,8 @@ interface CatalogState {
   services: CatalogServiceItem[];
   selectedService: CatalogServiceItem | null;
 
-  // Reservations data
-  reservations: Reservation[];
+  // Orders created from reservations
+  orders: Order[];
 
   // UI state
   isLoading: boolean;
@@ -32,16 +33,16 @@ interface CatalogState {
   selectService: (id: number) => Promise<void>;
   clearSelectedService: () => void;
 
-  // Actions - Reservations
-  createReservation: (reservation: CreateReservationInput) => Promise<Reservation | null>;
-  fetchReservations: () => Promise<void>;
+  // Actions - Orders
+  createReservation: (reservation: CreateReservationInput) => Promise<Order | null>;
+  fetchOrders: () => Promise<void>;
 }
 
 export const useCatalogStore = create<CatalogState>((set, get) => ({
   // Initial state
   services: [],
   selectedService: null,
-  reservations: [],
+  orders: [],
   isLoading: false,
   isSaving: false,
   error: null,
@@ -87,30 +88,34 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
     set({ selectedService: null });
   },
 
-  // Create a reservation
+  // Create an Order from a reservation input
   createReservation: async (reservation: CreateReservationInput) => {
     set({ isSaving: true, error: null });
     try {
-      const newReservation = await CatalogService.createReservation(reservation);
-      const currentReservations = get().reservations;
-      set({ reservations: [...currentReservations, newReservation], isSaving: false });
-      return newReservation;
+      const newOrder = await CatalogService.createReservation(reservation);
+      const currentOrders = get().orders;
+      set({ orders: [...currentOrders, newOrder], isSaving: false });
+
+      // 🔄 Sincronizamos con el store de órdenes
+      useOrdersStore.getState().addOrder(newOrder);
+
+      return newOrder;
     } catch (err) {
-      logger.error("Error creating reservation", err);
-      set({ error: "Failed to create reservation", isSaving: false });
+      logger.error("Error creating order", err);
+      set({ error: "Failed to create order", isSaving: false });
       return null;
     }
   },
 
-  // Fetch all reservations
-  fetchReservations: async () => {
+  // Fetch all orders for this user
+  fetchOrders: async () => {
     set({ isLoading: true, error: null });
     try {
-      const reservations = await CatalogService.getReservations();
-      set({ reservations, isLoading: false });
+      const orders = await CatalogService.getOrders();
+      set({ orders, isLoading: false });
     } catch (err) {
-      logger.error("Error fetching reservations", err);
-      set({ error: "Failed to fetch reservations", isLoading: false });
+      logger.error("Error fetching orders", err);
+      set({ error: "Failed to fetch orders", isLoading: false });
     }
   },
 }));

@@ -108,5 +108,30 @@
     "projects": "Proyectos",
     "request": "Solicitudes",
     "agenda": "Agenda"
+  },
+  "orders": {
+    "title": "Mis Pedidos",
+    "active": "Activos",
+    "history": "Historial",
+    "noActive": "No tenés pedidos activos",
+    "noHistory": "No hay historial de pedidos",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "cancel": "Cancelar pedido",
+    "cancelConfirm": "¿Cancelar este pedido?",
+    "canceled": "Pedido cancelado",
+    "code": "Código de Reserva",
+    "passengers": "pasajeros",
+    "adults": "Adultos",
+    "status": {
+      "searching": "BUSCANDO...",
+      "confirmed": "CONFIRMADO",
+      "completed": "COMPLETADO",
+      "cancelled": "CANCELADO",
+      "expired": "EXPIRADO",
+      "noShow": "NO ASISTIÓ"
+    },
+    "confirmCancel": "Sí, cancelar",
+    "keeping": "No, mantener"
   }
 }

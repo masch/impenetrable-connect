@@ -16,7 +16,7 @@ export const OrderSchema = z.object({
   price_at_purchase: z.number().nonnegative(),
   confirmed_venture_id: z.number().int().positive().nullable().optional(),
   confirmed_venture: VentureSchema.optional(),
-  service_date: z.string(), // Using string for date (YYYY-MM-DD) to ensure JSON serialization compatibility
+  service_date: z.date(),
   time_of_day: TimeOfDaySchema,
   guest_count: z.number().int().positive(),
   notes: z.string().nullable().optional(),

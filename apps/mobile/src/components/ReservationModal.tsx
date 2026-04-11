@@ -6,6 +6,7 @@
 import { useState } from "react";
 import { Text, View, Modal, Pressable, ScrollView, TextInput, Image } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import type { TimeOfDay } from "@repo/shared";
 import type { CatalogServiceItem } from "../mocks/catalog";
 import { useTranslations } from "../hooks/useI18n";
 
@@ -13,15 +14,15 @@ interface ReservationModalProps {
   visible: boolean;
   service: CatalogServiceItem | null;
   onClose: () => void;
-  onConfirm: (momentOfDay: string, quantity: number, notes?: string) => void;
+  onConfirm: (momentOfDay: TimeOfDay, quantity: number, date: Date, notes?: string) => void;
   isLoading?: boolean;
 }
 
-const MOMENTS_OF_DAY = [
-  { id: "Desayuno", icon: "coffee", labelKey: "catalog.reservation.moments.breakfast" },
-  { id: "Almuerzo", icon: "silverware-fork-knife", labelKey: "catalog.reservation.moments.lunch" },
-  { id: "Merienda", icon: "cookie", labelKey: "catalog.reservation.moments.afternoon" },
-  { id: "Cena", icon: "food-drumstick", labelKey: "catalog.reservation.moments.dinner" },
+const MOMENTS_OF_DAY: { id: TimeOfDay; icon: string; labelKey: string }[] = [
+  { id: "BREAKFAST", icon: "coffee", labelKey: "catalog.reservation.moments.breakfast" },
+  { id: "LUNCH", icon: "silverware-fork-knife", labelKey: "catalog.reservation.moments.lunch" },
+  { id: "SNACK", icon: "cookie", labelKey: "catalog.reservation.moments.afternoon" },
+  { id: "DINNER", icon: "food-drumstick", labelKey: "catalog.reservation.moments.dinner" },
 ];
 
 export function ReservationModal({
@@ -32,13 +33,14 @@ export function ReservationModal({
   isLoading = false,
 }: ReservationModalProps) {
   const { t } = useTranslations();
-  const [selectedMoment, setSelectedMoment] = useState<string | null>(null);
+  const [selectedMoment, setSelectedMoment] = useState<TimeOfDay | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState("");
+  const [date] = useState(new Date());
 
   const handleConfirm = () => {
     if (!selectedMoment) return;
-    onConfirm(selectedMoment, quantity, notes || undefined);
+    onConfirm(selectedMoment, quantity, date, notes || undefined);
     // Reset form
     setSelectedMoment(null);
     setQuantity(1);
@@ -123,7 +125,7 @@ export function ReservationModal({
                     />
                     <Text
                       className={`text-sm font-body ${
-                        selectedMoment === moment.id ? "text-white" : "text-on-surface"
+                        selectedMoment === moment.id ? "text-on-primary" : "text-on-surface"
                       }`}
                     >
                       {t(moment.labelKey)}
@@ -174,7 +176,7 @@ export function ReservationModal({
             <TextInput
               className="bg-surface-container-low border border-outline-variant p-3 mb-6 h-20 text-base font-body text-on-surface"
               placeholder={t("catalog.reservation.notes_placeholder")}
-              placeholderTextColor="rgba(28, 28, 24, 0.4)"
+              placeholderTextColor="on-surface"
               value={notes}
               onChangeText={setNotes}
               multiline

@@ -34,6 +34,7 @@ module.exports = {
 
         // Error Colors
         "error-container": "#ffdad6",
+        error: "#ba1a1a",
         "on-error-container": "#93000a",
 
         // Outline

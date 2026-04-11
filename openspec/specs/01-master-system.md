@@ -2158,6 +2158,8 @@ erDiagram
 
     Order ||--o{ Cascade_Assignment : "processed by engine"
     Order ||--o{ Notification : "triggers"
+
+    Catalog_Item ||--o{ Order : "requested in"
 ```
 
 ---

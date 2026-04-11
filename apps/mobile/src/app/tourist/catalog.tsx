@@ -12,6 +12,7 @@ import { SectionHeader } from "../../components/SectionHeader";
 import { ReservationModal } from "../../components/ReservationModal";
 import { useCatalogStore } from "../../stores/catalog.store";
 import type { CatalogServiceItem } from "../../mocks/catalog";
+import type { TimeOfDay } from "@repo/shared";
 
 export default function CatalogScreen() {
   const { t } = useTranslations();
@@ -38,14 +39,20 @@ export default function CatalogScreen() {
     setModalVisible(true);
   };
 
-  const handleReservation = async (momentOfDay: string, quantity: number, notes?: string) => {
+  const handleReservation = async (
+    momentOfDay: TimeOfDay,
+    quantity: number,
+    date: Date,
+    notes?: string,
+  ) => {
     if (!selectedService) return;
 
     setIsReserving(true);
     const result = await createReservation({
       serviceId: selectedService.id,
-      momentOfDay: momentOfDay as "Desayuno" | "Almuerzo" | "Merienda" | "Cena",
+      momentOfDay,
       quantity,
+      date,
       notes,
     });
     setIsReserving(false);
