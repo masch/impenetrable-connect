@@ -53,17 +53,13 @@ export default function CatalogScreen() {
 
     // Check if user is logged in
     if (!isAuthenticated) {
-      Alert.alert(
-        t("errors.login_required_title") || "Login required",
-        t("errors.login_required_message") || "You must be logged in to make a reservation",
-        [
-          { text: t("common.cancel") || "Cancel", style: "cancel" },
-          {
-            text: t("auth.login") || "Login",
-            onPress: () => router.push("/tourist/login"),
-          },
-        ],
-      );
+      Alert.alert(t("errors.login_required_title"), t("errors.login_required_message"), [
+        { text: t("common.cancel"), style: "cancel" },
+        {
+          text: t("auth.login"),
+          onPress: () => router.push("/tourist/login"),
+        },
+      ]);
       return;
     }
 
@@ -83,7 +79,7 @@ export default function CatalogScreen() {
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
-      Alert.alert(t("errors.reservation_failed") || "Error", message);
+      Alert.alert(t("errors.reservation_failed"), message);
     } finally {
       setIsReserving(false);
     }

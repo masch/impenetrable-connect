@@ -31,7 +31,7 @@ const getStatusConfig = (
     textClass: "text-on-tertiary-fixed",
   },
   OFFER_PENDING: {
-    label: t("orders.status.offer_pending") || "Oferta Pendiente",
+    label: t("orders.status.offer_pending"),
     bgClass: "bg-primary-container",
     textClass: "text-on-primary-fixed",
   },
@@ -56,7 +56,7 @@ const getStatusConfig = (
     textClass: "text-error",
   },
   EXPIRED: {
-    label: t("orders.status.expired") || "Expirada",
+    label: t("orders.status.expired"),
     bgClass: "bg-error-container",
     textClass: "text-on-error-container",
   },
@@ -341,10 +341,7 @@ export default function OrderScreen() {
         {/* Segmented Control */}
         <View className="mb-6">
           <SegmentedControl
-            segments={[
-              { label: t("orders.active") || "Activas" },
-              { label: t("orders.history") || "Historial" },
-            ]}
+            segments={[{ label: t("orders.active") }, { label: t("orders.history") }]}
             selectedIndex={selectedTab === "active" ? 0 : 1}
             onChange={handleTabChange}
           />
@@ -362,7 +359,7 @@ export default function OrderScreen() {
           <View className="flex-1 items-center justify-center py-20">
             <ActivityIndicator size="large" color="primary" />
             <Text className="text-base font-body text-on-surface opacity-60 mt-4">
-              {t("loading") || "Cargando..."}
+              {t("loading")}
             </Text>
           </View>
         ) : (
