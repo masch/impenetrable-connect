@@ -5,9 +5,10 @@
 
 import { Order } from "@repo/shared";
 import {
-  MOCK_CATALOG_FORST_STEW,
-  MOCK_CATALOG_REGIONAL_GRILL,
-  MOCK_CATALOG_RIVER_EXCURSION,
+  ESTOFADO_CHIVO,
+  EMPANADAS_CARNE_DOCENA,
+  ASADO_POLLO,
+  EMPANADAS_VERDURA_DOCENA,
 } from "./catalog";
 import { getMockUserId, getDefaultMockUserId } from "./users";
 import { mockGetCurrentUser } from "../services/auth.service";
@@ -21,8 +22,8 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   {
     id: 1,
     user_id: DEFAULT_USER_ID,
-    catalog_item_id: MOCK_CATALOG_FORST_STEW.id,
-    catalog_item: MOCK_CATALOG_FORST_STEW,
+    catalog_item_id: ESTOFADO_CHIVO.id,
+    catalog_item: ESTOFADO_CHIVO,
     quantity: 1,
     price_at_purchase: 2500,
     confirmed_venture_id: null,
@@ -41,8 +42,8 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   {
     id: 2,
     user_id: DEFAULT_USER_ID,
-    catalog_item_id: MOCK_CATALOG_RIVER_EXCURSION.id,
-    catalog_item: MOCK_CATALOG_RIVER_EXCURSION,
+    catalog_item_id: ASADO_POLLO.id,
+    catalog_item: ASADO_POLLO,
     quantity: 1,
     price_at_purchase: 4500,
     confirmed_venture_id: 1,
@@ -61,8 +62,8 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   {
     id: 3,
     user_id: DEFAULT_USER_ID,
-    catalog_item_id: MOCK_CATALOG_REGIONAL_GRILL.id,
-    catalog_item: MOCK_CATALOG_REGIONAL_GRILL,
+    catalog_item_id: EMPANADAS_CARNE_DOCENA.id,
+    catalog_item: EMPANADAS_CARNE_DOCENA,
     quantity: 1,
     price_at_purchase: 3500,
     confirmed_venture_id: 2,
@@ -81,8 +82,8 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   {
     id: 4,
     user_id: DEFAULT_USER_ID,
-    catalog_item_id: MOCK_CATALOG_REGIONAL_GRILL.id,
-    catalog_item: MOCK_CATALOG_REGIONAL_GRILL,
+    catalog_item_id: EMPANADAS_VERDURA_DOCENA.id,
+    catalog_item: EMPANADAS_VERDURA_DOCENA,
     quantity: 1,
     price_at_purchase: 3500,
     confirmed_venture_id: 2,

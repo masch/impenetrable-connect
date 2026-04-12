@@ -166,7 +166,7 @@ function ActiveOrderCard({ order, onCancel }: ActiveOrderCardProps) {
           className="opacity-60"
         />
         <Text className="text-base font-body text-on-surface opacity-80">
-          {order.guest_count} {t("orders.passengers")}
+          {order.guest_count} {t("orders.guest_count")}
         </Text>
       </View>
 
@@ -245,7 +245,7 @@ function HistoryItem({ order }: HistoryItemProps) {
           {getOrderTitle(order, locale)}
         </Text>
         <Text className="text-sm font-body text-on-surface opacity-60">
-          {formatDate(order.service_date)} · {order.guest_count} {t("orders.passengers")}
+          {formatDate(order.service_date)} · {order.guest_count} {t("orders.guest_count")}
         </Text>
       </View>
 

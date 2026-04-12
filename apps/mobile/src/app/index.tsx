@@ -11,6 +11,7 @@ import {
 } from "../mocks/users";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../hooks/useI18n";
+import { LanguageSwitcher } from "../components/LanguageSwitcher";
 
 // Role colors from design system - mapped for icons and backgrounds
 const ROLE_COLORS = {
@@ -128,6 +129,9 @@ export default function RoleSelectorScreen() {
   return (
     <Screen>
       <ScreenContent>
+        <View className="flex-row justify-end mb-4">
+          <LanguageSwitcher />
+        </View>
         <ScrollView showsVerticalScrollIndicator={false}>
           <Text className="text-3xl font-display font-bold text-on-surface mb-2">
             {t("role_selector.welcome")}

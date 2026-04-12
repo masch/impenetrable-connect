@@ -52,12 +52,22 @@ export function ServiceCard({ service, onPress, accessibilityLabel }: ServiceCar
       {/* Image */}
       <View className="h-40 w-full bg-surface-container-highest">
         {service.image_url ? (
-          <Image
-            source={{ uri: service.image_url }}
-            className="w-full h-full"
-            resizeMode="cover"
-            alt={name}
-          />
+          typeof service.image_url === "string" && service.image_url.startsWith("http") ? (
+            <Image
+              source={{ uri: service.image_url }}
+              className="w-full h-full"
+              resizeMode="cover"
+              alt={name}
+            />
+          ) : (
+            // Local require() - already resolved by Metro as a number
+            <Image
+              source={service.image_url as unknown as number}
+              className="w-full h-full"
+              resizeMode="cover"
+              alt={name}
+            />
+          )
         ) : (
           <View className="w-full h-full items-center justify-center">
             <MaterialCommunityIcons name="image-off" size={40} color="outline-variant" />
