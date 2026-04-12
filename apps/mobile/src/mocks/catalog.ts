@@ -6,6 +6,14 @@
 import { CatalogItem, CatalogType } from "@repo/shared";
 import { MOCK_PROJECTS, PROJECT_IDS } from "./projects";
 
+// Local assets
+import empanadas12 from "../../assets/catalog/empanadas12.jpeg";
+import empanadas6 from "../../assets/catalog/empanadas6.jpeg";
+import repollo from "../../assets/catalog/repollo.jpeg";
+import pastelCalabaza from "../../assets/catalog/pastel_calabaza.jpeg";
+import chivoGuiso from "../../assets/catalog/chivo_guiso.jpeg";
+import chivoEstofado from "../../assets/catalog/chivo_estofado.jpeg";
+
 // Get the first active project for our mock catalog types
 const defaultProject = MOCK_PROJECTS.find((p) => p.is_active) || MOCK_PROJECTS[0];
 
@@ -41,64 +49,237 @@ export const MOCK_CATALOG_TYPES: CatalogType[] = [
   },
 ];
 
-// Catalog Items - each has catalog_type_id referencing CatalogType
-export const MOCK_CATALOG_FORST_STEW: CatalogItem = {
+// Catalog Items as named exports (id is a number)
+export const EMPANADAS_CARNE_MEDIA_DOCENA: CatalogItem = {
   id: 1,
   catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
-  name_i18n: { es: "Guiso de Monte", en: "Forest Stew" },
+  name_i18n: { es: "Empanadas de carne 1/2 doc.", en: "Beef Empanadas 1/2 dozen" },
   description_i18n: {
-    es: "Auténtico guiso tradicional chaqueño preparado con ingredientes locales.",
-    en: "Traditional Chaco stew made with local ingredients.",
+    es: "Mínimo 6 empanadas. Empanadas de carne magra, masa casera",
+    en: "Minimum 6 empanadas. Lean beef empanadas, homemade dough",
   },
-  price: 2500,
+  price: 9500,
   max_participants: null,
-  image_url: "https://images.unsplash.com/photo-1547592180-85f173990554?w=400",
+  image_url: empanadas6 as unknown as string,
   global_pause: false,
 };
 
-export const MOCK_CATALOG_RIVER_EXCURSION: CatalogItem = {
-  id: 3,
-  catalog_type_id: CATALOG_TYPE_IDS.EXCURSION,
-  name_i18n: { es: "Excursión por el Río", en: "River Excursion" },
-  description_i18n: {
-    es: "Navegación por el río Paraguay en canoa tradicional.",
-    en: "Navigate the Paraguay River in a traditional canoe.",
-  },
-  price: 4500,
-  max_participants: 8,
-  image_url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",
-  global_pause: false,
-};
-
-export const MOCK_CATALOG_REGIONAL_GRILL: CatalogItem = {
+export const EMPANADAS_CARNE_DOCENA: CatalogItem = {
   id: 2,
   catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
-  name_i18n: { es: "Parrillada Regional", en: "Regional Grill" },
+  name_i18n: { es: "Empanadas de carne x doc.", en: "Beef Empanadas dozen" },
   description_i18n: {
-    es: "Variedad de carnes asadas a la parrilla del Chaco.",
-    en: "Assorted grilled meats from the Chaco.",
+    es: "Empanadas de carne magra, masa casera",
+    en: "Lean beef empanadas, homemade dough",
   },
-  price: 3500,
+  price: 18000,
   max_participants: null,
-  image_url: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400",
+  image_url: empanadas12 as unknown as string,
   global_pause: false,
 };
 
-export const MOCK_CATALOG_ITEMS: CatalogItem[] = [
-  MOCK_CATALOG_FORST_STEW,
-  MOCK_CATALOG_REGIONAL_GRILL,
-  MOCK_CATALOG_RIVER_EXCURSION,
-];
+export const EMPANADAS_CHARQUI_MEDIA_DOCENA: CatalogItem = {
+  id: 3,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Empanadas de charqui 1/2 doc.", en: "Charqui Empanadas 1/2 dozen" },
+  description_i18n: {
+    es: "Mínimo 6 empanadas. Empanadas de charqui artesanal",
+    en: "Minimum 6 empanadas. Artisan charqui empanadas",
+  },
+  price: 12500,
+  max_participants: null,
+  image_url: empanadas6 as unknown as string,
+  global_pause: false,
+};
+
+export const EMPANADAS_CHARQUI_DOCENA: CatalogItem = {
+  id: 4,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Empanadas de charqui x doc.", en: "Charqui Empanadas dozen" },
+  description_i18n: { es: "Empanadas de charqui artesanal", en: "Artisan charqui empanadas" },
+  price: 24000,
+  max_participants: null,
+  image_url: empanadas12 as unknown as string,
+  global_pause: false,
+};
+
+export const EMPANADAS_VERDURA_MEDIA_DOCENA: CatalogItem = {
+  id: 5,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Empanadas de verdura 1/2 doc.", en: "Vegetable Empanadas 1/2 dozen" },
+  description_i18n: {
+    es: "Mínimo 6 empanadas. Empanadas de verduras frescas de la huerta",
+    en: "Minimum 6 empanadas. Fresh garden vegetable empanadas",
+  },
+  price: 9000,
+  max_participants: null,
+  image_url: empanadas12 as unknown as string,
+  global_pause: false,
+};
+
+export const EMPANADAS_VERDURA_DOCENA: CatalogItem = {
+  id: 6,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Empanadas de verdura x doc.", en: "Vegetable Empanadas dozen" },
+  description_i18n: {
+    es: "Empanadas de verduras frescas de la huerta",
+    en: "Fresh garden vegetable empanadas",
+  },
+  price: 17000,
+  max_participants: null,
+  image_url: empanadas12 as unknown as string,
+  global_pause: false,
+};
+
+export const EMPANADAS_POLLO_MEDIA_DOCENA: CatalogItem = {
+  id: 7,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Empanadas de pollo 1/2 doc.", en: "Chicken Empanadas 1/2 dozen" },
+  description_i18n: {
+    es: "Mínimo 6 empanadas. Empanadas de pollo deshilachado",
+    en: "Minimum 6 empanadas. Shredded chicken empanadas",
+  },
+  price: 9000,
+  max_participants: null,
+  image_url: empanadas6 as unknown as string,
+  global_pause: false,
+};
+
+export const EMPANADAS_POLLO_DOCENA: CatalogItem = {
+  id: 8,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Empanadas de pollo x doc.", en: "Chicken Empanadas dozen" },
+  description_i18n: { es: "Empanadas de pollo deshilachado", en: "Shredded chicken empanadas" },
+  price: 17000,
+  max_participants: null,
+  image_url: empanadas12 as unknown as string,
+  global_pause: false,
+};
+
+export const ASADO_POLLO: CatalogItem = {
+  id: 9,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Asado de pollo c/guarnición", en: "Roasted chicken with garnish" },
+  description_i18n: {
+    es: "Asado de pollo con guarnición de arroz y ensalada",
+    en: "Roasted chicken with rice and salad garnish",
+  },
+  price: 17000,
+  max_participants: null,
+  image_url: "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400",
+  global_pause: false,
+};
+
+export const PASTEL_ZAPALLO_CHIVO: CatalogItem = {
+  id: 10,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Pastel de zapallo o papa c/chivo", en: "Pumpkin or potato pie with goat" },
+  description_i18n: {
+    es: "Pastel de zapallo o papa con carne de chivo",
+    en: "Pumpkin or potato pie with goat meat",
+  },
+  price: 18000,
+  max_participants: null,
+  image_url: pastelCalabaza as unknown as string,
+  global_pause: false,
+};
+
+export const ESTOFADO_CHIVO: CatalogItem = {
+  id: 11,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Estofado de chivo", en: "Goat stew" },
+  description_i18n: {
+    es: "Estofado tradicional de chivo chaqueño",
+    en: "Traditional Chaco goat stew",
+  },
+  price: 20000,
+  max_participants: null,
+  image_url: chivoEstofado as unknown as string,
+  global_pause: false,
+};
+
+export const GUISO_CHIVO: CatalogItem = {
+  id: 12,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Guiso de Chivo", en: "Goat stew (Guiso)" },
+  description_i18n: { es: "Guiso auténtica de chivo chaqueño", en: "Authentic Chaco goat guiso" },
+  price: 20000,
+  max_participants: null,
+  image_url: chivoGuiso as unknown as string,
+  global_pause: false,
+};
+
+export const REPOLLO_ASADO: CatalogItem = {
+  id: 13,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Repollo asado c/verduras", en: "Roasted cabbage with vegetables" },
+  description_i18n: {
+    es: "Repollo asado con mezcla de verduras de temporada",
+    en: "Roasted cabbage with seasonal vegetables",
+  },
+  price: 18000,
+  max_participants: null,
+  image_url: repollo as unknown as string,
+  global_pause: false,
+};
+
+export const POSTRE_REGIONAL: CatalogItem = {
+  id: 14,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Postre regional", en: "Regional dessert" },
+  description_i18n: {
+    es: "Postre típico de la región chaqueña",
+    en: "Typical dessert from the Chaco region",
+  },
+  price: 7000,
+  max_participants: null,
+  image_url: "https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?w=400",
+  global_pause: false,
+};
+
+export const DESAYUNO: CatalogItem = {
+  id: 15,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Desayuno/merienda", en: "Breakfast/afternoon tea" },
+  description_i18n: {
+    es: "Desayuno o merienda con productos regionales",
+    en: "Breakfast or afternoon tea with regional products",
+  },
+  price: 9000,
+  max_participants: null,
+  image_url: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400",
+  global_pause: false,
+};
+
+export const MOCK_CATALOG_ITEMS: Record<number, CatalogItem> = {
+  [EMPANADAS_CARNE_MEDIA_DOCENA.id]: EMPANADAS_CARNE_MEDIA_DOCENA,
+  [EMPANADAS_CARNE_DOCENA.id]: EMPANADAS_CARNE_DOCENA,
+  [EMPANADAS_CHARQUI_MEDIA_DOCENA.id]: EMPANADAS_CHARQUI_MEDIA_DOCENA,
+  [EMPANADAS_CHARQUI_DOCENA.id]: EMPANADAS_CHARQUI_DOCENA,
+  [EMPANADAS_VERDURA_MEDIA_DOCENA.id]: EMPANADAS_VERDURA_MEDIA_DOCENA,
+  [EMPANADAS_VERDURA_DOCENA.id]: EMPANADAS_VERDURA_DOCENA,
+  [EMPANADAS_POLLO_MEDIA_DOCENA.id]: EMPANADAS_POLLO_MEDIA_DOCENA,
+  [EMPANADAS_POLLO_DOCENA.id]: EMPANADAS_POLLO_DOCENA,
+  [ASADO_POLLO.id]: ASADO_POLLO,
+  [PASTEL_ZAPALLO_CHIVO.id]: PASTEL_ZAPALLO_CHIVO,
+  [ESTOFADO_CHIVO.id]: ESTOFADO_CHIVO,
+  [GUISO_CHIVO.id]: GUISO_CHIVO,
+  [REPOLLO_ASADO.id]: REPOLLO_ASADO,
+  [POSTRE_REGIONAL.id]: POSTRE_REGIONAL,
+  [DESAYUNO.id]: DESAYUNO,
+};
 
 // Derive additional UI fields from CatalogItem
 export type CatalogServiceItem = CatalogItem & {
   schedule?: string;
 };
 
-export const MOCK_CATALOG_SERVICES: CatalogServiceItem[] = MOCK_CATALOG_ITEMS.map((item) => ({
-  ...item,
-  schedule:
-    item.catalog_type_id === CATALOG_TYPE_IDS.GASTRONOMY
-      ? "12:00 - 16:00"
-      : "08:00 - 12:00 / 15:00 - 19:00",
-}));
+export const MOCK_CATALOG_SERVICES: CatalogServiceItem[] = Object.values(MOCK_CATALOG_ITEMS).map(
+  (item) => ({
+    ...item,
+    schedule:
+      item.catalog_type_id === CATALOG_TYPE_IDS.GASTRONOMY
+        ? "12:00 - 16:00"
+        : "08:00 - 12:00 / 15:00 - 19:00",
+  }),
+);

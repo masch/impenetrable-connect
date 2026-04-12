@@ -4,11 +4,12 @@
  */
 
 import { useState } from "react";
-import { Text, View, Modal, Pressable, ScrollView, TextInput, Image } from "react-native";
+import { Text, View, Modal, Pressable, ScrollView, TextInput } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import type { TimeOfDay } from "@repo/shared";
 import type { CatalogServiceItem } from "../mocks/catalog";
 import { useTranslations } from "../hooks/useI18n";
+import { CatalogImage } from "./CatalogImage";
 
 interface ReservationModalProps {
   visible: boolean;
@@ -78,10 +79,8 @@ export function ReservationModal({
           <View className="pb-4 border-b border-outline-variant">
             {service.image_url && (
               <View className="mx-auto mb-4 rounded-xl overflow-hidden sm:h-64 h-48 max-w-md w-full">
-                <Image
-                  source={{ uri: service.image_url }}
-                  className="w-full h-full"
-                  resizeMode="cover"
+                <CatalogImage
+                  imageUrl={service.image_url}
                   alt={service.name_i18n.es || service.name_i18n.en || "Service image"}
                 />
               </View>

@@ -121,7 +121,7 @@
     "cancelConfirm": "Cancel this order?",
     "canceled": "Order canceled",
     "code": "Reservation Code",
-    "passengers": "passengers",
+    "guest_count": "number of people",
     "adults": "Adults",
     "status": {
       "searching": "SEARCHING...",

@@ -3,11 +3,12 @@
  * Displays a tourist service (gastronomy or excursion) with image, details, and reservation action
  */
 
-import { Text, View, Image, Pressable } from "react-native";
+import { Text, View, Pressable } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../hooks/useI18n";
 import { CATALOG_TYPE_IDS } from "../mocks/catalog";
 import type { CatalogServiceItem } from "../mocks/catalog";
+import { CatalogImage } from "./CatalogImage";
 
 interface ServiceCardProps {
   service: CatalogServiceItem;
@@ -50,14 +51,9 @@ export function ServiceCard({ service, onPress, accessibilityLabel }: ServiceCar
       accessibilityLabel={accessibilityLabel || name}
     >
       {/* Image */}
-      <View className="h-40 w-full bg-surface-container-highest">
+      <View className="h-40 w-full bg-surface-container-highest items-center justify-center overflow-hidden">
         {service.image_url ? (
-          <Image
-            source={{ uri: service.image_url }}
-            className="w-full h-full"
-            resizeMode="cover"
-            alt={name}
-          />
+          <CatalogImage imageUrl={service.image_url} alt={name} />
         ) : (
           <View className="w-full h-full items-center justify-center">
             <MaterialCommunityIcons name="image-off" size={40} color="outline-variant" />

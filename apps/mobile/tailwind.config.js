@@ -64,6 +64,11 @@ module.exports = {
         "scale-6": "1.5rem",
         "scale-8": "2rem",
       },
+      objectFit: {
+        contain: "contain",
+        cover: "cover",
+        coverl: "cover",
+      },
     },
   },
   plugins: [],
