@@ -22,10 +22,12 @@ jobs:
           bun-version: latest
 
       - name: Install Dependencies
-        run: bun install
+        run: make setup
 
       - name: Export Web Build
         run: make eas-export-web
 
       - name: Deploy to EAS Hosting
         run: make eas-deploy-web-prod
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
