@@ -1,0 +1,31 @@
+name: Deploy Web
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/mobile/**"
+      - "packages/shared/**"
+      - "apps/backend/**"
+      - "!apps/mobile/assets/**"
+      - "!apps/mobile/**/*.md"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Export Web Build
+        run: make eas-export-web
+
+      - name: Deploy to EAS Hosting
+        run: make eas-deploy-web-prod

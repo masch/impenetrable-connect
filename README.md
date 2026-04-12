@@ -1,4 +1,4 @@
-# Impenetrable Connect
+<h1 align="center">🌳<a href="https://impenetrable-connect.expo.app/">Impenetrable Connect</a>🌳</h1>
 
 ## Overview
 
@@ -46,3 +46,15 @@ Built and orchestrated using a **Spec-Driven Development (SDD)** workflow.
    ```bash
    bun run dev
    ```
+
+## Web Deployment
+
+The Impenetrable Connect application is deployed to the web using Expo's EAS Hosting service.
+
+**Live URL**: https://impenetrable-connect.expo.app/
+
+### Automated Web Deployment
+
+Web builds and deployments are automatically triggered on pushes to the `main` branch via GitHub Actions workflow (`.eas/workflows/deploy-web.yml`).
+
+See the [Web Publishing Specification](openspec/specs/web-publishing.md) for detailed technical information.
