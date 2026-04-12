@@ -58,4 +58,5 @@ The Impenetrable Connect application is deployed to the web using Expo's EAS Hos
 Web builds and deployments are automatically triggered on pushes to the `main` branch via GitHub Actions workflow (`.eas/workflows/deploy-web.yml`).
 
 See the [Web Publishing Specification](openspec/specs/web-publishing.md) for detailed technical information.
+
 # test
