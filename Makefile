@@ -191,8 +191,8 @@ eas-deploy-web:
 	cd $(MOBILE_DIR) && eas deploy
 
 eas-deploy-web-prod:
-	cd $(MOBILE_DIR) && eas deploy --prod
-
+	cd $(MOBILE_DIR) && bunx eas deploy --prod
+	
 # ==========================================
 # 🤖 ANDROID EMULATOR
 # ==========================================

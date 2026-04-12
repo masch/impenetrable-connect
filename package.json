@@ -13,7 +13,6 @@
     "format": "bunx prettier --write ."
   },
   "devDependencies": {
-    "prettier": "^3.5.1",
-    "eas-cli": "latest"
+    "prettier": "^3.5.1"
   }
 }
