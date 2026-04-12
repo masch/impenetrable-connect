@@ -1,0 +1,35 @@
+# CI Workflow - Lint and Type Check
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/mobile/**"
+      - "packages/shared/**"
+      - "apps/backend/**"
+      - "!apps/mobile/assets/**"
+      - "!apps/mobile/**/*.md"
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: make setup
+
+      - name: Lint
+        run: make lint
+
+      - name: Typecheck
+        run: make typecheck
