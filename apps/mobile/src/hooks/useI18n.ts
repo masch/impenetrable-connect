@@ -28,3 +28,19 @@ export function useLocale() {
 
   return { locale, setLocale, initializeLocale };
 }
+
+/**
+ * Hook to get localized name from i18n object with fallback chain
+ * Usage: const name = useLocalizedName(item.name_i18n)
+ * Returns: name in current locale > Spanish > English
+ */
+export function useLocalizedName(name_i18n: Record<string, string> | undefined): string {
+  const locale = useLocaleStore((state) => state.locale);
+
+  if (!name_i18n) return "";
+
+  return name_i18n[locale] || name_i18n.es || name_i18n.en || "";
+}
+
+// Alias for backwards compatibility
+export const getLocalizedName = useLocalizedName;

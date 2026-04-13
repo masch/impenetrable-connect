@@ -53,7 +53,7 @@ export const MOCK_CATALOG_TYPES: CatalogType[] = [
 export const EMPANADAS_CARNE_MEDIA_DOCENA: CatalogItem = {
   id: 1,
   catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
-  name_i18n: { es: "Empanadas de carne 1/2 doc.", en: "Beef Empanadas 1/2 dozen" },
+  name_i18n: { es: "Empanadas de carne 1/2 docena", en: "Beef Empanadas 1/2 dozen" },
   description_i18n: {
     es: "Mínimo 6 empanadas. Empanadas de carne magra, masa casera",
     en: "Minimum 6 empanadas. Lean beef empanadas, homemade dough",
@@ -67,7 +67,7 @@ export const EMPANADAS_CARNE_MEDIA_DOCENA: CatalogItem = {
 export const EMPANADAS_CARNE_DOCENA: CatalogItem = {
   id: 2,
   catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
-  name_i18n: { es: "Empanadas de carne x doc.", en: "Beef Empanadas dozen" },
+  name_i18n: { es: "Empanadas de carne 1 docena", en: "Beef Empanadas dozen" },
   description_i18n: {
     es: "Empanadas de carne magra, masa casera",
     en: "Lean beef empanadas, homemade dough",
@@ -81,7 +81,7 @@ export const EMPANADAS_CARNE_DOCENA: CatalogItem = {
 export const EMPANADAS_CHARQUI_MEDIA_DOCENA: CatalogItem = {
   id: 3,
   catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
-  name_i18n: { es: "Empanadas de charqui 1/2 doc.", en: "Charqui Empanadas 1/2 dozen" },
+  name_i18n: { es: "Empanadas de charqui 1/2 docena", en: "Charqui Empanadas 1/2 dozen" },
   description_i18n: {
     es: "Mínimo 6 empanadas. Empanadas de charqui artesanal",
     en: "Minimum 6 empanadas. Artisan charqui empanadas",
@@ -95,7 +95,7 @@ export const EMPANADAS_CHARQUI_MEDIA_DOCENA: CatalogItem = {
 export const EMPANADAS_CHARQUI_DOCENA: CatalogItem = {
   id: 4,
   catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
-  name_i18n: { es: "Empanadas de charqui x doc.", en: "Charqui Empanadas dozen" },
+  name_i18n: { es: "Empanadas de charqui 1 docena", en: "Charqui Empanadas dozen" },
   description_i18n: { es: "Empanadas de charqui artesanal", en: "Artisan charqui empanadas" },
   price: 24000,
   max_participants: null,
@@ -106,7 +106,7 @@ export const EMPANADAS_CHARQUI_DOCENA: CatalogItem = {
 export const EMPANADAS_VERDURA_MEDIA_DOCENA: CatalogItem = {
   id: 5,
   catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
-  name_i18n: { es: "Empanadas de verdura 1/2 doc.", en: "Vegetable Empanadas 1/2 dozen" },
+  name_i18n: { es: "Empanadas de verdura 1/2 docena", en: "Vegetable Empanadas 1/2 dozen" },
   description_i18n: {
     es: "Mínimo 6 empanadas. Empanadas de verduras frescas de la huerta",
     en: "Minimum 6 empanadas. Fresh garden vegetable empanadas",
@@ -120,7 +120,7 @@ export const EMPANADAS_VERDURA_MEDIA_DOCENA: CatalogItem = {
 export const EMPANADAS_VERDURA_DOCENA: CatalogItem = {
   id: 6,
   catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
-  name_i18n: { es: "Empanadas de verdura x doc.", en: "Vegetable Empanadas dozen" },
+  name_i18n: { es: "Empanadas de verdura 1 docena", en: "Vegetable Empanadas dozen" },
   description_i18n: {
     es: "Empanadas de verduras frescas de la huerta",
     en: "Fresh garden vegetable empanadas",
@@ -134,7 +134,7 @@ export const EMPANADAS_VERDURA_DOCENA: CatalogItem = {
 export const EMPANADAS_POLLO_MEDIA_DOCENA: CatalogItem = {
   id: 7,
   catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
-  name_i18n: { es: "Empanadas de pollo 1/2 doc.", en: "Chicken Empanadas 1/2 dozen" },
+  name_i18n: { es: "Empanadas de pollo 1/2 docena", en: "Chicken Empanadas 1/2 dozen" },
   description_i18n: {
     es: "Mínimo 6 empanadas. Empanadas de pollo deshilachado",
     en: "Minimum 6 empanadas. Shredded chicken empanadas",
@@ -148,7 +148,7 @@ export const EMPANADAS_POLLO_MEDIA_DOCENA: CatalogItem = {
 export const EMPANADAS_POLLO_DOCENA: CatalogItem = {
   id: 8,
   catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
-  name_i18n: { es: "Empanadas de pollo x doc.", en: "Chicken Empanadas dozen" },
+  name_i18n: { es: "Empanadas de pollo 1 docena", en: "Chicken Empanadas dozen" },
   description_i18n: { es: "Empanadas de pollo deshilachado", en: "Shredded chicken empanadas" },
   price: 17000,
   max_participants: null,
@@ -240,10 +240,24 @@ export const POSTRE_REGIONAL: CatalogItem = {
 export const DESAYUNO: CatalogItem = {
   id: 15,
   catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
-  name_i18n: { es: "Desayuno/merienda", en: "Breakfast/afternoon tea" },
+  name_i18n: { es: "Desayuno", en: "Breakfast tea" },
   description_i18n: {
-    es: "Desayuno o merienda con productos regionales",
-    en: "Breakfast or afternoon tea with regional products",
+    es: "Desayuno con productos regionales",
+    en: "Breakfast with regional products",
+  },
+  price: 9000,
+  max_participants: null,
+  image_url: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400",
+  global_pause: false,
+};
+
+export const MERIENDA: CatalogItem = {
+  id: 16,
+  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  name_i18n: { es: "Merienda", en: "Snack" },
+  description_i18n: {
+    es: "Merienda con productos regionales",
+    en: "Snack with regional products",
   },
   price: 9000,
   max_participants: null,
@@ -267,6 +281,7 @@ export const MOCK_CATALOG_ITEMS: Record<number, CatalogItem> = {
   [REPOLLO_ASADO.id]: REPOLLO_ASADO,
   [POSTRE_REGIONAL.id]: POSTRE_REGIONAL,
   [DESAYUNO.id]: DESAYUNO,
+  [MERIENDA.id]: MERIENDA,
 };
 
 // Derive additional UI fields from CatalogItem

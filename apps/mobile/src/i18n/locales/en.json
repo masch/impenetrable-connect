@@ -68,6 +68,7 @@
     "reservation": {
       "title": "Reserve",
       "moment_of_day": "Time of day",
+      "date": "Date",
       "quantity": "Number of people",
       "total": "Total",
       "notes": "Additional notes (optional)",
@@ -79,7 +80,7 @@
       "moments": {
         "breakfast": "Breakfast",
         "lunch": "Lunch",
-        "afternoon": "Afternoon Tea",
+        "snack": "Snack",
         "dinner": "Dinner"
       }
     }
@@ -103,7 +104,7 @@
     "dev": "Dev",
     "login": "Login",
     "catalog": "Catalog",
-    "order": "Order",
+    "orders": "Orders",
     "profile": "Profile",
     "projects": "Projects",
     "request": "Request",
@@ -117,6 +118,9 @@
     "noHistory": "No order history",
     "today": "Today",
     "tomorrow": "Tomorrow",
+    "yesterday": "Yesterday",
+    "choose": "Choose",
+    "confirm": "Confirm",
     "cancel": "Cancel order",
     "cancelConfirm": "Cancel this order?",
     "canceled": "Order canceled",

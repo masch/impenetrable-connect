@@ -42,6 +42,12 @@ module.exports = {
 
         // Tab bar colors
         "tab-inactive": "#666666",
+
+        // Moment of Day Colors
+        "moment-breakfast": "#F59E0B",
+        "moment-lunch": "#10B981",
+        "moment-snack": "#F97316",
+        "moment-dinner": "#8B5CF6",
       },
       fontFamily: {
         // Section 3: Manrope for headlines, Inter for body

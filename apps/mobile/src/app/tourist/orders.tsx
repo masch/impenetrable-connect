@@ -19,6 +19,8 @@ import Screen, { ScreenContent } from "../../components/Screen";
 import { SegmentedControl } from "../../components/ui/SegmentedControl";
 import { useOrdersStore } from "../../stores/orders.store";
 import { useAuthStore } from "../../stores/auth.store";
+import { getLocalizedName } from "../../hooks/useI18n";
+import { getTimeOfDayIcon, getTimeOfDayColor } from "../../constants/moments";
 import type { Order, OrderStatus } from "@repo/shared";
 
 // Status badge mapping - labels come from i18n
@@ -63,14 +65,9 @@ const getStatusConfig = (
 });
 
 // Get localized name from order
-function getOrderTitle(order: Order, locale: string = "es"): string {
+function getOrderTitle(order: Order): string {
   if (order.catalog_item?.name_i18n) {
-    return (
-      order.catalog_item.name_i18n[locale as keyof typeof order.catalog_item.name_i18n] ||
-      order.catalog_item.name_i18n.es ||
-      order.catalog_item.name_i18n.en ||
-      "Orden"
-    );
+    return getLocalizedName(order.catalog_item.name_i18n) || "Orden";
   }
   return "Orden";
 }
@@ -80,25 +77,28 @@ function formatTimeOfDay(timeOfDay: string, t: (key: string) => string): string 
   const keyMap: Record<string, string> = {
     BREAKFAST: "breakfast",
     LUNCH: "lunch",
-    SNACK: "afternoon",
+    SNACK: "snack",
     DINNER: "dinner",
   };
   const key = keyMap[timeOfDay] || timeOfDay.toLowerCase();
   return t(`catalog.reservation.moments.${key}`);
 }
 
-// Check if date is today or tomorrow
-function getDateLabel(date: Date): "today" | "tomorrow" | null {
+// Check if date is today, tomorrow, or yesterday
+function getDateLabel(date: Date): "today" | "tomorrow" | "yesterday" | null {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
 
   const checkDate = new Date(date);
   checkDate.setHours(0, 0, 0, 0);
 
   if (checkDate.getTime() === today.getTime()) return "today";
   if (checkDate.getTime() === tomorrow.getTime()) return "tomorrow";
+  if (checkDate.getTime() === yesterday.getTime()) return "yesterday";
   return null;
 }
 
@@ -117,7 +117,7 @@ interface ActiveOrderCardProps {
 }
 
 function ActiveOrderCard({ order, onCancel }: ActiveOrderCardProps) {
-  const { t, locale } = useTranslations();
+  const { t } = useTranslations();
   const statusConfig = getStatusConfig(t);
   const status = statusConfig[order.global_status];
   const showCancelButton = order.global_status === "SEARCHING";
@@ -133,12 +133,12 @@ function ActiveOrderCard({ order, onCancel }: ActiveOrderCardProps) {
 
       {/* Title */}
       <Text className="text-xl font-display font-bold text-on-surface mb-2">
-        {getOrderTitle(order, locale)}
+        {getOrderTitle(order)}
       </Text>
 
       {/* Date and Time */}
       <View className="flex-row items-center gap-2 mb-1">
-        <MaterialCommunityIcons name="calendar-blank" size={18} color="on-surface" />
+        {getDateLabel(order.service_date) === null && <Text>📅</Text>}
         {getDateLabel(order.service_date) === "today" ? (
           <View className="bg-primary px-2 py-0.5 rounded">
             <Text className="text-xs font-bold text-on-primary">{t("orders.today")}</Text>
@@ -152,15 +152,27 @@ function ActiveOrderCard({ order, onCancel }: ActiveOrderCardProps) {
             {formatDate(order.service_date)}
           </Text>
         )}
-        <Text className="text-base font-body text-on-surface opacity-80">
-          · ({formatTimeOfDay(order.time_of_day, t)})
-        </Text>
+        <View className="flex-row items-center gap-1">
+          <MaterialCommunityIcons
+            name={
+              getTimeOfDayIcon(order.time_of_day) as keyof typeof MaterialCommunityIcons.glyphMap
+            }
+            size={16}
+            color={getTimeOfDayColor(order.time_of_day)}
+          />
+          <Text
+            className="text-base font-body"
+            style={{ color: getTimeOfDayColor(order.time_of_day) }}
+          >
+            {formatTimeOfDay(order.time_of_day, t)}
+          </Text>
+        </View>
       </View>
 
       {/* Guest count */}
       <View className="flex-row items-center gap-2 mb-4">
         <MaterialCommunityIcons
-          name="account-group"
+          name="account-group-outline"
           size={20}
           color="on-surface"
           className="opacity-60"
@@ -209,7 +221,7 @@ interface HistoryItemProps {
 }
 
 function HistoryItem({ order }: HistoryItemProps) {
-  const { t, locale } = useTranslations();
+  const { t } = useTranslations();
   const statusConfig = getStatusConfig(t);
   const status = statusConfig[order.global_status];
 
@@ -242,11 +254,56 @@ function HistoryItem({ order }: HistoryItemProps) {
       {/* Info */}
       <View className="flex-1">
         <Text className="text-base font-display font-bold text-on-surface">
-          {getOrderTitle(order, locale)}
+          {getOrderTitle(order)}
         </Text>
-        <Text className="text-sm font-body text-on-surface opacity-60">
-          {formatDate(order.service_date)} · {order.guest_count} {t("orders.guest_count")}
-        </Text>
+        <View className="flex-row items-center gap-3 mt-1">
+          {getDateLabel(order.service_date) === null && (
+            <View className="flex-row items-center gap-1">
+              <Text>📅</Text>
+              <Text className="text-sm font-body text-on-surface opacity-60">
+                {formatDate(order.service_date)}
+              </Text>
+            </View>
+          )}
+          {getDateLabel(order.service_date) === "today" && (
+            <View className="bg-primary px-2 py-0.5 rounded">
+              <Text className="text-xs font-bold text-on-primary">{t("orders.today")}</Text>
+            </View>
+          )}
+          {getDateLabel(order.service_date) === "tomorrow" && (
+            <View className="bg-secondary px-2 py-0.5 rounded">
+              <Text className="text-xs font-bold text-on-primary">{t("orders.tomorrow")}</Text>
+            </View>
+          )}
+          {getDateLabel(order.service_date) === "yesterday" && (
+            <View className="bg-surface-container-highest px-2 py-0.5 rounded">
+              <Text className="text-xs font-bold text-on-surface opacity-60">
+                {t("orders.yesterday")}
+              </Text>
+            </View>
+          )}
+          <View className="flex-row items-center gap-1">
+            <MaterialCommunityIcons
+              name={
+                getTimeOfDayIcon(order.time_of_day) as keyof typeof MaterialCommunityIcons.glyphMap
+              }
+              size={14}
+              color={getTimeOfDayColor(order.time_of_day)}
+            />
+            <Text
+              className="text-sm font-body"
+              style={{ color: getTimeOfDayColor(order.time_of_day) }}
+            >
+              {formatTimeOfDay(order.time_of_day, t)}
+            </Text>
+          </View>
+          <View className="flex-row items-center gap-1">
+            <MaterialCommunityIcons name="account-group-outline" size={14} color="on-surface" />
+            <Text className="text-sm font-body text-on-surface opacity-60">
+              {order.guest_count} {t("orders.guest_count")}
+            </Text>
+          </View>
+        </View>
       </View>
 
       {/* Status Badge */}

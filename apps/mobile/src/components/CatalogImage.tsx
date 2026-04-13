@@ -11,9 +11,15 @@ interface CatalogImageProps {
   imageUrl?: string | ImageRequireSource | null;
   alt: string;
   className?: string;
+  style?: object;
 }
 
-export function CatalogImage({ imageUrl, alt, className = "w-full h-full" }: CatalogImageProps) {
+export function CatalogImage({
+  imageUrl,
+  alt,
+  className = "w-full h-full",
+  style,
+}: CatalogImageProps) {
   if (!imageUrl) return null;
 
   const isRemoteUrl = typeof imageUrl === "string" && imageUrl.startsWith("http");
@@ -24,13 +30,13 @@ export function CatalogImage({ imageUrl, alt, className = "w-full h-full" }: Cat
       {isRemoteUrl ? (
         <Image
           source={{ uri: imageUrl }}
-          style={{ width: "100%", height: "100%", objectFit }}
+          style={[{ width: "100%", height: "100%", objectFit }, style]}
           accessibilityLabel={alt}
         />
       ) : (
         <Image
           source={imageUrl as ImageRequireSource}
-          style={{ width: "100%", height: "100%", objectFit }}
+          style={[{ width: "100%", height: "100%", objectFit }, style]}
           accessibilityLabel={alt}
         />
       )}

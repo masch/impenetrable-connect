@@ -6,10 +6,12 @@
 import { useState } from "react";
 import { Text, View, Modal, Pressable, ScrollView, TextInput } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { MOMENTS_OF_DAY } from "../constants/moments";
 import type { TimeOfDay } from "@repo/shared";
 import type { CatalogServiceItem } from "../mocks/catalog";
-import { useTranslations } from "../hooks/useI18n";
+import { useTranslations, getLocalizedName } from "../hooks/useI18n";
 import { CatalogImage } from "./CatalogImage";
+import { DatePicker } from "./DatePicker";
 
 interface ReservationModalProps {
   visible: boolean;
@@ -18,13 +20,6 @@ interface ReservationModalProps {
   onConfirm: (momentOfDay: TimeOfDay, quantity: number, date: Date, notes?: string) => void;
   isLoading?: boolean;
 }
-
-const MOMENTS_OF_DAY: { id: TimeOfDay; icon: string; labelKey: string }[] = [
-  { id: "BREAKFAST", icon: "coffee", labelKey: "catalog.reservation.moments.breakfast" },
-  { id: "LUNCH", icon: "silverware-fork-knife", labelKey: "catalog.reservation.moments.lunch" },
-  { id: "SNACK", icon: "cookie", labelKey: "catalog.reservation.moments.afternoon" },
-  { id: "DINNER", icon: "food-drumstick", labelKey: "catalog.reservation.moments.dinner" },
-];
 
 export function ReservationModal({
   visible,
@@ -37,21 +32,22 @@ export function ReservationModal({
   const [selectedMoment, setSelectedMoment] = useState<TimeOfDay | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState("");
-  const [date] = useState(new Date());
+  const [date, setDate] = useState<Date | null>(null);
+
+  const isValid = selectedMoment !== null && quantity > 0 && date !== null;
 
   const handleConfirm = () => {
-    if (!selectedMoment) return;
+    if (!isValid || !date) return;
     onConfirm(selectedMoment, quantity, date, notes || undefined);
-    // Reset form
-    setSelectedMoment(null);
-    setQuantity(1);
-    setNotes("");
+    // Close modal after confirming
+    handleClose();
   };
 
   const handleClose = () => {
     setSelectedMoment(null);
     setQuantity(1);
     setNotes("");
+    setDate(null);
     onClose();
   };
 
@@ -69,7 +65,7 @@ export function ReservationModal({
         {/* Glassmorphism overlay */}
         <View className="absolute inset-0 bg-surface/85 backdrop-blur-md" />
 
-        <Pressable className="bg-surface max-h-[85%]" onPress={() => {}}>
+        <Pressable className="flex-1 bg-surface" onPress={() => {}}>
           {/* Handle bar */}
           <View className="w-full items-center pt-3 pb-2">
             <View className="w-12 h-1 bg-outline-variant" />
@@ -78,17 +74,18 @@ export function ReservationModal({
           {/* Header with image */}
           <View className="pb-4 border-b border-outline-variant">
             {service.image_url && (
-              <View className="mx-auto mb-4 rounded-xl overflow-hidden sm:h-64 h-48 max-w-md w-full">
+              <View className="w-full h-[250px] mb-4">
                 <CatalogImage
                   imageUrl={service.image_url}
-                  alt={service.name_i18n.es || service.name_i18n.en || "Service image"}
+                  alt={getLocalizedName(service.name_i18n) || "Service image"}
+                  className="w-full h-full"
                 />
               </View>
             )}
             <View className="px-6 pt-0 flex-row justify-between items-start">
               <View className="flex-1 pr-4">
                 <Text className="text-xl font-display font-bold text-on-surface">
-                  {service.name_i18n.es || service.name_i18n.en}
+                  {getLocalizedName(service.name_i18n)}
                 </Text>
                 <Text className="text-base font-body text-primary font-bold mt-1">
                   {formatPrice(service.price)}
@@ -111,27 +108,33 @@ export function ReservationModal({
                   key={moment.id}
                   className={`flex-1 py-3 px-2 border ${
                     selectedMoment === moment.id
-                      ? "bg-secondary border-secondary"
+                      ? "border-0"
                       : "bg-surface-container-low border-outline-variant"
                   }`}
+                  style={
+                    selectedMoment === moment.id
+                      ? { backgroundColor: moment.color + "20" }
+                      : { borderColor: moment.color + "40" }
+                  }
                   onPress={() => setSelectedMoment(moment.id)}
                 >
                   <View className="items-center gap-1">
                     <MaterialCommunityIcons
                       name={moment.icon as keyof typeof MaterialCommunityIcons.glyphMap}
                       size={24}
-                      color={selectedMoment === moment.id ? "on-secondary" : "secondary"}
+                      color={moment.color}
                     />
-                    <Text
-                      className={`text-sm font-body ${
-                        selectedMoment === moment.id ? "text-on-primary" : "text-on-surface"
-                      }`}
-                    >
+                    <Text className="text-sm font-body" style={{ color: moment.color }}>
                       {t(moment.labelKey)}
                     </Text>
                   </View>
                 </Pressable>
               ))}
+            </View>
+
+            {/* Date Selection */}
+            <View className="mb-6">
+              <DatePicker value={date} onChange={setDate} />
             </View>
 
             {/* Quantity Selector */}
@@ -187,10 +190,10 @@ export function ReservationModal({
           <View className="px-6 pb-6 pt-4 border-t border-outline-variant">
             <Pressable
               className={`bg-primary py-4 flex-row items-center justify-center gap-2 ${
-                !selectedMoment || isLoading ? "opacity-50" : ""
+                !isValid || isLoading ? "opacity-50" : ""
               }`}
               onPress={handleConfirm}
-              disabled={!selectedMoment || isLoading}
+              disabled={!isValid || isLoading}
             >
               <MaterialCommunityIcons name="check" size={20} color="on-primary" />
               <Text className="text-base font-body font-bold text-on-primary">

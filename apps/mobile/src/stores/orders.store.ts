@@ -42,14 +42,18 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
       const orders = await orderService.getOrders();
 
       // Filter active orders: SEARCHING, OFFER_PENDING, CONFIRMED
-      const active = orders.filter((order) =>
-        ["SEARCHING", "OFFER_PENDING", "CONFIRMED"].includes(order.global_status),
-      );
+      const active = orders
+        .filter((order) =>
+          ["SEARCHING", "OFFER_PENDING", "CONFIRMED"].includes(order.global_status),
+        )
+        .sort((a, b) => new Date(a.service_date).getTime() - new Date(b.service_date).getTime());
 
       // Filter history orders: COMPLETED, CANCELLED, NO_SHOW, EXPIRED
-      const history = orders.filter((order) =>
-        ["COMPLETED", "CANCELLED", "NO_SHOW", "EXPIRED"].includes(order.global_status),
-      );
+      const history = orders
+        .filter((order) =>
+          ["COMPLETED", "CANCELLED", "NO_SHOW", "EXPIRED"].includes(order.global_status),
+        )
+        .sort((a, b) => new Date(b.service_date).getTime() - new Date(a.service_date).getTime());
 
       // Always replace orders (not append) to handle user changes correctly
       set({ activeOrders: active, historyOrders: history, isLoading: false });

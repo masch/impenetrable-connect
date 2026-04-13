@@ -48,11 +48,11 @@ export default function TouristTabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="order"
+        name="orders"
         options={{
-          href: "/tourist/order",
-          title: t("tabs.order"),
-          tabBarLabel: t("tabs.order"),
+          href: "/tourist/orders",
+          title: t("tabs.orders"),
+          tabBarLabel: t("tabs.orders"),
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="cart" size={size} color={color} />
           ),

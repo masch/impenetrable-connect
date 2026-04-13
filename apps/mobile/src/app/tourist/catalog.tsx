@@ -6,7 +6,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Text, View, ScrollView, RefreshControl, ActivityIndicator, Alert } from "react-native";
 import { useRouter } from "expo-router";
-import { useTranslations } from "../../hooks/useI18n";
+import { useTranslations, getLocalizedName } from "../../hooks/useI18n";
 import Screen, { ScreenContent } from "../../components/Screen";
 import { ServiceCard } from "../../components/ServiceCard";
 import { SectionHeader } from "../../components/SectionHeader";
@@ -135,7 +135,7 @@ export default function CatalogScreen() {
                     key={service.id}
                     service={service}
                     onPress={handleServicePress}
-                    accessibilityLabel={`${service.name_i18n.es || service.name_i18n.en}`}
+                    accessibilityLabel={getLocalizedName(service.name_i18n)}
                   />
                 ))}
               </View>
@@ -154,7 +154,7 @@ export default function CatalogScreen() {
                     key={service.id}
                     service={service}
                     onPress={handleServicePress}
-                    accessibilityLabel={`${service.name_i18n.es || service.name_i18n.en}`}
+                    accessibilityLabel={getLocalizedName(service.name_i18n)}
                   />
                 ))}
               </View>
