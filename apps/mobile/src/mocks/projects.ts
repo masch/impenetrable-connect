@@ -4,6 +4,8 @@ import { Project } from "@repo/shared";
 export const PROJECT_IDS = {
   IMPENETRABLE: 1,
   IBERA: 2,
+  PATAGONIA: 3,
+  PATAGONIA_AZUL: 4,
 } as const;
 
 // Get project by ID helper
@@ -17,7 +19,7 @@ export const getDefaultProject = (): Project =>
 export const MOCK_PROJECTS: Project[] = [
   {
     id: PROJECT_IDS.IMPENETRABLE,
-    name: "Impenetrable Connect",
+    name: "El Impenetrable",
     default_language: "es",
     supported_languages: ["es", "en"],
     cascade_timeout_minutes: 30,
@@ -26,11 +28,29 @@ export const MOCK_PROJECTS: Project[] = [
   },
   {
     id: PROJECT_IDS.IBERA,
-    name: "Iberá Discovery",
-    default_language: "en",
+    name: "Parque Iberá",
+    default_language: "es",
     supported_languages: ["es", "en"],
     cascade_timeout_minutes: 60,
     max_cascade_attempts: 5,
+    is_active: false,
+  },
+  {
+    id: PROJECT_IDS.PATAGONIA,
+    name: "Parque Patagonia",
+    default_language: "es",
+    supported_languages: ["es", "en"],
+    cascade_timeout_minutes: 45,
+    max_cascade_attempts: 8,
+    is_active: false,
+  },
+  {
+    id: PROJECT_IDS.PATAGONIA_AZUL,
+    name: "Parque Patagonia Azul",
+    default_language: "es",
+    supported_languages: ["es", "en"],
+    cascade_timeout_minutes: 45,
+    max_cascade_attempts: 8,
     is_active: false,
   },
 ];
