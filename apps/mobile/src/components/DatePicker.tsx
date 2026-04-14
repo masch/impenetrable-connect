@@ -99,8 +99,8 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
         <View className="flex-row gap-2">
           <Pressable
             className={`flex-1 py-3 border ${isDateSelected() && isToday()
-                ? "bg-secondary border-secondary"
-                : "bg-surface-container-low border-outline-variant"
+              ? "bg-secondary border-secondary"
+              : "bg-surface-container-low border-outline-variant"
               }`}
             onPress={() => handleWebQuickSelect(0)}
           >
@@ -112,8 +112,8 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
           </Pressable>
           <Pressable
             className={`flex-1 py-3 border ${isDateSelected() && isTomorrow()
-                ? "bg-secondary border-secondary"
-                : "bg-surface-container-low border-outline-variant"
+              ? "bg-secondary border-secondary"
+              : "bg-surface-container-low border-outline-variant"
               }`}
             onPress={() => handleWebQuickSelect(1)}
           >
@@ -125,8 +125,8 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
           </Pressable>
           <Pressable
             className={`flex-1 py-3 border ${isCustomDate()
-                ? "bg-secondary border-secondary"
-                : "bg-surface-container-low border-outline-variant"
+              ? "bg-secondary border-secondary"
+              : "bg-surface-container-low border-outline-variant"
               }`}
             onPress={() => {
               if (isWeb) {
@@ -207,8 +207,8 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
       <View className="flex-row gap-2">
         <Pressable
           className={`flex-1 py-3 border ${isDateSelected() && isToday()
-              ? "bg-secondary border-secondary"
-              : "bg-surface-container-low border-outline-variant"
+            ? "bg-secondary border-secondary"
+            : "bg-surface-container-low border-outline-variant"
             }`}
           onPress={() => handleQuickSelect(0)}
         >
@@ -220,8 +220,8 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
         </Pressable>
         <Pressable
           className={`flex-1 py-3 border ${isDateSelected() && isTomorrow()
-              ? "bg-secondary border-secondary"
-              : "bg-surface-container-low border-outline-variant"
+            ? "bg-secondary border-secondary"
+            : "bg-surface-container-low border-outline-variant"
             }`}
           onPress={() => handleQuickSelect(1)}
         >
@@ -233,8 +233,8 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
         </Pressable>
         <Pressable
           className={`flex-1 py-3 border ${isCustomDate()
-              ? "bg-secondary border-secondary"
-              : "bg-surface-container-low border-outline-variant"
+            ? "bg-secondary border-secondary"
+            : "bg-surface-container-low border-outline-variant"
             }`}
           onPress={() => setShowPicker(!showPicker)}
         >
