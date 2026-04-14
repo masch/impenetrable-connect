@@ -98,10 +98,11 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
         {/* Quick select in single line */}
         <View className="flex-row gap-2">
           <Pressable
-            className={`flex-1 py-3 border ${isDateSelected() && isToday()
-              ? "bg-secondary border-secondary"
-              : "bg-surface-container-low border-outline-variant"
-              }`}
+            className={`flex-1 py-3 border ${
+              isDateSelected() && isToday()
+                ? "bg-secondary border-secondary"
+                : "bg-surface-container-low border-outline-variant"
+            }`}
             onPress={() => handleWebQuickSelect(0)}
           >
             <Text
@@ -111,10 +112,11 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
             </Text>
           </Pressable>
           <Pressable
-            className={`flex-1 py-3 border ${isDateSelected() && isTomorrow()
-              ? "bg-secondary border-secondary"
-              : "bg-surface-container-low border-outline-variant"
-              }`}
+            className={`flex-1 py-3 border ${
+              isDateSelected() && isTomorrow()
+                ? "bg-secondary border-secondary"
+                : "bg-surface-container-low border-outline-variant"
+            }`}
             onPress={() => handleWebQuickSelect(1)}
           >
             <Text
@@ -124,10 +126,11 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
             </Text>
           </Pressable>
           <Pressable
-            className={`flex-1 py-3 border ${isCustomDate()
-              ? "bg-secondary border-secondary"
-              : "bg-surface-container-low border-outline-variant"
-              }`}
+            className={`flex-1 py-3 border ${
+              isCustomDate()
+                ? "bg-secondary border-secondary"
+                : "bg-surface-container-low border-outline-variant"
+            }`}
             onPress={() => {
               if (isWeb) {
                 setWebPickerOpen(!webPickerOpen);
@@ -206,10 +209,11 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
       {/* Quick select in single line */}
       <View className="flex-row gap-2">
         <Pressable
-          className={`flex-1 py-3 border ${isDateSelected() && isToday()
-            ? "bg-secondary border-secondary"
-            : "bg-surface-container-low border-outline-variant"
-            }`}
+          className={`flex-1 py-3 border ${
+            isDateSelected() && isToday()
+              ? "bg-secondary border-secondary"
+              : "bg-surface-container-low border-outline-variant"
+          }`}
           onPress={() => handleQuickSelect(0)}
         >
           <Text
@@ -219,10 +223,11 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
           </Text>
         </Pressable>
         <Pressable
-          className={`flex-1 py-3 border ${isDateSelected() && isTomorrow()
-            ? "bg-secondary border-secondary"
-            : "bg-surface-container-low border-outline-variant"
-            }`}
+          className={`flex-1 py-3 border ${
+            isDateSelected() && isTomorrow()
+              ? "bg-secondary border-secondary"
+              : "bg-surface-container-low border-outline-variant"
+          }`}
           onPress={() => handleQuickSelect(1)}
         >
           <Text
@@ -232,10 +237,11 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
           </Text>
         </Pressable>
         <Pressable
-          className={`flex-1 py-3 border ${isCustomDate()
-            ? "bg-secondary border-secondary"
-            : "bg-surface-container-low border-outline-variant"
-            }`}
+          className={`flex-1 py-3 border ${
+            isCustomDate()
+              ? "bg-secondary border-secondary"
+              : "bg-surface-container-low border-outline-variant"
+          }`}
           onPress={() => setShowPicker(!showPicker)}
         >
           {isCustomDate() ? (

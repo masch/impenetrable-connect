@@ -64,7 +64,7 @@ export function ReservationModal({
         {/* Glassmorphism overlay */}
         <View className="absolute inset-0 bg-surface/85 backdrop-blur-md" />
 
-        <Pressable className="flex-1 bg-surface" onPress={() => { }}>
+        <Pressable className="flex-1 bg-surface" onPress={() => {}}>
           {/* Handle bar */}
           <View className="w-full items-center pt-3 pb-2">
             <View className="w-12 h-1 bg-outline-variant" />
@@ -105,10 +105,11 @@ export function ReservationModal({
               {MOMENTS_OF_DAY.map((moment) => (
                 <Pressable
                   key={moment.id}
-                  className={`flex-1 py-3 px-2 border ${selectedMoment === moment.id
+                  className={`flex-1 py-3 px-2 border ${
+                    selectedMoment === moment.id
                       ? `border-0 bg-moment-${moment.id.toLowerCase()}/20`
                       : `bg-surface-container-low border-outline-variant border-moment-${moment.id.toLowerCase()}/40`
-                    }`}
+                  }`}
                   onPress={() => setSelectedMoment(moment.id)}
                 >
                   <View className="items-center gap-1">
@@ -182,8 +183,9 @@ export function ReservationModal({
           {/* Footer */}
           <View className="px-6 pb-6 pt-4 border-t border-outline-variant">
             <Pressable
-              className={`bg-primary py-4 flex-row items-center justify-center gap-2 ${!isValid || isLoading ? "opacity-50" : ""
-                }`}
+              className={`bg-primary py-4 flex-row items-center justify-center gap-2 ${
+                !isValid || isLoading ? "opacity-50" : ""
+              }`}
               onPress={handleConfirm}
               disabled={!isValid || isLoading}
             >
