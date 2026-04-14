@@ -2,7 +2,6 @@
   "name": "impenetrable-mobile",
   "version": "1.0.0",
   "main": "expo-router/entry",
-  "type": "module",
   "scripts": {
     "start": "expo start --go",
     "start:native": "expo start",
@@ -16,7 +15,9 @@
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier --write src",
     "typecheck": "tsc --noEmit",
-    "expo:fix:deps": "expo install --fix"
+    "expo:fix:deps": "expo install --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@expo/metro-config": "~55.0.9",
@@ -46,16 +47,24 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.28.6",
     "@babel/plugin-transform-react-jsx": "^7.28.6",
+    "@babel/preset-env": "^7.29.2",
+    "@babel/runtime": "^7.29.2",
+    "@testing-library/react-native": "12.4.3",
+    "@types/jest": "^29.5.12",
     "@types/react": "~19.2.10",
     "@typescript-eslint/eslint-plugin": "^8.58.0",
     "@typescript-eslint/parser": "^8.58.0",
+    "babel-jest": "^30.3.0",
     "babel-preset-expo": "~55.0.8",
     "eslint": "^10.1.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
+    "jest-expo": "^55.0.16",
     "prettier": "^3.5.1",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwindcss": "^3.4.17",

@@ -1,0 +1,155 @@
+$ jest src/__tests__/role-selector.test.tsx
+● Validation Warning:
+
+  Unknown option "watchPlugins" with value ["/home/masch/dev/js/rewilding-connect/node_modules/.bun/jest-watch-typeahead@2.2.1+4033d1060dc08975/node_modules/jest-watch-typeahead/build/file_name_plugin/plugin.js", "/home/masch/dev/js/rewilding-connect/node_modules/.bun/jest-watch-typeahead@2.2.1+4033d1060dc08975/node_modules/jest-watch-typeahead/build/test_name_plugin/plugin.js"] was found.
+  This is probably a typing mistake. Fixing it will remove this message.
+
+  Configuration Documentation:
+  https://jestjs.io/docs/configuration
+
+● Validation Warning:
+
+  Unknown option "watchPlugins" with value ["/home/masch/dev/js/rewilding-connect/node_modules/.bun/jest-watch-typeahead@2.2.1+4033d1060dc08975/node_modules/jest-watch-typeahead/build/file_name_plugin/plugin.js", "/home/masch/dev/js/rewilding-connect/node_modules/.bun/jest-watch-typeahead@2.2.1+4033d1060dc08975/node_modules/jest-watch-typeahead/build/test_name_plugin/plugin.js"] was found.
+  This is probably a typing mistake. Fixing it will remove this message.
+
+  Configuration Documentation:
+  https://jestjs.io/docs/configuration
+
+● Validation Warning:
+
+  Unknown option "watchPlugins" with value ["/home/masch/dev/js/rewilding-connect/node_modules/.bun/jest-watch-typeahead@2.2.1+4033d1060dc08975/node_modules/jest-watch-typeahead/build/file_name_plugin/plugin.js", "/home/masch/dev/js/rewilding-connect/node_modules/.bun/jest-watch-typeahead@2.2.1+4033d1060dc08975/node_modules/jest-watch-typeahead/build/test_name_plugin/plugin.js"] was found.
+  This is probably a typing mistake. Fixing it will remove this message.
+
+  Configuration Documentation:
+  https://jestjs.io/docs/configuration
+
+● Validation Warning:
+
+  Unknown option "watchPlugins" with value ["/home/masch/dev/js/rewilding-connect/node_modules/.bun/jest-watch-typeahead@2.2.1+4033d1060dc08975/node_modules/jest-watch-typeahead/build/file_name_plugin/plugin.js", "/home/masch/dev/js/rewilding-connect/node_modules/.bun/jest-watch-typeahead@2.2.1+4033d1060dc08975/node_modules/jest-watch-typeahead/build/test_name_plugin/plugin.js"] was found.
+  This is probably a typing mistake. Fixing it will remove this message.
+
+  Configuration Documentation:
+  https://jestjs.io/docs/configuration
+
+FAIL iOS src/__tests__/role-selector.test.tsx
+  ● Test suite failed to run
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    /home/masch/dev/js/rewilding-connect/node_modules/.bun/react-native@0.83.4+d6e42a6734e89d28/node_modules/react-native/jest/setup.js:16
+    import '@react-native/js-polyfills/error-guard';
+    ^^^^^^
+
+    SyntaxError: Cannot use import statement outside a module
+
+      at Runtime.createScriptFromCode (../../node_modules/.bun/jest-runtime@29.7.0/node_modules/jest-runtime/build/index.js:1505:14)
+
+FAIL Android src/__tests__/role-selector.test.tsx
+  ● Test suite failed to run
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    /home/masch/dev/js/rewilding-connect/node_modules/.bun/react-native@0.83.4+d6e42a6734e89d28/node_modules/react-native/jest/setup.js:16
+    import '@react-native/js-polyfills/error-guard';
+    ^^^^^^
+
+    SyntaxError: Cannot use import statement outside a module
+
+      at Runtime.createScriptFromCode (../../node_modules/.bun/jest-runtime@29.7.0/node_modules/jest-runtime/build/index.js:1505:14)
+
+FAIL Node src/__tests__/role-selector.test.tsx
+  ● Test suite failed to run
+
+    TypeError: Cannot read properties of undefined (reading 'getColorScheme')
+
+       5 |   React.createElement("div", props, children);
+       6 |
+    >  7 | export const Text = ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) =>
+         |                                                      ^
+       8 |   React.createElement("span", props, children);
+       9 |
+      10 | export const TouchableOpacity = ({
+
+      at Object.<anonymous> (../../node_modules/.bun/react-native-css-interop@0.2.3+374625aed9dce25a/node_modules/react-native-css-interop/src/runtime/web/color-scheme.ts:55:14)
+      at Object.<anonymous> (../../node_modules/.bun/react-native-css-interop@0.2.3+374625aed9dce25a/node_modules/react-native-css-interop/src/runtime/web/api.ts:11:1)
+      at Object.<anonymous> (../../node_modules/.bun/react-native-css-interop@0.2.3+374625aed9dce25a/node_modules/react-native-css-interop/src/runtime/api.ts:1:1)
+      at Object.<anonymous> (../../node_modules/.bun/react-native-css-interop@0.2.3+374625aed9dce25a/node_modules/react-native-css-interop/src/runtime/wrap-jsx.ts:2:1)
+      at Object.<anonymous> (../../node_modules/.bun/react-native-css-interop@0.2.3+374625aed9dce25a/node_modules/react-native-css-interop/src/index.ts:3:1)
+      at Object.<anonymous> (src/__mocks__/react-native.tsx:7:54)
+      at Object.require (../../node_modules/.bun/@testing-library+react-native@13.3.3+2900c2ea21fb0f80/node_modules/@testing-library/react-native/src/helpers/accessibility.ts:2:1)
+      at Object.require (../../node_modules/.bun/@testing-library+react-native@13.3.3+2900c2ea21fb0f80/node_modules/@testing-library/react-native/src/matchers/to-be-busy.ts:5:1)
+      at Object.require (../../node_modules/.bun/@testing-library+react-native@13.3.3+2900c2ea21fb0f80/node_modules/@testing-library/react-native/src/matchers/extend-expect.ts:1:1)
+      at Object.require (../../node_modules/.bun/@testing-library+react-native@13.3.3+2900c2ea21fb0f80/node_modules/@testing-library/react-native/src/index.ts:2:1)
+      at Object.require (src/__tests__/role-selector.test.tsx:1:1)
+
+FAIL Web src/__tests__/role-selector.test.tsx
+  ● Test suite failed to run
+
+    TypeError: Cannot read properties of undefined (reading 'getColorScheme')
+
+       5 |   React.createElement("div", props, children);
+       6 |
+    >  7 | export const Text = ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) =>
+         |                                                      ^
+       8 |   React.createElement("span", props, children);
+       9 |
+      10 | export const TouchableOpacity = ({
+
+      at Object.<anonymous> (../../node_modules/.bun/react-native-css-interop@0.2.3+374625aed9dce25a/node_modules/react-native-css-interop/src/runtime/web/color-scheme.ts:55:14)
+      at Object.<anonymous> (../../node_modules/.bun/react-native-css-interop@0.2.3+374625aed9dce25a/node_modules/react-native-css-interop/src/runtime/web/api.ts:11:1)
+      at Object.<anonymous> (../../node_modules/.bun/react-native-css-interop@0.2.3+374625aed9dce25a/node_modules/react-native-css-interop/src/runtime/api.ts:1:1)
+      at Object.<anonymous> (../../node_modules/.bun/react-native-css-interop@0.2.3+374625aed9dce25a/node_modules/react-native-css-interop/src/runtime/wrap-jsx.ts:2:1)
+      at Object.<anonymous> (../../node_modules/.bun/react-native-css-interop@0.2.3+374625aed9dce25a/node_modules/react-native-css-interop/src/index.ts:3:1)
+      at Object.<anonymous> (src/__mocks__/react-native.tsx:7:54)
+      at Object.require (../../node_modules/.bun/@testing-library+react-native@13.3.3+2900c2ea21fb0f80/node_modules/@testing-library/react-native/src/helpers/accessibility.ts:2:1)
+      at Object.require (../../node_modules/.bun/@testing-library+react-native@13.3.3+2900c2ea21fb0f80/node_modules/@testing-library/react-native/src/matchers/to-be-busy.ts:5:1)
+      at Object.require (../../node_modules/.bun/@testing-library+react-native@13.3.3+2900c2ea21fb0f80/node_modules/@testing-library/react-native/src/matchers/extend-expect.ts:1:1)
+      at Object.require (../../node_modules/.bun/@testing-library+react-native@13.3.3+2900c2ea21fb0f80/node_modules/@testing-library/react-native/src/index.ts:2:1)
+      at Object.require (src/__tests__/role-selector.test.tsx:1:1)
+
+Test Suites: 4 failed, 4 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        0.972 s
+Ran all test suites matching /src\/__tests__\/role-selector.test.tsx/i in 4 projects.
+error: script "test" exited with code 1
