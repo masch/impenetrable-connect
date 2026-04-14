@@ -1,6 +1,7 @@
 {
   "name": "impenetrable-mobile",
   "version": "1.0.0",
+  "type": "module",
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start --go",
