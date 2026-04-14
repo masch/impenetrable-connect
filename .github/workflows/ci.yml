@@ -33,3 +33,6 @@ jobs:
 
       - name: Typecheck
         run: make typecheck
+
+      - name: Run Tests
+        run: make test
