@@ -5,7 +5,7 @@
 
 import { Text, View, Pressable } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useTranslations, getLocalizedName } from "../hooks/useI18n";
+import { useTranslations } from "../hooks/useI18n";
 import { CATALOG_TYPE_IDS } from "../mocks/catalog";
 import type { CatalogServiceItem } from "../mocks/catalog";
 import { CatalogImage } from "./CatalogImage";
@@ -17,7 +17,7 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ service, onPress, accessibilityLabel }: ServiceCardProps) {
-  const { t } = useTranslations();
+  const { t, getLocalizedName } = useTranslations();
   const formatPrice = (price: number) => {
     return `$ ${price.toLocaleString("es-AR")}`;
   };

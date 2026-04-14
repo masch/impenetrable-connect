@@ -9,7 +9,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { MOMENTS_OF_DAY } from "../constants/moments";
 import type { TimeOfDay } from "@repo/shared";
 import type { CatalogServiceItem } from "../mocks/catalog";
-import { useTranslations, getLocalizedName } from "../hooks/useI18n";
+import { useTranslations } from "../hooks/useI18n";
 import { CatalogImage } from "./CatalogImage";
 import { DatePicker } from "./DatePicker";
 
@@ -28,7 +28,7 @@ export function ReservationModal({
   onConfirm,
   isLoading = false,
 }: ReservationModalProps) {
-  const { t } = useTranslations();
+  const { t, getLocalizedName } = useTranslations();
   const [selectedMoment, setSelectedMoment] = useState<TimeOfDay | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState("");
@@ -39,7 +39,6 @@ export function ReservationModal({
   const handleConfirm = () => {
     if (!isValid || !date) return;
     onConfirm(selectedMoment, quantity, date, notes || undefined);
-    // Close modal after confirming
     handleClose();
   };
 
@@ -108,23 +107,18 @@ export function ReservationModal({
                   key={moment.id}
                   className={`flex-1 py-3 px-2 border ${
                     selectedMoment === moment.id
-                      ? "border-0"
-                      : "bg-surface-container-low border-outline-variant"
+                      ? `border-0 bg-moment-${moment.id.toLowerCase()}/20`
+                      : `bg-surface-container-low border-outline-variant border-moment-${moment.id.toLowerCase()}/40`
                   }`}
-                  style={
-                    selectedMoment === moment.id
-                      ? { backgroundColor: moment.color + "20" }
-                      : { borderColor: moment.color + "40" }
-                  }
                   onPress={() => setSelectedMoment(moment.id)}
                 >
                   <View className="items-center gap-1">
                     <MaterialCommunityIcons
                       name={moment.icon as keyof typeof MaterialCommunityIcons.glyphMap}
                       size={24}
-                      color={moment.color}
+                      color={moment.hex}
                     />
-                    <Text className="text-sm font-body" style={{ color: moment.color }}>
+                    <Text className={`text-sm font-body moment-${moment.id.toLowerCase()}`}>
                       {t(moment.labelKey)}
                     </Text>
                   </View>

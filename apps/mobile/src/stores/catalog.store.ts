@@ -11,7 +11,6 @@ import {
   CreateReservationInput,
   CatalogService,
 } from "../services/catalog.service";
-import { useOrdersStore } from "./orders.store";
 import { logger } from "../services/logger.service";
 
 interface CatalogState {
@@ -96,8 +95,9 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
       const currentOrders = get().orders;
       set({ orders: [...currentOrders, newOrder], isSaving: false });
 
-      // 🔄 Sincronizamos con el store de órdenes
-      useOrdersStore.getState().addOrder(newOrder);
+      // Sync with orders store - MUST be done in useEffect, not during render
+      // The caller should use useEffect to sync after the order is created
+      // useOrdersStore.getState().addOrder(newOrder);
 
       return newOrder;
     } catch (err) {

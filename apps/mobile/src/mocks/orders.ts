@@ -11,12 +11,8 @@ import {
   DESAYUNO,
   MERIENDA,
 } from "./catalog";
-import { getMockUserId, getDefaultMockUserId } from "./users";
-import { mockGetCurrentUser } from "../services/auth.service";
+import { getMockUserId } from "./users";
 import { logger } from "../services/logger.service";
-
-// Default user ID for demo orders (read once at module load)
-const DEFAULT_USER_ID = getDefaultMockUserId();
 
 // Helper to get a date relative to today
 const daysFromNow = (days: number) => {
@@ -25,7 +21,6 @@ const daysFromNow = (days: number) => {
   return d;
 };
 
-// Dates for mocks
 const today = daysFromNow(0);
 const tomorrow = daysFromNow(1);
 const dayAfterTomorrow = daysFromNow(2);
@@ -35,7 +30,7 @@ const yesterday = daysFromNow(-1);
 const DEFAULT_MOCK_ORDERS: Order[] = [
   {
     id: 1,
-    user_id: DEFAULT_USER_ID,
+    user_id: "tourist_001",
     catalog_item_id: DESAYUNO.id,
     catalog_item: DESAYUNO,
     quantity: 1,
@@ -55,7 +50,7 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   },
   {
     id: 2,
-    user_id: DEFAULT_USER_ID,
+    user_id: "tourist_001",
     catalog_item_id: ASADO_POLLO.id,
     catalog_item: ASADO_POLLO,
     quantity: 1,
@@ -75,12 +70,12 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   },
   {
     id: 3,
-    user_id: DEFAULT_USER_ID,
+    user_id: "tourist_001",
     catalog_item_id: MERIENDA.id,
     catalog_item: MERIENDA,
-    quantity: 1,
-    price_at_purchase: 4500,
-    confirmed_venture_id: 1,
+    quantity: 2,
+    price_at_purchase: 19000,
+    confirmed_venture_id: 2,
     service_date: tomorrow,
     time_of_day: "SNACK",
     guest_count: 4,
@@ -95,7 +90,7 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   },
   {
     id: 4,
-    user_id: DEFAULT_USER_ID,
+    user_id: "tourist_001",
     catalog_item_id: ASADO_POLLO.id,
     catalog_item: ASADO_POLLO,
     quantity: 1,
@@ -115,7 +110,7 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   },
   {
     id: 5,
-    user_id: DEFAULT_USER_ID,
+    user_id: "tourist_001",
     catalog_item_id: EMPANADAS_CARNE_DOCENA.id,
     catalog_item: EMPANADAS_CARNE_DOCENA,
     quantity: 1,
@@ -135,7 +130,7 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   },
   {
     id: 6,
-    user_id: DEFAULT_USER_ID,
+    user_id: "tourist_001",
     catalog_item_id: EMPANADAS_VERDURA_DOCENA.id,
     catalog_item: EMPANADAS_VERDURA_DOCENA,
     quantity: 1,
@@ -155,35 +150,30 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   },
 ];
 
-// Store for dynamic orders (created at runtime) - wrapped in object to avoid let
+// In-memory orders - resets on refresh
 const ordersState = {
   orders: [] as Order[],
 };
 
 /**
- * Get all mock orders for the current user
- * - If no user logged in: returns empty array
- * - If logged in: returns orders matching user's ID (demo + dynamic)
+ * Get orders for current user
  */
 export function getMockOrders(): Order[] {
-  const currentUser = mockGetCurrentUser();
+  const userId = getMockUserId();
 
-  // If no user is logged in, return empty
-  if (!currentUser) {
+  if (!userId) {
     return [];
   }
 
-  // If user is logged in, return orders that match their ID (both demo and dynamic)
-  const allOrders = [...DEFAULT_MOCK_ORDERS, ...ordersState.orders];
-  return allOrders.filter((order) => order.user_id === currentUser.id);
+  // Return demo orders for tourist_001 + dynamically created orders
+  const defaultOrders = userId === "tourist_001" ? DEFAULT_MOCK_ORDERS : [];
+  return [...defaultOrders, ...ordersState.orders].filter((o) => o.user_id === userId);
 }
 
-// Legacy export for backwards compatibility - DO NOT use in new code
 export const MOCK_ORDERS: Order[] = [];
 
 /**
- * Helper to add an order to the mock collection
- * Automatically uses the current logged-in user's ID
+ * Add an order to the mock collection
  */
 export function addMockOrder(order: Omit<Order, "id" | "user_id">) {
   const newOrder: Order = {
@@ -196,7 +186,7 @@ export function addMockOrder(order: Omit<Order, "id" | "user_id">) {
 }
 
 /**
- * Helper to update an order status
+ * Update an order status
  */
 export function updateMockOrderStatus(id: number, status: Order["global_status"]) {
   const order = ordersState.orders.find((o) => o.id === id);

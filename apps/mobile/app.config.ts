@@ -42,7 +42,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     resizeMode: "contain",
     backgroundColor: "#fcf9f2", // Uses surface color from design system
   },
-  plugins: ["expo-localization", "expo-router"],
+  plugins: ["expo-localization", "expo-router", "@react-native-community/datetimepicker"],
   ios: {
     supportsTablet: true,
     bundleIdentifier: getUniqueIdentifier(),
@@ -70,4 +70,3 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   owner: "masch",
 });
-// test

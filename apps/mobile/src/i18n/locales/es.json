@@ -129,6 +129,7 @@
     "adults": "Adultos",
     "status": {
       "searching": "BUSCANDO...",
+      "offer_pending": "ESPERANDO RESPUESTA",
       "confirmed": "CONFIRMADO",
       "completed": "COMPLETADO",
       "cancelled": "CANCELADO",

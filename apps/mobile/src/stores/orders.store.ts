@@ -1,7 +1,7 @@
 /**
  * Orders Store (Zustand)
  * Manages tourist orders (active and history)
- * The UI consumes this store, oblivious to whether the data comes from a mock or a real API.
+ * In-memory state that persists while the app is open
  */
 
 import { create } from "zustand";

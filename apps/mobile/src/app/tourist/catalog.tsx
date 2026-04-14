@@ -6,26 +6,38 @@
 import { useEffect, useState, useCallback } from "react";
 import { Text, View, ScrollView, RefreshControl, ActivityIndicator, Alert } from "react-native";
 import { useRouter } from "expo-router";
-import { useTranslations, getLocalizedName } from "../../hooks/useI18n";
+import { useTranslations } from "../../hooks/useI18n";
 import Screen, { ScreenContent } from "../../components/Screen";
 import { ServiceCard } from "../../components/ServiceCard";
 import { SectionHeader } from "../../components/SectionHeader";
 import { ReservationModal } from "../../components/ReservationModal";
 import { useCatalogStore } from "../../stores/catalog.store";
+import { useOrdersStore } from "../../stores/orders.store";
 import { useAuthStore } from "../../stores/auth.store";
 import type { CatalogServiceItem } from "../../mocks/catalog";
 import type { TimeOfDay } from "@repo/shared";
 
 export default function CatalogScreen() {
   const router = useRouter();
-  const { t } = useTranslations();
-  const { services, isLoading, error, fetchServices, createReservation } = useCatalogStore();
+  const { t, getLocalizedName } = useTranslations();
+  const store = useCatalogStore();
+  const addOrderToStore = useOrdersStore((state) => state.addOrder);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  // Redirect to home if not authenticated (route guard)
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace("/tourist");
+    }
+  }, [isAuthenticated, router]);
 
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedService, setSelectedService] = useState<CatalogServiceItem | null>(null);
   const [isReserving, setIsReserving] = useState(false);
+
+  // Destructure for easier access - stable reference
+  const { services, isLoading, error, fetchServices, createReservation } = store;
 
   // Fetch services on mount
   useEffect(() => {
@@ -38,52 +50,63 @@ export default function CatalogScreen() {
     setRefreshing(false);
   }, [fetchServices]);
 
-  const handleServicePress = (service: CatalogServiceItem) => {
+  const handleServicePress = useCallback((service: CatalogServiceItem) => {
     setSelectedService(service);
     setModalVisible(true);
-  };
+  }, []);
 
-  const handleReservation = async (
-    momentOfDay: TimeOfDay,
-    quantity: number,
-    date: Date,
-    notes?: string,
-  ) => {
-    if (!selectedService) return;
+  const handleCloseModal = useCallback(() => {
+    setModalVisible(false);
+    setSelectedService(null);
+  }, []);
 
-    // Check if user is logged in
-    if (!isAuthenticated) {
-      Alert.alert(t("errors.login_required_title"), t("errors.login_required_message"), [
-        { text: t("common.cancel"), style: "cancel" },
-        {
-          text: t("auth.login"),
-          onPress: () => router.push("/tourist/login"),
-        },
-      ]);
-      return;
-    }
+  const handleReservation = useCallback(
+    async (momentOfDay: TimeOfDay, quantity: number, date: Date, notes?: string) => {
+      if (!selectedService) return;
 
-    setIsReserving(true);
-    try {
-      const result = await createReservation({
-        serviceId: selectedService.id,
-        momentOfDay,
-        quantity,
-        date,
-        notes,
-      });
-
-      if (result) {
-        setModalVisible(false);
-        setSelectedService(null);
+      if (!isAuthenticated) {
+        Alert.alert(t("errors.login_required_title"), t("errors.login_required_message"), [
+          { text: t("common.cancel"), style: "cancel" },
+          {
+            text: t("auth.login"),
+            onPress: () => router.push("/tourist/login"),
+          },
+        ]);
+        return;
       }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      Alert.alert(t("errors.reservation_failed"), message);
-    } finally {
-      setIsReserving(false);
-    }
-  };
+
+      setIsReserving(true);
+      try {
+        const result = await createReservation({
+          serviceId: selectedService.id,
+          momentOfDay,
+          quantity,
+          date,
+          notes,
+        });
+
+        if (result) {
+          handleCloseModal();
+          // Also add to orders store so it shows immediately
+          addOrderToStore(result);
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+        Alert.alert(t("errors.reservation_failed"), message);
+      } finally {
+        setIsReserving(false);
+      }
+    },
+    [
+      selectedService,
+      isAuthenticated,
+      createReservation,
+      handleCloseModal,
+      addOrderToStore,
+      t,
+      router,
+    ],
+  );
 
   // Group services by catalog_type_id: 1 = Gastronomy, 2 = Excursions
   const gastronomyServices = services.filter((s) => s.catalog_type_id === 1);
@@ -171,17 +194,16 @@ export default function CatalogScreen() {
           </ScrollView>
         )}
 
-        {/* Reservation Modal */}
-        <ReservationModal
-          visible={modalVisible}
-          service={selectedService}
-          onClose={() => {
-            setModalVisible(false);
-            setSelectedService(null);
-          }}
-          onConfirm={handleReservation}
-          isLoading={isReserving}
-        />
+        {/* Reservation Modal - conditionally rendered only when needed */}
+        {modalVisible && selectedService && (
+          <ReservationModal
+            visible={modalVisible}
+            service={selectedService}
+            onClose={handleCloseModal}
+            onConfirm={handleReservation}
+            isLoading={isReserving}
+          />
+        )}
       </ScreenContent>
     </Screen>
   );

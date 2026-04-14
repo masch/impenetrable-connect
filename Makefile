@@ -1,4 +1,4 @@
-.PHONY: help setup install dev clean lint gga format check typecheck mobile mobile-native mobile-clean mobile-web mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed eas-login eas-whoami eas-init eas-build-configure eas-build-dev eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator eas-export-web eas-deploy-web eas-deploy-web-prod android-reset android-stop android-kill android-restart
+.PHONY: help setup install dev clean lint gga format check typecheck mobile mobile-native mobile-clean mobile-web mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed eas-login eas-whoami eas-init eas-build-configure eas-build-dev eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator eas-export-web eas-deploy-web eas-deploy-web-prod android-app-stop android-app-restart android-reset android-stop android-kill android-restart
 
 # ==========================================
 # 📋 HELP
@@ -37,6 +37,8 @@ help:
 	@echo "    make check                        - Typecheck + lint + format + gga"
 	@echo ""
 	@echo "  🤖 ANDROID EMULATOR"
+	@echo "    make android-app-stop             - Stop app"
+	@echo "    make android-app-restart          - Restart app"
 	@echo "    make android-reset                - Reset emulator (wipe data)"
 	@echo "    make android-stop                 - Stop emulator (graceful)"
 	@echo "    make android-kill                 - Kill emulator (force)"
@@ -62,6 +64,7 @@ help:
 
 ANDROID_HOME ?= $(HOME)/dev/android/sdk
 ANDROID_EMULATOR = $(ANDROID_HOME)/emulator/emulator
+MOBILE_BUNDLE_ID = org.impenetrable.connect
 ANDROID_FIRST_AVD = $(shell $(ANDROID_EMULATOR) -list-avds | head -n 1)
 MOBILE_DIR = apps/mobile
 BACKEND_DIR = apps/backend
@@ -196,6 +199,14 @@ eas-deploy-web-prod:
 # ==========================================
 # 🤖 ANDROID EMULATOR
 # ==========================================
+
+android-app-stop:
+	@echo "🛑 Stopping app ($(MOBILE_BUNDLE_ID))..."
+	adb shell am force-stop $(MOBILE_BUNDLE_ID)
+
+android-app-restart: android-app-stop
+	@echo "🚀 Starting app again..."
+	adb shell am start -n $(MOBILE_BUNDLE_ID)/.MainActivity
 
 android-reset:
 	@echo "🚀 Resetting the emulator: $(ANDROID_FIRST_AVD)..."

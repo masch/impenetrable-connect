@@ -21,7 +21,7 @@
   "dependencies": {
     "@expo/metro-config": "~55.0.9",
     "@expo/vector-icons": "^15.1.1",
-    "@react-native-community/datetimepicker": "^9.1.0",
+    "@react-native-community/datetimepicker": "8.6.0",
     "@repo/shared": "workspace:*",
     "expo": "~55.0.13",
     "expo-constants": "~55.0.13",

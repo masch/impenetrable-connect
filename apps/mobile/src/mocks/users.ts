@@ -1,5 +1,4 @@
 import { User, UserRole } from "@repo/shared";
-import { mockGetCurrentUser } from "../services/auth.service";
 
 /**
  * Mock Users for development/testing
@@ -9,9 +8,12 @@ import { mockGetCurrentUser } from "../services/auth.service";
  * - Entrepreneurs/Admins: log in with email
  */
 
-// Default mock user ID (matches MOCK_USERS[0])
-const DEFAULT_MOCK_USER_ID = "tourist_001";
+// Default mock user ID (matches first tourist)
+export const DEFAULT_MOCK_USER_ID = "tourist_001";
 
+/**
+ * Default mock users - single source of truth (no duplicates)
+ */
 export const MOCK_USERS: User[] = [
   // === TOURISTS (3) ===
   {
@@ -214,19 +216,27 @@ export const DEMO_USERS_BY_ROLE: { role: UserRole; label: string; users: DemoUse
 
 /**
  * Get the current mock user ID
- * Returns the logged-in user's ID if available, otherwise returns default
  */
 export function getMockUserId(): string {
-  const user = mockGetCurrentUser();
-  return user?.id ?? DEFAULT_MOCK_USER_ID;
+  try {
+    const { mockGetCurrentUser } = require("../services/auth-state");
+    const user = mockGetCurrentUser();
+    return user?.id ?? DEFAULT_MOCK_USER_ID;
+  } catch {
+    return DEFAULT_MOCK_USER_ID;
+  }
 }
 
 /**
  * Check if a user is currently logged in (mock)
  */
 export function isMockUserLoggedIn(): boolean {
-  const user = mockGetCurrentUser();
-  return user !== null;
+  try {
+    const { mockGetCurrentUser } = require("../services/auth-state");
+    return mockGetCurrentUser() !== null;
+  } catch {
+    return false;
+  }
 }
 
 /**

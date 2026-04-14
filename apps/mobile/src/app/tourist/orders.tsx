@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useCallback, useState } from "react";
+import { useRouter } from "expo-router";
 import {
   View,
   Text,
@@ -19,7 +20,6 @@ import Screen, { ScreenContent } from "../../components/Screen";
 import { SegmentedControl } from "../../components/ui/SegmentedControl";
 import { useOrdersStore } from "../../stores/orders.store";
 import { useAuthStore } from "../../stores/auth.store";
-import { getLocalizedName } from "../../hooks/useI18n";
 import { getTimeOfDayIcon, getTimeOfDayColor } from "../../constants/moments";
 import type { Order, OrderStatus } from "@repo/shared";
 
@@ -63,14 +63,6 @@ const getStatusConfig = (
     textClass: "text-on-error-container",
   },
 });
-
-// Get localized name from order
-function getOrderTitle(order: Order): string {
-  if (order.catalog_item?.name_i18n) {
-    return getLocalizedName(order.catalog_item.name_i18n) || "Orden";
-  }
-  return "Orden";
-}
 
 // Format time of day for display using i18n
 function formatTimeOfDay(timeOfDay: string, t: (key: string) => string): string {
@@ -117,7 +109,7 @@ interface ActiveOrderCardProps {
 }
 
 function ActiveOrderCard({ order, onCancel }: ActiveOrderCardProps) {
-  const { t } = useTranslations();
+  const { t, getLocalizedName } = useTranslations();
   const statusConfig = getStatusConfig(t);
   const status = statusConfig[order.global_status];
   const showCancelButton = order.global_status === "SEARCHING";
@@ -133,7 +125,7 @@ function ActiveOrderCard({ order, onCancel }: ActiveOrderCardProps) {
 
       {/* Title */}
       <Text className="text-xl font-display font-bold text-on-surface mb-2">
-        {getOrderTitle(order)}
+        {getLocalizedName(order.catalog_item?.name_i18n)}
       </Text>
 
       {/* Date and Time */}
@@ -157,13 +149,10 @@ function ActiveOrderCard({ order, onCancel }: ActiveOrderCardProps) {
             name={
               getTimeOfDayIcon(order.time_of_day) as keyof typeof MaterialCommunityIcons.glyphMap
             }
-            size={16}
+            size={14}
             color={getTimeOfDayColor(order.time_of_day)}
           />
-          <Text
-            className="text-base font-body"
-            style={{ color: getTimeOfDayColor(order.time_of_day) }}
-          >
+          <Text className={`text-sm font-body moment-${order.time_of_day.toLowerCase()}`}>
             {formatTimeOfDay(order.time_of_day, t)}
           </Text>
         </View>
@@ -221,7 +210,7 @@ interface HistoryItemProps {
 }
 
 function HistoryItem({ order }: HistoryItemProps) {
-  const { t } = useTranslations();
+  const { t, getLocalizedName } = useTranslations();
   const statusConfig = getStatusConfig(t);
   const status = statusConfig[order.global_status];
 
@@ -254,7 +243,7 @@ function HistoryItem({ order }: HistoryItemProps) {
       {/* Info */}
       <View className="flex-1">
         <Text className="text-base font-display font-bold text-on-surface">
-          {getOrderTitle(order)}
+          {getLocalizedName(order.catalog_item?.name_i18n)}
         </Text>
         <View className="flex-row items-center gap-3 mt-1">
           {getDateLabel(order.service_date) === null && (
@@ -290,10 +279,7 @@ function HistoryItem({ order }: HistoryItemProps) {
               size={14}
               color={getTimeOfDayColor(order.time_of_day)}
             />
-            <Text
-              className="text-sm font-body"
-              style={{ color: getTimeOfDayColor(order.time_of_day) }}
-            >
+            <Text className={`text-sm font-body moment-${order.time_of_day.toLowerCase()}`}>
               {formatTimeOfDay(order.time_of_day, t)}
             </Text>
           </View>
@@ -351,6 +337,7 @@ function EmptyState({ type }: EmptyStateProps) {
 }
 
 export default function OrderScreen() {
+  const router = useRouter();
   const { t } = useTranslations();
   const {
     activeOrders,
@@ -365,6 +352,13 @@ export default function OrderScreen() {
 
   const currentUser = useAuthStore((state) => state.currentUser);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Redirect to home if not authenticated
+  useEffect(() => {
+    if (!currentUser) {
+      router.replace("/tourist");
+    }
+  }, [currentUser, router]);
 
   // Fetch orders when user changes
   useEffect(() => {
@@ -395,10 +389,13 @@ export default function OrderScreen() {
           </Text>
         </View>
 
-        {/* Segmented Control */}
+        {/* Segmented Control with counts */}
         <View className="mb-6">
           <SegmentedControl
-            segments={[{ label: t("orders.active") }, { label: t("orders.history") }]}
+            segments={[
+              { label: `${t("orders.active")} (${activeOrders.length})` },
+              { label: `${t("orders.history")} (${historyOrders.length})` },
+            ]}
             selectedIndex={selectedTab === "active" ? 0 : 1}
             onChange={handleTabChange}
           />
