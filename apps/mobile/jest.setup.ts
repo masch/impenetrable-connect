@@ -3,12 +3,15 @@
 // 1. Mock expo-router using our modular mock
 // Note: We use require inside the factory to avoid out-of-scope errors during hoisting
 jest.mock("expo-router", () => {
-  const mocks = require("./src/mocks/expo-router");
+  const mocks = require("./src/mocks/expo-router.tsx");
   return {
     router: mocks.mockRouter,
     useRouter: mocks.useRouter,
     useLocalSearchParams: mocks.useLocalSearchParams,
     Link: mocks.Link,
+    Tabs: mocks.Tabs,
+    Stack: mocks.Stack,
+    Slot: mocks.Slot,
     __mockRouter: mocks.mockRouter,
   };
 });
