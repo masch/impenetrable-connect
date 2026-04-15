@@ -9,6 +9,7 @@ import { useTranslations } from "../hooks/useI18n";
 import { CATALOG_TYPE_IDS } from "../mocks/catalog";
 import type { CatalogServiceItem } from "../mocks/catalog";
 import { CatalogImage } from "./CatalogImage";
+import { COLORS } from "@repo/shared";
 
 interface ServiceCardProps {
   service: CatalogServiceItem;
@@ -48,12 +49,12 @@ export function ServiceCard({ service, onPress, accessibilityLabel }: ServiceCar
           <CatalogImage imageUrl={service.image_url} alt={name} />
         ) : (
           <View className="w-full h-full items-center justify-center">
-            <MaterialCommunityIcons name="image-off" size={40} color="outline-variant" />
+            <MaterialCommunityIcons name="image-off" size={40} color={COLORS["outline-variant"]} />
           </View>
         )}
         {/* Category badge */}
         <View className="absolute top-3 left-3 bg-secondary px-3 py-1 flex-row items-center gap-1">
-          <MaterialCommunityIcons name={categoryIcon} size={14} color="on-secondary" />
+          <MaterialCommunityIcons name={categoryIcon} size={14} color={COLORS["on-secondary"]} />
           <Text className="text-xs font-body text-on-secondary">{categoryLabel}</Text>
         </View>
       </View>
@@ -75,7 +76,7 @@ export function ServiceCard({ service, onPress, accessibilityLabel }: ServiceCar
         <View className="flex-row gap-4">
           {service.max_participants && (
             <View className="flex-row items-center gap-1">
-              <MaterialCommunityIcons name="account-group" size={16} color="secondary" />
+              <MaterialCommunityIcons name="account-group" size={16} color={COLORS.secondary} />
               <Text className="text-sm font-body text-secondary">
                 {service.max_participants} {t("catalog.participants")}
               </Text>
@@ -83,7 +84,7 @@ export function ServiceCard({ service, onPress, accessibilityLabel }: ServiceCar
           )}
           {service.schedule && (
             <View className="flex-row items-center gap-1">
-              <MaterialCommunityIcons name="calendar-clock" size={16} color="secondary" />
+              <MaterialCommunityIcons name="calendar-clock" size={16} color={COLORS.secondary} />
               <Text className="text-sm font-body text-secondary">{service.schedule}</Text>
             </View>
           )}
@@ -92,7 +93,7 @@ export function ServiceCard({ service, onPress, accessibilityLabel }: ServiceCar
         {/* CTA */}
         <View className="mt-4">
           <View className="bg-primary py-3 px-4 flex-row items-center justify-center gap-2">
-            <MaterialCommunityIcons name="calendar-plus" size={18} color="on-primary" />
+            <MaterialCommunityIcons name="calendar-plus" size={18} color={COLORS["on-primary"]} />
             <Text className="text-base font-body font-bold text-on-primary">
               {t("catalog.reserve")}
             </Text>

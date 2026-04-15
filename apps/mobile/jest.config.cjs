@@ -7,6 +7,10 @@ module.exports = {
   moduleNameMapper: {
     "^@repo/shared$": path.resolve(__dirname, "../../packages/shared/src/index.ts"),
   },
+  // Explicitly list extensions to ensure reliable implicit resolution for
+  // monorepo aliases (@repo/shared) and TypeScript ESM.
+  // Native modules (.node) are intentionally excluded as they are not currently required.
+  moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json"],
   roots: ["<rootDir>/src"],
   testPathIgnorePatterns: ["/node_modules/"],
   transformIgnorePatterns: [
