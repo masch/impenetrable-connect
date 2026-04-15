@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# ======== REWILDING CONNECT HOOKS ========
+# Run full check suite (Typecheck, Lint, Format, GGA)
+make check || exit 1
+
+# Re-stage any files modified by automated formatting (Prettier)
+git add -u
+# ========================================
