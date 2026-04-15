@@ -40,6 +40,11 @@
 - **Branching**: Always create a descriptive feature branch (e.g., `issue-#/short-description`).
 - **Pull Requests**: Every change must be submitted via a PR linked to the issue.
 - **Commits**: Use conventional commits only. No AI attribution in commit messages.
+- **Post-Merge Cleanup**: When the user says "mergeado" (merged), the agent MUST:
+    1. Confirm the PR and its linked issue are closed (`gh pr view` / `gh issue view`).
+    2. Switch to `main` branch.
+    3. Pull the latest remote changes (`git pull origin main`).
+    4. Delete the local feature branch (`git branch -d branch-name`).
 
 ## User Skills
 
