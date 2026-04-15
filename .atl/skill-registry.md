@@ -40,7 +40,7 @@
 - **Branching**: Always create a descriptive feature branch (e.g., `issue-#/short-description`).
 - **Pull Requests**: Every change must be submitted via a PR linked to the issue.
 - **Commits**: Use conventional commits only. No AI attribution in commit messages.
-- **Pull Request Standards**: 
+- **Pull Request Standards**:
   - Descriptions MUST include a concise test summary: `✅ PASS: X total tests, make check successful`.
   - NEVER paste full terminal logs in the description.
   - MUST link to an approved issue ("Closes #XX").
