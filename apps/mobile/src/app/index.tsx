@@ -2,7 +2,7 @@ import { useAuthStore } from "../stores/auth.store";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import Screen, { ScreenContent } from "../components/Screen";
 import { router } from "expo-router";
-import { CreateUserInput } from "@repo/shared";
+import { CreateUserInput, COLORS } from "@repo/shared";
 import {
   DEMO_TOURIST_USERS,
   DEMO_ENTREPRENEUR_USERS,
@@ -16,21 +16,21 @@ import { LanguageSwitcher } from "../components/LanguageSwitcher";
 // Role colors from design system - mapped for icons and backgrounds
 const ROLE_COLORS = {
   TOURIST: {
-    icon: "tertiary-container",
+    icon: COLORS["tertiary-container"],
     bgClass: "bg-tertiary-container",
     accentClass: "bg-tertiary-container/10",
     borderClass: "border-tertiary-container/30",
     textClass: "text-tertiary-container",
   },
   ENTREPRENEUR: {
-    icon: "primary",
+    icon: COLORS.primary,
     bgClass: "bg-primary",
     accentClass: "bg-primary/10",
     borderClass: "border-primary/30",
     textClass: "text-primary",
   },
   ADMIN: {
-    icon: "secondary",
+    icon: COLORS.secondary,
     bgClass: "bg-secondary",
     accentClass: "bg-secondary/10",
     borderClass: "border-secondary/30",
@@ -176,7 +176,7 @@ export default function RoleSelectorScreen() {
                       <MaterialCommunityIcons
                         name="plus-circle-outline"
                         size={20}
-                        color="tertiary-container"
+                        color={COLORS["tertiary-container"]}
                       />
                       <Text className={`text-base font-medium ${config.textClass}`}>
                         {t("role_selector.create_identity")}
@@ -211,7 +211,7 @@ export default function RoleSelectorScreen() {
                         <MaterialCommunityIcons
                           name="chevron-right"
                           size={16}
-                          color="on-surface-variant"
+                          color={COLORS["on-surface-variant"]}
                         />
                       </View>
                     </TouchableOpacity>

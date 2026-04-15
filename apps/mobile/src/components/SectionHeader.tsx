@@ -5,6 +5,7 @@
 
 import { Text, View } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { COLORS } from "@repo/shared";
 
 interface SectionHeaderProps {
   title: string;
@@ -21,7 +22,7 @@ export function SectionHeader({ title, subtitle, icon, className = "" }: Section
           <MaterialCommunityIcons
             name={icon as keyof typeof MaterialCommunityIcons.glyphMap}
             size={24}
-            color="secondary"
+            color={COLORS.secondary}
           />
         )}
         <Text className="text-xl font-display font-bold text-on-surface">{title}</Text>

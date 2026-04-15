@@ -16,6 +16,7 @@ import { useOrdersStore } from "../../stores/orders.store";
 import { useAuthStore } from "../../stores/auth.store";
 import type { CatalogServiceItem } from "../../mocks/catalog";
 import type { TimeOfDay } from "@repo/shared";
+import { COLORS } from "@repo/shared";
 
 export default function CatalogScreen() {
   const router = useRouter();
@@ -133,7 +134,7 @@ export default function CatalogScreen() {
 
         {isLoading && services.length === 0 ? (
           <View className="flex-1 items-center justify-center py-20">
-            <ActivityIndicator size="large" color="primary" />
+            <ActivityIndicator size="large" color={COLORS.primary} />
             <Text className="text-base font-body text-on-surface opacity-60 mt-4">
               {t("loading")}
             </Text>
@@ -142,7 +143,11 @@ export default function CatalogScreen() {
           <ScrollView
             showsVerticalScrollIndicator={false}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="primary" />
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor={COLORS.primary}
+              />
             }
           >
             {/* Gastronomy Section */}
