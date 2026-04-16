@@ -17,6 +17,7 @@
 
 - **Functional Components**: Use functional components with hooks only.
 - **Imports**: No legacy `import * as React`. Use named imports (e.g., `import { useState }`).
+- **Button Standardization**: ALWAYS use the centralized `Button` component (`src/components/Button.tsx`) for any actionable button. Manual use of `TouchableOpacity` or `Pressable` for standard action buttons is STRICTLY PROHIBITED.
 - **Accessibility**: All images must have descriptive `alt` text (web) or `accessibilityLabel` (native).
 - **Performance**: Use dynamic components with `FlashList` for long lists and avoid heavy JS-side animations.
 

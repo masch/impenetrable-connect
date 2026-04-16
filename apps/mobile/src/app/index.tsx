@@ -1,5 +1,5 @@
 import { useAuthStore } from "../stores/auth.store";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import Screen, { ScreenContent } from "../components/Screen";
 import { router } from "expo-router";
 import { CreateUserInput, COLORS } from "@repo/shared";
@@ -12,6 +12,8 @@ import {
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../hooks/useI18n";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
+
+import { Button } from "../components/Button";
 
 // Role colors from design system - mapped for icons and backgrounds
 const ROLE_COLORS = {
@@ -168,53 +170,30 @@ export default function RoleSelectorScreen() {
 
                 {/* Create Identity Button - Only for Tourists */}
                 {group.role === "TOURIST" && (
-                  <TouchableOpacity
+                  <Button
+                    variant="outline"
                     onPress={handleTouristSignUp}
-                    className={`flex-1 min-w-[45%] border-2 ${config.borderClass} border-dashed px-4 py-3 rounded-xl mb-3`}
-                  >
-                    <View className="flex-row items-center gap-2">
-                      <MaterialCommunityIcons
-                        name="plus-circle-outline"
-                        size={20}
-                        color={COLORS["tertiary-container"]}
-                      />
-                      <Text className={`text-base font-medium ${config.textClass}`}>
-                        {t("role_selector.create_identity")}
-                      </Text>
-                    </View>
-                    <Text className="text-xs text-on-surface opacity-50 mt-1 ml-7">
-                      {t("role_selector.register_as_tourist")}
-                    </Text>
-                  </TouchableOpacity>
+                    leftIcon="plus-circle-outline"
+                    title={t("role_selector.create_identity")}
+                    subtitle={t("role_selector.register_as_tourist")}
+                    className="mb-3"
+                  />
                 )}
 
                 {/* Demo Users Grid */}
                 <View className="flex flex-row flex-wrap gap-2">
                   {group.users.map((user) => (
-                    <TouchableOpacity
+                    <Button
                       key={user.identifier}
+                      variant="secondary"
                       onPress={() => handleDemoLogin(user)}
+                      leftIcon="account-outline"
+                      rightIcon="chevron-right"
+                      iconColor={config.color}
+                      title={user.identifier.split("@")[0]}
                       className={`flex-1 min-w-[45%] border ${config.borderClass} bg-surface-container-low px-3 py-2.5 rounded-lg`}
-                    >
-                      <View className="flex-row items-center gap-2">
-                        <MaterialCommunityIcons
-                          name="account-outline"
-                          size={18}
-                          color={config.color}
-                        />
-                        <Text
-                          className="text-sm font-medium text-on-surface flex-1"
-                          numberOfLines={1}
-                        >
-                          {user.identifier.split("@")[0]}
-                        </Text>
-                        <MaterialCommunityIcons
-                          name="chevron-right"
-                          size={16}
-                          color={COLORS["on-surface-variant"]}
-                        />
-                      </View>
-                    </TouchableOpacity>
+                      accessibilityLabel={`Login as ${user.identifier.split("@")[0]}`}
+                    />
                   ))}
                 </View>
               </View>

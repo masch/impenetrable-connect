@@ -1,4 +1,4 @@
-.PHONY: help setup install dev clean lint gga format check typecheck test mobile mobile-native mobile-clean mobile-web mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed eas-login eas-whoami eas-init eas-build-configure eas-build-dev eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator eas-export-web eas-deploy-web eas-deploy-web-prod android-app-stop android-app-restart android-reset android-stop android-kill android-restart
+.PHONY: help setup install dev clean lint gga format check typecheck test test-coverage mobile mobile-native mobile-clean mobile-web mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed eas-login eas-whoami eas-init eas-build-configure eas-build-dev eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator eas-export-web eas-deploy-web eas-deploy-web-prod android-app-stop android-app-restart android-reset android-stop android-kill android-restart
 
 # ==========================================
 # 📋 HELP
@@ -13,6 +13,7 @@ help:
 	@echo ""
 	@echo "  🧪 TESTS"
 	@echo "    make test                          - Run mobile tests"
+	@echo "    make test-coverage                 - Run tests with coverage report"
 	@echo ""
 	@echo "  📱 MOBILE"
 	@echo "    make mobile                       - Start mobile with Expo"
@@ -141,6 +142,9 @@ dev:
 
 test:
 	cd $(MOBILE_DIR) && bun run test
+
+test-coverage:
+	cd $(MOBILE_DIR) && bun run test --coverage
 
 # ==========================================
 # 🧹 UTILS

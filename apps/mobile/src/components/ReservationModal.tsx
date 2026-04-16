@@ -12,6 +12,7 @@ import type { CatalogServiceItem } from "../mocks/catalog";
 import { useTranslations } from "../hooks/useI18n";
 import { CatalogImage } from "./CatalogImage";
 import { DatePicker } from "./DatePicker";
+import { Button } from "./Button";
 
 interface ReservationModalProps {
   visible: boolean;
@@ -182,18 +183,15 @@ export function ReservationModal({
 
           {/* Footer */}
           <View className="px-6 pb-6 pt-4 border-t border-outline-variant">
-            <Pressable
-              className={`bg-primary py-4 flex-row items-center justify-center gap-2 ${
-                !isValid || isLoading ? "opacity-50" : ""
-              }`}
+            <Button
+              variant="primary"
+              title={
+                isLoading ? t("catalog.reservation.confirming") : t("catalog.reservation.confirm")
+              }
               onPress={handleConfirm}
               disabled={!isValid || isLoading}
-            >
-              <MaterialCommunityIcons name="check" size={20} color="on-primary" />
-              <Text className="text-base font-body font-bold text-on-primary">
-                {isLoading ? t("catalog.reservation.confirming") : t("catalog.reservation.confirm")}
-              </Text>
-            </Pressable>
+              leftIcon="check"
+            />
           </View>
         </Pressable>
       </Pressable>
