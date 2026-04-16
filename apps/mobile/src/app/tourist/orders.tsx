@@ -5,21 +5,14 @@
 
 import { useEffect, useCallback, useState } from "react";
 import { useRouter } from "expo-router";
-import {
-  View,
-  Text,
-  ScrollView,
-  RefreshControl,
-  ActivityIndicator,
-  Pressable,
-  Alert,
-} from "react-native";
+import { View, Text, ScrollView, RefreshControl, ActivityIndicator, Alert } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../../hooks/useI18n";
 import Screen, { ScreenContent } from "../../components/Screen";
 import { SegmentedControl } from "../../components/ui/SegmentedControl";
 import { useOrdersStore } from "../../stores/orders.store";
 import { useAuthStore } from "../../stores/auth.store";
+import { Button } from "../../components/Button";
 import { getTimeOfDayIcon, getTimeOfDayColor } from "../../constants/moments";
 import type { Order, OrderStatus } from "@repo/shared";
 
@@ -183,8 +176,9 @@ function ActiveOrderCard({ order, onCancel }: ActiveOrderCardProps) {
 
       {/* Cancel Button */}
       {showCancelButton && (
-        <Pressable
-          disabled={order.global_status !== "SEARCHING"}
+        <Button
+          variant="danger"
+          title={t("orders.cancel")}
           onPress={() => {
             Alert.alert(t("orders.cancel"), t("orders.cancelConfirm"), [
               { text: t("orders.keeping"), style: "cancel" },
@@ -195,10 +189,9 @@ function ActiveOrderCard({ order, onCancel }: ActiveOrderCardProps) {
               },
             ]);
           }}
-          className="bg-error-container py-3 px-4 rounded-lg mt-2"
-        >
-          <Text className="text-base font-bold text-center text-error">{t("orders.cancel")}</Text>
-        </Pressable>
+          disabled={order.global_status !== "SEARCHING"}
+          className="mt-2"
+        />
       )}
     </View>
   );

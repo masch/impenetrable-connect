@@ -285,16 +285,6 @@ export const MOCK_CATALOG_ITEMS: Record<number, CatalogItem> = {
 };
 
 // Derive additional UI fields from CatalogItem
-export type CatalogServiceItem = CatalogItem & {
-  schedule?: string;
-};
+export type CatalogServiceItem = CatalogItem;
 
-export const MOCK_CATALOG_SERVICES: CatalogServiceItem[] = Object.values(MOCK_CATALOG_ITEMS).map(
-  (item) => ({
-    ...item,
-    schedule:
-      item.catalog_type_id === CATALOG_TYPE_IDS.GASTRONOMY
-        ? "12:00 - 16:00"
-        : "08:00 - 12:00 / 15:00 - 19:00",
-  }),
-);
+export const MOCK_CATALOG_SERVICES: CatalogServiceItem[] = Object.values(MOCK_CATALOG_ITEMS);

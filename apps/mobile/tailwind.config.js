@@ -22,7 +22,7 @@ export default {
         DEFAULT: "0",
       },
       minHeight: {
-        button: "5.5rem",
+        button: "3.5rem",
         touch: "3rem",
       },
       spacing: {

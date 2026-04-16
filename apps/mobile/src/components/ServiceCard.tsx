@@ -4,6 +4,7 @@
  */
 
 import { Text, View, Pressable } from "react-native";
+import { Button } from "./Button";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../hooks/useI18n";
 import { CATALOG_TYPE_IDS } from "../mocks/catalog";
@@ -82,22 +83,16 @@ export function ServiceCard({ service, onPress, accessibilityLabel }: ServiceCar
               </Text>
             </View>
           )}
-          {service.schedule && (
-            <View className="flex-row items-center gap-1">
-              <MaterialCommunityIcons name="calendar-clock" size={16} color={COLORS.secondary} />
-              <Text className="text-sm font-body text-secondary">{service.schedule}</Text>
-            </View>
-          )}
         </View>
 
         {/* CTA */}
         <View className="mt-4">
-          <View className="bg-primary py-3 px-4 flex-row items-center justify-center gap-2">
-            <MaterialCommunityIcons name="calendar-plus" size={18} color={COLORS["on-primary"]} />
-            <Text className="text-base font-body font-bold text-on-primary">
-              {t("catalog.reserve")}
-            </Text>
-          </View>
+          <Button
+            variant="primary"
+            title={t("catalog.reserve")}
+            leftIcon="calendar-plus"
+            onPress={() => onPress?.(service)}
+          />
         </View>
       </View>
     </Pressable>
