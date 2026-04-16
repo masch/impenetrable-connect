@@ -47,8 +47,9 @@
 - **Pull Requests**: Every change must be submitted via a PR linked to the issue.
 - **Commits**: Use conventional commits only. No AI attribution in commit messages.
 - **Pull Request Standards**:
-  - Descriptions MUST include a concise test summary: `✅ PASS: X total tests, make check successful`.
-  - NEVER paste full terminal logs in the description.
+  - **MANDATORY**: Every PR body MUST include a "Test Summary" following this exact format: `✅ PASS: X total tests, make check successful`.
+  - **Template**: ALWAYS use the provided template in `.github/PULL_REQUEST_TEMPLATE.md`.
+  - Descriptions must not paste full logs; use the summary format instead.
   - MUST link to an approved issue ("Closes #XX").
 - **Post-Merge Cleanup**: When the user says "mergeado" (merged), the agent MUST:
   1. Confirm the PR and its linked issue are closed (`gh pr view` / `gh issue view`).
