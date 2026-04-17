@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useFocusEffect, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Text, View, ActivityIndicator, ScrollView } from "react-native";
+import { Text, View, ScrollView } from "react-native";
 import { useProjectStore } from "../../../stores/project.store";
 import { useTranslations } from "../../../hooks/useI18n";
 import { useProjectSelectors } from "../../../hooks/useProjectSelectors";
@@ -9,6 +9,7 @@ import { ProjectCard } from "../../../components/project/ProjectCard";
 import { Button } from "../../../components/Button";
 import { LanguageSwitcher } from "../../../components/LanguageSwitcher";
 import Screen from "../../../components/Screen";
+import LoadingView from "../../../components/LoadingView";
 
 export default function ProjectsScreen() {
   const router = useRouter();
@@ -42,12 +43,7 @@ export default function ProjectsScreen() {
         </View>
 
         {/* Loading State */}
-        {isLoading && (
-          <View className="py-12 items-center">
-            <ActivityIndicator size="large" color="primary" />
-            <Text className="text-on-surface mt-4">{t("loading")}</Text>
-          </View>
-        )}
+        {isLoading && <LoadingView className="py-12" fullScreen={false} />}
 
         {/* Active Projects */}
         {!isLoading && !error && activeProjects.length > 0 && (

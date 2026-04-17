@@ -5,16 +5,17 @@
 
 import { useEffect, useCallback, useState } from "react";
 import { useRouter } from "expo-router";
-import { View, Text, ScrollView, RefreshControl, ActivityIndicator, Alert } from "react-native";
+import { View, Text, ScrollView, RefreshControl, Alert } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../../hooks/useI18n";
 import Screen, { ScreenContent } from "../../components/Screen";
+import LoadingView from "../../components/LoadingView";
 import { SegmentedControl } from "../../components/ui/SegmentedControl";
 import { useOrdersStore } from "../../stores/orders.store";
 import { useAuthStore } from "../../stores/auth.store";
 import { Button } from "../../components/Button";
 import { getTimeOfDayIcon, getTimeOfDayColor } from "../../constants/moments";
-import type { Order, OrderStatus } from "@repo/shared";
+import { type Order, type OrderStatus, COLORS } from "@repo/shared";
 
 // Status badge mapping - labels come from i18n
 const getStatusConfig = (
@@ -123,7 +124,9 @@ function ActiveOrderCard({ order, onCancel }: ActiveOrderCardProps) {
 
       {/* Date and Time */}
       <View className="flex-row items-center gap-2 mb-1">
-        {getDateLabel(order.service_date) === null && <Text>📅</Text>}
+        {getDateLabel(order.service_date) === null && (
+          <MaterialCommunityIcons name="calendar" size={14} color={COLORS["on-surface-variant"]} />
+        )}
         {getDateLabel(order.service_date) === "today" ? (
           <View className="bg-primary px-2 py-0.5 rounded">
             <Text className="text-xs font-bold text-on-primary">{t("orders.today")}</Text>
@@ -156,7 +159,7 @@ function ActiveOrderCard({ order, onCancel }: ActiveOrderCardProps) {
         <MaterialCommunityIcons
           name="account-group-outline"
           size={20}
-          color="on-surface"
+          color={COLORS["on-surface"]}
           className="opacity-60"
         />
         <Text className="text-base font-body text-on-surface opacity-80">
@@ -167,7 +170,7 @@ function ActiveOrderCard({ order, onCancel }: ActiveOrderCardProps) {
       {/* Confirmation code (if confirmed) */}
       {order.global_status === "CONFIRMED" && order.confirmed_venture_id && (
         <View className="flex-row items-center gap-2 mb-4">
-          <MaterialCommunityIcons name="check-circle" size={20} color="secondary" />
+          <MaterialCommunityIcons name="check-circle" size={20} color={COLORS.secondary} />
           <Text className="text-base font-body text-secondary font-bold">
             {t("orders.status.confirmed")}
           </Text>
@@ -228,7 +231,7 @@ function HistoryItem({ order }: HistoryItemProps) {
         <MaterialCommunityIcons
           name={getIcon() as keyof typeof MaterialCommunityIcons.glyphMap}
           size={20}
-          color="on-surface"
+          color={COLORS["on-surface"]}
           className="opacity-60"
         />
       </View>
@@ -241,7 +244,11 @@ function HistoryItem({ order }: HistoryItemProps) {
         <View className="flex-row items-center gap-3 mt-1">
           {getDateLabel(order.service_date) === null && (
             <View className="flex-row items-center gap-1">
-              <Text>📅</Text>
+              <MaterialCommunityIcons
+                name="calendar"
+                size={14}
+                color={COLORS["on-surface-variant"]}
+              />
               <Text className="text-sm font-body text-on-surface opacity-60">
                 {formatDate(order.service_date)}
               </Text>
@@ -277,7 +284,11 @@ function HistoryItem({ order }: HistoryItemProps) {
             </Text>
           </View>
           <View className="flex-row items-center gap-1">
-            <MaterialCommunityIcons name="account-group-outline" size={14} color="on-surface" />
+            <MaterialCommunityIcons
+              name="account-group-outline"
+              size={14}
+              color={COLORS["on-surface"]}
+            />
             <Text className="text-sm font-body text-on-surface opacity-60">
               {order.guest_count} {t("orders.guest_count")}
             </Text>
@@ -319,7 +330,7 @@ function EmptyState({ type }: EmptyStateProps) {
       <MaterialCommunityIcons
         name={type === "active" ? "package-variant-closed" : "history"}
         size={48}
-        color="on-surface"
+        color={COLORS["on-surface"]}
         className="opacity-20 mb-4"
       />
       <Text className="text-xl font-display font-bold text-on-surface opacity-40 text-center">
@@ -403,12 +414,7 @@ export default function OrderScreen() {
 
         {/* Loading State */}
         {isLoading && displayedOrders.length === 0 ? (
-          <View className="flex-1 items-center justify-center py-20">
-            <ActivityIndicator size="large" color="primary" />
-            <Text className="text-base font-body text-on-surface opacity-60 mt-4">
-              {t("loading")}
-            </Text>
-          </View>
+          <LoadingView className="py-20" />
         ) : (
           <ScrollView
             showsVerticalScrollIndicator={false}

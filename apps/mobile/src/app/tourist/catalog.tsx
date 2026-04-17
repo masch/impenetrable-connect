@@ -4,11 +4,12 @@
  */
 
 import { useEffect, useState, useCallback, useMemo, type ComponentProps } from "react";
-import { Text, View, ScrollView, RefreshControl, ActivityIndicator, Platform } from "react-native";
+import { Text, View, ScrollView, RefreshControl, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useTranslations } from "../../hooks/useI18n";
 import Screen, { ScreenContent } from "../../components/Screen";
+import LoadingView from "../../components/LoadingView";
 import { ServiceCard } from "../../components/ServiceCard";
 import { ReservationModal } from "../../components/ReservationModal";
 import { AppAlert, type AppAlertAction } from "../../components/AppAlert";
@@ -334,12 +335,7 @@ export default function CatalogScreen() {
         )}
 
         {isLoading && services.length === 0 ? (
-          <View className="flex-1 items-center justify-center py-20">
-            <ActivityIndicator size="large" color={COLORS.primary} />
-            <Text className="text-base font-body text-on-surface opacity-60 mt-4">
-              {t("loading")}
-            </Text>
-          </View>
+          <LoadingView className="py-20" />
         ) : (
           <ScrollView
             showsVerticalScrollIndicator={false}

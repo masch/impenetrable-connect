@@ -163,6 +163,24 @@
     "confirmCancel": "Yes, cancel",
     "keeping": "No, keep"
   },
+  "agenda": {
+    "title": "Your Agenda",
+    "occupation_status": "Occupation Status",
+    "occupied_seats": "{{occupied}}/{{total}} seats occupied",
+    "weekly_summary": "Weekly Summary",
+    "total_pax": "Total Pax",
+    "cancellations": "Cancellations",
+    "pending": "Pending",
+    "estimated_revenue": "Est. Revenue",
+    "demand_spike": "Demand spike detected for {{date}}",
+    "view_report": "VIEW REPORT",
+    "moments": {
+      "breakfast": "BREAKFAST",
+      "lunch": "LUNCH",
+      "snack": "SNACK",
+      "dinner": "DINNER"
+    }
+  },
   "errors": {
     "login_required_title": "Login required",
     "login_required_message": "You must be logged in to make a reservation",

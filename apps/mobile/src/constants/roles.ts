@@ -22,6 +22,6 @@ export const ROLE_CONFIG: Record<UserRole, RoleConfig> = {
 };
 
 export const ROLES = Object.entries(ROLE_CONFIG).map(([role, config]) => ({
-  role: role as UserRole,
+  role,
   ...config,
 }));

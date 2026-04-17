@@ -25,19 +25,29 @@
   - **Pluralization**: Use standard i18n pluralization keys (e.g., `one`, `other`) instead of manual ternary operators or conditional strings in the code.
   - **Variables**: Always pass context variables (count, name, etc.) to the translation function instead of hardcoding formatted strings.
   - **No Post-Processing transformations**: NEVER apply transformations like `.toUpperCase()` or `.toLowerCase()` directly to the result of `t()`. Use CSS utilities (e.g., `uppercase`) for styling. This ensures that missing keys remain clearly visible as `[missing_key]` and are not disguised by case changes.
+- **Loading State Standard**: Every screen that fetches async data MUST use the centralized `LoadingView` component (`src/components/LoadingView.tsx`). Manual use of `ActivityIndicator` for screen-level loading is STRICTLY PROHIBITED. The component handles both the spinner and the `t('loading')` label by default.
+- **JSX Ternary Hygiene**: For large conditional blocks (e.g., wrapping a `ScrollView`), maintain clear indentation and use comments like `} // isLoading` at the end of complex ternary blocks to prevent "Adjacent JSX elements" syntax errors.
 
 ### Styling (NativeWind v4 + Tailwind v3)
 
 - **Utilities First**: Use NativeWind CSS utilities only. No inline `style={...}`.
-- **Design Tokens**: Never hardcode colors/spacing. Use the established design system tokens.
+- **Design Tokens**: NEVER use hardcoded color strings (e.g., "#fff", "red"). ALWAYS use the established design system tokens from `COLORS` in `@repo/shared`.
 - **Mobile Footer Density**: For sticky footers in mobile views, prioritize a **compact single-row layout**. Avoid multi-row footers that consume excessive vertical screen real estate, especially on devices with small aspect ratios or web browsers.
 - **Native Context**: Be aware of NativeWind v4 limitations vs v5/v6.
+
+### UI/UX & Interaction Patterns
+
+- **Loading vs. Empty States**: Never show an empty screen or list while data is fetching. Always prioritize a branded `LoadingView` over blank space to maintain perceived performance and user trust.
+- **Role Parity**: The Entrepreneur (internal) experience must match the Tourist (external) experience in terms of UI polish, feedback, and loading patterns.
+- **Brand Continuity**: Always use branded tokens (`COLORS.primary`) via standardized components like `LoadingView` or `Button`. Direct use of `ActivityIndicator` is allowed only for micro-interactions where `LoadingView` is too heavy (e.g., inside a button or header).
+- **Manual Overrides**: ALWAYS provide a standard `RefreshControl` in scrollable lists to give the user a sense of control over data freshness.
 
 ### Architecture & Monorepo
 
 - **Single Source of Truth**: Shared types and validators must live in `@repo/shared`.
 - **Vertical Slicing**: Keep backend routes logic in services, not in the route handler.
 - **Error Handling**: Use Zod for all input validations on both sides of the bridge.
+- **Mock Data SSoT**: NEVER duplicate mock data across multiple files. Centralize shared entity mocks (Orders, Users, Catalog) in `src/mocks/*.data.ts` to ensure consistency across different user roles (Tourist vs. Entrepreneur).
 
 ### Testing
 

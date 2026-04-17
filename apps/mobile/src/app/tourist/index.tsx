@@ -114,7 +114,7 @@ export default function OrderSetupScreen() {
                     <MaterialCommunityIcons
                       name={m.icon as keyof typeof MaterialCommunityIcons.glyphMap}
                       size={34}
-                      color={isSelected ? m.hex : "#6B7280"}
+                      color={isSelected ? m.hex : COLORS["on-surface-variant"]}
                     />
                   </View>
                   <Text
