@@ -207,54 +207,56 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
   return (
     <View>
       {/* Quick select in single line */}
-      <View className="flex-row gap-2">
+      <View className="flex-row gap-3">
         <Pressable
-          className={`flex-1 py-3 border ${
+          className={`flex-1 py-4 border-2 rounded-2xl ${
             isDateSelected() && isToday()
-              ? "bg-secondary border-secondary"
-              : "bg-surface-container-low border-outline-variant"
+              ? "bg-secondary/10 border-secondary"
+              : "bg-surface-container-low border-outline-variant/30"
           }`}
           onPress={() => handleQuickSelect(0)}
         >
           <Text
-            className={`text-center text-base font-body ${isDateSelected() && isToday() ? "text-on-primary font-bold" : "text-on-surface"}`}
+            className={`text-center text-sm font-display leading-tight ${isDateSelected() && isToday() ? "text-secondary font-bold" : "text-on-surface-variant font-medium"}`}
           >
             {t("orders.today")}
           </Text>
         </Pressable>
         <Pressable
-          className={`flex-1 py-3 border ${
+          className={`flex-1 py-4 border-2 rounded-2xl ${
             isDateSelected() && isTomorrow()
-              ? "bg-secondary border-secondary"
-              : "bg-surface-container-low border-outline-variant"
+              ? "bg-secondary/10 border-secondary"
+              : "bg-surface-container-low border-outline-variant/30"
           }`}
           onPress={() => handleQuickSelect(1)}
         >
           <Text
-            className={`text-center text-base font-body ${isDateSelected() && isTomorrow() ? "text-on-primary font-bold" : "text-on-surface"}`}
+            className={`text-center text-sm font-display leading-tight ${isDateSelected() && isTomorrow() ? "text-secondary font-bold" : "text-on-surface-variant font-medium"}`}
           >
             {t("orders.tomorrow")}
           </Text>
         </Pressable>
         <Pressable
-          className={`flex-1 py-3 border ${
+          className={`flex-1 py-4 border-2 rounded-2xl ${
             isCustomDate()
-              ? "bg-secondary border-secondary"
-              : "bg-surface-container-low border-outline-variant"
+              ? "bg-secondary/10 border-secondary"
+              : "bg-surface-container-low border-outline-variant/30"
           }`}
           onPress={() => setShowPicker(!showPicker)}
         >
           {isCustomDate() ? (
             <View className="flex-row items-center justify-center gap-1">
-              <Text className="text-base font-body text-on-primary font-bold">
+              <Text className="text-sm font-display text-secondary font-bold leading-tight">
                 {formatDate(currentValue)}
               </Text>
-              <MaterialCommunityIcons name="pencil" size={14} color="on-primary" />
+              <MaterialCommunityIcons name="pencil" size={14} color="#000000" />
             </View>
           ) : (
             <View className="flex-row items-center justify-center gap-2">
-              <MaterialCommunityIcons name="calendar" size={18} color="on-surface" />
-              <Text className="text-base font-body text-on-surface">{t("orders.choose")}</Text>
+              <MaterialCommunityIcons name="calendar" size={16} color="#6B7280" />
+              <Text className="text-sm font-display text-on-surface-variant font-medium leading-tight">
+                {t("orders.choose")}
+              </Text>
             </View>
           )}
         </Pressable>

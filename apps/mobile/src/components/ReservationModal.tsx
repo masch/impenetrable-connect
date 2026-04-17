@@ -3,23 +3,32 @@
  * Modal for making a reservation - selects moment of day and quantity
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Text, View, Modal, Pressable, ScrollView, TextInput } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { MOMENTS_OF_DAY } from "../constants/moments";
-import type { TimeOfDay } from "@repo/shared";
+import type { TimeOfDay, Order } from "@repo/shared";
 import type { CatalogServiceItem } from "../mocks/catalog";
 import { useTranslations } from "../hooks/useI18n";
 import { CatalogImage } from "./CatalogImage";
-import { DatePicker } from "./DatePicker";
 import { Button } from "./Button";
+import { AppAlert } from "./AppAlert";
+import { useOrderContextStore } from "../stores/order-context.store";
+import { COLORS } from "@repo/shared";
 
 interface ReservationModalProps {
   visible: boolean;
   service: CatalogServiceItem | null;
   onClose: () => void;
-  onConfirm: (momentOfDay: TimeOfDay, quantity: number, date: Date, notes?: string) => void;
+  onConfirm: (
+    momentOfDay: TimeOfDay,
+    quantity: number,
+    date: Date,
+    notes?: string,
+    orderId?: number,
+  ) => void;
+  onDelete?: (orderId: number) => void;
   isLoading?: boolean;
+  editingOrder?: Order | null;
 }
 
 export function ReservationModal({
@@ -27,27 +36,49 @@ export function ReservationModal({
   service,
   onClose,
   onConfirm,
+  onDelete,
   isLoading = false,
+  editingOrder = null,
 }: ReservationModalProps) {
   const { t, getLocalizedName } = useTranslations();
-  const [selectedMoment, setSelectedMoment] = useState<TimeOfDay | null>(null);
-  const [quantity, setQuantity] = useState(1);
-  const [notes, setNotes] = useState("");
-  const [date, setDate] = useState<Date | null>(null);
+  const selectedDate = useOrderContextStore((state) => state.selectedDate);
+  const selectedMoment = useOrderContextStore((state) => state.selectedMoment);
+  const guestCount = useOrderContextStore((state) => state.guestCount);
 
-  const isValid = selectedMoment !== null && quantity > 0 && date !== null;
+  const [notes, setNotes] = useState("");
+  const [quantity, setQuantity] = useState(guestCount || 1);
+  const [deleteAlertVisible, setDeleteAlertVisible] = useState(false);
+
+  // Initialize state when modal opens or editing order changes
+  useEffect(() => {
+    if (visible) {
+      if (editingOrder) {
+        setNotes(editingOrder.notes || "");
+        setQuantity(editingOrder.quantity);
+      } else {
+        setNotes("");
+        setQuantity(guestCount || 1);
+      }
+    }
+  }, [visible, editingOrder, guestCount]);
+
+  const isValid = selectedMoment !== null && quantity > 0 && selectedDate !== null;
 
   const handleConfirm = () => {
-    if (!isValid || !date) return;
-    onConfirm(selectedMoment, quantity, date, notes || undefined);
-    handleClose();
+    if (!isValid || !selectedDate || !selectedMoment) return;
+
+    onConfirm(selectedMoment, quantity, selectedDate, notes || undefined, editingOrder?.id);
+    // Don't close here, let the parent handle it after the async call completes
+  };
+
+  const handleDelete = () => {
+    if (!editingOrder?.id || !onDelete) return;
+    setDeleteAlertVisible(true);
   };
 
   const handleClose = () => {
-    setSelectedMoment(null);
-    setQuantity(1);
     setNotes("");
-    setDate(null);
+    setQuantity(guestCount || 1);
     onClose();
   };
 
@@ -62,10 +93,10 @@ export function ReservationModal({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
       <Pressable className="flex-1 justify-end" onPress={handleClose}>
-        {/* Glassmorphism overlay */}
-        <View className="absolute inset-0 bg-surface/85 backdrop-blur-md" />
+        {/* Dark overlay backdrop */}
+        <View className="absolute inset-0 bg-black/60" />
 
-        <Pressable className="flex-1 bg-surface" onPress={() => {}}>
+        <Pressable className="flex-1 bg-surface-solid" onPress={() => {}}>
           {/* Handle bar */}
           <View className="w-full items-center pt-3 pb-2">
             <View className="w-12 h-1 bg-outline-variant" />
@@ -77,92 +108,65 @@ export function ReservationModal({
               <View className="w-full h-[250px] mb-4">
                 <CatalogImage
                   imageUrl={service.image_url}
-                  alt={getLocalizedName(service.name_i18n) || "Service image"}
+                  alt={getLocalizedName(service.name_i18n) || t("catalog.service_image_alt")}
                   className="w-full h-full"
                 />
               </View>
             )}
-            <View className="px-6 pt-0 flex-row justify-between items-start">
-              <View className="flex-1 pr-4">
-                <Text className="text-xl font-display font-bold text-on-surface">
-                  {getLocalizedName(service.name_i18n)}
-                </Text>
-                <Text className="text-base font-body text-primary font-bold mt-1">
-                  {formatPrice(service.price)}
+            <View className="px-6 pt-2 flex-row justify-between items-start">
+              <View className="flex-1 pr-6">
+                <View className="flex-row justify-between items-center mb-1">
+                  <Text className="text-xl font-display font-bold text-on-surface flex-1 mr-2">
+                    {getLocalizedName(service.name_i18n)}
+                  </Text>
+                  <Text className="text-lg font-display font-bold text-primary">
+                    {formatPrice(service.price)}
+                  </Text>
+                </View>
+                <Text className="text-sm font-body text-on-surface-variant leading-relaxed">
+                  {getLocalizedName(service.description_i18n)}
                 </Text>
               </View>
-              <Pressable onPress={handleClose} className="p-2 -mr-2 -mt-2">
+              <Pressable onPress={handleClose} className="p-2 -mr-2 -mt-1">
                 <MaterialCommunityIcons name="close" size={24} color="on-surface" />
               </Pressable>
             </View>
           </View>
 
           <ScrollView className="px-6 py-4" showsVerticalScrollIndicator={false}>
-            {/* Moment of Day Selection */}
-            <Text className="text-base font-body font-bold text-on-surface mb-3">
-              {t("catalog.reservation.moment_of_day")}
-            </Text>
-            <View className="flex-row gap-2 mb-6">
-              {MOMENTS_OF_DAY.map((moment) => (
-                <Pressable
-                  key={moment.id}
-                  className={`flex-1 py-3 px-2 border ${
-                    selectedMoment === moment.id
-                      ? `border-0 bg-moment-${moment.id.toLowerCase()}/20`
-                      : `bg-surface-container-low border-outline-variant border-moment-${moment.id.toLowerCase()}/40`
-                  }`}
-                  onPress={() => setSelectedMoment(moment.id)}
-                >
-                  <View className="items-center gap-1">
-                    <MaterialCommunityIcons
-                      name={moment.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-                      size={24}
-                      color={moment.hex}
-                    />
-                    <Text className={`text-sm font-body moment-${moment.id.toLowerCase()}`}>
-                      {t(moment.labelKey)}
+            {/* Quantity and Total Action Panel */}
+            <View className="mb-6">
+              <View className="flex-row items-center justify-between bg-surface-container-low p-4 rounded-2xl border border-outline-variant">
+                {/* Compact Stepper */}
+                <View className="flex-row items-center bg-surface-container-high rounded-full px-1 py-1">
+                  <Pressable
+                    onPress={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-10 h-10 items-center justify-center"
+                  >
+                    <MaterialCommunityIcons name="minus" size={20} color={COLORS["on-surface"]} />
+                  </Pressable>
+                  <View className="px-4 items-center min-w-[40px]">
+                    <Text className="text-lg font-display font-bold text-on-surface">
+                      {quantity}
                     </Text>
                   </View>
-                </Pressable>
-              ))}
-            </View>
+                  <Pressable
+                    onPress={() => setQuantity(Math.min(20, quantity + 1))}
+                    className="w-10 h-10 items-center justify-center"
+                  >
+                    <MaterialCommunityIcons name="plus" size={20} color={COLORS["on-surface"]} />
+                  </Pressable>
+                </View>
 
-            {/* Date Selection */}
-            <View className="mb-6">
-              <DatePicker value={date} onChange={setDate} />
-            </View>
-
-            {/* Quantity Selector */}
-            <Text className="text-base font-body font-bold text-on-surface mb-3">
-              {t("catalog.reservation.quantity")}
-            </Text>
-            <View className="flex-row items-center justify-center gap-4 mb-6">
-              <Pressable
-                className="w-12 h-12 bg-surface-container-low items-center justify-center border border-outline-variant"
-                onPress={() => setQuantity((q) => Math.max(1, q - 1))}
-              >
-                <MaterialCommunityIcons name="minus" size={24} color="on-surface" />
-              </Pressable>
-              <View className="w-16 h-12 bg-surface-container-highest items-center justify-center border border-outline-variant">
-                <Text className="text-2xl font-display font-bold text-on-surface">{quantity}</Text>
-              </View>
-              <Pressable
-                className="w-12 h-12 bg-surface-container-low items-center justify-center border border-outline-variant"
-                onPress={() => setQuantity((q) => Math.min(10, q + 1))}
-              >
-                <MaterialCommunityIcons name="plus" size={24} color="on-surface" />
-              </Pressable>
-            </View>
-
-            {/* Total */}
-            <View className="bg-surface-container-low p-4 mb-6">
-              <View className="flex-row justify-between items-center">
-                <Text className="text-base font-body text-on-surface">
-                  {t("catalog.reservation.total")}
-                </Text>
-                <Text className="text-xl font-display font-bold text-primary">
-                  {formatPrice(totalPrice)}
-                </Text>
+                {/* Integrated Total */}
+                <View className="items-end">
+                  <Text className="text-xs font-body text-outline uppercase mb-0.5">
+                    {t("catalog.reservation.total")}
+                  </Text>
+                  <Text className="text-xl font-display font-bold text-primary">
+                    {formatPrice(totalPrice)}
+                  </Text>
+                </View>
               </View>
             </View>
 
@@ -182,19 +186,56 @@ export function ReservationModal({
           </ScrollView>
 
           {/* Footer */}
-          <View className="px-6 pb-6 pt-4 border-t border-outline-variant">
+          <View className="px-6 pb-6 pt-4 border-t border-outline-variant flex-col gap-3">
             <Button
               variant="primary"
               title={
-                isLoading ? t("catalog.reservation.confirming") : t("catalog.reservation.confirm")
+                isLoading
+                  ? t("catalog.reservation.confirming")
+                  : editingOrder
+                    ? t("catalog.reservation.update")
+                    : t("catalog.reservation.add_to_selection")
               }
               onPress={handleConfirm}
               disabled={!isValid || isLoading}
               leftIcon="check"
             />
+            {editingOrder && (
+              <Button
+                variant="danger"
+                title={t("catalog.reservation.remove_button")}
+                onPress={handleDelete}
+                disabled={isLoading}
+                leftIcon="trash-can-outline"
+              />
+            )}
           </View>
         </Pressable>
       </Pressable>
+
+      <AppAlert
+        visible={deleteAlertVisible}
+        title={t("catalog.reservation.remove_confirm_title")}
+        message={t("catalog.reservation.remove_confirm_message")}
+        type="alert"
+        onClose={() => setDeleteAlertVisible(false)}
+        actions={[
+          {
+            text: t("common.cancel"),
+            style: "cancel",
+            onPress: () => {},
+          },
+          {
+            text: t("common.delete"),
+            style: "destructive",
+            onPress: () => {
+              if (editingOrder?.id && onDelete) {
+                onDelete(editingOrder.id);
+              }
+            },
+          },
+        ]}
+      />
     </Modal>
   );
 }

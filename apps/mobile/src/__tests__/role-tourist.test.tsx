@@ -38,7 +38,7 @@ describe("Tourist Role Flow", () => {
           alias: "Familia Gómez",
         }),
       );
-      expect(router.push).toHaveBeenCalledWith("/tourist/catalog");
+      expect(router.push).toHaveBeenCalledWith("/tourist");
     });
   });
 

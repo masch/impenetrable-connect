@@ -49,14 +49,16 @@
     "supported_languages_required": "Se requiere al menos un idioma"
   },
   "catalog": {
-    "title": "Catálogo",
+    "title": "Explorar",
     "subtitle": "Descubrí experiencias únicas en el Chaco",
     "gastronomy": "Gastronomía",
     "gastronomy_subtitle": "Sabores tradicionales del Chaco",
     "excursions": "Excursiones",
     "excursions_subtitle": "Explorá la naturaleza chaqueña",
     "empty": "No hay servicios disponibles",
+    "empty_selection_hint": "Elegí tus platos en el catálogo de abajo",
     "no_name": "Servicio sin nombre",
+    "service_image_alt": "Imagen del servicio",
     "participants": "personas",
     "no_description": "Sin descripción disponible",
     "category": {
@@ -64,26 +66,48 @@
       "excursion": "Excursión"
     },
     "includes": "Incluye:",
-    "reserve": "Reservar",
+    "add": "Añadir",
+    "edit": "Editar",
     "reservation": {
       "title": "Reservar",
       "moment_of_day": "Momento del día",
       "date": "Fecha",
-      "quantity": "Cantidad de personas",
+      "quantity": "Cantidad",
+      "guests": "Cantidad de personas",
       "total": "Total",
+      "total_items": {
+        "one": "Total ({{count}} plato)",
+        "other": "Total ({{count}} platos)"
+      },
+      "dishes": "unidades",
       "notes": "Notas adicionales (opcional)",
       "notes_placeholder": "Alguna request especial...",
-      "confirm": "Confirmar Reserva",
       "confirming": "Confirmando...",
       "success": "Reserva confirmada",
+      "updated_message": "Tu pedido fue enviado correctamente.",
       "error": "Error al crear la reserva",
+      "update": "Actualizar reserva",
+      "add_to_selection": "Añadir a la reserva",
+      "remove_button": "Eliminar de la reserva",
+      "remove_confirm_title": "¿Eliminar ítem?",
+      "remove_confirm_message": "¿Estás seguro de que querés eliminar este ítem de tu selección actual?",
+      "confirm_order_title": "¿Confirmar reserva?",
+      "confirm_order_message": "Se enviará tu pedido a los emprendedores seleccionados. ¿Deseas continuar?",
       "moments": {
         "breakfast": "Desayuno",
         "lunch": "Almuerzo",
         "snack": "Merienda",
         "dinner": "Cena"
       }
-    }
+    },
+    "active_order_title": "Detalle del pedido",
+    "items": {
+      "one": "ítem",
+      "other": "ítems"
+    },
+    "total_items": "Items totales",
+    "total_cost": "Total pedido",
+    "each": "c/u"
   },
   "roles": {
     "tourist": {
@@ -103,7 +127,7 @@
     "roles": "Roles",
     "dev": "Dev",
     "login": "Ingresar",
-    "catalog": "Catálogo",
+    "catalog": "Explorar",
     "orders": "Pedidos",
     "profile": "Perfil",
     "projects": "Proyectos",
@@ -145,7 +169,16 @@
     "reservation_failed": "Error al hacer la reserva"
   },
   "common": {
-    "cancel": "Cancelar"
+    "ok": "OK",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "confirm": "Confirmar",
+    "login": "Ingresar",
+    "person": "persona",
+    "people": "personas",
+    "info": "Información",
+    "error": "Error",
+    "alert": "Atención"
   },
   "role_selector": {
     "welcome": "Bienvenido",
@@ -166,5 +199,18 @@
         "description": "Administrá proyectos y emprendedores"
       }
     }
+  },
+  "order_setup": {
+    "title": "¿Cuándo comerías?",
+    "subtitle": "Seleccioná fecha y momento para ver el menú",
+    "date_label": "¿Para cuándo?",
+    "moment_label": "¿En qué momento?",
+    "guests_label": "¿Cuántas personas?",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "custom_date": "Otra fecha",
+    "submit": "Explorar sabores",
+    "active_context": "Pedido para {{date}} · {{moment}}",
+    "change_hint": "Tocá acá para cambiar fecha o momento"
   }
 }

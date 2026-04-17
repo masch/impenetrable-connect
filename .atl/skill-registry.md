@@ -20,6 +20,10 @@
 - **Button Standardization**: ALWAYS use the centralized `Button` component (`src/components/Button.tsx`) for any actionable button. Manual use of `TouchableOpacity` or `Pressable` for standard action buttons is STRICTLY PROHIBITED.
 - **Accessibility**: All images must have descriptive `alt` text (web) or `accessibilityLabel` (native).
 - **Performance**: Use dynamic components with `FlashList` for long lists and avoid heavy JS-side animations.
+- **Localization (i18n)**:
+  - **No defaultValue**: NEVER use the `defaultValue` option in `t()` calls. Missing keys MUST remain visible (showing the key name) to ensure they are detected and fixed during development.
+  - **Pluralization**: Use standard i18n pluralization keys (e.g., `one`, `other`) instead of manual ternary operators or conditional strings in the code.
+  - **Variables**: Always pass context variables (count, name, etc.) to the translation function instead of hardcoding formatted strings.
 
 ### Styling (NativeWind v4 + Tailwind v3)
 

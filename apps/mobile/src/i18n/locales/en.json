@@ -49,14 +49,16 @@
     "supported_languages_required": "At least one language is required"
   },
   "catalog": {
-    "title": "Catalog",
+    "title": "Explore",
     "subtitle": "Discover unique experiences in the Chaco",
     "gastronomy": "Gastronomy",
     "gastronomy_subtitle": "Traditional flavors of the Chaco",
     "excursions": "Excursions",
     "excursions_subtitle": "Explore the Chaco nature",
     "empty": "No services available",
+    "empty_selection_hint": "Select your dishes from the catalog below",
     "no_name": "Unnamed service",
+    "service_image_alt": "Service image",
     "participants": "people",
     "no_description": "No description available",
     "category": {
@@ -64,26 +66,48 @@
       "excursion": "Excursion"
     },
     "includes": "Includes:",
-    "reserve": "Reserve",
+    "add": "Add",
+    "edit": "Edit",
     "reservation": {
       "title": "Reserve",
       "moment_of_day": "Time of day",
       "date": "Date",
-      "quantity": "Number of people",
+      "quantity": "Quantity",
+      "guests": "Number of people",
       "total": "Total",
+      "total_items": {
+        "one": "Total ({{count}} dish)",
+        "other": "Total ({{count}} dishes)"
+      },
+      "dishes": "units",
       "notes": "Additional notes (optional)",
       "notes_placeholder": "Any special requests...",
-      "confirm": "Confirm Reservation",
       "confirming": "Confirming...",
       "success": "Reservation confirmed",
+      "updated_message": "Your order was sent successfully.",
       "error": "Error creating reservation",
+      "update": "Update reservation",
+      "add_to_selection": "Add to reservation",
+      "remove_button": "Remove from reservation",
+      "remove_confirm_title": "Remove Item?",
+      "remove_confirm_message": "Are you sure you want to remove this item from your current selection?",
+      "confirm_order_title": "Confirm reservation?",
+      "confirm_order_message": "Your order will be sent to the selected entrepreneurs. Do you want to continue?",
       "moments": {
         "breakfast": "Breakfast",
         "lunch": "Lunch",
         "snack": "Snack",
         "dinner": "Dinner"
       }
-    }
+    },
+    "active_order_title": "Order detail",
+    "items": {
+      "one": "item",
+      "other": "items"
+    },
+    "total_items": "Total items",
+    "total_cost": "Total cost",
+    "each": "each"
   },
   "roles": {
     "tourist": {
@@ -103,7 +127,7 @@
     "roles": "Roles",
     "dev": "Dev",
     "login": "Login",
-    "catalog": "Catalog",
+    "catalog": "Explore",
     "orders": "Orders",
     "profile": "Profile",
     "projects": "Projects",
@@ -145,7 +169,16 @@
     "reservation_failed": "Failed to create reservation"
   },
   "common": {
-    "cancel": "Cancel"
+    "ok": "OK",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "login": "Login",
+    "person": "person",
+    "people": "people",
+    "info": "Information",
+    "error": "Error",
+    "alert": "Attention"
   },
   "role_selector": {
     "welcome": "Welcome",
@@ -166,5 +199,18 @@
         "description": "Manage projects and entrepreneurs"
       }
     }
+  },
+  "order_setup": {
+    "title": "When would you eat?",
+    "subtitle": "Select date and time to see the menu",
+    "date_label": "For when?",
+    "moment_label": "At what time?",
+    "guests_label": "How many people?",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "custom_date": "Other date",
+    "submit": "Explore flavors",
+    "active_context": "Order for {{date}} · {{moment}}",
+    "change_hint": "Tap here to change date or time"
   }
 }

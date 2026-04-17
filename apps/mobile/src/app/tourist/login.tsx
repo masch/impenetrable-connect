@@ -56,7 +56,7 @@ export default function LoginScreen() {
       email: null,
     };
     login(userData);
-    router.push("/tourist/catalog");
+    router.push("/tourist");
   };
 
   const updateField = (field: keyof LoginFormData, value: string) => {
@@ -81,7 +81,7 @@ export default function LoginScreen() {
             <View className="relative w-full h-40 bg-surface-container-low">
               <Image
                 source={jaguarHero}
-                alt="Yaguareté in the Chaco"
+                accessibilityLabel="Yaguareté in the Chaco"
                 className="w-full h-full flex-1"
                 contentFit="cover"
                 transition={200}

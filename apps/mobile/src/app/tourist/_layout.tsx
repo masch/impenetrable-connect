@@ -11,7 +11,7 @@ export default function TouristTabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          href: "/tourist",
+          href: "/",
           title: t("tabs.roles"),
           tabBarLabel: t("tabs.roles"),
           tabBarAccessibilityLabel: t("tabs.roles"),
@@ -40,7 +40,7 @@ export default function TouristTabsLayout() {
           tabBarLabel: t("tabs.catalog"),
           tabBarAccessibilityLabel: t("tabs.catalog"),
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="view-grid" size={size} color={color} />
+            <MaterialCommunityIcons name="compass-outline" size={size} color={color} />
           ),
         }}
       />

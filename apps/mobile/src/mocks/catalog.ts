@@ -265,6 +265,20 @@ export const MERIENDA: CatalogItem = {
   global_pause: false,
 };
 
+export const PASEO_LANCHA: CatalogItem = {
+  id: 17,
+  catalog_type_id: CATALOG_TYPE_IDS.EXCURSION,
+  name_i18n: { es: "Paseo en lancha", en: "Boat trip" },
+  description_i18n: {
+    es: "Paseo guiado por el río Bermejito",
+    en: "Guided boat trip on the Bermejito river",
+  },
+  price: 15000,
+  max_participants: 6,
+  image_url: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400",
+  global_pause: false,
+};
+
 export const MOCK_CATALOG_ITEMS: Record<number, CatalogItem> = {
   [EMPANADAS_CARNE_MEDIA_DOCENA.id]: EMPANADAS_CARNE_MEDIA_DOCENA,
   [EMPANADAS_CARNE_DOCENA.id]: EMPANADAS_CARNE_DOCENA,
@@ -282,6 +296,7 @@ export const MOCK_CATALOG_ITEMS: Record<number, CatalogItem> = {
   [POSTRE_REGIONAL.id]: POSTRE_REGIONAL,
   [DESAYUNO.id]: DESAYUNO,
   [MERIENDA.id]: MERIENDA,
+  [PASEO_LANCHA.id]: PASEO_LANCHA,
 };
 
 // Derive additional UI fields from CatalogItem

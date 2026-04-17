@@ -5,7 +5,7 @@
  */
 
 import { create } from "zustand";
-import type { Order } from "@repo/shared";
+import type { Order, TimeOfDay } from "@repo/shared";
 import { orderService } from "../services/order.service";
 import { logger } from "../services/logger.service";
 
@@ -23,6 +23,8 @@ interface OrdersState {
   fetchOrders: () => Promise<void>;
   cancelOrder: (orderId: number) => Promise<void>;
   addOrder: (order: Order) => void;
+  updateOrder: (order: Order) => void;
+  moveOrders: (orderIds: number[], newDate: Date, newMoment: TimeOfDay) => Promise<void>;
   setTab: (tab: "active" | "history") => void;
 }
 
@@ -36,8 +38,8 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
 
   // Fetch all orders and split into active/history
   fetchOrders: async () => {
-    // Always clear existing orders first to avoid showing previous user's orders
-    set({ activeOrders: [], historyOrders: [], isLoading: true, error: null });
+    // Only set loading, don't clear existing orders to avoid flickering
+    set({ isLoading: true, error: null });
     try {
       const orders = await orderService.getOrders();
 
@@ -86,8 +88,38 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
     }
   },
 
+  // Update a single order in the store (optimistic update)
+  updateOrder: (order: Order) => {
+    set((state) => ({
+      activeOrders: state.activeOrders.map((o) =>
+        Number(o.id) === Number(order.id) ? { ...o, ...order } : o,
+      ),
+      historyOrders: state.historyOrders.map((o) =>
+        Number(o.id) === Number(order.id) ? { ...o, ...order } : o,
+      ),
+    }));
+  },
+
   // Set the selected tab
   setTab: (tab: "active" | "history") => {
     set({ selectedTab: tab });
+  },
+
+  // Move orders to a new context (date and moment)
+  moveOrders: async (orderIds: number[], newDate: Date, newMoment: TimeOfDay) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { CatalogService } = await import("../services/catalog.service");
+      for (const id of orderIds) {
+        await CatalogService.updateReservation(id, {
+          date: newDate,
+          momentOfDay: newMoment,
+        });
+      }
+      await get().fetchOrders();
+    } catch (err) {
+      logger.error("Error moving orders", err);
+      set({ error: "Failed to move orders", isLoading: false });
+    }
   },
 }));

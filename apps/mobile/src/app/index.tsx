@@ -97,7 +97,7 @@ export default function RoleSelectorScreen() {
     setUserRole(user.role);
 
     if (user.role === "TOURIST") {
-      router.push("/tourist/catalog");
+      router.push("/tourist");
     } else if (user.role === "ENTREPRENEUR") {
       router.push("/entrepreneur/agenda");
     } else if (user.role === "ADMIN") {

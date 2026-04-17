@@ -11,7 +11,7 @@ import type { ZodIssue, ZodSchema } from "zod";
 import type { Order } from "@repo/shared";
 import { TimeOfDaySchema } from "@repo/shared";
 import { MOCK_CATALOG_SERVICES, type CatalogServiceItem } from "../mocks/catalog";
-import { addMockOrder, getMockOrders } from "../mocks/orders";
+import { addMockOrder, getMockOrders, updateMockOrder } from "../mocks/orders";
 import { getMockUserId, isMockUserLoggedIn } from "../mocks/users";
 import { logger } from "./logger.service";
 import env from "../config/env";
@@ -53,6 +53,7 @@ export interface CatalogServiceInterface {
   getServiceById(id: number): Promise<CatalogServiceItem | null>;
   getServicesByCategory(catalogTypeId: number): Promise<CatalogServiceItem[]>;
   createReservation(reservation: CreateReservationInput): Promise<Order>;
+  updateReservation(id: number, reservation: Partial<CreateReservationInput>): Promise<Order>;
   getOrders(): Promise<Order[]>;
 }
 
@@ -122,6 +123,35 @@ const MockCatalogService: CatalogServiceInterface = {
     return newOrder;
   },
 
+  updateReservation: async (id: number, reservation: Partial<CreateReservationInput>) => {
+    await new Promise((r) => setTimeout(r, 600));
+
+    const existingOrders = getMockOrders();
+    const order = existingOrders.find((o) => Number(o.id) === Number(id));
+    if (!order) throw new Error("Order not found");
+
+    const updates: Partial<Order> = {};
+    if (reservation.quantity) {
+      updates.quantity = reservation.quantity;
+      updates.guest_count = reservation.quantity;
+      const servicePrice = order.catalog_item?.price || 0;
+      updates.price_at_purchase = servicePrice * reservation.quantity;
+    }
+    if (reservation.notes !== undefined) {
+      updates.notes = reservation.notes;
+    }
+    if (reservation.date) {
+      updates.service_date = reservation.date;
+    }
+    if (reservation.momentOfDay) {
+      updates.time_of_day = reservation.momentOfDay;
+    }
+
+    updateMockOrder(Number(id), updates);
+
+    return { ...order, ...updates };
+  },
+
   getOrders: async () => {
     await new Promise((r) => setTimeout(r, 500));
     return getMockOrders();
@@ -164,6 +194,19 @@ const RestCatalogService: CatalogServiceInterface = {
       }),
     });
     if (!response.ok) throw new Error("API error creating order");
+    return response.json();
+  },
+
+  updateReservation: async (id: number, reservation: Partial<CreateReservationInput>) => {
+    const response = await fetch(`${env.API_URL}/orders/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        quantity: reservation.quantity,
+        notes: reservation.notes,
+      }),
+    });
+    if (!response.ok) throw new Error("API error updating order");
     return response.json();
   },
 
