@@ -13,7 +13,7 @@ export default function Screen({ children, className = "" }: ScreenProps) {
   const horizontalPadding = Platform.OS === "web" || Platform.OS === "android" ? "px-4" : "";
 
   return (
-    <SafeAreaView className={`flex-1 bg-surface ${horizontalPadding} ${className}`}>
+    <SafeAreaView edges={["top"]} className={`flex-1 bg-surface ${horizontalPadding} ${className}`}>
       {children}
     </SafeAreaView>
   );

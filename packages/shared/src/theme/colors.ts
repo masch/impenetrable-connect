@@ -26,11 +26,16 @@ export interface Colors {
   "error-container": string;
   error: string;
   "on-error-container": string;
+  success: string;
+  warning: string;
+  info: string;
   "outline-variant": string;
   "moment-breakfast": string;
   "moment-lunch": string;
   "moment-snack": string;
   "moment-dinner": string;
+  "surface-solid": string;
+  "surface-container-solid": string;
 }
 
 /**

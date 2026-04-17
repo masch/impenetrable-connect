@@ -78,6 +78,6 @@ describe("RoleSelectorScreen UI (Archetypal Test)", () => {
         alias: "Familia Gómez",
       }),
     );
-    expect(router.push).toHaveBeenCalledWith("/tourist/catalog");
+    expect(router.push).toHaveBeenCalledWith("/tourist");
   });
 });

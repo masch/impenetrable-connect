@@ -1,4 +1,4 @@
-.PHONY: help setup install dev clean lint gga format check typecheck test test-coverage mobile mobile-native mobile-clean mobile-web mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed eas-login eas-whoami eas-init eas-build-configure eas-build-dev eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator eas-export-web eas-deploy-web eas-deploy-web-prod android-app-stop android-app-restart android-reset android-stop android-kill android-restart
+.PHONY: help setup install dev clean lint gga format check check-static typecheck test test-coverage mobile mobile-native mobile-clean mobile-web mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed eas-login eas-whoami eas-init eas-build-configure eas-build-dev eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator eas-export-web eas-deploy-web eas-deploy-web-prod android-app-stop android-app-restart android-reset android-stop android-kill android-restart
 
 # ==========================================
 # 📋 HELP
@@ -38,6 +38,7 @@ help:
 	@echo "    make format                       - Format code"
 	@echo "    make typecheck                    - Run TypeScript check"
 	@echo "    make gga                          - Run Gentleman Guardian Angel"
+	@echo "    make check-static                 - Typecheck + lint + format"
 	@echo "    make check                        - Typecheck + lint + format + gga"
 	@echo ""
 	@echo "  🤖 ANDROID EMULATOR"
@@ -168,7 +169,9 @@ typecheck:
 gga:
 	gga run
 
-check: typecheck lint format gga
+check-static: typecheck lint format
+
+check: check-static gga
 
 # ==========================================
 # 🤖 EAS

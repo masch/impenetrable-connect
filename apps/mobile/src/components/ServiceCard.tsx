@@ -14,11 +14,12 @@ import { COLORS } from "@repo/shared";
 
 interface ServiceCardProps {
   service: CatalogServiceItem;
+  isEditing?: boolean;
   onPress?: (service: CatalogServiceItem) => void;
   accessibilityLabel?: string;
 }
 
-export function ServiceCard({ service, onPress, accessibilityLabel }: ServiceCardProps) {
+export function ServiceCard({ service, isEditing, onPress, accessibilityLabel }: ServiceCardProps) {
   const { t, getLocalizedName } = useTranslations();
   const formatPrice = (price: number) => {
     return `$ ${price.toLocaleString("es-AR")}`;
@@ -39,58 +40,70 @@ export function ServiceCard({ service, onPress, accessibilityLabel }: ServiceCar
 
   return (
     <Pressable
-      className="bg-surface-container-low mb-4 overflow-hidden"
+      className="bg-surface-container-low mb-6 rounded-3xl overflow-hidden border border-outline-variant/20 shadow-sm active:opacity-95"
       onPress={() => onPress?.(service)}
       accessible
       accessibilityLabel={accessibilityLabel || name}
     >
-      {/* Image */}
-      <View className="h-40 w-full bg-surface-container-highest items-center justify-center overflow-hidden">
+      {/* Image Container with explicit height and background */}
+      <View className="h-48 w-full bg-surface-container-highest items-center justify-center overflow-hidden">
         {service.image_url ? (
           <CatalogImage imageUrl={service.image_url} alt={name} />
         ) : (
           <View className="w-full h-full items-center justify-center">
-            <MaterialCommunityIcons name="image-off" size={40} color={COLORS["outline-variant"]} />
+            <MaterialCommunityIcons name="image-off" size={48} color={COLORS["outline-variant"]} />
           </View>
         )}
-        {/* Category badge */}
-        <View className="absolute top-3 left-3 bg-secondary px-3 py-1 flex-row items-center gap-1">
-          <MaterialCommunityIcons name={categoryIcon} size={14} color={COLORS["on-secondary"]} />
-          <Text className="text-xs font-body text-on-secondary">{categoryLabel}</Text>
+
+        {/* Category badge - Pill style */}
+        <View className="absolute top-4 left-4 bg-black/40 px-3 py-1.5 rounded-full flex-row items-center gap-2 backdrop-blur-md border border-white/20">
+          <MaterialCommunityIcons name={categoryIcon} size={14} color="white" />
+          <Text className="text-[10px] font-display font-bold text-white uppercase tracking-widest">
+            {categoryLabel}
+          </Text>
         </View>
       </View>
 
-      {/* Content */}
-      <View className="p-4">
+      {/* Content Area */}
+      <View className="p-5">
         <View className="flex-row justify-between items-start mb-2">
-          <Text className="text-lg font-display font-bold text-on-surface flex-1 pr-2">{name}</Text>
-          <Text className="text-lg font-display font-bold text-primary">
+          <Text
+            className="text-xl font-display font-bold text-on-surface flex-1 pr-4"
+            numberOfLines={1}
+          >
+            {name}
+          </Text>
+          <Text className="text-xl font-display font-bold text-primary">
             {formatPrice(service.price)}
           </Text>
         </View>
 
-        <Text className="text-sm font-body text-on-surface opacity-70 mb-3" numberOfLines={2}>
+        <Text
+          className="text-sm font-body text-on-surface opacity-60 leading-5 mb-4"
+          numberOfLines={2}
+        >
           {description}
         </Text>
 
-        {/* Details row */}
-        <View className="flex-row gap-4">
-          {service.max_participants && (
-            <View className="flex-row items-center gap-1">
-              <MaterialCommunityIcons name="account-group" size={16} color={COLORS.secondary} />
-              <Text className="text-sm font-body text-secondary">
+        {/* Action Row - Includes details and CTA */}
+        <View className="flex-row items-center justify-between">
+          {service.max_participants ? (
+            <View className="flex-row items-center gap-1.5 bg-surface-container-high px-3 py-1.5 rounded-full">
+              <MaterialCommunityIcons name="account-group" size={14} color={COLORS.secondary} />
+              <Text className="text-xs font-display font-bold text-secondary uppercase tracking-tight">
                 {service.max_participants} {t("catalog.participants")}
               </Text>
             </View>
+          ) : (
+            <View />
           )}
-        </View>
 
-        {/* CTA */}
-        <View className="mt-4">
           <Button
-            variant="primary"
-            title={t("catalog.reserve")}
-            leftIcon="calendar-plus"
+            variant={isEditing ? "secondary" : "primary"}
+            title={isEditing ? t("catalog.edit") : t("catalog.add")}
+            leftIcon={isEditing ? "pencil" : "plus"}
+            className="px-6 rounded-2xl h-11"
+            size="sm"
             onPress={() => onPress?.(service)}
           />
         </View>

@@ -8,7 +8,7 @@ interface ButtonVariantStyle {
 }
 
 interface ButtonProps {
-  title: string;
+  title?: string;
   subtitle?: string;
   variant?: "primary" | "secondary" | "danger" | "outline";
   onPress: () => void;
@@ -19,6 +19,8 @@ interface ButtonProps {
   iconColor?: string; // Custom color for icons
   className?: string;
   accessibilityLabel?: string;
+  size?: "default" | "sm";
+  children?: React.ReactNode;
 }
 
 // Section 5: Sharp, angular (0 border-radius) - Section 6: Min touch targets 48x48dp, ideally 64dp+
@@ -57,6 +59,8 @@ export function Button({
   iconColor,
   className = "",
   accessibilityLabel,
+  size = "default",
+  children,
 }: ButtonProps) {
   const styles = variantStyles[variant];
 
@@ -67,11 +71,11 @@ export function Button({
 
   return (
     <Pressable
-      accessibilityLabel={accessibilityLabel || title}
+      accessibilityLabel={accessibilityLabel || title || "button"}
       accessibilityRole="button"
       className={`
-        min-h-button rounded-lg 
-        items-center justify-center flex-row gap-2 px-4
+        ${size === "sm" ? "min-h-[44px] py-1" : "min-h-button"} rounded-lg 
+        items-center justify-center flex-row gap-2 ${title || children ? "px-4" : "px-2"}
         ${styles.container}
         ${disabled ? "opacity-50" : ""}
         ${className}
@@ -81,41 +85,49 @@ export function Button({
     >
       {({ pressed }) => (
         <>
-          {leftIcon && (
-            <MaterialCommunityIcons
-              name={leftIcon}
-              size={20}
-              color={(pressed ? "on-surface-variant" : resolvedIconColor) as string}
-              className={variant === "outline" ? "text-tertiary-container" : ""}
-            />
-          )}
-          {icon && <Text className="text-lg">{icon}</Text>}
+          {children ? (
+            children
+          ) : (
+            <>
+              {leftIcon && (
+                <MaterialCommunityIcons
+                  name={leftIcon}
+                  size={20}
+                  color={(pressed ? "on-surface-variant" : resolvedIconColor) as string}
+                  className={variant === "outline" ? "text-tertiary-container" : ""}
+                />
+              )}
+              {icon && <Text className="text-lg">{icon}</Text>}
 
-          <View className={`${rightIcon ? "flex-1" : ""} flex-col justify-center`}>
-            <Text
-              className={`
-                font-bold ${!rightIcon ? "text-center" : ""}
-                ${pressed ? styles.pressed : styles.text}
-              `}
-            >
-              {title}
-            </Text>
-            {subtitle && (
-              <Text
-                className={`text-xs text-on-surface opacity-50 ${!rightIcon ? "text-center" : ""}`}
-              >
-                {subtitle}
-              </Text>
-            )}
-          </View>
+              {title && (
+                <View className={`${rightIcon ? "flex-1" : ""} flex-col justify-center`}>
+                  <Text
+                    className={`
+                      font-bold ${!rightIcon ? "text-center" : ""}
+                      ${pressed ? styles.pressed : styles.text}
+                    `}
+                  >
+                    {title}
+                  </Text>
+                  {subtitle && (
+                    <Text
+                      className={`text-xs text-on-surface opacity-50 ${!rightIcon ? "text-center" : ""}`}
+                    >
+                      {subtitle}
+                    </Text>
+                  )}
+                </View>
+              )}
 
-          {rightIcon && (
-            <MaterialCommunityIcons
-              name={rightIcon}
-              size={20}
-              color={(pressed ? "on-surface-variant" : resolvedIconColor) as string}
-              className={variant === "outline" ? "text-tertiary-container" : ""}
-            />
+              {rightIcon && (
+                <MaterialCommunityIcons
+                  name={rightIcon}
+                  size={20}
+                  color={(pressed ? "on-surface-variant" : resolvedIconColor) as string}
+                  className={variant === "outline" ? "text-tertiary-container" : ""}
+                />
+              )}
+            </>
           )}
         </>
       )}

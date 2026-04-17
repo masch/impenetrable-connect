@@ -11,7 +11,7 @@ import {
   DESAYUNO,
   MERIENDA,
 } from "./catalog";
-import { getMockUserId } from "./users";
+import { getMockUserId, DEFAULT_MOCK_USER_ID } from "./users";
 import { logger } from "../services/logger.service";
 
 // Helper to get a date relative to today
@@ -30,7 +30,7 @@ const yesterday = daysFromNow(-1);
 const DEFAULT_MOCK_ORDERS: Order[] = [
   {
     id: 1,
-    user_id: "tourist_001",
+    user_id: DEFAULT_MOCK_USER_ID,
     catalog_item_id: DESAYUNO.id,
     catalog_item: DESAYUNO,
     quantity: 1,
@@ -50,7 +50,7 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   },
   {
     id: 2,
-    user_id: "tourist_001",
+    user_id: DEFAULT_MOCK_USER_ID,
     catalog_item_id: ASADO_POLLO.id,
     catalog_item: ASADO_POLLO,
     quantity: 1,
@@ -70,7 +70,7 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   },
   {
     id: 3,
-    user_id: "tourist_001",
+    user_id: DEFAULT_MOCK_USER_ID,
     catalog_item_id: MERIENDA.id,
     catalog_item: MERIENDA,
     quantity: 2,
@@ -90,7 +90,7 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   },
   {
     id: 4,
-    user_id: "tourist_001",
+    user_id: DEFAULT_MOCK_USER_ID,
     catalog_item_id: ASADO_POLLO.id,
     catalog_item: ASADO_POLLO,
     quantity: 1,
@@ -110,7 +110,7 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   },
   {
     id: 5,
-    user_id: "tourist_001",
+    user_id: DEFAULT_MOCK_USER_ID,
     catalog_item_id: EMPANADAS_CARNE_DOCENA.id,
     catalog_item: EMPANADAS_CARNE_DOCENA,
     quantity: 1,
@@ -130,7 +130,7 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   },
   {
     id: 6,
-    user_id: "tourist_001",
+    user_id: DEFAULT_MOCK_USER_ID,
     catalog_item_id: EMPANADAS_VERDURA_DOCENA.id,
     catalog_item: EMPANADAS_VERDURA_DOCENA,
     quantity: 1,
@@ -150,24 +150,36 @@ const DEFAULT_MOCK_ORDERS: Order[] = [
   },
 ];
 
-// In-memory orders - resets on refresh
-const ordersState = {
-  orders: [] as Order[],
+/**
+ * Shared in-memory state for orders
+ * Uses global naming to ensure consistency across multiple module instances if they occur
+ */
+// Define the shape of our global state
+const GLOBAL_ORDERS_KEY = "__REWILDING_MOCK_ORDERS_STATE__";
+
+// Initialize global orders state if not already present
+// Using type assertion to avoid explicit 'any' while maintaining the global singleton
+const ordersStateContainer = globalThis as unknown as { [GLOBAL_ORDERS_KEY]: { orders: Order[] } };
+
+if (!ordersStateContainer[GLOBAL_ORDERS_KEY]) {
+  ordersStateContainer[GLOBAL_ORDERS_KEY] = {
+    orders: [...DEFAULT_MOCK_ORDERS],
+  };
+}
+
+const ordersState = ordersStateContainer[GLOBAL_ORDERS_KEY];
+
+// Fallback for user ID to ensure visibility in mock mode
+const getEffectiveUserId = () => {
+  return getMockUserId();
 };
 
 /**
  * Get orders for current user
  */
 export function getMockOrders(): Order[] {
-  const userId = getMockUserId();
-
-  if (!userId) {
-    return [];
-  }
-
-  // Return demo orders for tourist_001 + dynamically created orders
-  const defaultOrders = userId === "tourist_001" ? DEFAULT_MOCK_ORDERS : [];
-  return [...defaultOrders, ...ordersState.orders].filter((o) => o.user_id === userId);
+  const userId = getEffectiveUserId();
+  return ordersState.orders.filter((o: Order) => o.user_id === userId);
 }
 
 export const MOCK_ORDERS: Order[] = [];
@@ -178,18 +190,47 @@ export const MOCK_ORDERS: Order[] = [];
 export function addMockOrder(order: Omit<Order, "id" | "user_id">) {
   const newOrder: Order = {
     id: Date.now(),
-    user_id: getMockUserId(),
+    user_id: getEffectiveUserId(),
     ...order,
   };
   ordersState.orders = [newOrder, ...ordersState.orders];
-  logger.info("[MOCK] Added order:", newOrder as unknown as Record<string, unknown>);
+  logger.info("[MOCK API] Created order from reservation:", newOrder);
+
+  // DEBUG: Direct alert to see if we reached this point
+  // alert("Saving to memory...");
+
+  return newOrder;
 }
+
+/**
+ * Update a mock order with new data (Immutable update with numeric coercion)
+ */
+export function updateMockOrder(id: number, updates: Partial<Order>) {
+  // Global access to maintain state across different instances of this same file
+  const container = globalThis as unknown as { [GLOBAL_ORDERS_KEY]: { orders: Order[] } };
+  const ordersState = container[GLOBAL_ORDERS_KEY];
+
+  ordersState.orders = ordersState.orders.map((o: Order) =>
+    Number(o.id) === Number(id) ? { ...o, ...updates } : o,
+  );
+
+  console.log(`[MOCK] Updated order ${id} (new array reference created)`, new Date().toISOString());
+}
+
+export const getMockOrderById = (id: number): Order | undefined => {
+  const container = globalThis as unknown as { [GLOBAL_ORDERS_KEY]: { orders: Order[] } };
+  const ordersState = container[GLOBAL_ORDERS_KEY];
+  const order = ordersState.orders.find((o: Order) => Number(o.id) === Number(id));
+  return order;
+};
 
 /**
  * Update an order status
  */
 export function updateMockOrderStatus(id: number, status: Order["global_status"]) {
-  const order = ordersState.orders.find((o) => o.id === id);
+  const container = globalThis as unknown as { [GLOBAL_ORDERS_KEY]: { orders: Order[] } };
+  const ordersState = container[GLOBAL_ORDERS_KEY];
+  const order = ordersState.orders.find((o: Order) => Number(o.id) === Number(id));
   if (order) {
     order.global_status = status;
   }
