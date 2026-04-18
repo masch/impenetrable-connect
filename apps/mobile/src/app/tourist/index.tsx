@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, ScrollView, Pressable, SafeAreaView } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../../hooks/useI18n";
@@ -9,7 +9,8 @@ import { MOMENTS_OF_DAY } from "../../constants/moments";
 import { DatePicker } from "../../components/DatePicker";
 import { Button } from "../../components/Button";
 import { COLORS } from "@repo/shared";
-import type { TimeOfDay, Order } from "@repo/shared";
+import { TimeOfDay, Order } from "@repo/shared";
+import Screen, { ScreenContent } from "../../components/Screen";
 
 export default function OrderSetupScreen() {
   const router = useRouter();
@@ -59,101 +60,117 @@ export default function OrderSetupScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-surface">
-      <ScrollView className="flex-1 bg-surface" contentContainerStyle={{ paddingBottom: 60 }}>
-        {/* Header Section */}
-        <View className="px-6 pt-12 pb-6">
-          <Text className="text-4xl font-display font-bold text-on-surface leading-tight">
-            {t("order_setup.title")}
-          </Text>
-          <Text className="text-base font-body text-on-surface/50 mt-2">
-            {t("order_setup.subtitle")}
-          </Text>
-        </View>
-
-        {/* Date Selection */}
-        <View className="px-6 mb-8">
-          <View className="flex-row items-center mb-4">
-            <MaterialCommunityIcons name="calendar-clock" size={20} color={COLORS.primary} />
-            <Text className="text-lg font-display font-bold text-on-surface ml-2">
-              {t("order_setup.date_label")}
+    <Screen>
+      <ScreenContent>
+        <ScrollView
+          className="flex-1"
+          showsVerticalScrollIndicator={false}
+          contentContainerClassName="pb-[60px]"
+        >
+          {/* Header Section */}
+          <View className="px-2 pt-12 pb-6">
+            <Text className="text-4xl font-display font-bold text-on-surface leading-tight">
+              {t("order_setup.title")}
             </Text>
-          </View>
-          <DatePicker value={date} onChange={setDate} />
-        </View>
-
-        {/* Moment Selection */}
-        <View className="px-6 mb-10">
-          <View className="flex-row items-center mb-4">
-            <MaterialCommunityIcons name="clock-outline" size={20} color={COLORS.primary} />
-            <Text className="text-lg font-display font-bold text-on-surface ml-2">
-              {t("order_setup.moment_label")}
+            <Text className="text-base font-body text-on-surface/50 mt-2">
+              {t("order_setup.subtitle")}
             </Text>
           </View>
 
-          <View className="flex-row flex-wrap justify-between gap-y-4">
-            {MOMENTS_OF_DAY.map((m) => {
-              const isSelected = moment === m.id;
-              const momentKey = m.id.toLowerCase();
-              return (
-                <Pressable
-                  key={m.id}
-                  onPress={() => setMoment(m.id)}
-                  className={`w-[48%] items-center justify-center p-6 border-2 rounded-3xl transition-all shadow-sm ${
-                    isSelected
-                      ? `bg-moment-${momentKey}/10 border-moment-${momentKey} shadow-moment-${momentKey}/20`
-                      : "bg-surface-container-low border-outline-variant/30"
-                  }`}
-                  style={isSelected ? { elevation: 4 } : {}}
-                >
-                  <View
-                    className={`w-14 h-14 rounded-full items-center justify-center mb-3 ${
-                      isSelected ? `bg-moment-${momentKey}/20` : "bg-surface-container-high"
-                    }`}
-                  >
-                    <MaterialCommunityIcons
-                      name={m.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-                      size={34}
-                      color={isSelected ? m.hex : COLORS["on-surface-variant"]}
-                    />
-                  </View>
-                  <Text
-                    className={`text-base font-display transition-colors ${
+          {/* Date Selection */}
+          <View className="px-2 mb-8">
+            <View className="flex-row items-center mb-4">
+              <MaterialCommunityIcons name="calendar-clock" size={20} color={COLORS.primary} />
+              <Text className="text-lg font-display font-bold text-on-surface ml-2">
+                {t("order_setup.date_label")}
+              </Text>
+            </View>
+            <DatePicker
+              value={date}
+              onChange={setDate}
+              accessibilityLabel={t("order_setup.date_label")}
+            />
+          </View>
+
+          {/* Moment Selection */}
+          <View className="px-2 mb-10">
+            <View className="flex-row items-center mb-4">
+              <MaterialCommunityIcons name="clock-outline" size={20} color={COLORS.primary} />
+              <Text className="text-lg font-display font-bold text-on-surface ml-2">
+                {t("order_setup.moment_label")}
+              </Text>
+            </View>
+
+            <View className="flex-row flex-wrap justify-between gap-y-4">
+              {MOMENTS_OF_DAY.map((m) => {
+                const isSelected = moment === m.id;
+                const momentKey = m.id.toLowerCase();
+                const label = t(m.labelKey);
+                return (
+                  <Button
+                    key={m.id}
+                    onPress={() => setMoment(m.id)}
+                    accessibilityLabel={`${label}${isSelected ? `, ${t("common.selected")}` : ""}`}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: isSelected }}
+                    className={`w-[48%] items-center justify-center p-6 border-2 rounded-3xl transition-all shadow-sm ${
                       isSelected
-                        ? "text-on-surface font-bold"
-                        : "text-on-surface-variant font-medium"
+                        ? `bg-moment-${momentKey}/10 shadow-md border-moment-${momentKey} shadow-moment-${momentKey}/20`
+                        : "bg-surface-container-low border-outline-variant/30"
                     }`}
                   >
-                    {t(m.labelKey)}
-                  </Text>
-
-                  {isSelected && (
                     <View
-                      className="absolute top-3 right-3 w-5 h-5 rounded-full items-center justify-center"
-                      style={{ backgroundColor: m.hex }}
+                      className={`w-14 h-14 rounded-full items-center justify-center mb-3 ${
+                        isSelected ? `bg-moment-${momentKey}/20` : "bg-surface-container-high"
+                      }`}
                     >
-                      <MaterialCommunityIcons name="check" size={14} color="white" />
+                      <MaterialCommunityIcons
+                        name={m.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+                        size={34}
+                        color={isSelected ? m.hex : COLORS["on-surface-variant"]}
+                      />
                     </View>
-                  )}
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
+                    <Text
+                      className={`text-base font-display transition-colors ${
+                        isSelected
+                          ? "text-on-surface font-bold"
+                          : "text-on-surface-variant font-medium"
+                      }`}
+                    >
+                      {label}
+                    </Text>
 
-        {/* Action Button */}
-        <View className="px-6">
-          <Button
-            variant="primary"
-            title={t("order_setup.submit")}
-            onPress={handleProceed}
-            disabled={!isValid}
-            rightIcon="arrow-right"
-            className="py-5 rounded-2xl shadow-lg"
-            accessibilityLabel={t("order_setup.submit")}
-          />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+                    {isSelected && (
+                      <View
+                        className={`absolute top-3 right-3 w-5 h-5 rounded-full items-center justify-center bg-moment-${momentKey}`}
+                      >
+                        <MaterialCommunityIcons
+                          name="check"
+                          size={14}
+                          color={COLORS["on-primary"]}
+                        />
+                      </View>
+                    )}
+                  </Button>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* Action Button */}
+          <View className="px-2">
+            <Button
+              variant="primary"
+              title={t("order_setup.submit")}
+              onPress={handleProceed}
+              disabled={!isValid}
+              rightIcon="arrow-right"
+              className="py-5 rounded-2xl shadow-lg"
+              accessibilityLabel={t("order_setup.submit")}
+            />
+          </View>
+        </ScrollView>
+      </ScreenContent>
+    </Screen>
   );
 }
