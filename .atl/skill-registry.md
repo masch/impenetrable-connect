@@ -61,12 +61,16 @@
 - **No Direct Push**: NEVER push directly to `main` or `master`. No exceptions.
 - **Issue First**: Every change MUST be linked to a GitHub issue. If no issue exists, create one BEFORE starting the work (use `issue-creation` skill).
 - **Pre-Commit Validation**: ALWAYS run `make check` and ensure it passes BEFORE committing. No commit should be created with failing checks.
-- **Prohibición ABSOLUTA de `--no-verify`**: No importa qué tan 'chiquito' sea el cambio, si el linter está siendo 'pesado', o incluso si la herramienta de auditoría (`gga`) falla por un error de formato o ambigüedad: **NUNCA uses `--no-verify`**. No hay 'bypass justificado'. Si no podés lograr que el check pase en verde oficial, DETENETE y pedí ayuda al humano. El atajo es la muerte de la calidad. Bypassing quality gates is STRICTLY PROHIBITED.
+- **ZERO TOLERANCE: Absolute Prohibition of `--no-verify`**: Under NO circumstances—regardless of change size, linter strictness, or audit tool (`gga`) formatting errors/ambiguity—shall an agent use `--no-verify` or any bypass mechanism. There is NO "justified bypass". If a quality gate does not return an official, unambiguous 'PASSED' status, you MUST HALT immediately and escalate to the human lead. Bypassing quality gates is a direct violation of project integrity. Shortcuts are the death of quality. NO EXCEPTIONS.
 - **Branching**:
   - **Always Start from Fresh Main**: BEFORE starting any new feature (creating a branch or beginning work), MUST switch to `main`, pull the latest remote changes (`git pull origin main`), and ONLY THEN create the new feature branch. Starting from a stale state is STRICTLY PROHIBITED.
   - Always create a descriptive feature branch (e.g., `issue-#/short-description`).
 - **Pull Requests**: Every change must be submitted via a PR linked to the issue.
 - **Commits**: Use conventional commits only. No AI attribution in commit messages.
+- **Commit Security (GPG/SSH)**: If GPG/SSH signing is enabled in the repository configuration (`commit.gpgsign=true`), the agent is **STRICTLY PROHIBITED** from using `--no-gpg-sign` to bypass it. In such cases, the agent MUST:
+  1. Complete the work and run all quality checks (`make check`).
+  2. Add files to the staging area (`git add`).
+  3. **STOP** and request the user to execute the final `git commit` to ensure the cryptographic chain of trust is maintained. Bypassing security signatures is a direct violation of project integrity.
 - **Pull Request Standards**:
   - **MANDATORY**: Every PR body MUST include a "Test Summary" following this exact format: `✅ PASS: X total tests, make check successful`.
   - **Pre-Creation Protocol**: AGENTS MUST read `.github/PULL_REQUEST_TEMPLATE.md` before executing `gh pr create` to ensure all sections are filled correctly. Relying on memory is NOT allowed.

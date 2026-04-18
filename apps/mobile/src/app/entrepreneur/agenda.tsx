@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl } from "react-native";
+import { useEffect, useState } from "react";
+import { View, Text, ScrollView, RefreshControl } from "react-native";
+import { Button } from "../../components/Button";
 import Screen, { ScreenContent } from "../../components/Screen";
 import LoadingView from "../../components/LoadingView";
 import { useTranslations } from "../../hooks/useI18n";
@@ -54,27 +55,23 @@ export default function AgendaScreen() {
               if (isToday) dateLabel = t("order_setup.today");
               else if (isTomorrow) dateLabel = t("order_setup.tomorrow");
 
-              // Capitalize first letter (e.g. "Mañana", "Lun")
-              dateLabel = dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1).toLowerCase();
-              if (dateLabel.length > 3 && !isToday && !isTomorrow) {
-                dateLabel = dateLabel.substring(0, 3);
-              }
-
               return (
-                <TouchableOpacity
+                <Button
                   key={date.toISOString()}
                   onPress={() => setSelectedDate(date)}
-                  className={`mr-3 items-center pt-3.5 w-16 h-22 rounded-full border ${
+                  className={`mr-3 pt-3.5 w-16 h-22 rounded-full border ${
                     isSelected
                       ? "bg-primary border-primary shadow-lg"
                       : "bg-surface-container-lowest border-outline-variant/30"
                   }`}
                 >
                   <Text
-                    className={`font-display-bold text-[11px] mb-2 ${isSelected ? "text-white" : "text-on-surface-variant"}`}
+                    className={`font-display-bold text-[11px] mb-2 capitalize ${isSelected ? "text-white" : "text-on-surface-variant"}`}
                     numberOfLines={1}
                   >
-                    {dateLabel}
+                    {dateLabel.length > 3 && !isToday && !isTomorrow
+                      ? dateLabel.slice(0, 3)
+                      : dateLabel}
                   </Text>
                   <View
                     className={`w-10 h-10 items-center justify-center rounded-full ${isSelected ? "bg-white/20" : "bg-surface-container-low"}`}
@@ -89,7 +86,7 @@ export default function AgendaScreen() {
                     <View className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary" />
                   )}
                   {isSelected && <View className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/60" />}
-                </TouchableOpacity>
+                </Button>
               );
             })}
           </View>
@@ -114,10 +111,9 @@ export default function AgendaScreen() {
           <LoadingView className="py-20" />
         ) : (
           <ScrollView
-            className="flex-1 px-5"
-            contentContainerStyle={{ paddingTop: 10, paddingBottom: 30 }}
+            className="flex-1 px-5 bg-surface-container-low"
+            contentContainerClassName="pt-[10px] pb-[30px]"
             showsVerticalScrollIndicator={false}
-            style={{ backgroundColor: COLORS["surface-container-low"] }}
             refreshControl={
               <RefreshControl
                 refreshing={isLoading}
@@ -135,16 +131,13 @@ export default function AgendaScreen() {
                   {selectedDate.toLocaleDateString(locale, { month: "long", year: "numeric" })}
                 </Text>
               </View>
-              <TouchableOpacity
+              <Button
                 onPress={() => setShowDatePicker(true)}
+                variant="outline"
                 className="bg-surface-container-high p-2.5 rounded-xl border border-outline-variant/30"
-              >
-                <MaterialCommunityIcons
-                  name="calendar-month-outline"
-                  size={20}
-                  color={COLORS.primary}
-                />
-              </TouchableOpacity>
+                rightIcon="calendar-month-outline"
+                iconColor={COLORS.primary}
+              />
             </View>
 
             {renderDateSelector()}
@@ -155,7 +148,6 @@ export default function AgendaScreen() {
 
               const momentColor = getTimeOfDayColor(moment);
               const momentIcon = getTimeOfDayIcon(moment);
-              const momentKey = moment.toLowerCase();
 
               return (
                 <View key={moment} className="mb-6">
@@ -165,9 +157,7 @@ export default function AgendaScreen() {
                       style={{ backgroundColor: `${momentColor}15` }}
                     >
                       <MaterialCommunityIcons
-                        name={
-                          momentIcon as React.ComponentProps<typeof MaterialCommunityIcons>["name"]
-                        }
+                        name={momentIcon as keyof typeof MaterialCommunityIcons.glyphMap}
                         size={18}
                         color={momentColor}
                       />
@@ -176,7 +166,7 @@ export default function AgendaScreen() {
                       className="font-display-black text-[14px] uppercase tracking-[1.5px]"
                       style={{ color: momentColor }}
                     >
-                      {t(`agenda.moments.${momentKey}`)}
+                      {t(`agenda.moments.${moment}`)}
                     </Text>
                     <View
                       className="h-[0.8px] flex-1 ml-4 opacity-20"

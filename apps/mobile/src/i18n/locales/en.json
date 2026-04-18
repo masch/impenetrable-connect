@@ -196,7 +196,10 @@
     "people": "people",
     "info": "Information",
     "error": "Error",
-    "alert": "Attention"
+    "alert": "Attention",
+    "selected": "Selected",
+    "previous": "Previous",
+    "next": "Next"
   },
   "role_selector": {
     "welcome": "Welcome",
@@ -219,7 +222,7 @@
     }
   },
   "order_setup": {
-    "title": "When would you eat?",
+    "title": "When are we eating?",
     "subtitle": "Select date and time to see the menu",
     "date_label": "For when?",
     "moment_label": "At what time?",

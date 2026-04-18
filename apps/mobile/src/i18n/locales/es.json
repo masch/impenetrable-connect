@@ -196,7 +196,10 @@
     "people": "personas",
     "info": "Información",
     "error": "Error",
-    "alert": "Atención"
+    "alert": "Atención",
+    "selected": "Seleccionado",
+    "previous": "Anterior",
+    "next": "Siguiente"
   },
   "role_selector": {
     "welcome": "Bienvenido",
@@ -219,7 +222,7 @@
     }
   },
   "order_setup": {
-    "title": "¿Cuándo comerías?",
+    "title": "¿Cuándo comemos?",
     "subtitle": "Seleccioná fecha y momento para ver el menú",
     "date_label": "¿Para cuándo?",
     "moment_label": "¿En qué momento?",
