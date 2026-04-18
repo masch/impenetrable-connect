@@ -17,9 +17,16 @@ interface DatePickerProps {
   onChange: (date: Date) => void;
   minimumDate?: Date;
   maximumDate?: Date;
+  accessibilityLabel?: string;
 }
 
-export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePickerProps) {
+export function DatePicker({
+  value,
+  onChange,
+  minimumDate,
+  maximumDate,
+  accessibilityLabel,
+}: DatePickerProps) {
   const { t } = useTranslations();
   const [showPicker, setShowPicker] = useState(false);
 
@@ -95,7 +102,7 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
 
   if (isWeb) {
     return (
-      <View>
+      <View accessibilityLabel={accessibilityLabel}>
         {/* Quick select in single line */}
         <View className="flex-row gap-2">
           <Pressable
@@ -198,7 +205,7 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
   }
 
   return (
-    <View>
+    <View accessibilityLabel={accessibilityLabel}>
       {/* Quick select in single line */}
       <View className="flex-row gap-3">
         <Pressable

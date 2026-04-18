@@ -196,7 +196,8 @@
     "people": "personas",
     "info": "Información",
     "error": "Error",
-    "alert": "Atención"
+    "alert": "Atención",
+    "selected": "Seleccionado"
   },
   "role_selector": {
     "welcome": "Bienvenido",
