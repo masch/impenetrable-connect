@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Text, View, ScrollView, Alert, KeyboardAvoidingView, Platform } from "react-native";
+import { Text, View, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { useProjectStore } from "../../../stores/project.store";
 import { useTranslations } from "../../../hooks/useI18n";
 import { Language, SUPPORTED_LANGUAGES } from "@repo/shared";
@@ -12,6 +12,8 @@ import { FormSwitch } from "../../../components/FormSwitch";
 import { Button } from "../../../components/Button";
 import Screen from "../../../components/Screen";
 import LoadingView from "../../../components/LoadingView";
+import { AppAlert } from "../../../components/AppAlert";
+import { ComponentProps } from "react";
 
 const AVAILABLE_LANGUAGES = SUPPORTED_LANGUAGES;
 
@@ -51,6 +53,13 @@ export default function ProjectFormScreen() {
 
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [alertConfig, setAlertConfig] = useState<Omit<ComponentProps<typeof AppAlert>, "onClose">>({
+    visible: false,
+    title: "",
+    message: "",
+    type: "alert",
+    actions: [],
+  });
 
   // Reset form when switching between create and edit mode
   useEffect(() => {
@@ -137,7 +146,18 @@ export default function ProjectFormScreen() {
       router.replace("/admin/project");
     } catch (e: unknown) {
       logger.error("Failed to save project", e, { isEditMode, formData });
-      Alert.alert(t("error"), t("project_save_failed"));
+      setAlertConfig({
+        visible: true,
+        title: t("error"),
+        message: t("project_save_failed"),
+        type: "alert",
+        actions: [
+          {
+            text: t("ok"),
+            onPress: () => setAlertConfig((prev) => ({ ...prev, visible: false })),
+          },
+        ],
+      });
     }
   };
 
@@ -151,23 +171,21 @@ export default function ProjectFormScreen() {
   const handleLanguageToggle = (lang: Language) => {
     setFormData((prev) => {
       const isSelected = prev.supported_languages.includes(lang);
-      let newLanguages: Language[];
 
-      if (isSelected) {
-        // Don't allow removing the last language
-        if (prev.supported_languages.length === 1) {
-          return prev;
-        }
-        newLanguages = prev.supported_languages.filter((l) => l !== lang);
-      } else {
-        newLanguages = [...prev.supported_languages, lang];
+      // Don't allow removing the last language
+      if (isSelected && prev.supported_languages.length === 1) {
+        return prev;
       }
+
+      const newLanguages = isSelected
+        ? prev.supported_languages.filter((l) => l !== lang)
+        : [...prev.supported_languages, lang];
 
       // If removing the default language, switch to first remaining
-      let newDefault = prev.default_language;
-      if (!newLanguages.includes(prev.default_language) && newLanguages.length > 0) {
-        newDefault = newLanguages[0];
-      }
+      const newDefault =
+        !newLanguages.includes(prev.default_language) && newLanguages.length > 0
+          ? newLanguages[0]
+          : prev.default_language;
 
       return {
         ...prev,
@@ -307,6 +325,10 @@ export default function ProjectFormScreen() {
       </KeyboardAvoidingView>
 
       <StatusBar style="auto" />
+      <AppAlert
+        {...alertConfig}
+        onClose={() => setAlertConfig((prev) => ({ ...prev, visible: false }))}
+      />
     </Screen>
   );
 }

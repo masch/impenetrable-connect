@@ -1,16 +1,16 @@
-import type { TimeOfDay } from "@repo/shared";
+import type { ServiceMoment } from "@repo/shared";
 import { COLORS } from "@repo/shared";
 
 /**
- * Moment of day definitions with icons and colors
- * Used by ReservationModal and Orders screens
+ * Service moment definitions with icons and colors
+ * Used by Booking and Orders screens
  */
-export const MOMENTS_OF_DAY: {
-  id: TimeOfDay;
+export const SERVICE_MOMENTS: {
+  id: ServiceMoment;
   icon: string;
   labelKey: string;
-  color: string; // Tailwind class name like "moment-breakfast"
-  hex: string; // Hex for icons
+  color: string;
+  hex: string;
 }[] = [
   {
     id: "BREAKFAST",
@@ -43,17 +43,17 @@ export const MOMENTS_OF_DAY: {
 ];
 
 /**
- * Get icon for a time of day
+ * Get icon for a service moment
  */
-export function getTimeOfDayIcon(timeOfDay: string): string {
-  const found = MOMENTS_OF_DAY.find((m) => m.id === timeOfDay);
+export function getMomentIcon(moment: string): string {
+  const found = SERVICE_MOMENTS.find((m) => m.id === moment);
   return found?.icon || "clock-outline";
 }
 
 /**
- * Get hex color for a time of day (for MaterialCommunityIcons and Text)
+ * Get hex color for a service moment
  */
-export function getTimeOfDayColor(timeOfDay: string): string {
-  const found = MOMENTS_OF_DAY.find((m) => m.id === timeOfDay);
+export function getMomentColor(moment: string): string {
+  const found = SERVICE_MOMENTS.find((m) => m.id === moment);
   return found?.hex || COLORS["on-surface-variant"];
 }

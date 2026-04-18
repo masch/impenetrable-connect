@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 // Shared Enums from the spec
-export const TimeOfDaySchema = z.enum(["BREAKFAST", "LUNCH", "SNACK", "DINNER"]);
-export type TimeOfDay = z.infer<typeof TimeOfDaySchema>;
+export const ServiceMomentSchema = z.enum(["BREAKFAST", "LUNCH", "SNACK", "DINNER"]);
+export type ServiceMoment = z.infer<typeof ServiceMomentSchema>;
 
 // Supported languages for the platform
 export const LanguageSchema = z.enum(["es", "en"]);
@@ -35,6 +35,7 @@ export const USER_ROLE_KEYS = {
 
 export const OrderStatusSchema = z.enum([
   "SEARCHING",
+  "WAITING_FOR_OFFER",
   "OFFER_PENDING",
   "CONFIRMED",
   "COMPLETED",
@@ -42,7 +43,12 @@ export const OrderStatusSchema = z.enum([
   "CANCELLED",
   "EXPIRED",
 ]);
+
 export type OrderStatus = z.infer<typeof OrderStatusSchema>;
+
+export const ReservationStatusSchema = z.enum(["PENDING", "CONFIRMED", "PARTIAL", "CANCELLED"]);
+
+export type ReservationStatus = z.infer<typeof ReservationStatusSchema>;
 
 export const CancelReasonSchema = z.enum([
   "BY_TOURIST",

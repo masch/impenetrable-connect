@@ -2,6 +2,8 @@ import { Tabs } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../../hooks/useI18n";
 import { SHARED_SCREEN_OPTIONS } from "../../constants/theme";
+import { useCartStore } from "../../stores/cart.store";
+import { useReservationStore } from "../../stores/reservation.store";
 
 export default function TouristTabsLayout() {
   const { t } = useTranslations();
@@ -19,6 +21,16 @@ export default function TouristTabsLayout() {
             <MaterialCommunityIcons name="swap-horizontal" size={size} color={color} />
           ),
         }}
+        listeners={{
+          tabPress: () => {
+            useCartStore.getState().resetContext();
+            useReservationStore.setState({
+              activeOrders: [],
+              historyOrders: [],
+              error: null,
+            });
+          },
+        }}
       />
       <Tabs.Screen
         name="login"
@@ -33,9 +45,9 @@ export default function TouristTabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="catalog"
+        name="booking"
         options={{
-          href: "/tourist/catalog",
+          href: "/tourist/booking",
           title: t("tabs.catalog"),
           tabBarLabel: t("tabs.catalog"),
           tabBarAccessibilityLabel: t("tabs.catalog"),

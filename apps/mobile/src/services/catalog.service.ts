@@ -3,13 +3,13 @@
  * Follows the mock + REST switch pattern from project.service.ts
  *
  * Uses @repo/shared CatalogItem + Order types aligned with OpenSpec entities.
- * createReservation() builds an Order directly — there is no intermediate Reservation entity.
+ * placeOrder() builds an Order directly — there is no intermediate Reservation entity in the DB yet.
  */
 
 import { z } from "zod";
-import type { ZodIssue, ZodSchema } from "zod";
-import type { Order } from "@repo/shared";
-import { TimeOfDaySchema } from "@repo/shared";
+
+import type { Order, ServiceMoment } from "@repo/shared";
+import { ServiceMomentSchema } from "@repo/shared";
 import { MOCK_CATALOG_SERVICES, type CatalogServiceItem } from "../mocks/catalog";
 import { addMockOrder, getMockOrders, updateMockOrder } from "../mocks/orders";
 import { getMockUserId, isMockUserLoggedIn } from "../mocks/users";
@@ -20,30 +20,16 @@ import env from "../config/env";
 export type { CatalogServiceItem };
 export type { Order };
 
-// Validation schemas for catalog operations
-export const CreateReservationSchema = z.object({
+// Validation schemas for booking operations
+export const BookingInputSchema = z.object({
   serviceId: z.number(),
-  momentOfDay: TimeOfDaySchema,
+  moment: ServiceMomentSchema,
   quantity: z.number().min(1).max(20),
   date: z.date(),
   notes: z.string().optional(),
 });
 
-export type CreateReservationInput = z.infer<typeof CreateReservationSchema>;
-
-/**
- * Validate data using Zod schemas
- */
-function validateData<S extends ZodSchema>(data: unknown, schema: S): z.output<S> {
-  const result = schema.safeParse(data);
-  if (!result.success) {
-    const errors = result.error.issues
-      .map((i: ZodIssue) => `${i.path.join(".")}: ${i.message}`)
-      .join(", ");
-    throw new Error(`Validation failed: ${errors}`);
-  }
-  return result.data;
-}
+export type BookingInput = z.infer<typeof BookingInputSchema>;
 
 /**
  * Common interface for catalog service implementations
@@ -51,9 +37,14 @@ function validateData<S extends ZodSchema>(data: unknown, schema: S): z.output<S
 export interface CatalogServiceInterface {
   getServices(): Promise<CatalogServiceItem[]>;
   getServiceById(id: number): Promise<CatalogServiceItem | null>;
-  getServicesByCategory(catalogTypeId: number): Promise<CatalogServiceItem[]>;
-  createReservation(reservation: CreateReservationInput): Promise<Order>;
-  updateReservation(id: number, reservation: Partial<CreateReservationInput>): Promise<Order>;
+  getServicesByCategory(categoryId: number): Promise<CatalogServiceItem[]>;
+  placeOrder(
+    date: Date,
+    moment: ServiceMoment,
+    items: Array<{ catalog_item_id: number; quantity: number }>,
+    notes?: string,
+  ): Promise<Order>;
+  updateOrder(id: number, input: Partial<BookingInput>): Promise<Order>;
   getOrders(): Promise<Order[]>;
 }
 
@@ -61,8 +52,6 @@ export interface CatalogServiceInterface {
  * 🛠️ MOCK Implementation (Used during design/MVP phase)
  */
 const mockServices = [...MOCK_CATALOG_SERVICES];
-// NOTE: This is a shallow copy for read-only access, not state mutation
-// Mock services and state management handled via mocks/orders.ts helper functions
 
 const MockCatalogService: CatalogServiceInterface = {
   getServices: async () => {
@@ -75,39 +64,55 @@ const MockCatalogService: CatalogServiceInterface = {
     return mockServices.find((s) => s.id === id) || null;
   },
 
-  getServicesByCategory: async (catalogTypeId: number) => {
+  getServicesByCategory: async (categoryId: number) => {
     await new Promise((r) => setTimeout(r, 600));
-    return mockServices.filter((s) => s.catalog_type_id === catalogTypeId);
+    return mockServices.filter((s) => s.catalog_category_id === categoryId);
   },
 
-  createReservation: async (reservation: CreateReservationInput) => {
+  placeOrder: async (
+    date: Date,
+    moment: ServiceMoment,
+    items: Array<{ catalog_item_id: number; quantity: number }>,
+    notes?: string,
+  ) => {
     // Require user to be logged in
     if (!isMockUserLoggedIn()) {
-      throw new Error("User must be logged in to create a reservation");
+      throw new Error("User must be logged in to place an order");
     }
 
     await new Promise((r) => setTimeout(r, 800));
-    const validated = validateData(reservation, CreateReservationSchema);
-    const service = mockServices.find((s) => s.id === validated.serviceId);
 
-    if (!service) {
-      throw new Error("Service not found");
+    if (items.length === 0) {
+      throw new Error("Cannot place an order without items");
     }
 
+    // Use the first item's category as the order's primary category (MVP constraint)
+    const firstService = mockServices.find((s) => s.id === items[0].catalog_item_id);
+    if (!firstService) throw new Error("Service not found");
+
+    const orderId = Date.now();
+
     const newOrder: Order = {
-      id: Date.now(),
-      user_id: getMockUserId(), // use shared mock user state
-      catalog_item_id: service.id,
-      catalog_item: service,
-      quantity: validated.quantity,
-      price_at_purchase: service.price * validated.quantity,
+      id: orderId,
+      user_id: getMockUserId(),
+      reservation_id: Math.floor(Math.random() * 100000),
+      catalog_type_id: firstService.catalog_category_id,
       confirmed_venture_id: null,
-      service_date: validated.date,
-      time_of_day: validated.momentOfDay,
-      guest_count: validated.quantity,
-      notes: validated.notes ?? null,
+      service_date: date,
+      time_of_day: moment,
+      notes: notes ?? null,
       global_status: "SEARCHING",
       cancel_reason: null,
+      items: items.map((item) => {
+        const s = mockServices.find((service) => service.id === item.catalog_item_id);
+        return {
+          id: Math.floor(Math.random() * 100000),
+          order_id: orderId,
+          catalog_item_id: item.catalog_item_id,
+          quantity: item.quantity,
+          price: s?.price || 0,
+        };
+      }),
       cancelled_at: null,
       completed_at: null,
       confirmed_at: null,
@@ -117,13 +122,13 @@ const MockCatalogService: CatalogServiceInterface = {
 
     addMockOrder(newOrder);
     logger.info(
-      "[MOCK API] Created order from reservation:",
+      "[MOCK API] Placed multi-item order:",
       newOrder as unknown as Record<string, unknown>,
     );
     return newOrder;
   },
 
-  updateReservation: async (id: number, reservation: Partial<CreateReservationInput>) => {
+  updateOrder: async (id: number, input: Partial<BookingInput>) => {
     await new Promise((r) => setTimeout(r, 600));
 
     const existingOrders = getMockOrders();
@@ -131,20 +136,23 @@ const MockCatalogService: CatalogServiceInterface = {
     if (!order) throw new Error("Order not found");
 
     const updates: Partial<Order> = {};
-    if (reservation.quantity) {
-      updates.quantity = reservation.quantity;
-      updates.guest_count = reservation.quantity;
-      const servicePrice = order.catalog_item?.price || 0;
-      updates.price_at_purchase = servicePrice * reservation.quantity;
+    if (input.quantity) {
+      // Update quantity in items (assuming single item for now in mock)
+      if (order.items && order.items.length > 0) {
+        updates.items = order.items.map((item) => ({
+          ...item,
+          quantity: input.quantity!,
+        }));
+      }
     }
-    if (reservation.notes !== undefined) {
-      updates.notes = reservation.notes;
+    if (input.notes !== undefined) {
+      updates.notes = input.notes;
     }
-    if (reservation.date) {
-      updates.service_date = reservation.date;
+    if (input.date) {
+      updates.service_date = input.date;
     }
-    if (reservation.momentOfDay) {
-      updates.time_of_day = reservation.momentOfDay;
+    if (input.moment) {
+      updates.time_of_day = input.moment;
     }
 
     updateMockOrder(Number(id), updates);
@@ -174,36 +182,35 @@ const RestCatalogService: CatalogServiceInterface = {
     return response.json();
   },
 
-  getServicesByCategory: async (catalogTypeId: number) => {
-    const response = await fetch(`${env.API_URL}/services?catalog_type_id=${catalogTypeId}`);
+  getServicesByCategory: async (categoryId: number) => {
+    const response = await fetch(`${env.API_URL}/services?category_id=${categoryId}`);
     if (!response.ok) throw new Error("API error fetching services by category");
     return response.json();
   },
 
-  createReservation: async (reservation: CreateReservationInput) => {
+  placeOrder: async (date, moment, items, notes) => {
     const response = await fetch(`${env.API_URL}/orders`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        catalog_item_id: reservation.serviceId,
-        time_of_day: reservation.momentOfDay,
-        guest_count: reservation.quantity,
-        quantity: reservation.quantity,
-        service_date: reservation.date ?? new Date().toISOString().split("T")[0],
-        notes: reservation.notes ?? null,
+        reservation_id: 0,
+        catalog_category_id: 1, // Example ID
+        time_of_day: moment,
+        service_date: date.toISOString().split("T")[0],
+        notes: notes ?? null,
+        items: items,
       }),
     });
-    if (!response.ok) throw new Error("API error creating order");
+    if (!response.ok) throw new Error("API error placing order");
     return response.json();
   },
 
-  updateReservation: async (id: number, reservation: Partial<CreateReservationInput>) => {
+  updateOrder: async (id: number, input: Partial<BookingInput>) => {
     const response = await fetch(`${env.API_URL}/orders/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        quantity: reservation.quantity,
-        notes: reservation.notes,
+        notes: input.notes,
       }),
     });
     if (!response.ok) throw new Error("API error updating order");

@@ -161,7 +161,10 @@
       "noShow": "NO SHOW"
     },
     "confirmCancel": "Yes, cancel",
-    "keeping": "No, keep"
+    "keeping": "No, keep",
+    "noItems": "No items",
+    "itemNumber": "Item #",
+    "registeredTourist": "Registered Tourist"
   },
   "agenda": {
     "title": "Your Agenda",

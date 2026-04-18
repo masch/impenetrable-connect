@@ -3,7 +3,7 @@
  * Uses @repo/shared types aligned with OpenSpec Catalog_Item entity
  */
 
-import { CatalogItem, CatalogType } from "@repo/shared";
+import { CatalogItem, ServiceCategory } from "@repo/shared";
 import { MOCK_PROJECTS, PROJECT_IDS } from "./projects";
 
 // Local assets
@@ -17,16 +17,16 @@ import chivoEstofado from "../../assets/catalog/chivo_estofado.jpeg";
 // Get the first active project for our mock catalog types
 const defaultProject = MOCK_PROJECTS.find((p) => p.is_active) || MOCK_PROJECTS[0];
 
-// Catalog type IDs - explicit constants for type safety
-export const CATALOG_TYPE_IDS = {
+// Service category IDs - explicit constants for type safety
+export const SERVICE_CATEGORY_IDS = {
   GASTRONOMY: 1,
   EXCURSION: 2,
 } as const;
 
-// Catalog Types - referenced by catalog_type_id
-export const MOCK_CATALOG_TYPES: CatalogType[] = [
+// Service Categories - referenced by catalog_category_id
+export const MOCK_SERVICE_CATEGORIES: ServiceCategory[] = [
   {
-    id: CATALOG_TYPE_IDS.GASTRONOMY,
+    id: SERVICE_CATEGORY_IDS.GASTRONOMY,
     project_id: PROJECT_IDS.IMPENETRABLE,
     project: defaultProject,
     name_i18n: { es: "Gastronomía", en: "Gastronomy" },
@@ -37,7 +37,7 @@ export const MOCK_CATALOG_TYPES: CatalogType[] = [
     is_active: true,
   },
   {
-    id: CATALOG_TYPE_IDS.EXCURSION,
+    id: SERVICE_CATEGORY_IDS.EXCURSION,
     project_id: PROJECT_IDS.IMPENETRABLE,
     project: defaultProject,
     name_i18n: { es: "Excursiones", en: "Excursions" },
@@ -52,7 +52,7 @@ export const MOCK_CATALOG_TYPES: CatalogType[] = [
 // Catalog Items as named exports (id is a number)
 export const EMPANADAS_CARNE_MEDIA_DOCENA: CatalogItem = {
   id: 1,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Empanadas de carne 1/2 docena", en: "Beef Empanadas 1/2 dozen" },
   description_i18n: {
     es: "Mínimo 6 empanadas. Empanadas de carne magra, masa casera",
@@ -66,7 +66,7 @@ export const EMPANADAS_CARNE_MEDIA_DOCENA: CatalogItem = {
 
 export const EMPANADAS_CARNE_DOCENA: CatalogItem = {
   id: 2,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Empanadas de carne 1 docena", en: "Beef Empanadas dozen" },
   description_i18n: {
     es: "Empanadas de carne magra, masa casera",
@@ -80,7 +80,7 @@ export const EMPANADAS_CARNE_DOCENA: CatalogItem = {
 
 export const EMPANADAS_CHARQUI_MEDIA_DOCENA: CatalogItem = {
   id: 3,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Empanadas de charqui 1/2 docena", en: "Charqui Empanadas 1/2 dozen" },
   description_i18n: {
     es: "Mínimo 6 empanadas. Empanadas de charqui artesanal",
@@ -94,7 +94,7 @@ export const EMPANADAS_CHARQUI_MEDIA_DOCENA: CatalogItem = {
 
 export const EMPANADAS_CHARQUI_DOCENA: CatalogItem = {
   id: 4,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Empanadas de charqui 1 docena", en: "Charqui Empanadas dozen" },
   description_i18n: { es: "Empanadas de charqui artesanal", en: "Artisan charqui empanadas" },
   price: 24000,
@@ -105,7 +105,7 @@ export const EMPANADAS_CHARQUI_DOCENA: CatalogItem = {
 
 export const EMPANADAS_VERDURA_MEDIA_DOCENA: CatalogItem = {
   id: 5,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Empanadas de verdura 1/2 docena", en: "Vegetable Empanadas 1/2 dozen" },
   description_i18n: {
     es: "Mínimo 6 empanadas. Empanadas de verduras frescas de la huerta",
@@ -119,7 +119,7 @@ export const EMPANADAS_VERDURA_MEDIA_DOCENA: CatalogItem = {
 
 export const EMPANADAS_VERDURA_DOCENA: CatalogItem = {
   id: 6,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Empanadas de verdura 1 docena", en: "Vegetable Empanadas dozen" },
   description_i18n: {
     es: "Empanadas de verduras frescas de la huerta",
@@ -133,7 +133,7 @@ export const EMPANADAS_VERDURA_DOCENA: CatalogItem = {
 
 export const EMPANADAS_POLLO_MEDIA_DOCENA: CatalogItem = {
   id: 7,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Empanadas de pollo 1/2 docena", en: "Chicken Empanadas 1/2 dozen" },
   description_i18n: {
     es: "Mínimo 6 empanadas. Empanadas de pollo deshilachado",
@@ -147,7 +147,7 @@ export const EMPANADAS_POLLO_MEDIA_DOCENA: CatalogItem = {
 
 export const EMPANADAS_POLLO_DOCENA: CatalogItem = {
   id: 8,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Empanadas de pollo 1 docena", en: "Chicken Empanadas dozen" },
   description_i18n: { es: "Empanadas de pollo deshilachado", en: "Shredded chicken empanadas" },
   price: 17000,
@@ -158,7 +158,7 @@ export const EMPANADAS_POLLO_DOCENA: CatalogItem = {
 
 export const ASADO_POLLO: CatalogItem = {
   id: 9,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Asado de pollo c/guarnición", en: "Roasted chicken with garnish" },
   description_i18n: {
     es: "Asado de pollo con guarnición de arroz y ensalada",
@@ -172,7 +172,7 @@ export const ASADO_POLLO: CatalogItem = {
 
 export const PASTEL_ZAPALLO_CHIVO: CatalogItem = {
   id: 10,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Pastel de zapallo o papa c/chivo", en: "Pumpkin or potato pie with goat" },
   description_i18n: {
     es: "Pastel de zapallo o papa con carne de chivo",
@@ -186,7 +186,7 @@ export const PASTEL_ZAPALLO_CHIVO: CatalogItem = {
 
 export const ESTOFADO_CHIVO: CatalogItem = {
   id: 11,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Estofado de chivo", en: "Goat stew" },
   description_i18n: {
     es: "Estofado tradicional de chivo chaqueño",
@@ -200,7 +200,7 @@ export const ESTOFADO_CHIVO: CatalogItem = {
 
 export const GUISO_CHIVO: CatalogItem = {
   id: 12,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Guiso de Chivo", en: "Goat stew (Guiso)" },
   description_i18n: { es: "Guiso auténtica de chivo chaqueño", en: "Authentic Chaco goat guiso" },
   price: 20000,
@@ -211,7 +211,7 @@ export const GUISO_CHIVO: CatalogItem = {
 
 export const REPOLLO_ASADO: CatalogItem = {
   id: 13,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Repollo asado c/verduras", en: "Roasted cabbage with vegetables" },
   description_i18n: {
     es: "Repollo asado con mezcla de verduras de temporada",
@@ -225,7 +225,7 @@ export const REPOLLO_ASADO: CatalogItem = {
 
 export const POSTRE_REGIONAL: CatalogItem = {
   id: 14,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Postre regional", en: "Regional dessert" },
   description_i18n: {
     es: "Postre típico de la región chaqueña",
@@ -239,7 +239,7 @@ export const POSTRE_REGIONAL: CatalogItem = {
 
 export const DESAYUNO: CatalogItem = {
   id: 15,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Desayuno", en: "Breakfast tea" },
   description_i18n: {
     es: "Desayuno con productos regionales",
@@ -253,7 +253,7 @@ export const DESAYUNO: CatalogItem = {
 
 export const MERIENDA: CatalogItem = {
   id: 16,
-  catalog_type_id: CATALOG_TYPE_IDS.GASTRONOMY,
+  catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
   name_i18n: { es: "Merienda", en: "Snack" },
   description_i18n: {
     es: "Merienda con productos regionales",
@@ -267,7 +267,7 @@ export const MERIENDA: CatalogItem = {
 
 export const PASEO_LANCHA: CatalogItem = {
   id: 17,
-  catalog_type_id: CATALOG_TYPE_IDS.EXCURSION,
+  catalog_category_id: SERVICE_CATEGORY_IDS.EXCURSION,
   name_i18n: { es: "Paseo en lancha", en: "Boat trip" },
   description_i18n: {
     es: "Paseo guiado por el río Bermejito",

@@ -1,10 +1,15 @@
 import { z } from "zod";
-import { CatalogTypeSchema } from "./catalog-type";
+import { ServiceCategorySchema } from "./service-category";
+import { VentureMemberSchema } from "./venture-member";
 
-export const VentureSchema = z.object({
+/**
+ * VentureDbSchema
+ * Pure database entity representation (Flat)
+ * Mapped to 'ventures' table.
+ */
+export const VentureDbSchema = z.object({
   id: z.number().int().positive(),
   catalog_type_id: z.number().int().positive(),
-  catalog_type: CatalogTypeSchema.optional(),
   name: z.string().min(2),
   description: z.string().optional(),
   address: z.string(),
@@ -18,4 +23,14 @@ export const VentureSchema = z.object({
   is_active: z.boolean().default(true),
 });
 
+/**
+ * VentureSchema (Domain Aggregate)
+ * Business entity that includes catalog type and members.
+ */
+export const VentureSchema = VentureDbSchema.extend({
+  categories: z.array(ServiceCategorySchema).optional(),
+  members: z.array(VentureMemberSchema).optional(),
+});
+
+export type VentureRow = z.infer<typeof VentureDbSchema>;
 export interface Venture extends z.infer<typeof VentureSchema> {}

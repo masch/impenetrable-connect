@@ -1,15 +1,15 @@
 /**
- * Orders Store (Zustand)
- * Manages tourist orders (active and history)
- * In-memory state that persists while the app is open
+ * Reservation Store (Zustand)
+ * Manages tourist orders (active and history).
+ * Renamed from useOrdersStore to follow the domain model where Orders belong to a Reservation.
  */
 
 import { create } from "zustand";
-import type { Order, TimeOfDay } from "@repo/shared";
+import type { Order, ServiceMoment } from "@repo/shared";
 import { orderService } from "../services/order.service";
 import { logger } from "../services/logger.service";
 
-interface OrdersState {
+interface ReservationState {
   // Data
   activeOrders: Order[];
   historyOrders: Order[];
@@ -24,11 +24,11 @@ interface OrdersState {
   cancelOrder: (orderId: number) => Promise<void>;
   addOrder: (order: Order) => void;
   updateOrder: (order: Order) => void;
-  moveOrders: (orderIds: number[], newDate: Date, newMoment: TimeOfDay) => Promise<void>;
+  moveOrders: (orderIds: number[], newDate: Date, newMoment: ServiceMoment) => Promise<void>;
   setTab: (tab: "active" | "history") => void;
 }
 
-export const useOrdersStore = create<OrdersState>((set, get) => ({
+export const useReservationStore = create<ReservationState>((set, get) => ({
   // Initial state
   activeOrders: [],
   historyOrders: [],
@@ -38,7 +38,6 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
 
   // Fetch all orders and split into active/history
   fetchOrders: async () => {
-    // Only set loading, don't clear existing orders to avoid flickering
     set({ isLoading: true, error: null });
     try {
       const orders = await orderService.getOrders();
@@ -57,7 +56,6 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
         )
         .sort((a, b) => new Date(b.service_date).getTime() - new Date(a.service_date).getTime());
 
-      // Always replace orders (not append) to handle user changes correctly
       set({ activeOrders: active, historyOrders: history, isLoading: false });
     } catch (err) {
       logger.error("Error fetching orders", err);
@@ -70,7 +68,6 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       await orderService.cancelOrder(orderId);
-      // After cancelling, refresh the orders to update the lists
       await get().fetchOrders();
     } catch (err) {
       logger.error(`Error cancelling order ${orderId}`, err);
@@ -78,7 +75,7 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
     }
   },
 
-  // Add a single order (used after creation to avoid full refetch)
+  // Add a single order
   addOrder: (order: Order) => {
     const isActive = ["SEARCHING", "OFFER_PENDING", "CONFIRMED"].includes(order.global_status);
     if (isActive) {
@@ -88,7 +85,7 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
     }
   },
 
-  // Update a single order in the store (optimistic update)
+  // Update a single order
   updateOrder: (order: Order) => {
     set((state) => ({
       activeOrders: state.activeOrders.map((o) =>
@@ -105,15 +102,15 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
     set({ selectedTab: tab });
   },
 
-  // Move orders to a new context (date and moment)
-  moveOrders: async (orderIds: number[], newDate: Date, newMoment: TimeOfDay) => {
+  // Move orders to a new context
+  moveOrders: async (orderIds: number[], newDate: Date, newMoment: ServiceMoment) => {
     set({ isLoading: true, error: null });
     try {
       const { CatalogService } = await import("../services/catalog.service");
       for (const id of orderIds) {
-        await CatalogService.updateReservation(id, {
+        await CatalogService.updateOrder(id, {
           date: newDate,
-          momentOfDay: newMoment,
+          moment: newMoment,
         });
       }
       await get().fetchOrders();

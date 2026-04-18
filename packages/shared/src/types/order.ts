@@ -1,24 +1,22 @@
 import { z } from "zod";
-import { OrderStatusSchema, CancelReasonSchema, TimeOfDaySchema } from "./common";
+import { OrderStatusSchema, CancelReasonSchema, ServiceMomentSchema } from "./common";
 import { UserSchema } from "./user";
-import { CatalogItemSchema } from "./catalog";
 import { VentureSchema } from "./venture";
+import { OrderItemSchema } from "./order-item";
 
-export const OrderSchema = z.object({
+/**
+ * OrderDbSchema
+ * Pure database entity representation (Flat)
+ * Mapped to 'orders' table.
+ */
+export const OrderDbSchema = z.object({
   id: z.number().int().positive(),
-  // DB level: Links to the unified User table
   user_id: z.string().uuid(),
-  // Drizzle eager-loading projection: typed as User (tourist data)
-  user: UserSchema.optional(),
-  catalog_item_id: z.number().int().positive(),
-  catalog_item: CatalogItemSchema.optional(),
-  quantity: z.number().int().positive().default(1),
-  price_at_purchase: z.number().nonnegative(),
+  reservation_id: z.number().int().positive(),
+  catalog_type_id: z.number().int().positive(),
   confirmed_venture_id: z.number().int().positive().nullable().optional(),
-  confirmed_venture: VentureSchema.optional(),
   service_date: z.date(),
-  time_of_day: TimeOfDaySchema,
-  guest_count: z.number().int().positive(),
+  time_of_day: ServiceMomentSchema,
   notes: z.string().nullable().optional(),
   global_status: OrderStatusSchema.default("SEARCHING"),
   cancel_reason: CancelReasonSchema.nullable().optional(),
@@ -29,4 +27,18 @@ export const OrderSchema = z.object({
   notify_whatsapp: z.boolean().default(false),
 });
 
+/**
+ * OrderSchema (Domain Aggregate)
+ * Business entity that includes relations and nested items.
+ *
+ * DOMAIN RULE: All 'items' must belong to the same 'catalog_type_id' defined in the parent Order.
+ * Validation must be performed at the Service layer during order creation/update.
+ */
+export const OrderSchema = OrderDbSchema.extend({
+  items: z.array(OrderItemSchema).default([]),
+  user: UserSchema.optional(),
+  confirmed_venture: VentureSchema.optional(),
+});
+
+export type OrderRow = z.infer<typeof OrderDbSchema>;
 export interface Order extends z.infer<typeof OrderSchema> {}

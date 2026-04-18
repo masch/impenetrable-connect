@@ -7,7 +7,7 @@ import { Text, View, Pressable } from "react-native";
 import { Button } from "./Button";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../hooks/useI18n";
-import { CATALOG_TYPE_IDS } from "../mocks/catalog";
+import { SERVICE_CATEGORY_IDS } from "../mocks/catalog";
 import type { CatalogServiceItem } from "../mocks/catalog";
 import { CatalogImage } from "./CatalogImage";
 import { COLORS } from "@repo/shared";
@@ -25,8 +25,9 @@ export function ServiceCard({ service, isEditing, onPress, accessibilityLabel }:
     return `$ ${price.toLocaleString("es-AR")}`;
   };
 
-  // Get category from catalog_type_id: 1 = gastronomy, 2 = excursion
-  const isGastronomy = service.catalog_type_id === CATALOG_TYPE_IDS.GASTRONOMY;
+  // Get category from catalog_category_id: 1 = gastronomy, 2 = excursion
+  const isGastronomy =
+    Number(service.catalog_category_id) === Number(SERVICE_CATEGORY_IDS.GASTRONOMY);
   const categoryIcon = (
     isGastronomy ? "silverware-fork-knife" : "nature-people"
   ) as keyof typeof MaterialCommunityIcons.glyphMap;

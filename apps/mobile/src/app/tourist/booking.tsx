@@ -1,6 +1,6 @@
 /**
- * Tourist Catalog Screen
- * Displays available tourist services (gastronomy & excursions) with reservation capability
+ * Tourist Booking Screen
+ * Displays available tourist services grouped by categories with booking capability.
  */
 
 import { useEffect, useState, useCallback, useMemo, type ComponentProps } from "react";
@@ -14,41 +14,47 @@ import { ServiceCard } from "../../components/ServiceCard";
 import { ReservationModal } from "../../components/ReservationModal";
 import { AppAlert, type AppAlertAction } from "../../components/AppAlert";
 import { useCatalogStore } from "../../stores/catalog.store";
-import { useOrdersStore } from "../../stores/orders.store";
+import { useReservationStore } from "../../stores/reservation.store";
 import { useAuthStore } from "../../stores/auth.store";
 import { CatalogService } from "../../services/catalog.service";
 import { logger } from "../../services/logger.service";
-import { COLORS, type Order, type TimeOfDay } from "@repo/shared";
+import { COLORS, type Order, type ServiceMoment } from "@repo/shared";
 import type { CatalogServiceItem } from "../../mocks/catalog";
-import { useOrderContextStore } from "../../stores/order-context.store";
+import { useCartStore } from "../../stores/cart.store";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Pressable as NativePressable } from "react-native";
-import { MOMENTS_OF_DAY } from "../../constants/moments";
+import { SERVICE_MOMENTS } from "../../constants/moments";
 import { Button } from "../../components/Button";
 
-export default function CatalogScreen() {
+export default function BookingScreen() {
   const router = useRouter();
   const { t, getLocalizedName } = useTranslations();
   const services = useCatalogStore((state) => state.services);
   const isLoading = useCatalogStore((state) => state.isLoading);
   const error = useCatalogStore((state) => state.error);
   const fetchServices = useCatalogStore((state) => state.fetchServices);
-  const createReservation = useCatalogStore((state) => state.createReservation);
+  const placeOrder = useCatalogStore((state) => state.placeOrder);
 
-  const fetchOrders = useOrdersStore((state) => state.fetchOrders);
-  const addOrderToStore = useOrdersStore((state) => state.addOrder);
-  const updateOrderInStore = useOrdersStore((state) => state.updateOrder);
-  const activeOrders = useOrdersStore((state) => state.activeOrders);
-  const cancelOrder = useOrdersStore((state) => state.cancelOrder);
+  const fetchOrders = useReservationStore((state) => state.fetchOrders);
+  const addOrderToStore = useReservationStore((state) => state.addOrder);
+  const updateOrderInStore = useReservationStore((state) => state.updateOrder);
+  const activeOrders = useReservationStore((state) => state.activeOrders);
+  const cancelOrder = useReservationStore((state) => state.cancelOrder);
 
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  const isValidContext = useOrderContextStore((state) => state.isValid);
-  const selectedDate = useOrderContextStore((state) => state.selectedDate);
-  const selectedMoment = useOrderContextStore((state) => state.selectedMoment);
+  const {
+    isValid: isValidContext,
+    selectedDate,
+    selectedMoment,
+    cartItems,
+    addItem,
+    removeItem,
+    clearCart,
+  } = useCartStore();
 
   const currentMoment = useMemo(
-    () => MOMENTS_OF_DAY.find((m) => m.id === selectedMoment),
+    () => SERVICE_MOMENTS.find((m) => m.id === selectedMoment),
     [selectedMoment],
   );
 
@@ -94,8 +100,6 @@ export default function CatalogScreen() {
   const [selectedService, setSelectedService] = useState<CatalogServiceItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
-  const [deleteAlertVisible, setDeleteAlertVisible] = useState(false);
-  const [orderToDelete, setOrderToDelete] = useState<number | null>(null);
   const [alertConfig, setAlertConfig] = useState<{
     visible: boolean;
     title: string;
@@ -125,12 +129,20 @@ export default function CatalogScreen() {
     setRefreshing(false);
   }, [fetchServices]);
 
-  const handleEditOrder = useCallback((order: Order) => {
-    if (!order.catalog_item) return;
-    setSelectedService(order.catalog_item as CatalogServiceItem);
-    setEditingOrder(order);
-    setModalVisible(true);
-  }, []);
+  const handleEditOrder = useCallback(
+    (order: Order) => {
+      const firstItem = order.items?.[0];
+      if (!firstItem) return;
+
+      const service = services.find((s) => s.id === firstItem.catalog_item_id);
+      if (!service) return;
+
+      setSelectedService(service);
+      setEditingOrder(order);
+      setModalVisible(true);
+    },
+    [services],
+  );
 
   const handleCloseModal = useCallback(() => {
     setModalVisible(false);
@@ -140,9 +152,11 @@ export default function CatalogScreen() {
 
   const handleServicePress = useCallback(
     (service: CatalogServiceItem) => {
-      // Check if this service is already in the current context's order
       const existingOrder = activeOrders.find((order) => {
-        if (Number(order.catalog_item_id) !== Number(service.id)) return false;
+        const hasItem = order.items?.some(
+          (item) => Number(item.catalog_item_id) === Number(service.id),
+        );
+        if (!hasItem) return false;
 
         const oDate = new Date(order.service_date);
         const cDate = new Date(selectedDate!);
@@ -166,7 +180,16 @@ export default function CatalogScreen() {
   );
 
   const handleDeleteOrder = useCallback(
-    async (orderId: number) => {
+    async (orderId?: number) => {
+      // If no orderId, it's a cart item
+      if (!orderId) {
+        if (selectedService) {
+          removeItem(selectedService.id);
+          setModalVisible(false);
+        }
+        return;
+      }
+
       setIsSubmitting(true);
       try {
         await cancelOrder(orderId);
@@ -177,18 +200,13 @@ export default function CatalogScreen() {
         setIsSubmitting(false);
       }
     },
-    [cancelOrder, handleCloseModal],
+    [cancelOrder, handleCloseModal, removeItem, selectedService],
   );
 
-  const handleReservation = useCallback(
-    async (
-      momentOfDay: TimeOfDay,
-      quantity: number,
-      date: Date,
-      notes?: string,
-      orderId?: number,
-    ) => {
+  const handleBooking = useCallback(
+    async (moment: ServiceMoment, quantity: number, date: Date, notes?: string) => {
       if (!selectedService) return;
+      const orderId = editingOrder?.id;
 
       if (!isAuthenticated) {
         setAlertConfig({
@@ -212,38 +230,28 @@ export default function CatalogScreen() {
       }
 
       setIsSubmitting(true);
-
-      // Close modal immediately for better UX
       handleCloseModal();
 
       try {
         if (orderId) {
-          const updatedOrder = await CatalogService.updateReservation(Number(orderId), {
+          const updatedOrder = await CatalogService.updateOrder(Number(orderId), {
             quantity,
             notes,
           });
-
-          // Optimistically update the store
           updateOrderInStore(updatedOrder);
         } else {
-          logger.info("[CATALOG] Creating new order");
-          const newOrder = await createReservation({
-            serviceId: selectedService.id,
-            momentOfDay,
+          logger.info("[BOOKING] Adding item to cart");
+          addItem({
+            catalog_item_id: selectedService.id,
             quantity,
-            date,
-            notes,
+            price: selectedService.price,
           });
-
-          if (newOrder) {
-            addOrderToStore(newOrder);
-          }
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         }
 
-        // Refresh from service
         await fetchOrders();
       } catch (err) {
-        logger.error("Reservation failed", err);
+        logger.error("Booking failed", err);
         const message = err instanceof Error ? err.message : "Unknown error";
         setAlertConfig({
           visible: true,
@@ -265,50 +273,35 @@ export default function CatalogScreen() {
     [
       selectedService,
       isAuthenticated,
-      createReservation,
       fetchOrders,
       handleCloseModal,
       t,
       router,
-      addOrderToStore,
+      addItem,
       updateOrderInStore,
+      editingOrder?.id,
     ],
   );
 
-  // Get active items for the current context for UI markers and summary
-  const contextOrders = useMemo(() => {
-    if (!selectedDate || !selectedMoment || !activeOrders) return [];
-
-    return activeOrders.filter((order) => {
-      const oDateStr = new Date(order.service_date).toISOString().split("T")[0];
-      const cDateStr = new Date(selectedDate).toISOString().split("T")[0];
-      const isSameDay = oDateStr === cDateStr;
-      const isSameMoment =
-        String(order.time_of_day).trim().toUpperCase() ===
-        String(selectedMoment).trim().toUpperCase();
-      return isSameDay && isSameMoment;
-    });
-  }, [activeOrders, selectedDate, selectedMoment]);
-
   const contextServiceIds = useMemo(() => {
-    return new Set(contextOrders.map((o) => Number(o.catalog_item_id)));
-  }, [contextOrders]);
+    return new Set(cartItems.map((i) => i.catalog_item_id));
+  }, [cartItems]);
 
   const totalAmount = useMemo(() => {
-    return contextOrders.reduce((acc, curr) => acc + curr.price_at_purchase * curr.quantity, 0);
-  }, [contextOrders]);
+    return cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  }, [cartItems]);
 
   const totalQuantity = useMemo(() => {
-    return contextOrders.reduce((acc, curr) => acc + curr.quantity, 0);
-  }, [contextOrders]);
+    return cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  }, [cartItems]);
 
-  // Group services by catalog_type_id: 1 = Gastronomy, 2 = Excursions
-  const gastronomyServices = services.filter((s) => s.catalog_type_id === 1);
-  const excursionServices = services.filter((s) => s.catalog_type_id === 2);
+  // Group services by category: 1 = Gastronomy, 2 = Excursions
+  const gastronomyServices = services.filter((s) => s.catalog_category_id === 1);
+  const excursionServices = services.filter((s) => s.catalog_category_id === 2);
 
   return (
     <Screen>
-      <ScreenContent className={contextOrders.length > 0 ? "pb-24" : "pb-4"}>
+      <ScreenContent className={cartItems.length > 0 ? "pb-24" : "pb-4"}>
         {/* Header */}
         <View className="pt-2 pb-6">
           <View className="flex-row items-center justify-between mt-2">
@@ -388,41 +381,35 @@ export default function CatalogScreen() {
           </ScrollView>
         )}
 
-        {/* Reservation Modal - conditionally rendered only when needed */}
+        {/* Reservation Modal */}
         {modalVisible && selectedService && (
           <ReservationModal
-            key={editingOrder ? `edit-${editingOrder.id}` : "new-order"}
+            key={selectedService?.id ? `service-${selectedService.id}` : "reservation-modal"}
             visible={modalVisible}
             service={selectedService}
             onClose={handleCloseModal}
-            onConfirm={handleReservation}
-            onDelete={handleDeleteOrder}
+            onConfirm={handleBooking}
+            onDelete={() => handleDeleteOrder(editingOrder?.id)}
             isLoading={isSubmitting}
-            editingOrder={editingOrder}
+            initialNotes={editingOrder?.notes || undefined}
+            initialQuantity={
+              selectedService
+                ? editingOrder
+                  ? editingOrder.items?.find(
+                      (i) => Number(i.catalog_item_id) === Number(selectedService.id),
+                    )?.quantity
+                  : cartItems.find((i) => Number(i.catalog_item_id) === Number(selectedService.id))
+                      ?.quantity
+                : undefined
+            }
+            mode={
+              editingOrder ||
+              cartItems.some((i) => Number(i.catalog_item_id) === Number(selectedService?.id))
+                ? "edit"
+                : "add"
+            }
           />
         )}
-
-        <AppAlert
-          visible={deleteAlertVisible}
-          title={t("catalog.reservation.remove_confirm_title")}
-          message={t("catalog.reservation.remove_confirm_message")}
-          type="alert"
-          onClose={() => setDeleteAlertVisible(false)}
-          actions={[
-            {
-              text: t("common.cancel"),
-              style: "cancel",
-              onPress: () => {},
-            },
-            {
-              text: t("common.delete"),
-              style: "destructive",
-              onPress: () => {
-                if (orderToDelete) cancelOrder(orderToDelete);
-              },
-            },
-          ]}
-        />
 
         <AppAlert
           visible={alertConfig.visible}
@@ -434,30 +421,29 @@ export default function CatalogScreen() {
         />
 
         {/* Sticky Footer - Confirm Order Button */}
-        {contextOrders.length > 0 && (
+        {cartItems.length > 0 && (
           <View className="absolute bottom-0 left-0 right-0">
             <View
               className={`bg-surface-solid border-t border-outline-variant ${Platform.OS === "web" ? "pb-6" : "pb-0"} pt-0.5 px-4 shadow-2xl`}
             >
-              {/* Collapsed/Expanded Content */}
               <View className="pt-1 pb-1">
-                {/* Order Summary List (Expanded) */}
-
                 {showOrderSummary && (
                   <ScrollView
                     className="max-h-48 mb-4 border-b border-outline-variant/20 pb-2"
                     showsVerticalScrollIndicator={false}
                   >
-                    {contextOrders.map((order) => {
-                      const service = services.find((s) => s.id === order.catalog_item_id);
+                    {cartItems.map((item) => {
+                      const service = services.find((s) => s.id === item.catalog_item_id);
                       const name = service ? getLocalizedName(service.name_i18n) : "---";
                       return (
                         <View
-                          key={order.id}
+                          key={item.catalog_item_id}
                           className="flex-row items-center border-b border-outline-variant/10 last:border-0"
                         >
                           <NativePressable
-                            onPress={() => handleEditOrder(order)}
+                            onPress={() => {
+                              if (service) handleServicePress(service);
+                            }}
                             className="flex-1 flex-row items-center justify-between py-1.5"
                             style={({ pressed }) => (pressed ? { opacity: 0.6 } : {})}
                           >
@@ -472,10 +458,10 @@ export default function CatalogScreen() {
                             </View>
                             <View className="flex-row items-center">
                               <Text className="text-[10px] font-display font-bold text-primary uppercase tracking-tighter mr-2 bg-primary/5 px-2 py-0.5 rounded-md">
-                                x{order.quantity}
+                                x{item.quantity}
                               </Text>
                               <Text className="text-sm font-display font-bold text-on-surface mr-3">
-                                $ {order.price_at_purchase.toLocaleString("es-AR")}
+                                $ {(item.price * item.quantity).toLocaleString("es-AR")}
                               </Text>
                               <View className="w-7 h-7 bg-surface-container-high rounded-full items-center justify-center border border-outline-variant/20">
                                 <MaterialCommunityIcons
@@ -488,10 +474,28 @@ export default function CatalogScreen() {
                           </NativePressable>
 
                           <NativePressable
-                            testID={`order-delete-button-${order.id}`}
                             onPress={() => {
-                              setOrderToDelete(order.id);
-                              setDeleteAlertVisible(true);
+                              setAlertConfig({
+                                visible: true,
+                                title: t("catalog.reservation.remove_confirm_title"),
+                                message: t("catalog.reservation.remove_confirm_message"),
+                                type: "alert",
+                                actions: [
+                                  {
+                                    text: t("common.cancel") || "Cancelar",
+                                    style: "cancel",
+                                    onPress: () => {},
+                                  },
+                                  {
+                                    text: t("common.confirm") || "Quitar",
+                                    variant: "danger",
+                                    onPress: () => {
+                                      removeItem(item.catalog_item_id);
+                                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                    },
+                                  },
+                                ],
+                              });
                             }}
                             hitSlop={12}
                             className="p-2 ml-1"
@@ -510,7 +514,6 @@ export default function CatalogScreen() {
                 )}
 
                 <View className="flex-row items-center justify-between mt-1 py-1">
-                  {/* Left: Interactive Summary & Total */}
                   <NativePressable
                     onPress={() => setShowOrderSummary(!showOrderSummary)}
                     className="flex-row items-center"
@@ -533,7 +536,6 @@ export default function CatalogScreen() {
                     </View>
                   </NativePressable>
 
-                  {/* Right: Session Info & Confirm Action */}
                   <View className="flex-row items-center gap-2">
                     <Button
                       variant="secondary"
@@ -590,9 +592,30 @@ export default function CatalogScreen() {
                             {
                               text: t("common.confirm"),
                               variant: "primary",
-                              onPress: () => {
-                                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                                router.push("/tourist/orders");
+                              onPress: async () => {
+                                setIsSubmitting(true);
+                                try {
+                                  const newOrder = await placeOrder(
+                                    selectedDate!,
+                                    selectedMoment!,
+                                    cartItems.map((i) => ({
+                                      catalog_item_id: i.catalog_item_id,
+                                      quantity: i.quantity,
+                                    })),
+                                  );
+                                  if (newOrder) {
+                                    addOrderToStore(newOrder);
+                                    clearCart();
+                                    Haptics.notificationAsync(
+                                      Haptics.NotificationFeedbackType.Success,
+                                    );
+                                    router.push("/tourist/orders");
+                                  }
+                                } catch (err) {
+                                  logger.error("Final confirmation failed", err);
+                                } finally {
+                                  setIsSubmitting(false);
+                                }
                               },
                             },
                           ],

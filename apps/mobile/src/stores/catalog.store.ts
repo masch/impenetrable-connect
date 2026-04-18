@@ -1,24 +1,20 @@
 /**
  * Catalog Store (Zustand)
- * Manages tourist services and reservations
+ * Manages tourist services and service categories.
  * The UI consumes this store, oblivious to whether the data comes from a mock or a real API.
  */
 
 import { create } from "zustand";
-import {
-  CatalogServiceItem,
-  Order,
-  CreateReservationInput,
-  CatalogService,
-} from "../services/catalog.service";
+import { CatalogServiceItem, Order, CatalogService } from "../services/catalog.service";
 import { logger } from "../services/logger.service";
+import { ServiceMoment } from "@repo/shared";
 
 interface CatalogState {
   // Services data
   services: CatalogServiceItem[];
   selectedService: CatalogServiceItem | null;
 
-  // Orders created from reservations
+  // Orders created during the session
   orders: Order[];
 
   // UI state
@@ -28,12 +24,17 @@ interface CatalogState {
 
   // Actions - Services
   fetchServices: () => Promise<void>;
-  fetchServicesByCategory: (catalogTypeId: number) => Promise<void>;
+  fetchServicesByCategory: (categoryId: number) => Promise<void>;
   selectService: (id: number) => Promise<void>;
   clearSelectedService: () => void;
 
   // Actions - Orders
-  createReservation: (reservation: CreateReservationInput) => Promise<Order | null>;
+  placeOrder: (
+    date: Date,
+    moment: ServiceMoment,
+    items: Array<{ catalog_item_id: number; quantity: number }>,
+    notes?: string,
+  ) => Promise<Order | null>;
   fetchOrders: () => Promise<void>;
 }
 
@@ -58,14 +59,14 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
     }
   },
 
-  // Fetch services by catalog_type_id (1 = Gastronomy, 2 = Excursions)
-  fetchServicesByCategory: async (catalogTypeId: number) => {
+  // Fetch services by category ID
+  fetchServicesByCategory: async (categoryId: number) => {
     set({ isLoading: true, error: null });
     try {
-      const services = await CatalogService.getServicesByCategory(catalogTypeId);
+      const services = await CatalogService.getServicesByCategory(categoryId);
       set({ services, isLoading: false });
     } catch (err) {
-      logger.error(`Error fetching services for catalog_type_id: ${catalogTypeId}`, err);
+      logger.error(`Error fetching services for category: ${categoryId}`, err);
       set({ error: "Failed to fetch services", isLoading: false });
     }
   },
@@ -87,22 +88,22 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
     set({ selectedService: null });
   },
 
-  // Create an Order from a reservation input
-  createReservation: async (reservation: CreateReservationInput) => {
+  // Place a new order
+  placeOrder: async (date, moment, items, notes) => {
     set({ isSaving: true, error: null });
     try {
-      const newOrder = await CatalogService.createReservation(reservation);
+      const newOrder = await CatalogService.placeOrder(date, moment, items, notes);
       const currentOrders = get().orders;
-      set({ orders: [...currentOrders, newOrder], isSaving: false });
-
-      // Sync with orders store - MUST be done in useEffect, not during render
-      // The caller should use useEffect to sync after the order is created
-      // useOrdersStore.getState().addOrder(newOrder);
+      if (newOrder) {
+        set({ orders: [...currentOrders, newOrder], isSaving: false });
+      } else {
+        set({ isSaving: false });
+      }
 
       return newOrder;
     } catch (err) {
-      logger.error("Error creating order", err);
-      set({ error: "Failed to create order", isSaving: false });
+      logger.error("Error placing order", err);
+      set({ error: "Failed to place order", isSaving: false });
       return null;
     }
   },

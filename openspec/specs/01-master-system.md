@@ -2061,16 +2061,24 @@ erDiagram
     %% ==========================================
     %% TRANSACTIONAL & CASCADING FLOW
     %% ==========================================
-    Order {
+    Reservation {
         int id PK
         uuid user_id FK "Links to User (tourist)"
-        int catalog_item_id FK "The requested item"
-        int quantity "Number of items requested"
-        decimal price_at_purchase "Price recorded at order time (historical)"
+        date service_date "Date of the experience"
+        string time_of_day "Enum: BREAKFAST, LUNCH, SNACK, DINNER"
+        enum status "PENDING, CONFIRMED, CANCELLED, COMPLETED"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    Order {
+        int id PK
+        int reservation_id FK "Links to parent Reservation"
+        uuid user_id FK "Links to User (tourist)"
+        int catalog_type_id FK "Determines which ventures can fulfill this order"
         int confirmed_venture_id FK "Nullable. Set when status becomes CONFIRMED"
-        date service_date "Used for Calendar view"
-        int time_of_day_id FK "Used for Calendar view"
-        int guest_count
+        date service_date "Used for filtering/cascade logic"
+        string time_of_day "Used for filtering/cascade logic"
         string notes "Special requests or dietary restrictions from tourist"
         enum global_status "SEARCHING, OFFER_PENDING, CONFIRMED, COMPLETED, NO_SHOW, CANCELLED, EXPIRED"
         enum cancel_reason "null, BY_TOURIST, BY_ENTREPRENEUR, NO_VENTURE_AVAILABLE, SYSTEM_ERROR"
@@ -2078,9 +2086,15 @@ erDiagram
         timestamp completed_at "Nullable. Set when status becomes COMPLETED (explicit or auto)"
         timestamp confirmed_at "Nullable. Set when status becomes CONFIRMED"
         timestamp created_at
-
-        %% Notification preferences for this order
         boolean notify_whatsapp "Whether to send WhatsApp notifications for this order"
+    }
+
+    OrderItem {
+        int id PK
+        int order_id FK "Links to parent Order"
+        int catalog_item_id FK "The catalog item being ordered"
+        int quantity "Number of items requested"
+        decimal price "Price recorded at order time (historical)"
     }
 
     Cascade_Assignment {
@@ -2134,32 +2148,33 @@ erDiagram
     %% ==========================================
     User ||--o{ User_Session : "has active sessions"
     User ||--o{ Idempotency_Key : "has idempotency keys"
-
-    Role_Type ||--o{ Venture : "defines venture category"
-    Time_Of_Day ||--o{ Order : "schedules order time"
-
     Project ||--o{ Catalog_Type : "has catalog types"
 
-    Catalog_Type ||--o{ Catalog_Item : "contains items"
-    Catalog_Type ||--o{ Venture : "defines venture type"
-
-    Venture ||--o{ Cascade_Assignment : "receives offers (cascade iterates ventures)"
-    Venture ||--o{ Order : "confirmed in"
-
-    User ||--o{ Order : "places"
+    User ||--o{ Reservation : "places"
+    User ||--o{ Order : "legacy-direct-link (deprecated)"
     User ||--o{ Notification : "receives"
     User ||--o{ Notification_Preference : "has"
     User ||--o{ Tourist_Device : "has devices"
     User ||--o{ Venture_Manager : "manages ventures"
 
+    Reservation ||--|{ Order : "contains"
+    Order ||--|{ OrderItem : "contains"
+
+    Role_Type ||--o{ Venture : "defines venture category"
+    Catalog_Type ||--o{ Catalog_Item : "contains items"
+    Catalog_Type ||--o{ Venture : "defines venture type"
+    Catalog_Type ||--o{ Order : "defines category"
+
+    Catalog_Item ||--o{ OrderItem : "requested in"
+
+    Venture ||--o{ Cascade_Assignment : "receives offers (cascade iterates ventures)"
+    Venture ||--o{ Order : "confirmed in"
     Venture ||--o{ Venture_Schedule : "has schedule"
     Venture ||--o{ Venture_Manager : "managed by"
     Venture ||--o{ Venture_Paused_Item : "has paused items"
 
     Order ||--o{ Cascade_Assignment : "processed by engine"
     Order ||--o{ Notification : "triggers"
-
-    Catalog_Item ||--o{ Order : "requested in"
 ```
 
 ---

@@ -24,8 +24,8 @@ describe("Agenda Store", () => {
 
     const stats = useAgendaStore.getState().getOccupationStats(20); // Max capacity 20
 
-    // Today in mocks has several orders for Maria's venture totaling 25 guests
-    expect(stats.occupied).toBe(25);
+    // Today in mocks has several orders for Maria's venture totaling 7 guests
+    expect(stats.occupied).toBe(7);
     expect(stats.total).toBe(20);
   });
 });

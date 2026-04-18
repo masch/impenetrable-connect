@@ -9,7 +9,10 @@
 
 ### TypeScript
 
-- **Strict Typing**: No `any` types. Use proper types or `unknown` with narrowing.
+- **Strict Typing (Zero-Any Policy)**: The use of `any` is strictly prohibited in BOTH production and test code (including mocks and helpers).
+  - "It's just a test" is NOT a valid justification for `any`.
+  - Use `Record<string, unknown>` for generic objects or `unknown` with type guards/narrowing.
+  - For store mocks, use `Partial<StoreState>` or specialized mock interfaces.
 - **Immutability**: Use `const` over `let` wherever possible.
 - **Contract Definition**: Prefer `interface` over `type` for objects and service definitions.
 
@@ -27,6 +30,12 @@
   - **No Post-Processing transformations**: NEVER apply transformations like `.toUpperCase()` or `.toLowerCase()` directly to the result of `t()`. Use CSS utilities (e.g., `uppercase`) for styling. This ensures that missing keys remain clearly visible as `[missing_key]` and are not disguised by case changes.
 - **Loading State Standard**: Every screen that fetches async data MUST use the centralized `LoadingView` component (`src/components/LoadingView.tsx`). Manual use of `ActivityIndicator` for screen-level loading is STRICTLY PROHIBITED. The component handles both the spinner and the `t('loading')` label by default.
 - **JSX Ternary Hygiene**: For large conditional blocks (e.g., wrapping a `ScrollView`), maintain clear indentation and use comments like `} // isLoading` at the end of complex ternary blocks to prevent "Adjacent JSX elements" syntax errors.
+- **AppAlert Standardization**: ALWAYS use the centralized `AppAlert` component (`src/components/AppAlert.tsx`) for any modal confirmation or alert message. Manual use of `Alert.alert` from React Native is STRICTLY PROHIBITED to maintain visual consistency and support the project's premium design system.
+- **Entity-Agnostic Modals (Decoupling Pattern)**: Modal components designed for entity creation or modification MUST remain **agnostic of the parent aggregate and its identification context**.
+  - **No ID Leakage**: Modals should NOT receive or return database IDs (e.g., `orderId`, `userId`).
+  - **Attribute-Focused**: They must exclusively manage and return the **attributes** being edited.
+  - **Closure-Based Binding**: The **Parent** component is responsible for binding the specific ID or context using functional closures in callbacks (e.g., `onConfirm={(data) => handleUpdate(data, entityId)}`).
+  - **Explicit Intent**: Use a semantic `mode: 'add' | 'edit'` prop to drive UI states/labels instead of using the presence or absence of data/IDs as a proxy for intent.
 
 ### Styling (NativeWind v4 + Tailwind v3)
 

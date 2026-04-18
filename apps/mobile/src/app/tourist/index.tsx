@@ -3,23 +3,23 @@ import { View, Text, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../../hooks/useI18n";
-import { useOrderContextStore } from "../../stores/order-context.store";
-import { useOrdersStore } from "../../stores/orders.store";
-import { MOMENTS_OF_DAY } from "../../constants/moments";
+import { useCartStore } from "../../stores/cart.store";
+import { useReservationStore } from "../../stores/reservation.store";
+import { SERVICE_MOMENTS } from "../../constants/moments";
 import { DatePicker } from "../../components/DatePicker";
 import { Button } from "../../components/Button";
 import { COLORS } from "@repo/shared";
-import { TimeOfDay, Order } from "@repo/shared";
+import { ServiceMoment, Order } from "@repo/shared";
 import Screen, { ScreenContent } from "../../components/Screen";
 
 export default function OrderSetupScreen() {
   const router = useRouter();
   const { t } = useTranslations();
-  const { setContext, selectedDate, selectedMoment } = useOrderContextStore();
-  const { activeOrders, moveOrders } = useOrdersStore();
+  const { setContext, selectedDate, selectedMoment } = useCartStore();
+  const { activeOrders, moveOrders } = useReservationStore();
 
   const [date, setDate] = useState<Date | null>(selectedDate || null);
-  const [moment, setMoment] = useState<TimeOfDay | null>(selectedMoment);
+  const [moment, setMoment] = useState<ServiceMoment | null>(selectedMoment);
 
   const isValid = date !== null && moment !== null;
 
@@ -42,7 +42,7 @@ export default function OrderSetupScreen() {
           oDate.getFullYear() === selectedDate.getFullYear() &&
           oDate.getMonth() === selectedDate.getMonth() &&
           oDate.getDate() === selectedDate.getDate() &&
-          o.time_of_day === selectedMoment
+          String(o.time_of_day).toUpperCase() === String(selectedMoment).toUpperCase()
         );
       });
 
@@ -56,7 +56,7 @@ export default function OrderSetupScreen() {
     }
 
     setContext(date, moment);
-    router.push("/tourist/catalog");
+    router.push("/tourist/booking");
   };
 
   return (
@@ -102,7 +102,7 @@ export default function OrderSetupScreen() {
             </View>
 
             <View className="flex-row flex-wrap justify-between gap-y-4">
-              {MOMENTS_OF_DAY.map((m) => {
+              {SERVICE_MOMENTS.map((m) => {
                 const isSelected = moment === m.id;
                 const momentKey = m.id.toLowerCase();
                 const label = t(m.labelKey);

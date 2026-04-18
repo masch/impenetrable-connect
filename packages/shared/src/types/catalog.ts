@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { I18nStringSchema } from "./common";
-import { CatalogTypeSchema } from "./catalog-type";
+import { ServiceCategorySchema } from "./service-category";
 
 export const CatalogItemSchema = z.object({
   id: z.number().int().positive(),
-  catalog_type_id: z.number().int().positive(),
-  catalog_type: CatalogTypeSchema.optional(),
+  catalog_category_id: z.number().int().positive(),
+  category: ServiceCategorySchema.optional(),
   name_i18n: I18nStringSchema,
   description_i18n: I18nStringSchema.optional(),
   allergens_i18n: I18nStringSchema.optional(),

@@ -38,16 +38,14 @@ export const useAgendaStore = create<AgendaState>((set, get) => ({
       const currentUser = mockGetCurrentUser();
       const dateStr = date.toISOString().split("T")[0];
 
-      // Only Maria (entrepreneur_001) has mock agenda data for venture 1
-      let filtered: Order[] = [];
-
-      if (currentUser?.id === "entrepreneur_001") {
-        filtered = MOCK_AGENDA_ORDERS.filter(
-          (o) =>
-            o.service_date.toISOString().split("T")[0] === dateStr &&
-            o.confirmed_venture_id === MARIA_VENTURE_ID,
-        );
-      }
+      const filtered =
+        currentUser?.id === "entrepreneur_001"
+          ? MOCK_AGENDA_ORDERS.filter(
+              (o) =>
+                o.service_date.toISOString().split("T")[0] === dateStr &&
+                o.confirmed_venture_id === MARIA_VENTURE_ID,
+            )
+          : [];
 
       set({ orders: filtered, isLoading: false });
     } catch (err) {
@@ -58,7 +56,10 @@ export const useAgendaStore = create<AgendaState>((set, get) => ({
 
   // Calculate occupation stats for current orders in state
   getOccupationStats: (maxCapacity: number) => {
-    const totalOccupied = get().orders.reduce((sum, order) => sum + order.guest_count, 0);
+    const totalOccupied = get().orders.reduce((sum, order) => {
+      const itemsSum = order.items?.reduce((iSum, item) => iSum + item.quantity, 0) || 0;
+      return sum + itemsSum;
+    }, 0);
     return {
       occupied: totalOccupied,
       total: maxCapacity,

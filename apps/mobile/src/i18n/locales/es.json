@@ -161,7 +161,10 @@
       "noShow": "NO ASISTIÓ"
     },
     "confirmCancel": "Sí, cancelar",
-    "keeping": "No, mantener"
+    "keeping": "No, mantener",
+    "noItems": "Sin ítems",
+    "itemNumber": "Ítem #",
+    "registeredTourist": "Turista Registrado"
   },
   "agenda": {
     "title": "Tu Agenda",

@@ -1,34 +1,30 @@
 /**
  * ReservationModal Component
- * Modal for making a reservation - selects moment of day and quantity
+ * Modal for adding services to the cart or updating existing order items.
  */
 
 import { useState, useEffect } from "react";
 import { Text, View, Modal, Pressable, ScrollView, TextInput } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import type { TimeOfDay, Order } from "@repo/shared";
+import type { ServiceMoment } from "@repo/shared";
 import type { CatalogServiceItem } from "../mocks/catalog";
 import { useTranslations } from "../hooks/useI18n";
 import { CatalogImage } from "./CatalogImage";
 import { Button } from "./Button";
 import { AppAlert } from "./AppAlert";
-import { useOrderContextStore } from "../stores/order-context.store";
+import { useCartStore } from "../stores/cart.store";
 import { COLORS } from "@repo/shared";
 
 interface ReservationModalProps {
   visible: boolean;
   service: CatalogServiceItem | null;
   onClose: () => void;
-  onConfirm: (
-    momentOfDay: TimeOfDay,
-    quantity: number,
-    date: Date,
-    notes?: string,
-    orderId?: number,
-  ) => void;
-  onDelete?: (orderId: number) => void;
+  onConfirm: (moment: ServiceMoment, quantity: number, date: Date, notes?: string) => void;
+  onDelete?: () => void;
   isLoading?: boolean;
-  editingOrder?: Order | null;
+  initialQuantity?: number;
+  initialNotes?: string;
+  mode?: "add" | "edit";
 }
 
 export function ReservationModal({
@@ -38,47 +34,42 @@ export function ReservationModal({
   onConfirm,
   onDelete,
   isLoading = false,
-  editingOrder = null,
+  initialQuantity,
+  initialNotes,
+  mode = "add",
 }: ReservationModalProps) {
   const { t, getLocalizedName } = useTranslations();
-  const selectedDate = useOrderContextStore((state) => state.selectedDate);
-  const selectedMoment = useOrderContextStore((state) => state.selectedMoment);
-  const guestCount = useOrderContextStore((state) => state.guestCount);
+  const selectedDate = useCartStore((state) => state.selectedDate);
+  const selectedMoment = useCartStore((state) => state.selectedMoment);
 
   const [notes, setNotes] = useState("");
-  const [quantity, setQuantity] = useState(guestCount || 1);
+  const [quantity, setQuantity] = useState(initialQuantity || 1);
   const [deleteAlertVisible, setDeleteAlertVisible] = useState(false);
 
-  // Initialize state when modal opens or editing order changes
+  // Initialize state when modal opens or initial data changes
   useEffect(() => {
     if (visible) {
-      if (editingOrder) {
-        setNotes(editingOrder.notes || "");
-        setQuantity(editingOrder.quantity);
-      } else {
-        setNotes("");
-        setQuantity(guestCount || 1);
-      }
+      setQuantity(initialQuantity || 1);
+      setNotes(initialNotes || "");
     }
-  }, [visible, editingOrder, guestCount]);
+  }, [visible, initialQuantity, initialNotes]);
 
   const isValid = selectedMoment !== null && quantity > 0 && selectedDate !== null;
 
   const handleConfirm = () => {
     if (!isValid || !selectedDate || !selectedMoment) return;
 
-    onConfirm(selectedMoment, quantity, selectedDate, notes || undefined, editingOrder?.id);
-    // Don't close here, let the parent handle it after the async call completes
+    onConfirm(selectedMoment, quantity, selectedDate, notes || undefined);
   };
 
   const handleDelete = () => {
-    if (!editingOrder?.id || !onDelete) return;
+    if (!onDelete) return;
     setDeleteAlertVisible(true);
   };
 
   const handleClose = () => {
     setNotes("");
-    setQuantity(guestCount || 1);
+    setQuantity(1);
     onClose();
   };
 
@@ -93,7 +84,6 @@ export function ReservationModal({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
       <Pressable className="flex-1 justify-end" onPress={handleClose}>
-        {/* Dark overlay backdrop */}
         <View className="absolute inset-0 bg-black/60" />
 
         <Pressable className="flex-1 bg-surface-solid" onPress={() => {}}>
@@ -128,7 +118,7 @@ export function ReservationModal({
                 </Text>
               </View>
               <Pressable onPress={handleClose} className="p-2 -mr-2 -mt-1">
-                <MaterialCommunityIcons name="close" size={24} color="on-surface" />
+                <MaterialCommunityIcons name="close" size={24} color={COLORS["on-surface"]} />
               </Pressable>
             </View>
           </View>
@@ -177,7 +167,7 @@ export function ReservationModal({
             <TextInput
               className="bg-surface-container-low border border-outline-variant p-3 mb-6 h-20 text-base font-body text-on-surface"
               placeholder={t("catalog.reservation.notes_placeholder")}
-              placeholderTextColor="on-surface"
+              placeholderTextColor={COLORS["on-surface"]}
               value={notes}
               onChangeText={setNotes}
               multiline
@@ -192,7 +182,7 @@ export function ReservationModal({
               title={
                 isLoading
                   ? t("catalog.reservation.confirming")
-                  : editingOrder
+                  : mode === "edit"
                     ? t("catalog.reservation.update")
                     : t("catalog.reservation.add_to_selection")
               }
@@ -200,7 +190,7 @@ export function ReservationModal({
               disabled={!isValid || isLoading}
               leftIcon="check"
             />
-            {editingOrder && (
+            {mode === "edit" && (
               <Button
                 variant="danger"
                 title={t("catalog.reservation.remove_button")}
@@ -229,8 +219,8 @@ export function ReservationModal({
             text: t("common.delete"),
             style: "destructive",
             onPress: () => {
-              if (editingOrder?.id && onDelete) {
-                onDelete(editingOrder.id);
+              if (onDelete) {
+                onDelete();
               }
             },
           },

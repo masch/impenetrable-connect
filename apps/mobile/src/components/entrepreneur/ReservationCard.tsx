@@ -19,8 +19,8 @@ export default function ReservationCard({
   isFirst = true,
   accentColorOverride,
 }: ReservationCardProps) {
-  const { t, getLocalizedName } = useTranslations();
-  const isGastronomy = order.catalog_item?.catalog_type_id === 1;
+  const { t } = useTranslations();
+  const isGastronomy = order.catalog_type_id === 1;
   const accentColorClass = isGastronomy ? "bg-primary" : "bg-secondary";
 
   const containerClass = `bg-surface-container-lowest overflow-hidden ${hideBorder ? "" : "border border-outline-variant rounded-2xl mb-2"} ${hideShadow ? "" : "shadow-sm"}`;
@@ -38,9 +38,22 @@ export default function ReservationCard({
       <View className="p-3">
         <View className="flex-row justify-between items-start mb-2">
           <View className="flex-1 mr-3">
-            <Text className="text-on-surface font-display-bold text-base leading-tight">
-              {order.catalog_item && getLocalizedName(order.catalog_item.name_i18n)}
-            </Text>
+            {/* List items if available, otherwise generic title */}
+            {order.items && order.items.length > 0 ? (
+              order.items.map((item) => (
+                <Text
+                  key={item.id}
+                  className="text-on-surface font-display-bold text-base leading-tight"
+                >
+                  {item.quantity}x {t("orders.itemNumber")}
+                  {item.catalog_item_id}
+                </Text>
+              ))
+            ) : (
+              <Text className="text-on-surface font-display-bold text-base leading-tight">
+                {t("orders.noItems")}
+              </Text>
+            )}
             <View className="flex-row items-center mt-1">
               <MaterialCommunityIcons
                 name="account-outline"
@@ -48,7 +61,7 @@ export default function ReservationCard({
                 color={COLORS["on-surface-variant"]}
               />
               <Text className="text-on-surface-variant font-body-medium text-[11px] ml-1.5">
-                {order.user?.alias || "Turista Registrado"}
+                {order.user?.alias || t("orders.registeredTourist")}
               </Text>
             </View>
           </View>
@@ -71,7 +84,7 @@ export default function ReservationCard({
             style={{ backgroundColor: `${accentColorOverride || COLORS.primary}10` }}
           >
             <MaterialCommunityIcons
-              name="account-group"
+              name="cart-outline"
               size={14}
               color={accentColorOverride || COLORS.primary}
             />
@@ -79,7 +92,7 @@ export default function ReservationCard({
               className="font-display-black text-[11px] ml-1.5"
               style={{ color: accentColorOverride || COLORS.primary }}
             >
-              {order.guest_count}
+              {order.items?.reduce((sum, item) => sum + item.quantity, 0) || 0}
             </Text>
           </View>
 

@@ -90,4 +90,24 @@ Service cards MUST adhere to a minimalist, high-fidelity aesthetic to profession
 - WHEN displayed as a card
 - THEN it MUST use high-radius corners (min 24dp)
 - AND it MUST include a translucent "pill-style" badge for its category
-- AND it MUST follow strict design token constraints for all colors and typography
+
+### Requirement: Order Management
+
+The system MUST allow tourists to view and manage their active and historical orders.
+
+#### Scenario: Categorization by status
+
+- GIVEN a tourist has both active and past orders
+- WHEN they navigate to the "My Orders" screen
+- THEN they MUST see a segmented control with "Active" and "History" tabs
+- AND "Active" MUST show orders with status SEARCHING or CONFIRMED
+- AND "History" MUST show orders with status COMPLETED, CANCELLED, or NO_SHOW
+
+#### Scenario: Order Actions and Details
+
+- GIVEN an order in SEARCHING status
+- THEN a "Cancel" button MUST be visible
+- AND clicking it MUST prompt for confirmation via `AppAlert`
+- GIVEN an order in CONFIRMED status
+- THEN the reservation code MUST be displayed clearly
+- AND each order MUST show localized date, time, and service details

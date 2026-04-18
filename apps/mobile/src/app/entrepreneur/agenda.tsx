@@ -8,7 +8,7 @@ import { useAgendaStore } from "../../stores/agenda.store";
 import ReservationCard from "../../components/entrepreneur/ReservationCard";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
-import { getTimeOfDayColor, getTimeOfDayIcon } from "../../constants/moments";
+import { getMomentColor, getMomentIcon } from "../../constants/moments";
 import { COLORS } from "@repo/shared";
 
 const MOMENTS = ["BREAKFAST", "LUNCH", "SNACK", "DINNER"] as const;
@@ -33,7 +33,6 @@ export default function AgendaScreen() {
     }
   };
 
-  // Helper to render date selector
   const renderDateSelector = () => {
     const days = [0, 1, 2, 3, 4, 5, 6].map((offset) => {
       const date = new Date();
@@ -51,9 +50,11 @@ export default function AgendaScreen() {
                 new Date(Date.now() + 86400000).toDateString() === date.toDateString();
               const isSelected = date.toDateString() === selectedDate.toDateString();
 
-              let dateLabel = date.toLocaleDateString(locale, { weekday: "short" });
-              if (isToday) dateLabel = t("order_setup.today");
-              else if (isTomorrow) dateLabel = t("order_setup.tomorrow");
+              const dateLabel = isToday
+                ? t("order_setup.today")
+                : isTomorrow
+                  ? t("order_setup.tomorrow")
+                  : date.toLocaleDateString(locale, { weekday: "short" });
 
               return (
                 <Button
@@ -146,8 +147,8 @@ export default function AgendaScreen() {
               const momentOrders = orders.filter((o) => o.time_of_day === moment);
               if (momentOrders.length === 0) return null;
 
-              const momentColor = getTimeOfDayColor(moment);
-              const momentIcon = getTimeOfDayIcon(moment);
+              const momentColor = getMomentColor(moment);
+              const momentIcon = getMomentIcon(moment);
 
               return (
                 <View key={moment} className="mb-6">

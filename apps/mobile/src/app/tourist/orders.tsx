@@ -1,20 +1,22 @@
 /**
  * Tourist Orders Screen
- * Displays active and historical orders with status badges
+ * Displays active and historical orders with status badges.
  */
 
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, type ComponentProps } from "react";
 import { useRouter } from "expo-router";
-import { View, Text, ScrollView, RefreshControl, Alert } from "react-native";
+import { View, Text, ScrollView, RefreshControl } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../../hooks/useI18n";
 import Screen, { ScreenContent } from "../../components/Screen";
 import LoadingView from "../../components/LoadingView";
+import { AppAlert } from "../../components/AppAlert";
 import { SegmentedControl } from "../../components/ui/SegmentedControl";
-import { useOrdersStore } from "../../stores/orders.store";
+import { useReservationStore } from "../../stores/reservation.store";
 import { useAuthStore } from "../../stores/auth.store";
+import { useCatalogStore } from "../../stores/catalog.store";
 import { Button } from "../../components/Button";
-import { getTimeOfDayIcon, getTimeOfDayColor } from "../../constants/moments";
+import { getMomentIcon, getMomentColor } from "../../constants/moments";
 import { type Order, type OrderStatus, COLORS } from "@repo/shared";
 
 // Status badge mapping - labels come from i18n
@@ -23,8 +25,13 @@ const getStatusConfig = (
 ): Record<OrderStatus, { label: string; bgClass: string; textClass: string }> => ({
   SEARCHING: {
     label: t("orders.status.searching"),
-    bgClass: "bg-tertiary-container",
-    textClass: "text-on-tertiary-fixed",
+    bgClass: "bg-[#EAB308]/20",
+    textClass: "text-[#854D0E]",
+  },
+  WAITING_FOR_OFFER: {
+    label: t("orders.status.waiting_for_offer"),
+    bgClass: "bg-primary-container",
+    textClass: "text-on-primary-fixed",
   },
   OFFER_PENDING: {
     label: t("orders.status.offer_pending"),
@@ -58,39 +65,27 @@ const getStatusConfig = (
   },
 });
 
-// Format time of day for display using i18n
-function formatTimeOfDay(timeOfDay: string, t: (key: string) => string): string {
+// Format service moment for display using i18n
+function formatMoment(moment: string, t: (key: string) => string): string {
   const keyMap: Record<string, string> = {
     BREAKFAST: "breakfast",
     LUNCH: "lunch",
     SNACK: "snack",
     DINNER: "dinner",
   };
-  const key = keyMap[timeOfDay] || timeOfDay.toLowerCase();
+  const key = keyMap[moment] || moment.toLowerCase();
   return t(`catalog.reservation.moments.${key}`);
 }
 
-// Check if date is today, tomorrow, or yesterday
-function getDateLabel(date: Date): "today" | "tomorrow" | "yesterday" | null {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  const checkDate = new Date(date);
-  checkDate.setHours(0, 0, 0, 0);
-
-  if (checkDate.getTime() === today.getTime()) return "today";
-  if (checkDate.getTime() === tomorrow.getTime()) return "tomorrow";
-  if (checkDate.getTime() === yesterday.getTime()) return "yesterday";
-  return null;
-}
-
 // Format date for display
-function formatDate(date: Date, locale: string = "es-AR"): string {
-  return date.toLocaleDateString(locale, {
+function formatDate(date: Date, locale: string): string {
+  // Use locale mapping for Intl.DateTimeFormat (es-AR, en-US, etc.)
+  const localeMap: Record<string, string> = {
+    es: "es-AR",
+    en: "en-US",
+  };
+  const fullLocale = localeMap[locale] || "es-AR";
+  return date.toLocaleDateString(fullLocale, {
     day: "numeric",
     month: "short",
   });
@@ -100,78 +95,112 @@ function formatDate(date: Date, locale: string = "es-AR"): string {
 interface ActiveOrderCardProps {
   order: Order;
   onCancel: (orderId: number) => void;
+  onShowAlert: (config: Omit<ComponentProps<typeof AppAlert>, "onClose">) => void;
 }
 
-function ActiveOrderCard({ order, onCancel }: ActiveOrderCardProps) {
-  const { t, getLocalizedName } = useTranslations();
+function ActiveOrderCard({ order, onCancel, onShowAlert }: ActiveOrderCardProps) {
+  const { t, locale, getLocalizedName } = useTranslations();
   const statusConfig = getStatusConfig(t);
   const status = statusConfig[order.global_status];
   const showCancelButton = order.global_status === "SEARCHING";
+  const services = useCatalogStore((state) => state.services);
+
+  // Helper to get relative date label
+  const getRelativeDateLabel = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+
+    if (checkDate.getTime() === today.getTime()) return t("orders.today");
+    if (checkDate.getTime() === tomorrow.getTime()) return t("orders.tomorrow");
+    return formatDate(date, locale);
+  };
 
   return (
     <View className="bg-surface-container-lowest rounded-xl p-4 mb-4 shadow-sm">
-      {/* Status Badge */}
-      <View className={`self-start px-3 py-1 rounded-md mb-3 ${status.bgClass}`}>
-        <Text className={`text-[10px] font-black tracking-widest uppercase ${status.textClass}`}>
-          {status.label}
-        </Text>
-      </View>
-
-      {/* Title */}
-      <Text className="text-xl font-display font-bold text-on-surface mb-2">
-        {getLocalizedName(order.catalog_item?.name_i18n)}
-      </Text>
-
-      {/* Date and Time */}
-      <View className="flex-row items-center gap-2 mb-1">
-        {getDateLabel(order.service_date) === null && (
-          <MaterialCommunityIcons name="calendar" size={14} color={COLORS["on-surface-variant"]} />
-        )}
-        {getDateLabel(order.service_date) === "today" ? (
-          <View className="bg-primary px-2 py-0.5 rounded">
-            <Text className="text-xs font-bold text-on-primary">{t("orders.today")}</Text>
-          </View>
-        ) : getDateLabel(order.service_date) === "tomorrow" ? (
-          <View className="bg-secondary px-2 py-0.5 rounded">
-            <Text className="text-xs font-bold text-on-primary">{t("orders.tomorrow")}</Text>
-          </View>
-        ) : (
-          <Text className="text-base font-body text-on-surface opacity-80">
-            {formatDate(order.service_date)}
+      {/* Top Row: Status and Date/Moment */}
+      <View className="flex-row items-center justify-between mb-4">
+        <View className={`px-3 py-1 rounded-md ${status.bgClass}`}>
+          <Text className={`text-[10px] font-black tracking-widest uppercase ${status.textClass}`}>
+            {status.label}
           </Text>
-        )}
-        <View className="flex-row items-center gap-1">
-          <MaterialCommunityIcons
-            name={
-              getTimeOfDayIcon(order.time_of_day) as keyof typeof MaterialCommunityIcons.glyphMap
-            }
-            size={14}
-            color={getTimeOfDayColor(order.time_of_day)}
-          />
-          <Text className={`text-sm font-body moment-${order.time_of_day.toLowerCase()}`}>
-            {formatTimeOfDay(order.time_of_day, t)}
-          </Text>
+        </View>
+
+        <View className="flex-row items-center gap-3">
+          <View className="flex-row items-center gap-1.5">
+            <MaterialCommunityIcons
+              name="calendar"
+              size={14}
+              color={COLORS["on-surface-variant"]}
+              className="opacity-60"
+            />
+            <Text className="text-sm font-bold text-on-surface opacity-80">
+              {getRelativeDateLabel(order.service_date)}
+            </Text>
+          </View>
+          <View className="flex-row items-center gap-1.5">
+            <MaterialCommunityIcons
+              name={
+                getMomentIcon(order.time_of_day) as keyof typeof MaterialCommunityIcons.glyphMap
+              }
+              size={14}
+              color={getMomentColor(order.time_of_day)}
+            />
+            <Text className={`text-sm font-bold moment-${order.time_of_day.toLowerCase()}`}>
+              {formatMoment(order.time_of_day, t)}
+            </Text>
+          </View>
         </View>
       </View>
 
-      {/* Guest count */}
-      <View className="flex-row items-center gap-2 mb-4">
-        <MaterialCommunityIcons
-          name="account-group-outline"
-          size={20}
-          color={COLORS["on-surface"]}
-          className="opacity-60"
-        />
-        <Text className="text-base font-body text-on-surface opacity-80">
-          {order.guest_count} {t("orders.guest_count")}
-        </Text>
+      {/* Items List (Premium Style) */}
+      <View className="mb-2">
+        {order.items && order.items.length > 0 ? (
+          order.items.map((item, idx) => {
+            const service = services.find((s) => Number(s.id) === Number(item.catalog_item_id));
+            const name = service
+              ? getLocalizedName(service.name_i18n)
+              : `${t("orders.itemNumber")}${item.catalog_item_id}`;
+            return (
+              <View
+                key={item.id}
+                className={`flex-row items-center justify-between py-3 ${
+                  idx < order.items.length - 1 ? "border-b border-outline-variant/10" : ""
+                }`}
+              >
+                <Text className="flex-1 text-base font-body text-on-surface">{name}</Text>
+                <View className="flex-row items-center">
+                  <View className="bg-surface-container-high px-2 py-0.5 rounded-lg mr-3">
+                    <Text className="text-[11px] font-display font-black text-on-surface-variant uppercase tracking-tighter">
+                      X{item.quantity}
+                    </Text>
+                  </View>
+                  <Text className="text-base font-display font-bold text-on-surface">
+                    ${" "}
+                    {(item.price * item.quantity).toLocaleString(
+                      locale === "es" ? "es-AR" : "en-US",
+                    )}
+                  </Text>
+                </View>
+              </View>
+            );
+          })
+        ) : (
+          <Text className="text-sm font-body text-on-surface opacity-40 py-2 italic">
+            {t("orders.noItems")}
+          </Text>
+        )}
       </View>
 
       {/* Confirmation code (if confirmed) */}
       {order.global_status === "CONFIRMED" && order.confirmed_venture_id && (
-        <View className="flex-row items-center gap-2 mb-4">
-          <MaterialCommunityIcons name="check-circle" size={20} color={COLORS.secondary} />
-          <Text className="text-base font-body text-secondary font-bold">
+        <View className="flex-row items-center gap-2 mt-2 mb-2">
+          <MaterialCommunityIcons name="check-circle" size={18} color={COLORS.secondary} />
+          <Text className="text-sm font-body text-secondary font-bold">
             {t("orders.status.confirmed")}
           </Text>
         </View>
@@ -183,17 +212,27 @@ function ActiveOrderCard({ order, onCancel }: ActiveOrderCardProps) {
           variant="danger"
           title={t("orders.cancel")}
           onPress={() => {
-            Alert.alert(t("orders.cancel"), t("orders.cancelConfirm"), [
-              { text: t("orders.keeping"), style: "cancel" },
-              {
-                text: t("orders.confirmCancel"),
-                style: "destructive",
-                onPress: () => onCancel(order.id),
-              },
-            ]);
+            onShowAlert({
+              visible: true,
+              title: t("orders.cancel"),
+              message: t("orders.cancelConfirm"),
+              type: "alert",
+              actions: [
+                {
+                  text: t("orders.keeping"),
+                  style: "cancel",
+                  onPress: () => {},
+                },
+                {
+                  text: t("orders.confirmCancel"),
+                  variant: "danger",
+                  onPress: () => onCancel(order.id),
+                },
+              ],
+            });
           }}
           disabled={order.global_status !== "SEARCHING"}
-          className="mt-2"
+          className="mt-4"
         />
       )}
     </View>
@@ -206,101 +245,97 @@ interface HistoryItemProps {
 }
 
 function HistoryItem({ order }: HistoryItemProps) {
-  const { t, getLocalizedName } = useTranslations();
+  const { t, locale, getLocalizedName } = useTranslations();
   const statusConfig = getStatusConfig(t);
   const status = statusConfig[order.global_status];
+  const services = useCatalogStore((state) => state.services);
 
-  // Icon based on status
-  const getIcon = () => {
-    switch (order.global_status) {
-      case "COMPLETED":
-        return "check_circle";
-      case "CANCELLED":
-        return "cancel";
-      case "NO_SHOW":
-        return "event_busy";
-      default:
-        return "help";
-    }
+  const getRelativeDateLabel = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+
+    if (checkDate.getTime() === today.getTime()) return t("orders.today");
+    if (checkDate.getTime() === tomorrow.getTime()) return t("orders.tomorrow");
+    if (checkDate.getTime() === yesterday.getTime()) return t("orders.yesterday");
+    return formatDate(date, locale);
   };
 
   return (
-    <View className="flex-row items-center bg-surface-container-lowest rounded-xl p-4 mb-3">
-      {/* Icon */}
-      <View className="w-10 h-10 rounded-full bg-surface-container-highest items-center justify-center mr-3">
-        <MaterialCommunityIcons
-          name={getIcon() as keyof typeof MaterialCommunityIcons.glyphMap}
-          size={20}
-          color={COLORS["on-surface"]}
-          className="opacity-60"
-        />
-      </View>
+    <View className="bg-surface-container-lowest rounded-xl p-4 mb-3">
+      {/* Header: Date and Moment */}
+      <View className="flex-row items-center justify-between mb-3 border-b border-outline-variant/10 pb-2">
+        <View className="flex-row items-center gap-2">
+          <MaterialCommunityIcons
+            name="calendar"
+            size={14}
+            color={COLORS["on-surface-variant"]}
+            className="opacity-60"
+          />
+          <Text className="text-sm font-bold text-on-surface opacity-80">
+            {getRelativeDateLabel(order.service_date)}
+          </Text>
+          <View className="w-[1px] h-3 bg-outline-variant/30 mx-1" />
+          <MaterialCommunityIcons
+            name={getMomentIcon(order.time_of_day) as keyof typeof MaterialCommunityIcons.glyphMap}
+            size={14}
+            color={getMomentColor(order.time_of_day)}
+          />
+          <Text className={`text-sm font-bold moment-${order.time_of_day.toLowerCase()}`}>
+            {formatMoment(order.time_of_day, t)}
+          </Text>
+        </View>
 
-      {/* Info */}
-      <View className="flex-1">
-        <Text className="text-base font-display font-bold text-on-surface">
-          {getLocalizedName(order.catalog_item?.name_i18n)}
-        </Text>
-        <View className="flex-row items-center gap-3 mt-1">
-          {getDateLabel(order.service_date) === null && (
-            <View className="flex-row items-center gap-1">
-              <MaterialCommunityIcons
-                name="calendar"
-                size={14}
-                color={COLORS["on-surface-variant"]}
-              />
-              <Text className="text-sm font-body text-on-surface opacity-60">
-                {formatDate(order.service_date)}
-              </Text>
-            </View>
-          )}
-          {getDateLabel(order.service_date) === "today" && (
-            <View className="bg-primary px-2 py-0.5 rounded">
-              <Text className="text-xs font-bold text-on-primary">{t("orders.today")}</Text>
-            </View>
-          )}
-          {getDateLabel(order.service_date) === "tomorrow" && (
-            <View className="bg-secondary px-2 py-0.5 rounded">
-              <Text className="text-xs font-bold text-on-primary">{t("orders.tomorrow")}</Text>
-            </View>
-          )}
-          {getDateLabel(order.service_date) === "yesterday" && (
-            <View className="bg-surface-container-highest px-2 py-0.5 rounded">
-              <Text className="text-xs font-bold text-on-surface opacity-60">
-                {t("orders.yesterday")}
-              </Text>
-            </View>
-          )}
-          <View className="flex-row items-center gap-1">
-            <MaterialCommunityIcons
-              name={
-                getTimeOfDayIcon(order.time_of_day) as keyof typeof MaterialCommunityIcons.glyphMap
-              }
-              size={14}
-              color={getTimeOfDayColor(order.time_of_day)}
-            />
-            <Text className={`text-sm font-body moment-${order.time_of_day.toLowerCase()}`}>
-              {formatTimeOfDay(order.time_of_day, t)}
-            </Text>
-          </View>
-          <View className="flex-row items-center gap-1">
-            <MaterialCommunityIcons
-              name="account-group-outline"
-              size={14}
-              color={COLORS["on-surface"]}
-            />
-            <Text className="text-sm font-body text-on-surface opacity-60">
-              {order.guest_count} {t("orders.guest_count")}
-            </Text>
-          </View>
+        <View className={`px-2 py-0.5 rounded ${status.bgClass}`}>
+          <Text className={`text-[9px] font-black tracking-widest uppercase ${status.textClass}`}>
+            {status.label}
+          </Text>
         </View>
       </View>
 
-      {/* Status Badge */}
-      <View className={`px-2 py-1 rounded ${status.bgClass}`}>
-        <Text className={`text-[10px] font-black tracking-widest uppercase ${status.textClass}`}>
-          {status.label}
-        </Text>
+      {/* Items List */}
+      <View>
+        {order.items && order.items.length > 0 ? (
+          order.items.map((item, idx) => {
+            const service = services.find((s) => Number(s.id) === Number(item.catalog_item_id));
+            const name = service
+              ? getLocalizedName(service.name_i18n)
+              : `${t("orders.itemNumber")}${item.catalog_item_id}`;
+            return (
+              <View
+                key={item.id}
+                className={`flex-row items-center justify-between py-2 ${
+                  idx < order.items.length - 1 ? "border-b border-outline-variant/5" : ""
+                }`}
+              >
+                <Text className="flex-1 text-sm font-body text-on-surface opacity-90">{name}</Text>
+                <View className="flex-row items-center">
+                  <View className="bg-surface-container-high px-1.5 py-0.5 rounded mr-2">
+                    <Text className="text-[10px] font-display font-black text-on-surface-variant uppercase">
+                      X{item.quantity}
+                    </Text>
+                  </View>
+                  <Text className="text-sm font-display font-bold text-on-surface">
+                    ${" "}
+                    {(item.price * item.quantity).toLocaleString(
+                      locale === "es" ? "es-AR" : "en-US",
+                    )}
+                  </Text>
+                </View>
+              </View>
+            );
+          })
+        ) : (
+          <Text className="text-xs font-body text-on-surface opacity-40 italic">
+            {t("orders.noItems")}
+          </Text>
+        )}
       </View>
     </View>
   );
@@ -352,10 +387,19 @@ export default function OrderScreen() {
     fetchOrders,
     cancelOrder,
     setTab,
-  } = useOrdersStore();
+  } = useReservationStore();
+
+  const fetchServices = useCatalogStore((state) => state.fetchServices);
+  const services = useCatalogStore((state) => state.services);
 
   const currentUser = useAuthStore((state) => state.currentUser);
   const [refreshing, setRefreshing] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<Omit<ComponentProps<typeof AppAlert>, "onClose">>({
+    visible: false,
+    title: "",
+    message: "",
+    actions: [],
+  });
 
   // Redirect to home if not authenticated
   useEffect(() => {
@@ -364,10 +408,13 @@ export default function OrderScreen() {
     }
   }, [currentUser, router]);
 
-  // Fetch orders when user changes
+  // Fetch orders and services when user changes
   useEffect(() => {
     fetchOrders();
-  }, [currentUser?.id, fetchOrders]);
+    if (services.length === 0) {
+      fetchServices();
+    }
+  }, [currentUser?.id, fetchOrders, fetchServices, services.length]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -375,25 +422,21 @@ export default function OrderScreen() {
     setRefreshing(false);
   }, [fetchOrders]);
 
-  // Handle tab change
   const handleTabChange = (index: number) => {
     setTab(index === 0 ? "active" : "history");
   };
 
-  // Determine which orders to display based on selected tab
   const displayedOrders = selectedTab === "active" ? activeOrders : historyOrders;
 
   return (
     <Screen>
       <ScreenContent className="pb-20">
-        {/* Header */}
         <View className="py-6">
           <Text className="text-3xl font-display font-bold text-on-surface">
             {t("orders.title")}
           </Text>
         </View>
 
-        {/* Segmented Control with counts */}
         <View className="mb-6">
           <SegmentedControl
             segments={[
@@ -405,29 +448,35 @@ export default function OrderScreen() {
           />
         </View>
 
-        {/* Error Message */}
         {error && (
           <View className="bg-error-container p-4 mb-4 rounded-lg">
             <Text className="text-base font-body text-on-error-container">{error}</Text>
           </View>
         )}
 
-        {/* Loading State */}
         {isLoading && displayedOrders.length === 0 ? (
           <LoadingView className="py-20" />
         ) : (
           <ScrollView
             showsVerticalScrollIndicator={false}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="primary" />
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor={COLORS.primary}
+              />
             }
           >
-            {/* Active Orders */}
             {selectedTab === "active" && (
               <>
                 {activeOrders.length > 0 ? (
                   activeOrders.map((order) => (
-                    <ActiveOrderCard key={order.id} order={order} onCancel={cancelOrder} />
+                    <ActiveOrderCard
+                      key={order.id}
+                      order={order}
+                      onCancel={cancelOrder}
+                      onShowAlert={setAlertConfig}
+                    />
                   ))
                 ) : (
                   <EmptyState type="active" />
@@ -435,7 +484,6 @@ export default function OrderScreen() {
               </>
             )}
 
-            {/* History Orders */}
             {selectedTab === "history" && (
               <>
                 {historyOrders.length > 0 ? (
@@ -448,6 +496,10 @@ export default function OrderScreen() {
           </ScrollView>
         )}
       </ScreenContent>
+      <AppAlert
+        {...alertConfig}
+        onClose={() => setAlertConfig({ ...alertConfig, visible: false })}
+      />
     </Screen>
   );
 }

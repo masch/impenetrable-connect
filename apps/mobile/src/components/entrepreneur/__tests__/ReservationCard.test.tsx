@@ -4,14 +4,15 @@ import ReservationCard from "../ReservationCard";
 import { MOCK_AGENDA_ORDERS } from "../../../mocks/agenda";
 
 describe("ReservationCard", () => {
-  it("should render client name, guests and service name", () => {
-    const order = MOCK_AGENDA_ORDERS.find((o) => o.guest_count > 0)!;
+  it("should render client name, items and service name", () => {
+    const order = MOCK_AGENDA_ORDERS[0];
+    const totalQuantity = order.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
     render(<ReservationCard order={order} />);
 
-    if (order.catalog_item?.name_i18n?.en) {
-      expect(screen.getByText(order.catalog_item.name_i18n.en)).toBeTruthy();
+    if (order.items && order.items.length > 0) {
+      expect(screen.getByText(new RegExp(`Ítem #${order.items[0].catalog_item_id}`))).toBeTruthy();
     }
-    expect(screen.getByText(order.guest_count.toString())).toBeTruthy();
+    expect(screen.getByText(totalQuantity.toString())).toBeTruthy();
   });
 
   it("should show notes if present", () => {
