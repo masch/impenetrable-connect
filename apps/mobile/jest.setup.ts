@@ -54,5 +54,26 @@ jest.mock("./src/hooks/useI18n", () => ({
   }),
 }));
 
+// 5. Native hardware mocks
+// Mock expo-haptics to prevent environment warnings (EXPO_OS undefined) during tests.
+// Expo modules expect Babel to inline 'process.env.EXPO_OS' at build time, which
+// doesn't happen during Jest execution. This also ensures haptic feedback
+// logic doesn't crash in a generic Node environment.
+jest.mock("expo-haptics", () => ({
+  selectionAsync: jest.fn(),
+  notificationAsync: jest.fn(),
+  impactAsync: jest.fn(),
+  NotificationFeedbackType: {
+    Success: "success",
+    Warning: "warning",
+    Error: "error",
+  },
+  ImpactFeedbackStyle: {
+    Light: "light",
+    Medium: "medium",
+    Heavy: "heavy",
+  },
+}));
+
 // Mock nativewind CSS to avoid errors in tests
 jest.mock("nativewind", () => ({}));

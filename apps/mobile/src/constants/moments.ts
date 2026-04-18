@@ -1,4 +1,5 @@
 import type { TimeOfDay } from "@repo/shared";
+import { COLORS } from "@repo/shared";
 
 /**
  * Moment of day definitions with icons and colors
@@ -16,28 +17,28 @@ export const MOMENTS_OF_DAY: {
     icon: "white-balance-sunny",
     labelKey: "catalog.reservation.moments.breakfast",
     color: "moment-breakfast",
-    hex: "#F59E0B",
+    hex: COLORS["moment-breakfast"],
   },
   {
     id: "LUNCH",
-    icon: "white-balance-sunny",
+    icon: "pot-steam",
     labelKey: "catalog.reservation.moments.lunch",
     color: "moment-lunch",
-    hex: "#10B981",
+    hex: COLORS["moment-lunch"],
   },
   {
     id: "SNACK",
     icon: "cookie",
     labelKey: "catalog.reservation.moments.snack",
     color: "moment-snack",
-    hex: "#F97316",
+    hex: COLORS["moment-snack"],
   },
   {
     id: "DINNER",
     icon: "moon-waning-crescent",
     labelKey: "catalog.reservation.moments.dinner",
     color: "moment-dinner",
-    hex: "#8B5CF6",
+    hex: COLORS["moment-dinner"],
   },
 ];
 
@@ -54,5 +55,5 @@ export function getTimeOfDayIcon(timeOfDay: string): string {
  */
 export function getTimeOfDayColor(timeOfDay: string): string {
   const found = MOMENTS_OF_DAY.find((m) => m.id === timeOfDay);
-  return found?.hex || "#6B7280";
+  return found?.hex || COLORS["on-surface-variant"];
 }

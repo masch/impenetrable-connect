@@ -11,6 +11,7 @@ import { FormLanguageSelector } from "../../../components/FormLanguageSelector";
 import { FormSwitch } from "../../../components/FormSwitch";
 import { Button } from "../../../components/Button";
 import Screen from "../../../components/Screen";
+import LoadingView from "../../../components/LoadingView";
 
 const AVAILABLE_LANGUAGES = SUPPORTED_LANGUAGES;
 
@@ -204,11 +205,7 @@ export default function ProjectFormScreen() {
           </View>
 
           {/* Loading State */}
-          {isEditMode && isLoading && (
-            <View className="py-12 items-center">
-              <Text className="text-on-surface">{t("loading")}</Text>
-            </View>
-          )}
+          {isEditMode && isLoading && <LoadingView fullScreen={false} className="py-12" />}
 
           {/* Form */}
           {!isEditMode || !isLoading ? (

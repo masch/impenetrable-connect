@@ -8,6 +8,7 @@ import { View, Text, Pressable, Platform } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../hooks/useI18n";
+import { COLORS } from "@repo/shared";
 
 const isWeb = Platform.OS === "web";
 
@@ -144,19 +145,11 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
                 <Text className="text-base font-body text-on-primary font-bold">
                   {formatDate(currentValue)}
                 </Text>
-                {isWeb ? (
-                  <Text className="text-xs text-on-primary">✏️</Text>
-                ) : (
-                  <MaterialCommunityIcons name="pencil" size={14} color="on-primary" />
-                )}
+                <MaterialCommunityIcons name="pencil" size={14} color={COLORS["on-primary"]} />
               </View>
             ) : (
               <View className="flex-row items-center justify-center gap-2">
-                {isWeb ? (
-                  <Text>📅</Text>
-                ) : (
-                  <MaterialCommunityIcons name="calendar" size={18} color="on-surface" />
-                )}
+                <MaterialCommunityIcons name="calendar" size={18} color={COLORS["on-surface"]} />
                 <Text className="text-base font-body text-on-surface">{t("orders.choose")}</Text>
               </View>
             )}
@@ -167,21 +160,21 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
           <View className="mt-2 bg-surface-container-low border border-outline-variant p-4">
             <View className="flex-row justify-between items-center mb-4">
               <Pressable className="p-2" onPress={() => adjustDate(-1)}>
-                {isWeb ? (
-                  <Text>◀</Text>
-                ) : (
-                  <MaterialCommunityIcons name="chevron-left" size={24} color="on-surface" />
-                )}
+                <MaterialCommunityIcons
+                  name="chevron-left"
+                  size={24}
+                  color={COLORS["on-surface"]}
+                />
               </Pressable>
               <Text className="text-lg font-body font-bold text-on-surface">
                 {formatDate(currentValue)}
               </Text>
               <Pressable className="p-2" onPress={() => adjustDate(1)}>
-                {isWeb ? (
-                  <Text>▶</Text>
-                ) : (
-                  <MaterialCommunityIcons name="chevron-right" size={24} color="on-surface" />
-                )}
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={24}
+                  color={COLORS["on-surface"]}
+                />
               </Pressable>
             </View>
             <View className="flex-row gap-2 justify-center">
@@ -249,11 +242,15 @@ export function DatePicker({ value, onChange, minimumDate, maximumDate }: DatePi
               <Text className="text-sm font-display text-secondary font-bold leading-tight">
                 {formatDate(currentValue)}
               </Text>
-              <MaterialCommunityIcons name="pencil" size={14} color="#000000" />
+              <MaterialCommunityIcons name="pencil" size={14} color={COLORS["on-surface"]} />
             </View>
           ) : (
             <View className="flex-row items-center justify-center gap-2">
-              <MaterialCommunityIcons name="calendar" size={16} color="#6B7280" />
+              <MaterialCommunityIcons
+                name="calendar"
+                size={16}
+                color={COLORS["on-surface-variant"]}
+              />
               <Text className="text-sm font-display text-on-surface-variant font-medium leading-tight">
                 {t("orders.choose")}
               </Text>

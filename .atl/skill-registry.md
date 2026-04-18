@@ -25,6 +25,8 @@
   - **Pluralization**: Use standard i18n pluralization keys (e.g., `one`, `other`) instead of manual ternary operators or conditional strings in the code.
   - **Variables**: Always pass context variables (count, name, etc.) to the translation function instead of hardcoding formatted strings.
   - **No Post-Processing transformations**: NEVER apply transformations like `.toUpperCase()` or `.toLowerCase()` directly to the result of `t()`. Use CSS utilities (e.g., `uppercase`) for styling. This ensures that missing keys remain clearly visible as `[missing_key]` and are not disguised by case changes.
+- **Loading State Standard**: Every screen that fetches async data MUST use the centralized `LoadingView` component (`src/components/LoadingView.tsx`). Manual use of `ActivityIndicator` for screen-level loading is STRICTLY PROHIBITED. The component handles both the spinner and the `t('loading')` label by default.
+- **JSX Ternary Hygiene**: For large conditional blocks (e.g., wrapping a `ScrollView`), maintain clear indentation and use comments like `} // isLoading` at the end of complex ternary blocks to prevent "Adjacent JSX elements" syntax errors.
 
 ### Styling (NativeWind v4 + Tailwind v3)
 
@@ -33,11 +35,19 @@
 - **Mobile Footer Density**: For sticky footers in mobile views, prioritize a **compact single-row layout**. Avoid multi-row footers that consume excessive vertical screen real estate, especially on devices with small aspect ratios or web browsers.
 - **Native Context**: Be aware of NativeWind v4 limitations vs v5/v6.
 
+### UI/UX & Interaction Patterns
+
+- **Loading vs. Empty States**: Never show an empty screen or list while data is fetching. Always prioritize a branded `LoadingView` over blank space to maintain perceived performance and user trust.
+- **Role Parity**: The Entrepreneur (internal) experience must match the Tourist (external) experience in terms of UI polish, feedback, and loading patterns.
+- **Brand Continuity**: Always use branded tokens (`COLORS.primary`) via standardized components like `LoadingView` or `Button`. Direct use of `ActivityIndicator` is allowed only for micro-interactions where `LoadingView` is too heavy (e.g., inside a button or header).
+- **Manual Overrides**: ALWAYS provide a standard `RefreshControl` in scrollable lists to give the user a sense of control over data freshness.
+
 ### Architecture & Monorepo
 
 - **Single Source of Truth**: Shared types and validators must live in `@repo/shared`.
 - **Vertical Slicing**: Keep backend routes logic in services, not in the route handler.
 - **Error Handling**: Use Zod for all input validations on both sides of the bridge.
+- **Mock Data SSoT**: NEVER duplicate mock data across multiple files. Centralize shared entity mocks (Orders, Users, Catalog) in `src/mocks/*.data.ts` to ensure consistency across different user roles (Tourist vs. Entrepreneur).
 
 ### Testing
 
@@ -51,12 +61,14 @@
 - **No Direct Push**: NEVER push directly to `main` or `master`. No exceptions.
 - **Issue First**: Every change MUST be linked to a GitHub issue. If no issue exists, create one BEFORE starting the work (use `issue-creation` skill).
 - **Pre-Commit Validation**: ALWAYS run `make check` and ensure it passes BEFORE committing. No commit should be created with failing checks.
+- **No Verification Bypass**: NEVER use `--no-verify` or any mechanism to bypass Git hooks (linter, tests, `gga`). If a check fails, the root cause MUST be investigated and fixed. Bypassing quality gates is STRICTLY PROHIBITED.
 - **Branching**: Always create a descriptive feature branch (e.g., `issue-#/short-description`).
 - **Pull Requests**: Every change must be submitted via a PR linked to the issue.
 - **Commits**: Use conventional commits only. No AI attribution in commit messages.
 - **Pull Request Standards**:
   - **MANDATORY**: Every PR body MUST include a "Test Summary" following this exact format: `✅ PASS: X total tests, make check successful`.
-  - **Template**: ALWAYS use the provided template in `.github/PULL_REQUEST_TEMPLATE.md`.
+  - **Pre-Creation Protocol**: AGENTS MUST read `.github/PULL_REQUEST_TEMPLATE.md` before executing `gh pr create` to ensure all sections are filled correctly. Relying on memory is NOT allowed.
+  - **Label Verification**: ALWAYS run `gh label list` before adding labels to a PR to ensure compliance with project-specific naming (e.g., `type:feature` vs `type:feat`).
   - Descriptions must not paste full logs; use the summary format instead.
   - MUST link to an approved issue ("Closes #XX").
 - **Post-Merge Cleanup**: When the user says "mergeado" (merged), the agent MUST:
