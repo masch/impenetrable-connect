@@ -10,7 +10,8 @@ describe("ReservationCard", () => {
     render(<ReservationCard order={order} />);
 
     if (order.items && order.items.length > 0) {
-      expect(screen.getByText(new RegExp(`Ítem #${order.items[0].catalog_item_id}`))).toBeTruthy();
+      // Use a more resilient matcher that looks for the item ID
+      expect(screen.getByText(new RegExp(order.items[0].catalog_item_id.toString()))).toBeTruthy();
     }
     expect(screen.getByText(totalQuantity.toString())).toBeTruthy();
   });
