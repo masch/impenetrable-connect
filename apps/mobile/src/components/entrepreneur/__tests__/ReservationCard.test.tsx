@@ -5,20 +5,27 @@ import { getMockAgendaOrders } from "../../../mocks/agenda";
 
 describe("ReservationCard", () => {
   it("should render client name, items and service name", () => {
-    const order = getMockAgendaOrders()[0];
+    const orders = getMockAgendaOrders();
+    const order = orders[0];
     const totalQuantity = order.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
     render(<ReservationCard order={order} />);
 
     if (order.items && order.items.length > 0) {
-      // Use a more resilient matcher that looks for the item ID
-      expect(screen.getByText(new RegExp(order.items[0].catalog_item_id.toString()))).toBeTruthy();
+      // Check for item name instead of ID
+      const itemName = order.items[0].catalog_item?.name_i18n.en || "";
+      expect(screen.getByText(new RegExp(itemName, "i"))).toBeTruthy();
     }
-    expect(screen.getByText(totalQuantity.toString())).toBeTruthy();
+    // Use a regex that includes the quantity and the "dishes" context to be unique
+    expect(screen.getByText(new RegExp(`${totalQuantity}.*dishes`, "i"))).toBeTruthy();
   });
 
   it("should show notes if present", () => {
-    const order = getMockAgendaOrders().find((o) => o.notes)!;
-    render(<ReservationCard order={order} />);
-    expect(screen.getByText(order.notes!)).toBeTruthy();
+    const mockOrder = getMockAgendaOrders()[0];
+    const orderWithNotes = {
+      ...mockOrder,
+      notes: "Extra napkins please",
+    };
+    render(<ReservationCard order={orderWithNotes} />);
+    expect(screen.getByText("Extra napkins please")).toBeTruthy();
   });
 });

@@ -4,7 +4,6 @@ describe("OrderSchema", () => {
   it("should validate a valid multi-item order linked to a reservation", () => {
     const validOrder = {
       id: 1,
-      user_id: "550e8400-e29b-41d4-a716-446655440000",
       reservation_id: 10,
       catalog_type_id: 100,
       global_status: "SEARCHING",
@@ -25,7 +24,6 @@ describe("OrderSchema", () => {
   it("should fail if catalog_item_id is present (deprecated)", () => {
     const deprecatedOrder = {
       id: 1,
-      user_id: "550e8400-e29b-41d4-a716-446655440000",
       reservation_id: 10,
       catalog_item_id: 200, // Should be removed
       quantity: 1,
@@ -47,7 +45,6 @@ describe("OrderSchema", () => {
   it("should fail if reservation_id is missing", () => {
     const invalidOrder = {
       id: 1,
-      user_id: "550e8400-e29b-41d4-a716-446655440000",
       catalog_type_id: 100,
       global_status: "SEARCHING",
       service_date: new Date(),

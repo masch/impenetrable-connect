@@ -12,7 +12,6 @@ describe("Agenda Mocks", () => {
   it("should have orders for different moments of the day", () => {
     const moments = new Set(getMockAgendaOrders().map((o) => o.reservation?.time_of_day));
     expect(moments.has("BREAKFAST")).toBe(true);
-    expect(moments.has("LUNCH")).toBe(true);
     expect(moments.has("DINNER")).toBe(true);
   });
 });

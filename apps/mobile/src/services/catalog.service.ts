@@ -12,7 +12,7 @@ import type { Order, ServiceMoment } from "@repo/shared";
 import { ServiceMomentSchema } from "@repo/shared";
 import { MOCK_CATALOG_SERVICES, type CatalogServiceItem } from "../mocks/catalog";
 import { addMockOrder, getMockOrders, updateMockOrder } from "../mocks/orders";
-import { getMockUserId, isMockUserLoggedIn } from "../mocks/users";
+import { isMockUserLoggedIn } from "../mocks/users";
 import { logger } from "./logger.service";
 import env from "../config/env";
 
@@ -94,7 +94,6 @@ const MockCatalogService: CatalogServiceInterface = {
 
     const newOrder: Order = {
       id: orderId,
-      user_id: getMockUserId(),
       reservation_id: Math.floor(Math.random() * 100000),
       catalog_type_id: firstService.catalog_category_id,
       confirmed_venture_id: null,

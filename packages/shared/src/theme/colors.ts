@@ -36,6 +36,8 @@ export interface Colors {
   "moment-dinner": string;
   "surface-solid": string;
   "surface-container-solid": string;
+  "status-searching": string;
+  "status-pending": string;
 }
 
 /**

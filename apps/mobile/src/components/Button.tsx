@@ -18,6 +18,7 @@ interface ButtonProps {
   rightIcon?: keyof typeof MaterialCommunityIcons.glyphMap;
   iconColor?: string;
   className?: string;
+  textClassName?: string;
   accessibilityLabel?: string;
   size?: "default" | "sm";
   accessibilityRole?: AccessibilityRole;
@@ -64,6 +65,7 @@ export function Button({
   accessibilityRole,
   accessibilityState,
   children,
+  textClassName = "",
 }: ButtonProps) {
   const styles = variantStyles[variant];
 
@@ -108,6 +110,7 @@ export function Button({
                     className={`
                       font-bold ${!rightIcon ? "text-center" : ""}
                       ${pressed ? styles.pressed : styles.text}
+                      ${textClassName}
                     `}
                   >
                     {title}

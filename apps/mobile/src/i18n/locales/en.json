@@ -153,7 +153,7 @@
     "adults": "Adults",
     "status": {
       "searching": "SEARCHING...",
-      "offer_pending": "AWAITING RESPONSE",
+      "offer_pending": "AWAITING CONFIRMATION",
       "confirmed": "CONFIRMED",
       "completed": "COMPLETED",
       "cancelled": "CANCELLED",
@@ -202,7 +202,14 @@
     "alert": "Attention",
     "selected": "Selected",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "accept": "Accept",
+    "decline": "Decline",
+    "dishes_one": "Dish",
+    "dishes_other": "Dishes",
+    "today_short": "TODAY",
+    "tomorrow_short": "TOM",
+    "total": "Total"
   },
   "role_selector": {
     "welcome": "Welcome",
