@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text } from "react-native";
 import { Button } from "../../components/Button";
-import { type Order, COLORS } from "@repo/shared";
+import { type Order, type OrderStatus, COLORS } from "@repo/shared";
 import { useTranslations } from "../../hooks/useI18n";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -9,61 +9,70 @@ interface ReservationCardProps {
   order: Order;
   hideBorder?: boolean;
   hideShadow?: boolean;
+  onAccept?: () => void;
+  onDecline?: () => void;
 }
+
+interface StatusConfig {
+  color: string;
+  label: string;
+  icon: string;
+}
+
+// Dynamic colors based on status - defined at module level for performance
+const getStatusConfig = (t: (key: string) => string, globalStatus: OrderStatus): StatusConfig => {
+  const statusMap: Record<string, StatusConfig> = {
+    OFFER_PENDING: {
+      color: COLORS["status-pending"],
+      label: t("orders.status.offer_pending"),
+      icon: "clock-outline",
+    },
+    CONFIRMED: {
+      color: COLORS.secondary,
+      label: t("orders.status.confirmed"),
+      icon: "check-circle-outline",
+    },
+    CANCELLED: {
+      color: COLORS.error,
+      label: t("orders.status.cancelled"),
+      icon: "close-circle-outline",
+    },
+    SEARCHING: {
+      color: COLORS["status-searching"],
+      label: t("orders.status.searching"),
+      icon: "magnify",
+    },
+    COMPLETED: {
+      color: COLORS.success,
+      label: t("orders.status.completed"),
+      icon: "check-all",
+    },
+    EXPIRED: {
+      color: COLORS["on-surface-variant"],
+      label: t("orders.status.expired"),
+      icon: "calendar-remove",
+    },
+  };
+
+  return (
+    statusMap[globalStatus] || {
+      color: COLORS["status-searching"],
+      label: t("orders.status.searching"),
+      icon: "magnify",
+    }
+  );
+};
 
 export default function ReservationCard({
   order,
   hideBorder = false,
   hideShadow = false,
+  onAccept,
+  onDecline,
 }: ReservationCardProps) {
   const { t, locale } = useTranslations();
   const isPending = order.global_status === "OFFER_PENDING";
-
-  // Dynamic colors based on status
-  const getStatusConfig = () => {
-    const statusMap: Record<string, { color: string; label: string; icon: string }> = {
-      OFFER_PENDING: {
-        color: COLORS["status-pending"],
-        label: t("orders.status.offer_pending"),
-        icon: "clock-outline",
-      },
-      CONFIRMED: {
-        color: COLORS.secondary,
-        label: t("orders.status.confirmed"),
-        icon: "check-circle-outline",
-      },
-      CANCELLED: {
-        color: COLORS.error,
-        label: t("orders.status.cancelled"),
-        icon: "close-circle-outline",
-      },
-      SEARCHING: {
-        color: COLORS["status-searching"], // Vibrant sky blue for searching
-        label: t("orders.status.searching"),
-        icon: "magnify",
-      },
-      COMPLETED: {
-        color: COLORS.success,
-        label: t("orders.status.completed"),
-        icon: "check-all",
-      },
-      EXPIRED: {
-        color: COLORS["on-surface-variant"],
-        label: t("orders.status.expired"),
-        icon: "calendar-remove",
-      },
-    };
-
-    return (
-      statusMap[order.global_status] || {
-        color: COLORS["status-searching"],
-        label: t("orders.status.searching"),
-        icon: "magnify",
-      }
-    );
-  };
-
-  const status = getStatusConfig();
+  const status = getStatusConfig(t, order.global_status);
   const containerClass = `bg-surface-container-lowest overflow-hidden ${hideBorder ? "" : "border border-outline-variant/50 rounded-3xl mb-4"} ${hideShadow ? "" : "shadow-md"}`;
 
   return (
@@ -122,10 +131,13 @@ export default function ReservationCard({
                 </View>
 
                 <View className="flex-row items-center">
-                  <Text className="text-on-surface-variant font-display-bold text-xs mr-4">
-                    x{item.quantity}
-                  </Text>
-                  <Text className="text-on-surface font-display-black text-[15px]">
+                  <View className="items-end mr-3">
+                    <Text className="text-on-surface-variant font-body-medium text-xs">
+                      {item.quantity}
+                      {item.quantity > 1 && ` x $${item.price.toLocaleString()}`}
+                    </Text>
+                  </View>
+                  <Text className="text-on-surface font-display-black text-[16px] min-w-[80px] text-right">
                     ${(item.price * item.quantity).toLocaleString()}
                   </Text>
                 </View>
@@ -188,17 +200,17 @@ export default function ReservationCard({
           {isPending && (
             <View className="flex-row">
               <Button
-                variant="outline"
+                variant="danger"
                 className="flex-1 mr-2"
-                textClassName="text-red-500 text-xs"
-                onPress={() => {}}
+                textClassName="text-xs"
+                onPress={onDecline || (() => {})}
                 title={t("common.decline")}
               />
               <Button
                 variant="primary"
                 className="flex-1"
-                textClassName="text-white text-xs"
-                onPress={() => {}}
+                textClassName="text-xs"
+                onPress={onAccept || (() => {})}
                 title={t("common.accept")}
               />
             </View>

@@ -19,13 +19,16 @@ import { Button } from "../../components/Button";
 import { getMomentIcon, getMomentColor } from "../../constants/moments";
 import { type Order, type OrderStatus, COLORS } from "@repo/shared";
 
+interface StatusUIConfig {
+  label: string;
+  bgClass: string;
+  textClass: string;
+  icon: string;
+  color: string;
+}
+
 // Status badge mapping - labels come from i18n
-const getStatusConfig = (
-  t: (key: string) => string,
-): Record<
-  OrderStatus,
-  { label: string; bgClass: string; textClass: string; icon: string; color: string }
-> => ({
+const getStatusConfig = (t: (key: string) => string): Record<OrderStatus, StatusUIConfig> => ({
   SEARCHING: {
     label: t("orders.status.searching"),
     bgClass: "bg-status-searching/10",
@@ -196,12 +199,13 @@ function ActiveOrderCard({ order, onCancel, onShowAlert }: ActiveOrderCardProps)
                 >
                   <Text className="flex-1 text-base font-body text-on-surface">{name}</Text>
                   <View className="flex-row items-center">
-                    <View className="bg-surface-container-high px-2 py-0.5 rounded-lg mr-3">
-                      <Text className="text-[11px] font-display font-black text-on-surface-variant uppercase tracking-tighter">
-                        X{item.quantity}
+                    <View className="items-end mr-3">
+                      <Text className="text-on-surface-variant font-body-medium text-xs">
+                        {item.quantity}
+                        {item.quantity > 1 && ` x $${item.price.toLocaleString()}`}
                       </Text>
                     </View>
-                    <Text className="text-base font-display font-bold text-on-surface">
+                    <Text className="text-base font-display-bold text-on-surface min-w-[80px] text-right">
                       ${" "}
                       {(item.price * item.quantity).toLocaleString(
                         locale === "es" ? "es-AR" : "en-US",
@@ -267,7 +271,6 @@ function ActiveOrderCard({ order, onCancel, onShowAlert }: ActiveOrderCardProps)
               ],
             });
           }}
-          disabled={order.global_status !== "SEARCHING"}
           className="mt-4"
         />
       )}
@@ -366,12 +369,13 @@ function HistoryItem({ order }: HistoryItemProps) {
                     {name}
                   </Text>
                   <View className="flex-row items-center">
-                    <View className="bg-surface-container-high px-1.5 py-0.5 rounded mr-2">
-                      <Text className="text-[10px] font-display font-black text-on-surface-variant uppercase">
-                        X{item.quantity}
+                    <View className="items-end mr-3">
+                      <Text className="text-on-surface-variant font-body-medium text-xs">
+                        {item.quantity}
+                        {item.quantity > 1 && ` x $${item.price.toLocaleString()}`}
                       </Text>
                     </View>
-                    <Text className="text-sm font-display font-bold text-on-surface">
+                    <Text className="text-on-surface font-display-bold text-base min-w-[80px] text-right">
                       ${" "}
                       {(item.price * item.quantity).toLocaleString(
                         locale === "es" ? "es-AR" : "en-US",
@@ -490,7 +494,8 @@ export default function OrderScreen() {
     setTab(index === 0 ? "active" : "history");
   };
 
-  const displayedOrders = selectedTab === "active" ? activeOrders : historyOrders;
+  const isActiveTab = selectedTab === "active";
+  const displayedOrders = isActiveTab ? activeOrders : historyOrders;
 
   return (
     <Screen>
@@ -500,24 +505,21 @@ export default function OrderScreen() {
             {t("orders.title")}
           </Text>
         </View>
-
         <View className="mb-6">
           <SegmentedControl
             segments={[
               { label: `${t("orders.active")} (${activeOrders.length})` },
               { label: `${t("orders.history")} (${historyOrders.length})` },
             ]}
-            selectedIndex={selectedTab === "active" ? 0 : 1}
+            selectedIndex={isActiveTab ? 0 : 1}
             onChange={handleTabChange}
           />
         </View>
-
         {error && (
           <View className="bg-error-container p-4 mb-4 rounded-lg">
             <Text className="text-base font-body text-on-error-container">{error}</Text>
           </View>
         )}
-
         {isLoading && displayedOrders.length === 0 ? (
           <LoadingView className="py-20" />
         ) : (
@@ -531,7 +533,7 @@ export default function OrderScreen() {
               />
             }
           >
-            {selectedTab === "active" && (
+            {isActiveTab && (
               <>
                 {activeOrders.length > 0 ? (
                   activeOrders.map((order) => (
@@ -548,7 +550,7 @@ export default function OrderScreen() {
               </>
             )}
 
-            {selectedTab === "history" && (
+            {!isActiveTab && (
               <>
                 {historyOrders.length > 0 ? (
                   historyOrders.map((order) => <HistoryItem key={order.id} order={order} />)
@@ -558,7 +560,8 @@ export default function OrderScreen() {
               </>
             )}
           </ScrollView>
-        )}
+        )}{" "}
+        // !isLoading
       </ScreenContent>
       <AppAlert
         {...alertConfig}

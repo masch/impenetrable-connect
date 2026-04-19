@@ -2,6 +2,7 @@ import { Order, Reservation } from "@repo/shared";
 import {
   ASADO_POLLO,
   EMPANADAS_VERDURA_DOCENA,
+  POSTRE_REGIONAL,
   REPOLLO_ASADO,
   SERVICE_CATEGORY_IDS,
 } from "./catalog";
@@ -148,9 +149,9 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
       {
         id: 6,
         order_id: 4,
-        catalog_item_id: ASADO_POLLO.id,
-        quantity: 1,
-        price: 4501,
+        catalog_item_id: POSTRE_REGIONAL.id,
+        quantity: 3,
+        price: POSTRE_REGIONAL.price,
       },
     ],
     notify_whatsapp: false,
