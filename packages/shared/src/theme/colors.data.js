@@ -31,4 +31,6 @@ export const COLORS = {
   "moment-dinner": "#8B5CF6",
   "surface-solid": "#fcf9f2",
   "surface-container-solid": "#f6f3ec",
+  "status-searching": "#0ea5e9",
+  "status-pending": "#a3412a",
 };

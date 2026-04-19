@@ -35,7 +35,6 @@ export const USER_ROLE_KEYS = {
 
 export const OrderStatusSchema = z.enum([
   "SEARCHING",
-  "WAITING_FOR_OFFER",
   "OFFER_PENDING",
   "CONFIRMED",
   "COMPLETED",
@@ -46,7 +45,7 @@ export const OrderStatusSchema = z.enum([
 
 export type OrderStatus = z.infer<typeof OrderStatusSchema>;
 
-export const ReservationStatusSchema = z.enum(["PENDING", "CONFIRMED", "CANCELLED"]);
+export const ReservationStatusSchema = z.enum(["CREATED", "SEARCHING", "CONFIRMED", "CANCELLED"]);
 
 export type ReservationStatus = z.infer<typeof ReservationStatusSchema>;
 

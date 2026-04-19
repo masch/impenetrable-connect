@@ -7,7 +7,6 @@ import { create } from "zustand";
 import type { Order } from "@repo/shared";
 import { logger } from "../services/logger.service";
 import { getMockAgendaOrders } from "../mocks/agenda";
-import { MARIA_VENTURE_ID } from "../mocks/agenda";
 import { mockGetCurrentUser } from "../services/auth-state";
 
 interface AgendaState {
@@ -37,14 +36,13 @@ export const useAgendaStore = create<AgendaState>((set, get) => ({
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const currentUser = mockGetCurrentUser();
-      const dateStr = date.toISOString().split("T")[0];
+      const dateStr = date.toLocaleDateString("en-CA"); // Gives YYYY-MM-DD in local time
 
       const filtered =
         currentUser?.id === "entrepreneur_001"
           ? getMockAgendaOrders().filter(
               (o) =>
-                (o.reservation?.service_date || new Date()).toISOString().split("T")[0] ===
-                  dateStr && o.confirmed_venture_id === MARIA_VENTURE_ID,
+                (o.reservation?.service_date || new Date()).toLocaleDateString("en-CA") === dateStr,
             )
           : [];
 

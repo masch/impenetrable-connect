@@ -13,5 +13,10 @@ export { MARIA_VENTURE_ID };
  * Uses a function to ensure we always get the latest state from the mock system.
  */
 export function getMockAgendaOrders(): Order[] {
-  return getAllMockOrders().filter((order) => order.confirmed_venture_id === MARIA_VENTURE_ID);
+  return getAllMockOrders().filter(
+    (order) =>
+      order.confirmed_venture_id === MARIA_VENTURE_ID ||
+      (order.global_status === "OFFER_PENDING" &&
+        order.current_offer_venture_id === MARIA_VENTURE_ID),
+  );
 }

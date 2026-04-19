@@ -1,5 +1,10 @@
 import { Order, Reservation } from "@repo/shared";
-import { ASADO_POLLO, EMPANADAS_VERDURA_DOCENA, SERVICE_CATEGORY_IDS } from "./catalog";
+import {
+  ASADO_POLLO,
+  EMPANADAS_VERDURA_DOCENA,
+  REPOLLO_ASADO,
+  SERVICE_CATEGORY_IDS,
+} from "./catalog";
 import { MOCK_USER_TOURIST_WITH_ORDERS } from "./users.data";
 
 // Helper for dates relative to today
@@ -11,30 +16,38 @@ const daysFromNow = (days: number) => {
 };
 
 const today = daysFromNow(0);
-const yesterday = daysFromNow(-1);
+const tomorrow = daysFromNow(1);
 
 export const MARIA_VENTURE_ID = 1;
 
-const MOCK_RESERVATION_TODAY_LUNCH_PENDING: Reservation = {
+const MOCK_RESERVATION_TODAY_LUNCH_CREATED: Reservation = {
   id: 1,
   user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
   service_date: today,
   time_of_day: "LUNCH",
-  status: "PENDING",
+  status: "CREATED",
 };
 
-const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED: Reservation = {
+const MOCK_RESERVATION_TODAY_BREAKFAST_SEARCHING: Reservation = {
   id: 2,
   user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
   service_date: today,
+  time_of_day: "BREAKFAST",
+  status: "SEARCHING",
+};
+
+const MOCK_RESERVATION_TOMORROW_DINNER_CONFIRMED: Reservation = {
+  id: 3,
+  user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
+  service_date: tomorrow,
   time_of_day: "DINNER",
   status: "CONFIRMED",
 };
 
-const MOCK_RESERVATION_TODAY_BREAKFAST_CANCELLED: Reservation = {
-  id: 3,
+const MOCK_RESERVATION_TOMORROW_BREAKFAST_CANCELLED: Reservation = {
+  id: 4,
   user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  service_date: today,
+  service_date: tomorrow,
   time_of_day: "BREAKFAST",
   status: "CANCELLED",
 };
@@ -43,20 +56,19 @@ const MOCK_RESERVATION_TODAY_BREAKFAST_CANCELLED: Reservation = {
  * Reservations (parent entities for orders)
  */
 export const MOCK_RESERVATIONS: Reservation[] = [
-  MOCK_RESERVATION_TODAY_LUNCH_PENDING,
-  MOCK_RESERVATION_TODAY_DINNER_CONFIRMED,
-  MOCK_RESERVATION_TODAY_BREAKFAST_CANCELLED,
+  MOCK_RESERVATION_TODAY_LUNCH_CREATED,
+  MOCK_RESERVATION_TODAY_BREAKFAST_SEARCHING,
+  MOCK_RESERVATION_TOMORROW_DINNER_CONFIRMED,
+  MOCK_RESERVATION_TOMORROW_BREAKFAST_CANCELLED,
 ];
 
 /**
  * Pure mock data for orders to be used in different services/stores
  */
 export const INITIAL_MOCK_ORDERS: Order[] = [
-  // --- Reservation 1 (Lunch Today) ---
   {
     id: 1,
-    user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-    reservation_id: 1,
+    reservation_id: MOCK_RESERVATION_TODAY_LUNCH_CREATED.id,
     catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
     global_status: "SEARCHING",
     notes: "Please no spicy",
@@ -78,16 +90,15 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
     ],
     created_at: today,
     notify_whatsapp: true,
-    confirmed_venture_id: MARIA_VENTURE_ID,
+    confirmed_venture_id: null,
   },
-  // --- Reservation 2 (Dinner Today) ---
   {
     id: 2,
-    user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-    reservation_id: 2,
+    reservation_id: MOCK_RESERVATION_TODAY_BREAKFAST_SEARCHING.id,
     catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
-    global_status: "CONFIRMED",
-    confirmed_venture_id: MARIA_VENTURE_ID,
+    global_status: "OFFER_PENDING",
+    confirmed_venture_id: null,
+    current_offer_venture_id: MARIA_VENTURE_ID,
     items: [
       {
         id: 3,
@@ -96,23 +107,47 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
         quantity: 1,
         price: 4501,
       },
+      {
+        id: 4,
+        order_id: 2,
+        catalog_item_id: REPOLLO_ASADO.id,
+        quantity: 3,
+        price: REPOLLO_ASADO.price,
+      },
     ],
-    created_at: yesterday,
-    confirmed_at: today,
+    created_at: tomorrow,
+    confirmed_at: null,
     notify_whatsapp: false,
   },
-  // --- Reservation 3 (Breakfast Today) ---
   {
     id: 3,
-    user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-    reservation_id: 3,
+    reservation_id: MOCK_RESERVATION_TOMORROW_DINNER_CONFIRMED.id,
+    catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    global_status: "CONFIRMED",
+    confirmed_venture_id: MARIA_VENTURE_ID,
+    items: [
+      {
+        id: 5,
+        order_id: 3,
+        catalog_item_id: ASADO_POLLO.id,
+        quantity: 1,
+        price: 4501,
+      },
+    ],
+    notify_whatsapp: false,
+    created_at: today,
+    confirmed_at: today,
+  },
+  {
+    id: 4,
+    reservation_id: MOCK_RESERVATION_TOMORROW_BREAKFAST_CANCELLED.id,
     catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
     global_status: "CANCELLED",
     confirmed_venture_id: MARIA_VENTURE_ID,
     items: [
       {
-        id: 3,
-        order_id: 3,
+        id: 6,
+        order_id: 4,
         catalog_item_id: ASADO_POLLO.id,
         quantity: 1,
         price: 4501,

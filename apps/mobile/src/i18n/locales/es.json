@@ -153,7 +153,7 @@
     "adults": "Adultos",
     "status": {
       "searching": "BUSCANDO...",
-      "offer_pending": "ESPERANDO RESPUESTA",
+      "offer_pending": "ESPERANDO CONFIRMACION",
       "confirmed": "CONFIRMADO",
       "completed": "COMPLETADO",
       "cancelled": "CANCELADO",
@@ -202,7 +202,14 @@
     "alert": "Atención",
     "selected": "Seleccionado",
     "previous": "Anterior",
-    "next": "Siguiente"
+    "next": "Siguiente",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "dishes_one": "Plato",
+    "dishes_other": "Platos",
+    "today_short": "HOY",
+    "tomorrow_short": "MAÑ",
+    "total": "Total"
   },
   "role_selector": {
     "welcome": "Bienvenido",

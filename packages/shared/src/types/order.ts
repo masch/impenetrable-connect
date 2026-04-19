@@ -12,16 +12,26 @@ import { ReservationSchema } from "./reservation";
  */
 export const OrderDbSchema = z.object({
   id: z.number().int().positive(),
-  user_id: z.string().uuid(),
   reservation_id: z.number().int().positive(),
   catalog_type_id: z.number().int().positive(),
   confirmed_venture_id: z.number().int().positive().nullable().optional(),
   notes: z.string().nullable().optional(),
+  /**
+   * Order Lifecycle Status
+   * - SEARCHING: Engine is looking for a venture.
+   * - OFFER_PENDING: Entrepreneur notified, waiting for response (Timeout active).
+   * - CONFIRMED: Entrepreneur accepted the order.
+   * - COMPLETED: Service delivered.
+   * - NO_SHOW: Tourist didn't show up.
+   * - CANCELLED: Order cancelled.
+   * - EXPIRED: No venture available after cascade.
+   */
   global_status: OrderStatusSchema.default("SEARCHING"),
   cancel_reason: CancelReasonSchema.nullable().optional(),
   cancelled_at: z.date().nullable().optional(),
   completed_at: z.date().nullable().optional(),
   confirmed_at: z.date().nullable().optional(),
+  current_offer_venture_id: z.number().int().positive().nullable().optional(),
   created_at: z.date(),
   notify_whatsapp: z.boolean().default(false),
 });
@@ -35,7 +45,7 @@ import { type Reservation } from "./reservation";
  * OrderSchema (Domain Aggregate)
  * Business entity that includes relations and nested items.
  */
-export const OrderSchema: z.ZodType<Order, z.ZodTypeDef, any> = OrderDbSchema.extend({
+export const OrderSchema: z.ZodType<Order, z.ZodTypeDef, unknown> = OrderDbSchema.extend({
   items: z.array(OrderItemSchema).default([]),
   user: UserSchema.optional(),
   confirmed_venture: VentureSchema.optional(),
@@ -49,4 +59,5 @@ export interface Order extends OrderRow {
   user?: User;
   confirmed_venture?: Venture;
   reservation?: Reservation;
+  current_offer_venture_id?: number | null;
 }

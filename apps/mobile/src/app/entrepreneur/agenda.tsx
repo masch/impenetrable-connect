@@ -50,43 +50,74 @@ export default function AgendaScreen() {
                 new Date(Date.now() + 86400000).toDateString() === date.toDateString();
               const isSelected = date.toDateString() === selectedDate.toDateString();
 
-              const dateLabel = isToday
-                ? t("order_setup.today")
+              const weekdayLabel = isToday
+                ? t("orders.today")
                 : isTomorrow
-                  ? t("order_setup.tomorrow")
+                  ? t("orders.tomorrow")
                   : date.toLocaleDateString(locale, { weekday: "short" });
 
               return (
                 <Button
                   key={date.toISOString()}
                   onPress={() => setSelectedDate(date)}
-                  className={`mr-3 pt-3.5 w-16 h-22 rounded-full border ${
+                  className={`mr-3 w-[58px] h-[82px] rounded-3xl border items-center justify-center ${
                     isSelected
-                      ? "bg-primary border-primary shadow-lg"
-                      : "bg-surface-container-lowest border-outline-variant/30"
+                      ? "bg-primary border-primary shadow-lg shadow-primary/30"
+                      : isToday
+                        ? "bg-secondary/10 border-secondary/40"
+                        : "bg-surface-container-lowest border-outline-variant/30"
                   }`}
                 >
-                  <Text
-                    className={`font-display-bold text-[11px] mb-2 capitalize ${isSelected ? "text-white" : "text-on-surface-variant"}`}
-                    numberOfLines={1}
-                  >
-                    {dateLabel.length > 3 && !isToday && !isTomorrow
-                      ? dateLabel.slice(0, 3)
-                      : dateLabel}
-                  </Text>
-                  <View
-                    className={`w-10 h-10 items-center justify-center rounded-full ${isSelected ? "bg-white/20" : "bg-surface-container-low"}`}
-                  >
-                    <Text
-                      className={`font-display-black text-lg ${isSelected ? "text-white" : "text-on-surface"}`}
-                    >
-                      {date.getDate()}
-                    </Text>
+                  <View className="items-center justify-center flex-1">
+                    {isToday || isTomorrow ? (
+                      <>
+                        <View
+                          className={`p-1.5 rounded-full mb-1 ${isSelected ? "bg-white/20" : isToday ? "bg-secondary/20" : "bg-primary/10"}`}
+                        >
+                          <MaterialCommunityIcons
+                            name={isToday ? "star" : "calendar-arrow-right"}
+                            size={22}
+                            color={
+                              isSelected ? "white" : isToday ? COLORS.secondary : COLORS.primary
+                            }
+                          />
+                        </View>
+                        <Text
+                          className={`font-display-black text-[9px] uppercase tracking-[0.5px] ${
+                            isSelected
+                              ? "text-white"
+                              : isToday
+                                ? "text-secondary"
+                                : "text-on-surface-variant"
+                          }`}
+                        >
+                          {isToday ? t("common.today_short") : t("common.tomorrow_short")}
+                        </Text>
+                      </>
+                    ) : (
+                      <>
+                        <Text
+                          className={`font-display-bold text-[9px] uppercase tracking-tighter mb-1.5 ${
+                            isSelected ? "text-white/70" : "text-on-surface-variant"
+                          }`}
+                        >
+                          {weekdayLabel}
+                        </Text>
+
+                        <Text
+                          className={`font-display-black text-xl ${
+                            isSelected ? "text-white" : "text-on-surface"
+                          }`}
+                        >
+                          {date.getDate()}
+                        </Text>
+                      </>
+                    )}
                   </View>
+
                   {isToday && !isSelected && (
-                    <View className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary" />
+                    <View className="absolute bottom-2 w-1.5 h-1.5 rounded-full bg-secondary" />
                   )}
-                  {isSelected && <View className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/60" />}
                 </Button>
               );
             })}
@@ -167,7 +198,15 @@ export default function AgendaScreen() {
                       className="font-display-black text-[14px] uppercase tracking-[1.5px]"
                       style={{ color: momentColor }}
                     >
-                      {t(`agenda.moments.${moment.toLowerCase()}`)}
+                      {(() => {
+                        const momentMap: Record<string, string> = {
+                          BREAKFAST: "catalog.reservation.moments.breakfast",
+                          LUNCH: "catalog.reservation.moments.lunch",
+                          SNACK: "catalog.reservation.moments.snack",
+                          DINNER: "catalog.reservation.moments.dinner",
+                        };
+                        return t(momentMap[moment] || "catalog.reservation.moments.lunch");
+                      })()}
                     </Text>
                     <View
                       className="h-[0.8px] flex-1 ml-4 opacity-20"
@@ -177,13 +216,7 @@ export default function AgendaScreen() {
                   <View className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 overflow-hidden">
                     {momentOrders.map((order, index) => (
                       <View key={order.id}>
-                        <ReservationCard
-                          order={order}
-                          hideBorder
-                          hideShadow
-                          isFirst={index === 0}
-                          accentColorOverride={momentColor}
-                        />
+                        <ReservationCard order={order} hideBorder hideShadow />
                         {index < momentOrders.length - 1 && (
                           <View
                             className="h-[1px] mx-2"

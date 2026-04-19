@@ -22,59 +22,71 @@ import { type Order, type OrderStatus, COLORS } from "@repo/shared";
 // Status badge mapping - labels come from i18n
 const getStatusConfig = (
   t: (key: string) => string,
-): Record<OrderStatus, { label: string; bgClass: string; textClass: string }> => ({
+): Record<
+  OrderStatus,
+  { label: string; bgClass: string; textClass: string; icon: string; color: string }
+> => ({
   SEARCHING: {
     label: t("orders.status.searching"),
-    bgClass: "bg-warning/20",
-    textClass: "text-tertiary-container",
-  },
-  WAITING_FOR_OFFER: {
-    label: t("orders.status.waiting_for_offer"),
-    bgClass: "bg-primary-container",
-    textClass: "text-on-primary-fixed",
+    bgClass: "bg-status-searching/10",
+    textClass: "text-status-searching",
+    icon: "magnify",
+    color: COLORS["status-searching"],
   },
   OFFER_PENDING: {
     label: t("orders.status.offer_pending"),
-    bgClass: "bg-primary-container",
-    textClass: "text-on-primary-fixed",
+    bgClass: "bg-status-pending/15",
+    textClass: "text-status-pending",
+    icon: "clock-outline",
+    color: COLORS["status-pending"],
   },
   CONFIRMED: {
     label: t("orders.status.confirmed"),
-    bgClass: "bg-secondary-container",
-    textClass: "text-on-secondary-fixed",
+    bgClass: "bg-secondary/15",
+    textClass: "text-secondary",
+    icon: "check-circle-outline",
+    color: COLORS.secondary,
   },
   COMPLETED: {
     label: t("orders.status.completed"),
     bgClass: "bg-surface-container-highest",
     textClass: "text-on-surface opacity-60",
+    icon: "check-all",
+    color: COLORS["on-surface-variant"],
   },
   CANCELLED: {
     label: t("orders.status.cancelled"),
-    bgClass: "bg-error-container",
+    bgClass: "bg-error/15",
     textClass: "text-error",
+    icon: "close-circle-outline",
+    color: COLORS.error,
   },
   NO_SHOW: {
     label: t("orders.status.noShow"),
-    bgClass: "bg-error-container",
+    bgClass: "bg-error/15",
     textClass: "text-error",
+    icon: "close-circle-outline",
+    color: COLORS.error,
   },
   EXPIRED: {
     label: t("orders.status.expired"),
-    bgClass: "bg-error-container",
-    textClass: "text-on-error-container",
+    bgClass: "bg-on-surface-variant/15",
+    textClass: "text-on-surface-variant",
+    icon: "calendar-remove",
+    color: COLORS["on-surface-variant"],
   },
 });
 
 // Format service moment for display using i18n
 function formatMoment(moment: string, t: (key: string) => string): string {
   const keyMap: Record<string, string> = {
-    BREAKFAST: "breakfast",
-    LUNCH: "lunch",
-    SNACK: "snack",
-    DINNER: "dinner",
+    BREAKFAST: "catalog.reservation.moments.breakfast",
+    LUNCH: "catalog.reservation.moments.lunch",
+    SNACK: "catalog.reservation.moments.snack",
+    DINNER: "catalog.reservation.moments.dinner",
   };
-  const key = keyMap[moment] || moment.toLowerCase();
-  return t(`catalog.reservation.moments.${key}`);
+  const key = keyMap[moment as keyof typeof keyMap];
+  return key ? t(key) : moment;
 }
 
 // Format date for display
@@ -124,8 +136,15 @@ function ActiveOrderCard({ order, onCancel, onShowAlert }: ActiveOrderCardProps)
     <View className="bg-surface-container-lowest rounded-xl p-4 mb-4 shadow-sm">
       {/* Top Row: Status and Date/Moment */}
       <View className="flex-row items-center justify-between mb-4">
-        <View className={`px-3 py-1 rounded-md ${status.bgClass}`}>
-          <Text className={`text-[10px] font-black tracking-widest uppercase ${status.textClass}`}>
+        <View className={`flex-row items-center px-3 py-1.5 rounded-lg ${status.bgClass}`}>
+          <MaterialCommunityIcons
+            name={status.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+            size={14}
+            color={status.color}
+          />
+          <Text
+            className={`text-[10px] font-black tracking-widest uppercase ml-1.5 ${status.textClass}`}
+          >
             {status.label}
           </Text>
         </View>
@@ -152,9 +171,7 @@ function ActiveOrderCard({ order, onCancel, onShowAlert }: ActiveOrderCardProps)
               size={14}
               color={getMomentColor(order.reservation?.time_of_day || "LUNCH")}
             />
-            <Text
-              className={`text-sm font-bold moment-${(order.reservation?.time_of_day || "LUNCH").toLowerCase()}`}
-            >
+            <Text className="text-sm font-bold uppercase text-on-surface opacity-80">
               {formatMoment(order.reservation?.time_of_day || "LUNCH", t)}
             </Text>
           </View>
@@ -164,35 +181,50 @@ function ActiveOrderCard({ order, onCancel, onShowAlert }: ActiveOrderCardProps)
       {/* Items List (Premium Style) */}
       <View className="mb-2">
         {order.items && order.items.length > 0 ? (
-          order.items.map((item, idx) => {
-            const service = services.find((s) => Number(s.id) === Number(item.catalog_item_id));
-            const name = service
-              ? getLocalizedName(service.name_i18n)
-              : `${t("orders.itemNumber")}${item.catalog_item_id}`;
-            return (
-              <View
-                key={item.id}
-                className={`flex-row items-center justify-between py-3 ${
-                  idx < order.items.length - 1 ? "border-b border-outline-variant/10" : ""
-                }`}
-              >
-                <Text className="flex-1 text-base font-body text-on-surface">{name}</Text>
-                <View className="flex-row items-center">
-                  <View className="bg-surface-container-high px-2 py-0.5 rounded-lg mr-3">
-                    <Text className="text-[11px] font-display font-black text-on-surface-variant uppercase tracking-tighter">
-                      X{item.quantity}
+          <>
+            {order.items.map((item, idx) => {
+              const service = services.find((s) => Number(s.id) === Number(item.catalog_item_id));
+              const name = service
+                ? getLocalizedName(service.name_i18n)
+                : `${t("orders.itemNumber")}${item.catalog_item_id}`;
+              return (
+                <View
+                  key={item.id}
+                  className={`flex-row items-center justify-between py-3 ${
+                    idx < (order.items?.length || 0) - 1 ? "border-b border-outline-variant/10" : ""
+                  }`}
+                >
+                  <Text className="flex-1 text-base font-body text-on-surface">{name}</Text>
+                  <View className="flex-row items-center">
+                    <View className="bg-surface-container-high px-2 py-0.5 rounded-lg mr-3">
+                      <Text className="text-[11px] font-display font-black text-on-surface-variant uppercase tracking-tighter">
+                        X{item.quantity}
+                      </Text>
+                    </View>
+                    <Text className="text-base font-display font-bold text-on-surface">
+                      ${" "}
+                      {(item.price * item.quantity).toLocaleString(
+                        locale === "es" ? "es-AR" : "en-US",
+                      )}
                     </Text>
                   </View>
-                  <Text className="text-base font-display font-bold text-on-surface">
-                    ${" "}
-                    {(item.price * item.quantity).toLocaleString(
-                      locale === "es" ? "es-AR" : "en-US",
-                    )}
-                  </Text>
                 </View>
-              </View>
-            );
-          })
+              );
+            })}
+
+            {/* Total Row */}
+            <View className="flex-row items-center justify-between mt-2 pt-4 border-t-2 border-outline-variant/30">
+              <Text className="text-lg font-display-black text-on-surface uppercase tracking-tight">
+                {t("common.total")}
+              </Text>
+              <Text className="text-2xl font-display-black text-primary">
+                ${" "}
+                {order.items
+                  .reduce((sum, item) => sum + item.price * item.quantity, 0)
+                  .toLocaleString(locale === "es" ? "es-AR" : "en-US")}
+              </Text>
+            </View>
+          </>
         ) : (
           <Text className="text-sm font-body text-on-surface opacity-40 py-2 italic">
             {t("orders.noItems")}
@@ -295,15 +327,20 @@ function HistoryItem({ order }: HistoryItemProps) {
             size={14}
             color={getMomentColor(order.reservation?.time_of_day || "LUNCH")}
           />
-          <Text
-            className={`text-sm font-bold moment-${(order.reservation?.time_of_day || "LUNCH").toLowerCase()}`}
-          >
+          <Text className="text-sm font-bold uppercase text-on-surface opacity-80">
             {formatMoment(order.reservation?.time_of_day || "LUNCH", t)}
           </Text>
         </View>
 
-        <View className={`px-2 py-0.5 rounded ${status.bgClass}`}>
-          <Text className={`text-[9px] font-black tracking-widest uppercase ${status.textClass}`}>
+        <View className={`flex-row items-center px-2 py-0.5 rounded ${status.bgClass}`}>
+          <MaterialCommunityIcons
+            name={status.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+            size={10}
+            color={status.color}
+          />
+          <Text
+            className={`text-[9px] font-black tracking-widest uppercase ml-1 ${status.textClass}`}
+          >
             {status.label}
           </Text>
         </View>
@@ -312,35 +349,52 @@ function HistoryItem({ order }: HistoryItemProps) {
       {/* Items List */}
       <View>
         {order.items && order.items.length > 0 ? (
-          order.items.map((item, idx) => {
-            const service = services.find((s) => Number(s.id) === Number(item.catalog_item_id));
-            const name = service
-              ? getLocalizedName(service.name_i18n)
-              : `${t("orders.itemNumber")}${item.catalog_item_id}`;
-            return (
-              <View
-                key={item.id}
-                className={`flex-row items-center justify-between py-2 ${
-                  idx < order.items.length - 1 ? "border-b border-outline-variant/5" : ""
-                }`}
-              >
-                <Text className="flex-1 text-sm font-body text-on-surface opacity-90">{name}</Text>
-                <View className="flex-row items-center">
-                  <View className="bg-surface-container-high px-1.5 py-0.5 rounded mr-2">
-                    <Text className="text-[10px] font-display font-black text-on-surface-variant uppercase">
-                      X{item.quantity}
+          <>
+            {order.items.map((item, idx) => {
+              const service = services.find((s) => Number(s.id) === Number(item.catalog_item_id));
+              const name = service
+                ? getLocalizedName(service.name_i18n)
+                : `${t("orders.itemNumber")}${item.catalog_item_id}`;
+              return (
+                <View
+                  key={item.id}
+                  className={`flex-row items-center justify-between py-2 ${
+                    idx < (order.items?.length || 0) - 1 ? "border-b border-outline-variant/5" : ""
+                  }`}
+                >
+                  <Text className="flex-1 text-sm font-body text-on-surface opacity-90">
+                    {name}
+                  </Text>
+                  <View className="flex-row items-center">
+                    <View className="bg-surface-container-high px-1.5 py-0.5 rounded mr-2">
+                      <Text className="text-[10px] font-display font-black text-on-surface-variant uppercase">
+                        X{item.quantity}
+                      </Text>
+                    </View>
+                    <Text className="text-sm font-display font-bold text-on-surface">
+                      ${" "}
+                      {(item.price * item.quantity).toLocaleString(
+                        locale === "es" ? "es-AR" : "en-US",
+                      )}
                     </Text>
                   </View>
-                  <Text className="text-sm font-display font-bold text-on-surface">
-                    ${" "}
-                    {(item.price * item.quantity).toLocaleString(
-                      locale === "es" ? "es-AR" : "en-US",
-                    )}
-                  </Text>
                 </View>
-              </View>
-            );
-          })
+              );
+            })}
+
+            {/* Total Row */}
+            <View className="flex-row items-center justify-between mt-1 pt-2 border-t border-outline-variant/20">
+              <Text className="text-xs font-display-black text-on-surface-variant uppercase">
+                {t("common.total")}
+              </Text>
+              <Text className="text-base font-display-black text-on-surface">
+                ${" "}
+                {order.items
+                  .reduce((sum, item) => sum + item.price * item.quantity, 0)
+                  .toLocaleString(locale === "es" ? "es-AR" : "en-US")}
+              </Text>
+            </View>
+          </>
         ) : (
           <Text className="text-xs font-body text-on-surface opacity-40 italic">
             {t("orders.noItems")}
