@@ -61,8 +61,8 @@ export function ProjectCard({ project, isActive }: ProjectCardProps) {
             <Text className={`text-sm text-on-surface ${secondaryOpacity}`}>
               {t("default_language")}
             </Text>
-            <Text className={`text-sm font-medium text-on-surface ${textOpacity}`}>
-              {project.default_language.toUpperCase()}
+            <Text className={`text-sm font-medium text-on-surface uppercase ${textOpacity}`}>
+              {project.default_language}
             </Text>
           </View>
 
@@ -71,8 +71,8 @@ export function ProjectCard({ project, isActive }: ProjectCardProps) {
             <Text className={`text-sm text-on-surface ${secondaryOpacity}`}>
               {t("supported_languages")}
             </Text>
-            <Text className={`text-sm font-medium text-on-surface ${textOpacity}`}>
-              {project.supported_languages.map((l) => l.toUpperCase()).join(", ")}
+            <Text className={`text-sm font-medium text-on-surface uppercase ${textOpacity}`}>
+              {project.supported_languages.join(", ")}
             </Text>
           </View>
 

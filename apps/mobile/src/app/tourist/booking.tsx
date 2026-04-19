@@ -5,9 +5,15 @@
 
 import { useEffect, useState, useCallback, useMemo, type ComponentProps } from "react";
 import { Text, View, ScrollView, RefreshControl, Platform } from "react-native";
-import * as Haptics from "expo-haptics";
+import {
+  impactAsync,
+  notificationAsync,
+  ImpactFeedbackStyle,
+  NotificationFeedbackType,
+} from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useTranslations } from "../../hooks/useI18n";
+import { formatCurrency, getRelativeDateLabel, isSameDay } from "../../logic/formatters";
 import Screen, { ScreenContent } from "../../components/Screen";
 import LoadingView from "../../components/LoadingView";
 import { ServiceCard } from "../../components/ServiceCard";
@@ -22,7 +28,6 @@ import { COLORS, type Order, type ServiceMoment } from "@repo/shared";
 import type { CatalogServiceItem } from "../../mocks/catalog";
 import { useCartStore } from "../../stores/cart.store";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { Pressable as NativePressable } from "react-native";
 import { SERVICE_MOMENTS } from "../../constants/moments";
 import { Button } from "../../components/Button";
 
@@ -69,31 +74,7 @@ export default function BookingScreen() {
     }
   }, [isAuthenticated, isValidContext, router]);
 
-  const getRelativeDateLabel = (date: Date | null): string => {
-    if (!date) return "";
-
-    const today = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-
-    const isToday =
-      date.getFullYear() === today.getFullYear() &&
-      date.getMonth() === today.getMonth() &&
-      date.getDate() === today.getDate();
-
-    const isTomorrow =
-      date.getFullYear() === tomorrow.getFullYear() &&
-      date.getMonth() === tomorrow.getMonth() &&
-      date.getDate() === tomorrow.getDate();
-
-    if (isToday) return t("orders.today");
-    if (isTomorrow) return t("orders.tomorrow");
-
-    return date.toLocaleDateString("es-AR", {
-      day: "numeric",
-      month: "short",
-    });
-  };
+  const relativeDateLabel = getRelativeDateLabel(selectedDate, t);
 
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -159,14 +140,11 @@ export default function BookingScreen() {
         if (!hasItem) return false;
 
         const oDate = new Date(order.reservation?.service_date || 0);
-        const cDate = new Date(selectedDate!);
-        const isSameDay = oDate.toISOString().split("T")[0] === cDate.toISOString().split("T")[0];
-        const isSameMoment =
-          String(order.reservation?.time_of_day || "")
-            .trim()
-            .toUpperCase() === String(selectedMoment).trim().toUpperCase();
+        if (!selectedDate) return false;
+        const isSameDayResult = isSameDay(oDate, selectedDate);
+        const isSameMoment = order.reservation?.time_of_day === selectedMoment;
 
-        return isSameDay && isSameMoment;
+        return isSameDayResult && isSameMoment;
       });
 
       if (existingOrder) {
@@ -247,7 +225,7 @@ export default function BookingScreen() {
             quantity,
             price: selectedService.price,
           });
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          impactAsync(ImpactFeedbackStyle.Medium);
         }
 
         await fetchOrders();
@@ -441,12 +419,12 @@ export default function BookingScreen() {
                           key={item.catalog_item_id}
                           className="flex-row items-center border-b border-outline-variant/10 last:border-0"
                         >
-                          <NativePressable
+                          <Button
+                            variant="ghost"
                             onPress={() => {
                               if (service) handleServicePress(service);
                             }}
-                            className="flex-1 flex-row items-center justify-between py-1.5"
-                            style={({ pressed }) => (pressed ? { opacity: 0.6 } : {})}
+                            className="flex-1 flex-row items-center justify-between py-1.5 rounded-none"
                           >
                             <View className="flex-1 mr-3">
                               <Text
@@ -462,7 +440,7 @@ export default function BookingScreen() {
                                 x{item.quantity}
                               </Text>
                               <Text className="text-sm font-display font-bold text-on-surface mr-3">
-                                $ {(item.price * item.quantity).toLocaleString("es-AR")}
+                                {formatCurrency(item.price * item.quantity)}
                               </Text>
                               <View className="w-7 h-7 bg-surface-container-high rounded-full items-center justify-center border border-outline-variant/20">
                                 <MaterialCommunityIcons
@@ -472,9 +450,10 @@ export default function BookingScreen() {
                                 />
                               </View>
                             </View>
-                          </NativePressable>
+                          </Button>
 
-                          <NativePressable
+                          <Button
+                            variant="ghost"
                             onPress={() => {
                               setAlertConfig({
                                 visible: true,
@@ -483,31 +462,29 @@ export default function BookingScreen() {
                                 type: "alert",
                                 actions: [
                                   {
-                                    text: t("common.cancel") || "Cancelar",
+                                    text: t("common.cancel"),
                                     style: "cancel",
                                     onPress: () => {},
                                   },
                                   {
-                                    text: t("common.confirm") || "Quitar",
+                                    text: t("common.confirm"),
                                     variant: "danger",
                                     onPress: () => {
                                       removeItem(item.catalog_item_id);
-                                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                      impactAsync(ImpactFeedbackStyle.Light);
                                     },
                                   },
                                 ],
                               });
                             }}
-                            hitSlop={12}
-                            className="p-2 ml-1"
-                            style={({ pressed }) => (pressed ? { opacity: 0.6 } : {})}
+                            className="p-2 ml-1 min-w-0"
                           >
                             <MaterialCommunityIcons
                               name="trash-can-outline"
                               size={18}
                               color={COLORS.error}
                             />
-                          </NativePressable>
+                          </Button>
                         </View>
                       );
                     })}
@@ -515,10 +492,10 @@ export default function BookingScreen() {
                 )}
 
                 <View className="flex-row items-center justify-between mt-1 py-1">
-                  <NativePressable
+                  <Button
+                    variant="ghost"
                     onPress={() => setShowOrderSummary(!showOrderSummary)}
-                    className="flex-row items-center"
-                    style={({ pressed }) => (pressed ? { opacity: 0.7 } : {})}
+                    className="flex-row items-center min-w-0 p-0"
                   >
                     <View>
                       <View className="flex-row items-center gap-1">
@@ -532,17 +509,17 @@ export default function BookingScreen() {
                         />
                       </View>
                       <Text className="text-lg font-display font-bold text-on-surface -mt-1">
-                        $ {totalAmount.toLocaleString("es-AR")}
+                        {formatCurrency(totalAmount)}
                       </Text>
                     </View>
-                  </NativePressable>
+                  </Button>
 
                   <View className="flex-row items-center gap-2">
                     <Button
                       variant="secondary"
                       className="flex-row items-center p-0 px-2.5 h-10 rounded-xl border border-outline-variant/30 bg-surface-container-solid"
                       onPress={() => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        impactAsync(ImpactFeedbackStyle.Light);
                         router.replace("/tourist");
                       }}
                     >
@@ -553,7 +530,7 @@ export default function BookingScreen() {
                         className="opacity-80"
                       />
                       <Text className="text-[9px] font-display font-bold text-on-surface-variant uppercase tracking-tighter ml-1">
-                        {getRelativeDateLabel(selectedDate)}
+                        {relativeDateLabel}
                       </Text>
 
                       <View className="w-[1px] h-3 bg-outline-variant/30 mx-1.5" />
@@ -594,11 +571,12 @@ export default function BookingScreen() {
                               text: t("common.confirm"),
                               variant: "primary",
                               onPress: async () => {
+                                if (!selectedDate || !selectedMoment) return;
                                 setIsSubmitting(true);
                                 try {
                                   const newOrder = await placeOrder(
-                                    selectedDate!,
-                                    selectedMoment!,
+                                    selectedDate,
+                                    selectedMoment,
                                     cartItems.map((i) => ({
                                       catalog_item_id: i.catalog_item_id,
                                       quantity: i.quantity,
@@ -607,9 +585,7 @@ export default function BookingScreen() {
                                   if (newOrder) {
                                     addOrderToStore(newOrder);
                                     clearCart();
-                                    Haptics.notificationAsync(
-                                      Haptics.NotificationFeedbackType.Success,
-                                    );
+                                    notificationAsync(NotificationFeedbackType.Success);
                                     router.push("/tourist/orders");
                                   }
                                 } catch (err) {

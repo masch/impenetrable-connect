@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { Text, View, Modal, Pressable, ScrollView, TextInput } from "react-native";
+import { Text, View, Modal, ScrollView } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import type { ServiceMoment } from "@repo/shared";
 import type { CatalogServiceItem } from "../mocks/catalog";
@@ -12,8 +12,10 @@ import { useTranslations } from "../hooks/useI18n";
 import { CatalogImage } from "./CatalogImage";
 import { Button } from "./Button";
 import { AppAlert } from "./AppAlert";
+import { FormInput } from "./FormInput";
 import { useCartStore } from "../stores/cart.store";
 import { COLORS } from "@repo/shared";
+import { formatCurrency } from "../logic/formatters";
 
 interface ReservationModalProps {
   visible: boolean;
@@ -73,20 +75,20 @@ export function ReservationModal({
     onClose();
   };
 
-  const formatPrice = (price: number) => {
-    return `$ ${price.toLocaleString("es-AR")}`;
-  };
-
   if (!service) return null;
 
   const totalPrice = service.price * quantity;
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
-      <Pressable className="flex-1 justify-end" onPress={handleClose}>
-        <View className="absolute inset-0 bg-black/60" />
+      <View className="flex-1 justify-end">
+        {/* Backdrop overlay - Sibling pattern */}
+        <Button variant="ghost" className="absolute inset-0 rounded-none" onPress={handleClose}>
+          <View className="absolute inset-0 bg-black/60" />
+        </Button>
 
-        <Pressable className="flex-1 bg-surface-solid" onPress={() => {}}>
+        {/* Content Container - View instead of Button */}
+        <View className="flex-1 bg-surface-solid">
           {/* Handle bar */}
           <View className="w-full items-center pt-3 pb-2">
             <View className="w-12 h-1 bg-outline-variant" />
@@ -110,16 +112,16 @@ export function ReservationModal({
                     {getLocalizedName(service.name_i18n)}
                   </Text>
                   <Text className="text-lg font-display font-bold text-primary">
-                    {formatPrice(service.price)}
+                    {formatCurrency(service.price)}
                   </Text>
                 </View>
                 <Text className="text-sm font-body text-on-surface-variant leading-relaxed">
                   {getLocalizedName(service.description_i18n)}
                 </Text>
               </View>
-              <Pressable onPress={handleClose} className="p-2 -mr-2 -mt-1">
+              <Button variant="ghost" onPress={handleClose} className="p-2 -mr-2 -mt-1 min-w-0">
                 <MaterialCommunityIcons name="close" size={24} color={COLORS["on-surface"]} />
-              </Pressable>
+              </Button>
             </View>
           </View>
 
@@ -129,23 +131,25 @@ export function ReservationModal({
               <View className="flex-row items-center justify-between bg-surface-container-low p-4 rounded-2xl border border-outline-variant">
                 {/* Compact Stepper */}
                 <View className="flex-row items-center bg-surface-container-high rounded-full px-1 py-1">
-                  <Pressable
+                  <Button
+                    variant="ghost"
                     onPress={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-10 h-10 items-center justify-center"
+                    className="w-10 h-10 items-center justify-center p-0 rounded-full"
                   >
                     <MaterialCommunityIcons name="minus" size={20} color={COLORS["on-surface"]} />
-                  </Pressable>
+                  </Button>
                   <View className="px-4 items-center min-w-[40px]">
                     <Text className="text-lg font-display font-bold text-on-surface">
                       {quantity}
                     </Text>
                   </View>
-                  <Pressable
+                  <Button
+                    variant="ghost"
                     onPress={() => setQuantity(Math.min(20, quantity + 1))}
-                    className="w-10 h-10 items-center justify-center"
+                    className="w-10 h-10 items-center justify-center p-0 rounded-full"
                   >
                     <MaterialCommunityIcons name="plus" size={20} color={COLORS["on-surface"]} />
-                  </Pressable>
+                  </Button>
                 </View>
 
                 {/* Integrated Total */}
@@ -154,24 +158,22 @@ export function ReservationModal({
                     {t("catalog.reservation.total")}
                   </Text>
                   <Text className="text-xl font-display font-bold text-primary">
-                    {formatPrice(totalPrice)}
+                    {formatCurrency(totalPrice)}
                   </Text>
                 </View>
               </View>
             </View>
 
             {/* Notes input */}
-            <Text className="text-base font-body font-bold text-on-surface mb-3">
-              {t("catalog.reservation.notes")}
-            </Text>
-            <TextInput
-              className="bg-surface-container-low border border-outline-variant p-3 mb-6 h-20 text-base font-body text-on-surface"
+            <FormInput
+              label={t("catalog.reservation.notes")}
               placeholder={t("catalog.reservation.notes_placeholder")}
-              placeholderTextColor={COLORS["on-surface"]}
               value={notes}
               onChangeText={setNotes}
               multiline
+              numberOfLines={4}
               textAlignVertical="top"
+              className="h-28"
             />
           </ScrollView>
 
@@ -200,8 +202,8 @@ export function ReservationModal({
               />
             )}
           </View>
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
 
       <AppAlert
         visible={deleteAlertVisible}

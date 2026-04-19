@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { Button } from "./Button";
 import { useLocale } from "../hooks/useI18n";
 
 const AVAILABLE_LOCALES = [
@@ -19,10 +20,11 @@ export function LanguageSwitcher() {
       {AVAILABLE_LOCALES.map((lang) => {
         const isActive = locale === lang.code;
         return (
-          <Pressable
+          <Button
             key={lang.code}
+            variant="ghost"
             className={`
-              px-4 py-2 min-h-touch
+              px-4 py-2 min-h-touch rounded-none
               ${isActive ? "bg-primary-container" : "bg-surface-container-highest"}
             `}
             onPress={() => setLocale(lang.code)}
@@ -35,7 +37,7 @@ export function LanguageSwitcher() {
             >
               {lang.label}
             </Text>
-          </Pressable>
+          </Button>
         );
       })}
     </View>

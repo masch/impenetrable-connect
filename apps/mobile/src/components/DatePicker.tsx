@@ -5,11 +5,13 @@
 
 import { useState } from "react";
 import { View, Text, Platform } from "react-native";
-import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import { type DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import { AppDateTimePicker } from "./AppDateTimePicker";
 import { useTranslations } from "../hooks/useI18n";
 import { Button } from "./Button";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { COLORS } from "@repo/shared";
+import { formatDate as formatDisplayDate } from "../logic/formatters";
 
 const isWeb = Platform.OS === "web";
 
@@ -45,7 +47,7 @@ export function DatePicker({
   };
 
   const formatDate = (date: Date): string => {
-    return date.toLocaleDateString("es-AR", {
+    return formatDisplayDate(date, {
       weekday: "short",
       day: "numeric",
       month: "short",
@@ -233,7 +235,7 @@ export function DatePicker({
                 name="calendar-month-outline"
                 size={18}
                 color={COLORS["on-surface-variant"]}
-                style={{ opacity: 0.4 }}
+                className="opacity-40"
               />
             )}
             <Text
@@ -254,14 +256,12 @@ export function DatePicker({
 
       {showPicker && (
         <View className="mt-2 items-center">
-          <DateTimePicker
+          <AppDateTimePicker
             value={currentValue}
-            mode="date"
-            display={Platform.OS === "ios" ? "spinner" : "default"}
             onChange={handleChange}
             minimumDate={minimumDate}
             maximumDate={maximumDate}
-            locale="es-AR"
+            display={Platform.OS === "ios" ? "spinner" : "default"}
           />
         </View>
       )}

@@ -149,9 +149,8 @@ export default function RoleSelectorScreen() {
 
           {demoUsersByRole.map((group) => {
             const config = ROLE_CONFIG[group.role];
-            const roleKey = group.role.toLowerCase();
-            const label = t(`role_selector.roles.${roleKey}.label`);
-            const description = t(`role_selector.roles.${roleKey}.description`);
+            const label = t(`role_selector.roles.${group.role}.label`);
+            const description = t(`role_selector.roles.${group.role}.description`);
             return (
               <View key={group.role} className="mb-6">
                 {/* Role Header - Prominent styling */}

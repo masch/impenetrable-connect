@@ -24,6 +24,14 @@ PROVIDER="opencode"
 #   FILE_PATTERNS="*.py"
 #   FILE_PATTERNS="*.go,*.mod"
 FILE_PATTERNS="*.ts,*.tsx,*.js,*.jsx"
+#FILE_PATTERNS="apps/mobile/src/app/*"
+#FILE_PATTERNS="apps/mobile/src/components/*"
+#FILE_PATTERNS="apps/mobile/src/mocks/*"
+#FILE_PATTERNS="apps/mobile/src/services/*"
+#FILE_PATTERNS="apps/mobile/src/logic/*"
+#FILE_PATTERNS="apps/mobile/src/stores/*"
+#FILE_PATTERNS="apps/mobile/src/constants/*"
+
 
 # File patterns to exclude from review (comma-separated)
 # Default: none

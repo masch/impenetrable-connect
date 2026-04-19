@@ -94,10 +94,10 @@
       "confirm_order_title": "¿Confirmar reserva?",
       "confirm_order_message": "Se enviará tu pedido a los emprendedores seleccionados. ¿Deseas continuar?",
       "moments": {
-        "breakfast": "Desayuno",
-        "lunch": "Almuerzo",
-        "snack": "Merienda",
-        "dinner": "Cena"
+        "BREAKFAST": "Desayuno",
+        "LUNCH": "Almuerzo",
+        "SNACK": "Merienda",
+        "DINNER": "Cena"
       }
     },
     "active_order_title": "Detalle del pedido",
@@ -110,15 +110,15 @@
     "each": "c/u"
   },
   "roles": {
-    "tourist": {
+    "TOURIST": {
       "label": "Turista",
       "description": "Explorá el catálogo y hacé pedidos"
     },
-    "entrepreneur": {
+    "ENTREPRENEUR": {
       "label": "Emprendedor",
       "description": "Gestioná solicitudes y tu agenda"
     },
-    "admin": {
+    "ADMIN": {
       "label": "Administrador",
       "description": "Gestioná los proyectos"
     }
@@ -147,6 +147,7 @@
     "confirm": "Confirmar",
     "cancel": "Cancelar pedido",
     "cancelConfirm": "¿Cancelar este pedido?",
+    "cancelTitle": "Cancelar Pedido",
     "canceled": "Pedido cancelado",
     "code": "Código de Reserva",
     "guest_count": "número de personas",
@@ -164,7 +165,9 @@
     "keeping": "No, mantener",
     "noItems": "Sin ítems",
     "itemNumber": "Ítem #",
-    "registeredTourist": "Turista Registrado"
+    "registeredTourist": "Turista Registrado",
+    "registeredVenture": "Emprendimiento Registrado",
+    "notes": "Notas"
   },
   "agenda": {
     "title": "Tu Agenda",
@@ -178,10 +181,10 @@
     "demand_spike": "Pico de demanda detectado para el {{date}}",
     "view_report": "VER REPORTE",
     "moments": {
-      "breakfast": "Desayuno",
-      "lunch": "Almuerzo",
-      "snack": "Merienda",
-      "dinner": "Cena"
+      "BREAKFAST": "Desayuno",
+      "LUNCH": "Almuerzo",
+      "SNACK": "Merienda",
+      "DINNER": "Cena"
     }
   },
   "errors": {
@@ -209,7 +212,9 @@
     "dishes_other": "Platos",
     "today_short": "HOY",
     "tomorrow_short": "MAÑ",
-    "total": "Total"
+    "total": "Total",
+    "yes": "Sí",
+    "no": "No"
   },
   "role_selector": {
     "welcome": "Bienvenido",
@@ -217,15 +222,15 @@
     "create_identity": "Crear mi identidad",
     "register_as_tourist": "Registrarme como turista",
     "roles": {
-      "tourist": {
+      "TOURIST": {
         "label": "Turistas",
         "description": "Explorá servicios turísticos del Chaco"
       },
-      "entrepreneur": {
+      "ENTREPRENEUR": {
         "label": "Emprendedores",
         "description": "Gestioná tus servicios y reservas"
       },
-      "admin": {
+      "ADMIN": {
         "label": "Administradores",
         "description": "Administrá proyectos y emprendedores"
       }

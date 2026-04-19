@@ -30,10 +30,10 @@ describe("RoleSelectorScreen UI (Archetypal Test)", () => {
     // Check main title (using our mock t function which returns the key)
     expect(screen.getByText("role_selector.welcome")).toBeTruthy();
 
-    // Check role labels
-    expect(screen.getByText("role_selector.roles.tourist.label")).toBeTruthy();
-    expect(screen.getByText("role_selector.roles.entrepreneur.label")).toBeTruthy();
-    expect(screen.getByText("role_selector.roles.admin.label")).toBeTruthy();
+    // Check role labels (match the enum-based keys in JSON)
+    expect(screen.getByText("role_selector.roles.TOURIST.label")).toBeTruthy();
+    expect(screen.getByText("role_selector.roles.ENTREPRENEUR.label")).toBeTruthy();
+    expect(screen.getByText("role_selector.roles.ADMIN.label")).toBeTruthy();
 
     // Check that demo users are rendered
     // Tourists (shown by alias)

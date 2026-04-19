@@ -255,23 +255,24 @@ export default function ProjectFormScreen() {
                   </Text>
                   <View className="flex-row gap-2">
                     {formData.supported_languages.map((lang) => (
-                      <View
+                      <Button
                         key={lang}
+                        variant="ghost"
                         className={`
-                          px-5 py-3 min-h-touch cursor-pointer
+                          px-5 py-3 min-h-touch rounded-none
                           ${formData.default_language === lang ? "bg-primary-container" : "bg-surface-container-highest"}
                         `}
-                        onTouchEnd={() => handleDefaultLanguageChange(lang)}
+                        onPress={() => handleDefaultLanguageChange(lang)}
                       >
                         <Text
                           className={`
-                            text-base font-medium
+                            text-base font-medium uppercase
                             ${formData.default_language === lang ? "text-on-primary" : "text-on-surface opacity-50"}
                           `}
                         >
-                          {lang.toUpperCase()}
+                          {lang}
                         </Text>
-                      </View>
+                      </Button>
                     ))}
                   </View>
                 </View>

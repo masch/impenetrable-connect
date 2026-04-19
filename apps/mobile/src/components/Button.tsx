@@ -8,6 +8,7 @@ import {
   ViewStyle,
 } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { COLORS } from "@repo/shared";
 
 interface ButtonVariantStyle {
   container: string;
@@ -31,6 +32,7 @@ interface ButtonProps {
   size?: "default" | "sm";
   accessibilityRole?: AccessibilityRole;
   accessibilityState?: AccessibilityState;
+  accessibilityHint?: string;
   children?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
 }
@@ -78,6 +80,7 @@ export function Button({
   size = "default",
   accessibilityRole,
   accessibilityState,
+  accessibilityHint,
   children,
   textClassName = "",
   style,
@@ -85,13 +88,14 @@ export function Button({
   const styles = variantStyles[variant];
 
   const resolvedIconColor: string | undefined =
-    iconColor || (variant === "primary" ? "white" : undefined);
+    iconColor || (variant === "primary" ? COLORS["on-primary"] : undefined);
 
   return (
     <Pressable
       accessibilityLabel={accessibilityLabel || title || "button"}
       accessibilityRole={accessibilityRole || "button"}
       accessibilityState={accessibilityState}
+      accessibilityHint={accessibilityHint}
       className={`
         ${size === "sm" ? "min-h-[44px] py-1" : "min-h-button"} rounded-lg 
         items-center justify-center flex-row gap-2 ${title || children ? "px-4" : "px-2"}
@@ -113,7 +117,7 @@ export function Button({
                 <MaterialCommunityIcons
                   name={leftIcon}
                   size={20}
-                  color={(pressed ? "on-surface-variant" : resolvedIconColor) as string}
+                  color={pressed ? COLORS["on-surface-variant"] : resolvedIconColor}
                   className={variant === "outline" ? "text-tertiary-container" : ""}
                 />
               )}
@@ -145,7 +149,7 @@ export function Button({
                 <MaterialCommunityIcons
                   name={rightIcon}
                   size={20}
-                  color={(pressed ? "on-surface-variant" : resolvedIconColor) as string}
+                  color={pressed ? COLORS["on-surface-variant"] : resolvedIconColor}
                   className={variant === "outline" ? "text-tertiary-container" : ""}
                 />
               )}

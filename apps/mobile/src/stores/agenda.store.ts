@@ -8,6 +8,7 @@ import type { Order } from "@repo/shared";
 import { logger } from "../services/logger.service";
 import { getMockAgendaOrders } from "../mocks/agenda";
 import { mockGetCurrentUser } from "../services/auth-state";
+import { toISODate } from "../logic/formatters";
 
 interface AgendaState {
   // Data
@@ -36,19 +37,19 @@ export const useAgendaStore = create<AgendaState>((set, get) => ({
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const currentUser = mockGetCurrentUser();
-      const dateStr = date.toLocaleDateString("en-CA"); // Gives YYYY-MM-DD in local time
+      const dateStr = toISODate(date);
 
       const filtered =
         currentUser?.id === "entrepreneur_001"
           ? getMockAgendaOrders().filter(
-              (o) =>
-                (o.reservation?.service_date || new Date()).toLocaleDateString("en-CA") === dateStr,
+              (o) => toISODate(o.reservation?.service_date || new Date()) === dateStr,
             )
           : [];
 
       set({ orders: filtered, isLoading: false });
-    } catch (err) {
-      logger.error("Error fetching agenda", err);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      logger.error("Error fetching agenda", { error: errorMessage });
       set({ error: "Failed to fetch agenda", isLoading: false });
     }
   },

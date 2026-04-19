@@ -94,10 +94,10 @@
       "confirm_order_title": "Confirm reservation?",
       "confirm_order_message": "Your order will be sent to the selected entrepreneurs. Do you want to continue?",
       "moments": {
-        "breakfast": "Breakfast",
-        "lunch": "Lunch",
-        "snack": "Snack",
-        "dinner": "Dinner"
+        "BREAKFAST": "Breakfast",
+        "LUNCH": "Lunch",
+        "SNACK": "Snack",
+        "DINNER": "Dinner"
       }
     },
     "active_order_title": "Order detail",
@@ -110,15 +110,15 @@
     "each": "each"
   },
   "roles": {
-    "tourist": {
+    "TOURIST": {
       "label": "Tourist",
-      "description": "Browse catalog and place orders"
+      "description": "Explore the catalog and place orders"
     },
-    "entrepreneur": {
+    "ENTREPRENEUR": {
       "label": "Entrepreneur",
-      "description": "Manage requests and agenda"
+      "description": "Manage requests and your agenda"
     },
-    "admin": {
+    "ADMIN": {
       "label": "Admin",
       "description": "Manage projects"
     }
@@ -147,6 +147,7 @@
     "confirm": "Confirm",
     "cancel": "Cancel order",
     "cancelConfirm": "Cancel this order?",
+    "cancelTitle": "Cancel Order",
     "canceled": "Order canceled",
     "code": "Reservation Code",
     "guest_count": "number of people",
@@ -164,7 +165,9 @@
     "keeping": "No, keep",
     "noItems": "No items",
     "itemNumber": "Item #",
-    "registeredTourist": "Registered Tourist"
+    "registeredTourist": "Registered Tourist",
+    "registeredVenture": "Registered Venture",
+    "notes": "Notes"
   },
   "agenda": {
     "title": "Your Agenda",
@@ -178,10 +181,10 @@
     "demand_spike": "Demand spike detected for {{date}}",
     "view_report": "VIEW REPORT",
     "moments": {
-      "breakfast": "Breakfast",
-      "lunch": "Lunch",
-      "snack": "Snack",
-      "dinner": "Dinner"
+      "BREAKFAST": "Breakfast",
+      "LUNCH": "Lunch",
+      "SNACK": "Snack",
+      "DINNER": "Dinner"
     }
   },
   "errors": {
@@ -209,7 +212,9 @@
     "dishes_other": "Dishes",
     "today_short": "TODAY",
     "tomorrow_short": "TOM",
-    "total": "Total"
+    "total": "Total",
+    "yes": "Yes",
+    "no": "No"
   },
   "role_selector": {
     "welcome": "Welcome",
@@ -217,15 +222,15 @@
     "create_identity": "Create my identity",
     "register_as_tourist": "Register as a tourist",
     "roles": {
-      "tourist": {
+      "TOURIST": {
         "label": "Tourists",
         "description": "Explore tourist services in the Chaco"
       },
-      "entrepreneur": {
+      "ENTREPRENEUR": {
         "label": "Entrepreneurs",
         "description": "Manage your services and reservations"
       },
-      "admin": {
+      "ADMIN": {
         "label": "Administrators",
         "description": "Manage projects and entrepreneurs"
       }

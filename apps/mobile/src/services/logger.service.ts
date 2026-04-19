@@ -41,8 +41,9 @@ class LoggerService {
     return error;
   }
 
-  private log(entry: LogEntry) {
-    const { level, message, context, error, timestamp } = entry;
+  private log(entry: Omit<LogEntry, "timestamp"> & { timestamp?: string }) {
+    const timestamp = entry.timestamp || new Date().toISOString();
+    const { level, message, context, error } = entry;
     const formattedError = error ? this.formatError(error) : undefined;
 
     // 1. Development Transport (Console)
@@ -69,15 +70,15 @@ class LoggerService {
   }
 
   debug(message: string, context?: Record<string, unknown>) {
-    this.log({ level: "debug", message, context, timestamp: new Date().toISOString() });
+    this.log({ level: "debug", message, context });
   }
 
   info(message: string, context?: Record<string, unknown>) {
-    this.log({ level: "info", message, context, timestamp: new Date().toISOString() });
+    this.log({ level: "info", message, context });
   }
 
   warn(message: string, context?: Record<string, unknown>) {
-    this.log({ level: "warn", message, context, timestamp: new Date().toISOString() });
+    this.log({ level: "warn", message, context });
   }
 
   error(message: string, error: unknown, context?: Record<string, unknown>) {
@@ -86,7 +87,6 @@ class LoggerService {
       message,
       error,
       context,
-      timestamp: new Date().toISOString(),
     });
   }
 }

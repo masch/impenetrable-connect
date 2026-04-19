@@ -6,6 +6,11 @@
 
 - **Language Policy**: ALL technical metadata, including code comments, docstrings, and Git metadata (Commit messages, PR descriptions), MUST be written in **English**. The project's "Technical Esperanto" is English, regardless of the conversation language.
 - **Command Policy: Make-First**: ALWAYS use `make <command>` for ANY development execution. Direct use of `bun`, `npm`, or `yarn` is STRICTLY PROHIBITED. If a required command is missing from the `Makefile`, ASK the user to add it first.
+- **Code Quality & Formatting (Prettier-First Policy)**: ALL code files MUST strictly adhere to the project's `.prettierrc` configuration.
+  - **Tab Width**: 2 spaces.
+  - **Quotes**: Double quotes (`"`) for strings.
+  - **Semicolons**: Always required (`true`).
+  - **Trailing Commas**: Always required for all members (`all`).
 
 ### TypeScript
 
@@ -14,20 +19,28 @@
   - Use `Record<string, unknown>` for generic objects or `unknown` with type guards/narrowing.
   - For store mocks, use `Partial<StoreState>` or specialized mock interfaces.
 - **Immutability**: Use `const` over `let` wherever possible.
-- **Contract Definition**: Prefer `interface` over `type` for objects and service definitions.
+- **Contract Definition (Interface-First Policy)**: ALWAYS use `interface` for object definitions, component props, and service contracts. The use of `type` for simple object definitions is STRICTLY PROHIBITED. `type` is ONLY permitted for Unions, Intersections, Primitives, or Utility Types (e.g., `Omit`, `Pick`) where an `interface` is technically impossible. When using a `type` for a Union of props, all constituent members MUST be defined as `interface` first to maintain extensibility and declaration merging capabilities.
+- **Enum Standardization (Screaming Case Policy)**: ALL Enum members and constant keys intended for logical mapping or comparison MUST use `SCREAMING_SNAKE_CASE`. This ensures direct compatibility with translation keys and consistency across the monorepo.
+  - **Naming**: Enum names should be `PascalCase` (e.g., `UserRole`).
+  - **Members**: Members must be `SCREAMING_SNAKE_CASE` (e.g., `TOURIST`, `SERVICE_MOMENT`).
+  - **Rationale**: This eliminates the need for string transformations (like `.toUpperCase()`) during comparisons or i18n key construction, supporting the Zero-Transformation Policy.
 
 ### React & React Native
 
 - **Functional Components**: Use functional components with hooks only.
-- **Imports**: No legacy `import * as React`. Use named imports (e.g., `import { useState }`).
-- **Button Standardization**: ALWAYS use the centralized `Button` component (`src/components/Button.tsx`) for any actionable button. Manual use of `TouchableOpacity` or `Pressable` for standard action buttons is STRICTLY PROHIBITED.
+- **Imports**: No legacy `import * as Library`. Use named imports (e.g., `import { useState }`, `import { impactAsync }`). This rule is **UNIVERSAL** for all libraries (React, Expo, etc.) to ensure consistency and support effective tree-shaking.
+- **Button Standardization (Zero-Pressable Policy)**: Manual use of `TouchableOpacity` or `Pressable` is STRICTLY PROHIBITED across the entire mobile application, NO EXCEPTIONS. For ANY interactive element—including standard buttons, custom Cards, Date Selectors, or List Items—you MUST use the centralized `Button` component (`src/components/Button.tsx`). Even if you only need a touchable wrapper for a complex layout, use the `children` prop of the `Button` component (with `variant="ghost"` if no styling is needed). This ensures consistent touch feedback, accessibility roles, and centralized interaction management. Using `Pressable` is considered a critical architectural failure.
 - **Accessibility**: All images must have descriptive `alt` text (web) or `accessibilityLabel` (native).
 - **Performance**: Use dynamic components with `FlashList` for long lists and avoid heavy JS-side animations.
 - **Localization (i18n)**:
   - **No defaultValue**: NEVER use the `defaultValue` option in `t()` calls. Missing keys MUST remain visible (showing the key name) to ensure they are detected and fixed during development.
   - **Pluralization**: Use standard i18n pluralization keys (e.g., `one`, `other`) instead of manual ternary operators or conditional strings in the code.
   - **Variables**: Always pass context variables (count, name, etc.) to the translation function instead of hardcoding formatted strings.
-  - **No Post-Processing transformations**: NEVER apply transformations like `.toUpperCase()` or `.toLowerCase()` directly to the result of `t()`. Use CSS utilities (e.g., `uppercase`) for styling. This ensures that missing keys remain clearly visible as `[missing_key]` and are not disguised by case changes.
+    - **Localization & Data (Zero-Transformation Policy)**: ALL data formatting and text transformations are STRICTLY PROHIBITED via native JavaScript methods (`.toUpperCase()`, `.toLocaleString()`, `.toLocaleDateString()`, etc.) directly within components.
+    - **For Display**: ALWAYS use CSS/Tailwind utilities (e.g., `uppercase`, `capitalize`) for text styling.
+    - **For Formatting**: ALWAYS use centralized utility functions (e.g., `formatCurrency`, `formatDate` from `src/logic/formatters.ts`). This ensures a Single Source of Truth (SSoT) for project-wide formatting standards and facilitates future locale changes.
+    - **For Logic**: Data MUST be normalized at the source (API/Store/Enums). Using transformations to compare values is considered an architectural failure.
+    - **Observability**: This ensures translation keys (e.g., `[missing_key]`) remain raw and identifiable in the UI, avoiding "disguised" keys that hinder development.
 - **Loading State Standard**: Every screen that fetches async data MUST use the centralized `LoadingView` component (`src/components/LoadingView.tsx`). Manual use of `ActivityIndicator` for screen-level loading is STRICTLY PROHIBITED. The component handles both the spinner and the `t('loading')` label by default.
 - **JSX Ternary Hygiene**: For large conditional blocks (e.g., wrapping a `ScrollView`), maintain clear indentation and use comments like `} // isLoading` at the end of complex ternary blocks to prevent "Adjacent JSX elements" syntax errors.
 - **AppAlert Standardization**: ALWAYS use the centralized `AppAlert` component (`src/components/AppAlert.tsx`) for any modal confirmation or alert message. Manual use of `Alert.alert` from React Native is STRICTLY PROHIBITED to maintain visual consistency and support the project's premium design system.

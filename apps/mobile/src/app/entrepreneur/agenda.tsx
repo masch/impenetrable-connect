@@ -5,16 +5,16 @@ import Screen, { ScreenContent } from "../../components/Screen";
 import LoadingView from "../../components/LoadingView";
 import { useTranslations } from "../../hooks/useI18n";
 import { useAgendaStore } from "../../stores/agenda.store";
+import { type DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import ReservationCard from "../../components/entrepreneur/ReservationCard";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
-import { getMomentColor, getMomentIcon } from "../../constants/moments";
+import { getMomentConfig, MOMENTS } from "../../constants/moments";
 import { COLORS } from "@repo/shared";
-
-const MOMENTS = ["BREAKFAST", "LUNCH", "SNACK", "DINNER"] as const;
+import { formatDate, isSameDay, toISODate, formatMoment } from "../../logic/formatters";
+import { AppDateTimePicker } from "../../components/AppDateTimePicker";
 
 export default function AgendaScreen() {
-  const { t, locale } = useTranslations();
+  const { t } = useTranslations();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -45,20 +45,23 @@ export default function AgendaScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View className="flex-row pb-2 px-1">
             {days.map((date) => {
-              const isToday = new Date().toDateString() === date.toDateString();
-              const isTomorrow =
-                new Date(Date.now() + 86400000).toDateString() === date.toDateString();
-              const isSelected = date.toDateString() === selectedDate.toDateString();
+              const today = new Date();
+              const tomorrow = new Date();
+              tomorrow.setDate(today.getDate() + 1);
+
+              const isToday = isSameDay(date, today);
+              const isTomorrow = isSameDay(date, tomorrow);
+              const isSelected = isSameDay(date, selectedDate);
 
               const weekdayLabel = isToday
                 ? t("orders.today")
                 : isTomorrow
                   ? t("orders.tomorrow")
-                  : date.toLocaleDateString(locale, { weekday: "short" });
+                  : formatDate(date, { weekday: "short" });
 
               return (
                 <Button
-                  key={date.toISOString()}
+                  key={toISODate(date)}
                   onPress={() => setSelectedDate(date)}
                   className={`mr-3 w-[58px] h-[82px] rounded-3xl border items-center justify-center ${
                     isSelected
@@ -113,7 +116,7 @@ export default function AgendaScreen() {
                             isSelected ? "text-white" : "text-on-surface"
                           }`}
                         >
-                          {date.getDate()}
+                          {formatDate(date, { day: "numeric" })}
                         </Text>
                       </>
                     )}
@@ -134,15 +137,7 @@ export default function AgendaScreen() {
   return (
     <Screen>
       <ScreenContent>
-        {showDatePicker && (
-          <DateTimePicker
-            value={selectedDate}
-            mode="date"
-            display="default"
-            onChange={onDateChange}
-            locale={locale === "es" ? "es-AR" : "en-US"}
-          />
-        )}
+        {showDatePicker && <AppDateTimePicker value={selectedDate} onChange={onDateChange} />}
         {isLoading && orders.length === 0 ? (
           <LoadingView className="py-20" />
         ) : (
@@ -163,8 +158,8 @@ export default function AgendaScreen() {
                 <Text className="text-foreground font-display-bold text-2xl tracking-tight">
                   {t("agenda.title")}
                 </Text>
-                <Text className="text-secondary font-body-medium text-xs mt-0.5">
-                  {selectedDate.toLocaleDateString(locale, { month: "long", year: "numeric" })}
+                <Text className="text-secondary font-body-medium text-xs mt-0.5 capitalize">
+                  {formatDate(selectedDate, { month: "long", year: "numeric" })}
                 </Text>
               </View>
               <Button
@@ -182,50 +177,38 @@ export default function AgendaScreen() {
               const momentOrders = orders.filter((o) => o.reservation?.time_of_day === moment);
               if (momentOrders.length === 0) return null;
 
-              const momentColor = getMomentColor(moment);
-              const momentIcon = getMomentIcon(moment);
+              const config = getMomentConfig(moment);
 
               return (
                 <View key={moment} className="mb-4">
                   <View className="flex-row items-center mb-3.5 px-1">
-                    <View
-                      className="p-2 rounded-xl mr-3"
-                      style={{ backgroundColor: `${momentColor}15` }}
-                    >
+                    <View className={`p-2 rounded-xl mr-3 ${config.bgClass}/15`}>
                       <MaterialCommunityIcons
-                        name={momentIcon as keyof typeof MaterialCommunityIcons.glyphMap}
+                        name={config.icon as keyof typeof MaterialCommunityIcons.glyphMap}
                         size={18}
-                        color={momentColor}
+                        color={config.hex}
                       />
                     </View>
                     <Text
-                      className="font-display-black text-[14px] uppercase tracking-[1.5px]"
-                      style={{ color: momentColor }}
+                      className={`font-display-black text-[14px] uppercase tracking-[1.5px] ${config.textClass}`}
                     >
-                      {(() => {
-                        const momentMap: Record<string, string> = {
-                          BREAKFAST: "catalog.reservation.moments.breakfast",
-                          LUNCH: "catalog.reservation.moments.lunch",
-                          SNACK: "catalog.reservation.moments.snack",
-                          DINNER: "catalog.reservation.moments.dinner",
-                        };
-                        return t(momentMap[moment] || "catalog.reservation.moments.lunch");
-                      })()}
+                      {formatMoment(moment, t)}
                     </Text>
-                    <View
-                      className="h-[0.8px] flex-1 ml-4 opacity-20"
-                      style={{ backgroundColor: momentColor }}
-                    />
+                    <View className={`h-[0.8px] flex-1 ml-4 opacity-20 ${config.bgClass}`} />
                   </View>
                   <View className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 overflow-hidden">
                     {momentOrders.map((order, index) => (
                       <View key={order.id}>
-                        <ReservationCard order={order} hideBorder hideShadow />
+                        <ReservationCard
+                          order={order}
+                          role="entrepreneur"
+                          hideBorder
+                          hideShadow
+                          onAccept={() => {}}
+                          onDecline={() => {}}
+                        />
                         {index < momentOrders.length - 1 && (
-                          <View
-                            className="h-[1px] mx-2"
-                            style={{ backgroundColor: `${momentColor}40` }}
-                          />
+                          <View className={`h-[1px] mx-2 ${config.bgClass}/40`} />
                         )}
                       </View>
                     ))}

@@ -1,8 +1,8 @@
 import { Order } from "@repo/shared";
-import { MARIA_VENTURE_ID } from "./orders.data";
+import { MOCK_VENTURE_WITH_ORDERS } from "./ventures.data";
 import { getAllMockOrders } from "./orders";
 
-export { MARIA_VENTURE_ID };
+export { MOCK_VENTURE_WITH_ORDERS };
 
 /**
  * Mock data for entrepreneur agenda
@@ -15,8 +15,8 @@ export { MARIA_VENTURE_ID };
 export function getMockAgendaOrders(): Order[] {
   return getAllMockOrders().filter(
     (order) =>
-      order.confirmed_venture_id === MARIA_VENTURE_ID ||
+      order.confirmed_venture_id === MOCK_VENTURE_WITH_ORDERS.id ||
       (order.global_status === "OFFER_PENDING" &&
-        order.current_offer_venture_id === MARIA_VENTURE_ID),
+        order.current_offer_venture_id === MOCK_VENTURE_WITH_ORDERS.id),
   );
 }

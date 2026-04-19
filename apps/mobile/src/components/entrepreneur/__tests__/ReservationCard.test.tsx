@@ -8,7 +8,14 @@ describe("ReservationCard", () => {
     const orders = getMockAgendaOrders();
     const order = orders[0];
     const totalQuantity = order.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-    render(<ReservationCard order={order} />);
+    render(
+      <ReservationCard
+        order={order}
+        role="entrepreneur"
+        onAccept={() => {}}
+        onDecline={() => {}}
+      />,
+    );
 
     if (order.items && order.items.length > 0) {
       // Check for item name instead of ID
@@ -25,7 +32,14 @@ describe("ReservationCard", () => {
       ...mockOrder,
       notes: "Extra napkins please",
     };
-    render(<ReservationCard order={orderWithNotes} />);
+    render(
+      <ReservationCard
+        order={orderWithNotes}
+        role="entrepreneur"
+        onAccept={() => {}}
+        onDecline={() => {}}
+      />,
+    );
     expect(screen.getByText("Extra napkins please")).toBeTruthy();
   });
 });

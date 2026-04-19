@@ -1,10 +1,12 @@
 import { Text, TextInput, View, TextInputProps } from "react-native";
+import { COLORS } from "@repo/shared";
 
-interface FormInputProps extends Omit<TextInputProps, "className"> {
+interface FormInputProps extends TextInputProps {
   label: string;
   error?: string;
   helperText?: string;
   required?: boolean;
+  className?: string;
 }
 
 export function FormInput({
@@ -16,6 +18,7 @@ export function FormInput({
   onChangeText,
   keyboardType,
   placeholder,
+  className = "",
   ...rest
 }: FormInputProps) {
   return (
@@ -28,12 +31,13 @@ export function FormInput({
         className={`
           bg-surface-container-highest p-4 min-h-touch
           ${error ? "border-2 border-error-container" : "border-2 border-transparent"}
+          ${className}
         `}
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
         placeholder={placeholder}
-        placeholderTextColor="text-on-surface opacity-40"
+        placeholderTextColor={COLORS["on-surface-variant"]}
         {...rest}
       />
       {helperText && <Text className="text-xs text-on-surface opacity-60 mt-1">{helperText}</Text>}

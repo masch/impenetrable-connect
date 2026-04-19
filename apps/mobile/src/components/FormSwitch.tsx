@@ -1,4 +1,5 @@
-import { Text, View, Pressable } from "react-native";
+import { Text, View } from "react-native";
+import { Button } from "./Button";
 
 interface FormSwitchProps {
   label: string;
@@ -24,7 +25,11 @@ export function FormSwitch({ label, value, onValueChange }: FormSwitchProps) {
         </View>
 
         {/* Tap area overlay */}
-        <Pressable className="absolute inset-0" onPress={() => onValueChange(!value)} />
+        <Button
+          variant="ghost"
+          className="absolute inset-0 p-0 rounded-none"
+          onPress={() => onValueChange(!value)}
+        />
       </View>
     </View>
   );

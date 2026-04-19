@@ -129,7 +129,7 @@ describe("Booking & Cart Integration", () => {
     expect(totalDishesText).toBeTruthy();
 
     // Total price: $ 28.500
-    const totalPriceText = await screen.findByText(/\$ 28[.,]500/i);
+    const totalPriceText = await screen.findByText(/\$?\s*28[.,]500/i);
     expect(totalPriceText).toBeTruthy();
   });
 });

@@ -1,4 +1,4 @@
-import { Modal, Pressable, Text, View, ScrollView } from "react-native";
+import { Modal, Text, View, ScrollView } from "react-native";
 import { Button } from "./Button";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../hooks/useI18n";
@@ -55,31 +55,32 @@ export function AppAlert({
     }
   };
 
-  const iconConfig = getIconConfig();
+  const { name, color, bg } = getIconConfig();
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable
-        className="flex-1 justify-center items-center px-6"
-        onPress={onClose}
-        accessibilityLabel={t("common.cancel")}
-        accessibilityHint={t("common.cancel")}
-      >
-        {/* Backdrop overlay */}
-        <View className="absolute inset-0 bg-black/60" />
-
-        <Pressable
-          className="w-full max-w-[340px] p-6 rounded-[32px] border border-outline-variant shadow-2xl bg-surface-solid"
-          onPress={(e) => e.stopPropagation()}
+      <View className="flex-1 justify-center items-center px-6">
+        {/* Backdrop overlay - Now a sibling to avoid nesting buttons in HTML */}
+        <Button
+          variant="ghost"
+          className="absolute inset-0 rounded-none"
+          onPress={onClose}
+          accessibilityLabel={t("common.cancel")}
+          accessibilityHint={t("common.cancel")}
         >
+          <View className="absolute inset-0 bg-black/60" />
+        </Button>
+
+        {/* Content - Non-clickable View container */}
+        <View className="w-full max-w-[340px] p-6 rounded-[32px] border border-outline-variant shadow-2xl bg-surface-solid">
           {/* Icon / Brand mark */}
           <View className="items-center mb-4">
             <View
-              className={`w-14 h-14 ${iconConfig.bg} rounded-full items-center justify-center`}
+              className={`w-14 h-14 ${bg} rounded-full items-center justify-center`}
               accessibilityLabel={t(`common.${type}`)}
               accessibilityRole="image"
             >
-              <MaterialCommunityIcons name={iconConfig.name} size={32} color={iconConfig.color} />
+              <MaterialCommunityIcons name={name} size={32} color={color} />
             </View>
           </View>
 
@@ -109,8 +110,8 @@ export function AppAlert({
               />
             ))}
           </View>
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 }

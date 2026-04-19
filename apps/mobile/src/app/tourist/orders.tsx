@@ -6,408 +6,19 @@
 import { useEffect, useCallback, useState, type ComponentProps } from "react";
 import { useRouter } from "expo-router";
 import { View, Text, ScrollView, RefreshControl } from "react-native";
+import { Button } from "../../components/Button";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../../hooks/useI18n";
 import Screen, { ScreenContent } from "../../components/Screen";
 import LoadingView from "../../components/LoadingView";
 import { AppAlert } from "../../components/AppAlert";
-import { SegmentedControl } from "../../components/ui/SegmentedControl";
 import { useReservationStore } from "../../stores/reservation.store";
 import { useAuthStore } from "../../stores/auth.store";
 import { useCatalogStore } from "../../stores/catalog.store";
-import { Button } from "../../components/Button";
-import { getMomentIcon, getMomentColor } from "../../constants/moments";
-import { type Order, type OrderStatus, COLORS } from "@repo/shared";
-
-interface StatusUIConfig {
-  label: string;
-  bgClass: string;
-  textClass: string;
-  icon: string;
-  color: string;
-}
-
-// Status badge mapping - labels come from i18n
-const getStatusConfig = (t: (key: string) => string): Record<OrderStatus, StatusUIConfig> => ({
-  SEARCHING: {
-    label: t("orders.status.searching"),
-    bgClass: "bg-status-searching/10",
-    textClass: "text-status-searching",
-    icon: "magnify",
-    color: COLORS["status-searching"],
-  },
-  OFFER_PENDING: {
-    label: t("orders.status.offer_pending"),
-    bgClass: "bg-status-pending/15",
-    textClass: "text-status-pending",
-    icon: "clock-outline",
-    color: COLORS["status-pending"],
-  },
-  CONFIRMED: {
-    label: t("orders.status.confirmed"),
-    bgClass: "bg-secondary/15",
-    textClass: "text-secondary",
-    icon: "check-circle-outline",
-    color: COLORS.secondary,
-  },
-  COMPLETED: {
-    label: t("orders.status.completed"),
-    bgClass: "bg-surface-container-highest",
-    textClass: "text-on-surface opacity-60",
-    icon: "check-all",
-    color: COLORS["on-surface-variant"],
-  },
-  CANCELLED: {
-    label: t("orders.status.cancelled"),
-    bgClass: "bg-error/15",
-    textClass: "text-error",
-    icon: "close-circle-outline",
-    color: COLORS.error,
-  },
-  NO_SHOW: {
-    label: t("orders.status.noShow"),
-    bgClass: "bg-error/15",
-    textClass: "text-error",
-    icon: "close-circle-outline",
-    color: COLORS.error,
-  },
-  EXPIRED: {
-    label: t("orders.status.expired"),
-    bgClass: "bg-on-surface-variant/15",
-    textClass: "text-on-surface-variant",
-    icon: "calendar-remove",
-    color: COLORS["on-surface-variant"],
-  },
-});
-
-// Format service moment for display using i18n
-function formatMoment(moment: string, t: (key: string) => string): string {
-  const keyMap: Record<string, string> = {
-    BREAKFAST: "catalog.reservation.moments.breakfast",
-    LUNCH: "catalog.reservation.moments.lunch",
-    SNACK: "catalog.reservation.moments.snack",
-    DINNER: "catalog.reservation.moments.dinner",
-  };
-  const key = keyMap[moment as keyof typeof keyMap];
-  return key ? t(key) : moment;
-}
-
-// Format date for display
-function formatDate(date: Date, locale: string): string {
-  // Use locale mapping for Intl.DateTimeFormat (es-AR, en-US, etc.)
-  const localeMap: Record<string, string> = {
-    es: "es-AR",
-    en: "en-US",
-  };
-  const fullLocale = localeMap[locale] || "es-AR";
-  return date.toLocaleDateString(fullLocale, {
-    day: "numeric",
-    month: "short",
-  });
-}
-
-// Active Order Card Component
-interface ActiveOrderCardProps {
-  order: Order;
-  onCancel: (orderId: number) => void;
-  onShowAlert: (config: Omit<ComponentProps<typeof AppAlert>, "onClose">) => void;
-}
-
-function ActiveOrderCard({ order, onCancel, onShowAlert }: ActiveOrderCardProps) {
-  const { t, locale, getLocalizedName } = useTranslations();
-  const statusConfig = getStatusConfig(t);
-  const status = statusConfig[order.global_status];
-  const showCancelButton = order.global_status === "SEARCHING";
-  const services = useCatalogStore((state) => state.services);
-
-  // Helper to get relative date label
-  const getRelativeDateLabel = (date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const checkDate = new Date(date);
-    checkDate.setHours(0, 0, 0, 0);
-
-    if (checkDate.getTime() === today.getTime()) return t("orders.today");
-    if (checkDate.getTime() === tomorrow.getTime()) return t("orders.tomorrow");
-    return formatDate(date, locale);
-  };
-
-  return (
-    <View className="bg-surface-container-lowest rounded-xl p-4 mb-4 shadow-sm">
-      {/* Top Row: Status and Date/Moment */}
-      <View className="flex-row items-center justify-between mb-4">
-        <View className={`flex-row items-center px-3 py-1.5 rounded-lg ${status.bgClass}`}>
-          <MaterialCommunityIcons
-            name={status.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-            size={14}
-            color={status.color}
-          />
-          <Text
-            className={`text-[10px] font-black tracking-widest uppercase ml-1.5 ${status.textClass}`}
-          >
-            {status.label}
-          </Text>
-        </View>
-
-        <View className="flex-row items-center gap-3">
-          <View className="flex-row items-center gap-1.5">
-            <MaterialCommunityIcons
-              name="calendar"
-              size={14}
-              color={COLORS["on-surface-variant"]}
-              className="opacity-60"
-            />
-            <Text className="text-sm font-bold text-on-surface opacity-80">
-              {getRelativeDateLabel(order.reservation?.service_date || new Date())}
-            </Text>
-          </View>
-          <View className="flex-row items-center gap-1.5">
-            <MaterialCommunityIcons
-              name={
-                getMomentIcon(
-                  order.reservation?.time_of_day || "LUNCH",
-                ) as keyof typeof MaterialCommunityIcons.glyphMap
-              }
-              size={14}
-              color={getMomentColor(order.reservation?.time_of_day || "LUNCH")}
-            />
-            <Text className="text-sm font-bold uppercase text-on-surface opacity-80">
-              {formatMoment(order.reservation?.time_of_day || "LUNCH", t)}
-            </Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Items List (Premium Style) */}
-      <View className="mb-2">
-        {order.items && order.items.length > 0 ? (
-          <>
-            {order.items.map((item, idx) => {
-              const service = services.find((s) => Number(s.id) === Number(item.catalog_item_id));
-              const name = service
-                ? getLocalizedName(service.name_i18n)
-                : `${t("orders.itemNumber")}${item.catalog_item_id}`;
-              return (
-                <View
-                  key={item.id}
-                  className={`flex-row items-center justify-between py-3 ${
-                    idx < (order.items?.length || 0) - 1 ? "border-b border-outline-variant/10" : ""
-                  }`}
-                >
-                  <Text className="flex-1 text-base font-body text-on-surface">{name}</Text>
-                  <View className="flex-row items-center">
-                    <View className="items-end mr-3">
-                      <Text className="text-on-surface-variant font-body-medium text-xs">
-                        {item.quantity}
-                        {item.quantity > 1 && ` x $${item.price.toLocaleString()}`}
-                      </Text>
-                    </View>
-                    <Text className="text-base font-display-bold text-on-surface min-w-[80px] text-right">
-                      ${" "}
-                      {(item.price * item.quantity).toLocaleString(
-                        locale === "es" ? "es-AR" : "en-US",
-                      )}
-                    </Text>
-                  </View>
-                </View>
-              );
-            })}
-
-            {/* Total Row */}
-            <View className="flex-row items-center justify-between mt-2 pt-4 border-t-2 border-outline-variant/30">
-              <Text className="text-lg font-display-black text-on-surface uppercase tracking-tight">
-                {t("common.total")}
-              </Text>
-              <Text className="text-2xl font-display-black text-primary">
-                ${" "}
-                {order.items
-                  .reduce((sum, item) => sum + item.price * item.quantity, 0)
-                  .toLocaleString(locale === "es" ? "es-AR" : "en-US")}
-              </Text>
-            </View>
-          </>
-        ) : (
-          <Text className="text-sm font-body text-on-surface opacity-40 py-2 italic">
-            {t("orders.noItems")}
-          </Text>
-        )}
-      </View>
-
-      {/* Confirmation code (if confirmed) */}
-      {order.global_status === "CONFIRMED" && order.confirmed_venture_id && (
-        <View className="flex-row items-center gap-2 mt-2 mb-2">
-          <MaterialCommunityIcons name="check-circle" size={18} color={COLORS.secondary} />
-          <Text className="text-sm font-body text-secondary font-bold">
-            {t("orders.status.confirmed")}
-          </Text>
-        </View>
-      )}
-
-      {/* Cancel Button */}
-      {showCancelButton && (
-        <Button
-          variant="danger"
-          title={t("orders.cancel")}
-          onPress={() => {
-            onShowAlert({
-              visible: true,
-              title: t("orders.cancel"),
-              message: t("orders.cancelConfirm"),
-              type: "alert",
-              actions: [
-                {
-                  text: t("orders.keeping"),
-                  style: "cancel",
-                  onPress: () => {},
-                },
-                {
-                  text: t("orders.confirmCancel"),
-                  variant: "danger",
-                  onPress: () => onCancel(order.id),
-                },
-              ],
-            });
-          }}
-          className="mt-4"
-        />
-      )}
-    </View>
-  );
-}
-
-// History Item Component
-interface HistoryItemProps {
-  order: Order;
-}
-
-function HistoryItem({ order }: HistoryItemProps) {
-  const { t, locale, getLocalizedName } = useTranslations();
-  const statusConfig = getStatusConfig(t);
-  const status = statusConfig[order.global_status];
-  const services = useCatalogStore((state) => state.services);
-
-  const getRelativeDateLabel = (date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    const checkDate = new Date(date);
-    checkDate.setHours(0, 0, 0, 0);
-
-    if (checkDate.getTime() === today.getTime()) return t("orders.today");
-    if (checkDate.getTime() === tomorrow.getTime()) return t("orders.tomorrow");
-    if (checkDate.getTime() === yesterday.getTime()) return t("orders.yesterday");
-    return formatDate(date, locale);
-  };
-
-  return (
-    <View className="bg-surface-container-lowest rounded-xl p-4 mb-3">
-      {/* Header: Date and Moment */}
-      <View className="flex-row items-center justify-between mb-3 border-b border-outline-variant/10 pb-2">
-        <View className="flex-row items-center gap-2">
-          <MaterialCommunityIcons
-            name="calendar"
-            size={14}
-            color={COLORS["on-surface-variant"]}
-            className="opacity-60"
-          />
-          <Text className="text-sm font-bold text-on-surface opacity-80">
-            {getRelativeDateLabel(order.reservation?.service_date || new Date())}
-          </Text>
-          <View className="w-[1px] h-3 bg-outline-variant/30 mx-1" />
-          <MaterialCommunityIcons
-            name={
-              getMomentIcon(
-                order.reservation?.time_of_day || "LUNCH",
-              ) as keyof typeof MaterialCommunityIcons.glyphMap
-            }
-            size={14}
-            color={getMomentColor(order.reservation?.time_of_day || "LUNCH")}
-          />
-          <Text className="text-sm font-bold uppercase text-on-surface opacity-80">
-            {formatMoment(order.reservation?.time_of_day || "LUNCH", t)}
-          </Text>
-        </View>
-
-        <View className={`flex-row items-center px-2 py-0.5 rounded ${status.bgClass}`}>
-          <MaterialCommunityIcons
-            name={status.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-            size={10}
-            color={status.color}
-          />
-          <Text
-            className={`text-[9px] font-black tracking-widest uppercase ml-1 ${status.textClass}`}
-          >
-            {status.label}
-          </Text>
-        </View>
-      </View>
-
-      {/* Items List */}
-      <View>
-        {order.items && order.items.length > 0 ? (
-          <>
-            {order.items.map((item, idx) => {
-              const service = services.find((s) => Number(s.id) === Number(item.catalog_item_id));
-              const name = service
-                ? getLocalizedName(service.name_i18n)
-                : `${t("orders.itemNumber")}${item.catalog_item_id}`;
-              return (
-                <View
-                  key={item.id}
-                  className={`flex-row items-center justify-between py-2 ${
-                    idx < (order.items?.length || 0) - 1 ? "border-b border-outline-variant/5" : ""
-                  }`}
-                >
-                  <Text className="flex-1 text-sm font-body text-on-surface opacity-90">
-                    {name}
-                  </Text>
-                  <View className="flex-row items-center">
-                    <View className="items-end mr-3">
-                      <Text className="text-on-surface-variant font-body-medium text-xs">
-                        {item.quantity}
-                        {item.quantity > 1 && ` x $${item.price.toLocaleString()}`}
-                      </Text>
-                    </View>
-                    <Text className="text-on-surface font-display-bold text-base min-w-[80px] text-right">
-                      ${" "}
-                      {(item.price * item.quantity).toLocaleString(
-                        locale === "es" ? "es-AR" : "en-US",
-                      )}
-                    </Text>
-                  </View>
-                </View>
-              );
-            })}
-
-            {/* Total Row */}
-            <View className="flex-row items-center justify-between mt-1 pt-2 border-t border-outline-variant/20">
-              <Text className="text-xs font-display-black text-on-surface-variant uppercase">
-                {t("common.total")}
-              </Text>
-              <Text className="text-base font-display-black text-on-surface">
-                ${" "}
-                {order.items
-                  .reduce((sum, item) => sum + item.price * item.quantity, 0)
-                  .toLocaleString(locale === "es" ? "es-AR" : "en-US")}
-              </Text>
-            </View>
-          </>
-        ) : (
-          <Text className="text-xs font-body text-on-surface opacity-40 italic">
-            {t("orders.noItems")}
-          </Text>
-        )}
-      </View>
-    </View>
-  );
-}
+import { getMomentConfig, MOMENTS } from "../../constants/moments";
+import { type Order, COLORS } from "@repo/shared";
+import { formatDate, isSameDay, toISODate, formatMoment } from "../../logic/formatters";
+import ReservationCard from "../../components/entrepreneur/ReservationCard";
 
 // Empty State Component
 interface EmptyStateProps {
@@ -446,16 +57,12 @@ function EmptyState({ type }: EmptyStateProps) {
 export default function OrderScreen() {
   const router = useRouter();
   const { t } = useTranslations();
-  const {
-    activeOrders,
-    historyOrders,
-    isLoading,
-    error,
-    selectedTab,
-    fetchOrders,
-    cancelOrder,
-    setTab,
-  } = useReservationStore();
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const { activeOrders, historyOrders, isLoading, error, fetchOrders, cancelOrder } =
+    useReservationStore();
+
+  const allOrders = [...activeOrders, ...historyOrders];
 
   const fetchServices = useCatalogStore((state) => state.fetchServices);
   const services = useCatalogStore((state) => state.services);
@@ -490,40 +97,153 @@ export default function OrderScreen() {
     setRefreshing(false);
   }, [fetchOrders]);
 
-  const handleTabChange = (index: number) => {
-    setTab(index === 0 ? "active" : "history");
+  // Filter orders based on selected date
+  const filteredOrders = allOrders.filter((o) => {
+    if (!o.reservation?.service_date) return false;
+    const orderDate = new Date(o.reservation.service_date);
+    return isSameDay(orderDate, selectedDate);
+  });
+
+  // Group orders by date and then moment for a more "Agenda" feel
+  const groupOrdersByDate = (orders: Order[]) => {
+    const groups: Record<string, Order[]> = {};
+    orders.forEach((order) => {
+      const date = new Date(order.reservation?.service_date || new Date());
+      const dateStr = toISODate(date);
+      if (!groups[dateStr]) groups[dateStr] = [];
+      groups[dateStr].push(order);
+    });
+    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
   };
 
-  const isActiveTab = selectedTab === "active";
-  const displayedOrders = isActiveTab ? activeOrders : historyOrders;
+  const groupedOrders = groupOrdersByDate(filteredOrders);
+
+  // Render horizontal date selector like the agenda
+  const renderDateSelector = () => {
+    const days = [0, 1, 2, 3, 4, 5, 6].map((offset) => {
+      const date = new Date();
+      date.setDate(date.getDate() + offset);
+      return date;
+    });
+
+    return (
+      <View className="mb-6">
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View className="flex-row pb-2 px-1">
+            {days.map((date) => {
+              const today = new Date();
+              const tomorrow = new Date();
+              tomorrow.setDate(today.getDate() + 1);
+
+              const isToday = isSameDay(date, today);
+              const isTomorrow = isSameDay(date, tomorrow);
+              const isSelected = isSameDay(date, selectedDate);
+
+              const weekdayLabel = isToday
+                ? t("orders.today")
+                : isTomorrow
+                  ? t("orders.tomorrow")
+                  : formatDate(date, { weekday: "short" });
+
+              return (
+                <Button
+                  key={toISODate(date)}
+                  onPress={() => setSelectedDate(date)}
+                  variant="ghost"
+                  className="mr-3"
+                >
+                  <View
+                    className={`w-[58px] h-[82px] rounded-3xl border items-center justify-center overflow-hidden ${
+                      isSelected
+                        ? "bg-primary border-primary shadow-lg"
+                        : isToday
+                          ? "bg-secondary/10 border-secondary/40"
+                          : "bg-surface-container-lowest border-outline-variant/30"
+                    }`}
+                  >
+                    <View className="items-center justify-center flex-1">
+                      {isToday || isTomorrow ? (
+                        <>
+                          <View
+                            className={`p-1.5 rounded-full mb-1 ${isSelected ? "bg-white/20" : isToday ? "bg-secondary/20" : "bg-primary/10"}`}
+                          >
+                            <MaterialCommunityIcons
+                              name={isToday ? "star" : "calendar-arrow-right"}
+                              size={22}
+                              color={
+                                isSelected
+                                  ? COLORS["on-primary"]
+                                  : isToday
+                                    ? COLORS.secondary
+                                    : COLORS.primary
+                              }
+                            />
+                          </View>
+                          <Text
+                            className={`font-display-black text-[9px] uppercase tracking-[0.5px] ${
+                              isSelected
+                                ? "text-white"
+                                : isToday
+                                  ? "text-secondary"
+                                  : "text-on-surface-variant"
+                            }`}
+                          >
+                            {isToday ? t("common.today_short") : t("common.tomorrow_short")}
+                          </Text>
+                        </>
+                      ) : (
+                        <>
+                          <Text
+                            className={`font-display-black text-[12px] uppercase ${isSelected ? "text-white" : "text-on-surface-variant"}`}
+                          >
+                            {weekdayLabel}
+                          </Text>
+                          <Text
+                            className={`font-display-black text-[20px] ${isSelected ? "text-white" : "text-on-surface"}`}
+                          >
+                            {date.getDate()}
+                          </Text>
+                        </>
+                      )}
+                    </View>
+                  </View>
+                </Button>
+              );
+            })}
+          </View>
+        </ScrollView>
+      </View>
+    );
+  };
+
+  // Resolve venture name from enriched order data
+  const getVentureName = (order: Order) => {
+    return order.confirmed_venture?.name;
+  };
 
   return (
     <Screen>
       <ScreenContent>
-        <View className="py-6">
-          <Text className="text-3xl font-display font-bold text-on-surface">
+        <View className="py-4">
+          <Text className="text-foreground font-display-bold text-3xl tracking-tight">
             {t("orders.title")}
           </Text>
         </View>
-        <View className="mb-6">
-          <SegmentedControl
-            segments={[
-              { label: `${t("orders.active")} (${activeOrders.length})` },
-              { label: `${t("orders.history")} (${historyOrders.length})` },
-            ]}
-            selectedIndex={isActiveTab ? 0 : 1}
-            onChange={handleTabChange}
-          />
-        </View>
+
+        {renderDateSelector()}
+
         {error && (
           <View className="bg-error-container p-4 mb-4 rounded-lg">
             <Text className="text-base font-body text-on-error-container">{error}</Text>
           </View>
         )}
-        {isLoading && displayedOrders.length === 0 ? (
+
+        {isLoading && filteredOrders.length === 0 ? (
           <LoadingView className="py-20" />
         ) : (
           <ScrollView
+            className="flex-1 bg-surface-container-low rounded-t-3xl"
+            contentContainerClassName="pt-6 pb-10 px-2"
             showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl
@@ -533,31 +253,72 @@ export default function OrderScreen() {
               />
             }
           >
-            {isActiveTab && (
-              <>
-                {activeOrders.length > 0 ? (
-                  activeOrders.map((order) => (
-                    <ActiveOrderCard
-                      key={order.id}
-                      order={order}
-                      onCancel={cancelOrder}
-                      onShowAlert={setAlertConfig}
-                    />
-                  ))
-                ) : (
-                  <EmptyState type="active" />
-                )}
-              </>
-            )}
+            {filteredOrders.length > 0 ? (
+              groupedOrders.map(([dateStr, dayOrders]) => (
+                <View key={dateStr} className="mb-8">
+                  {MOMENTS.map((moment) => {
+                    const momentOrders = dayOrders.filter(
+                      (o) => o.reservation?.time_of_day === moment,
+                    );
+                    if (momentOrders.length === 0) return null;
 
-            {!isActiveTab && (
-              <>
-                {historyOrders.length > 0 ? (
-                  historyOrders.map((order) => <HistoryItem key={order.id} order={order} />)
-                ) : (
-                  <EmptyState type="history" />
-                )}
-              </>
+                    const config = getMomentConfig(moment);
+
+                    return (
+                      <View key={moment} className="mb-6">
+                        <View className="flex-row items-center mb-4 px-2">
+                          <View className={`p-1.5 rounded-lg mr-3 ${config.bgClass}/15`}>
+                            <MaterialCommunityIcons
+                              name={config.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+                              size={18}
+                              color={config.hex}
+                            />
+                          </View>
+                          <Text className="font-display-bold text-lg text-on-surface">
+                            {formatMoment(moment, t)}
+                          </Text>
+                        </View>
+
+                        {momentOrders.map((order, index) => (
+                          <View key={order.id} className="mb-4">
+                            <ReservationCard
+                              order={order}
+                              role="tourist"
+                              title={getVentureName(order)}
+                              hideBorder
+                              hideShadow
+                              onCancel={() => {
+                                setAlertConfig({
+                                  visible: true,
+                                  title: t("orders.cancelTitle"),
+                                  message: t("orders.cancelConfirm"),
+                                  actions: [
+                                    {
+                                      text: t("common.no"),
+                                      style: "cancel",
+                                      onPress: () => {},
+                                    },
+                                    {
+                                      text: t("common.yes"),
+                                      onPress: () => cancelOrder(order.id),
+                                      style: "destructive",
+                                    },
+                                  ],
+                                });
+                              }}
+                            />
+                            {index < momentOrders.length - 1 && (
+                              <View className={`h-[1px] mx-4 ${config.bgClass}/20`} />
+                            )}
+                          </View>
+                        ))}
+                      </View>
+                    );
+                  })}
+                </View>
+              ))
+            ) : (
+              <EmptyState type="active" />
             )}
           </ScrollView>
         )}

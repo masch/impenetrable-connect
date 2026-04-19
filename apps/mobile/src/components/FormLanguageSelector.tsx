@@ -1,4 +1,5 @@
-import { Text, View, Pressable } from "react-native";
+import { Text, View } from "react-native";
+import { Button } from "./Button";
 import { Language } from "@repo/shared";
 
 interface FormLanguageSelectorProps {
@@ -23,23 +24,24 @@ export function FormLanguageSelector({
         {availableLanguages.map((lang) => {
           const isSelected = selectedLanguages.includes(lang);
           return (
-            <Pressable
+            <Button
               key={lang}
+              variant="ghost"
               className={`
-                px-5 py-3 min-h-touch
+                px-5 py-3 min-h-touch rounded-none
                 ${isSelected ? "bg-primary-container" : "bg-surface-container-highest"}
               `}
               onPress={() => onToggle(lang)}
             >
               <Text
                 className={`
-                  text-base font-medium
+                  text-base font-medium uppercase
                   ${isSelected ? "text-on-primary" : "text-on-surface opacity-50"}
                 `}
               >
-                {lang.toUpperCase()}
+                {lang}
               </Text>
-            </Pressable>
+            </Button>
           );
         })}
       </View>

@@ -8,8 +8,8 @@ import { useReservationStore } from "../../stores/reservation.store";
 import { SERVICE_MOMENTS } from "../../constants/moments";
 import { DatePicker } from "../../components/DatePicker";
 import { Button } from "../../components/Button";
-import { COLORS } from "@repo/shared";
-import { ServiceMoment, Order } from "@repo/shared";
+import { COLORS, ServiceMoment, Order } from "@repo/shared";
+import { isSameDay } from "../../logic/formatters";
 import Screen, { ScreenContent } from "../../components/Screen";
 
 export default function OrderSetupScreen() {
@@ -28,23 +28,17 @@ export default function OrderSetupScreen() {
 
     // Detect if we need to move existing items to a new context
     const hasContextChanged =
-      (selectedDate &&
-        (date.getFullYear() !== selectedDate.getFullYear() ||
-          date.getMonth() !== selectedDate.getMonth() ||
-          date.getDate() !== selectedDate.getDate())) ||
+      (selectedDate && !isSameDay(date, selectedDate)) ||
       (selectedMoment && moment !== selectedMoment);
 
     if (hasContextChanged && selectedDate && selectedMoment) {
       // Find orders in the PREVIOUS context to move them
       const itemsToMove = activeOrders.filter((o: Order) => {
         const oDate = new Date(o.reservation?.service_date || 0);
-        return (
-          oDate.getFullYear() === selectedDate.getFullYear() &&
-          oDate.getMonth() === selectedDate.getMonth() &&
-          oDate.getDate() === selectedDate.getDate() &&
-          String(o.reservation?.time_of_day || "").toUpperCase() ===
-            String(selectedMoment).toUpperCase()
-        );
+        const isSameDayResult = isSameDay(oDate, selectedDate);
+        const isSameMoment = o.reservation?.time_of_day === selectedMoment;
+
+        return isSameDayResult && isSameMoment;
       });
 
       if (itemsToMove.length > 0) {
@@ -112,17 +106,16 @@ export default function OrderSetupScreen() {
                     accessibilityState={{ selected: isSelected }}
                     className={`w-[48%] items-center justify-center p-5 border rounded-3xl transition-all ${
                       isSelected
-                        ? "shadow-lg"
+                        ? `shadow-lg border-${m.color} ${m.bgClass}/15`
                         : "bg-surface-container-low/30 border-outline-variant/20"
                     }`}
-                    style={isSelected ? { borderColor: m.hex, backgroundColor: `${m.hex}15` } : {}}
                   >
                     <View className="items-center justify-center mb-3">
                       <MaterialCommunityIcons
                         name={m.icon as keyof typeof MaterialCommunityIcons.glyphMap}
                         size={42}
                         color={isSelected ? m.hex : COLORS["on-surface-variant"]}
-                        style={!isSelected ? { opacity: 0.4 } : {}}
+                        className={!isSelected ? "opacity-40" : ""}
                       />
                     </View>
                     <Text
@@ -137,8 +130,7 @@ export default function OrderSetupScreen() {
 
                     {isSelected && (
                       <View
-                        className="absolute top-3 right-3 w-5 h-5 rounded-full items-center justify-center"
-                        style={{ backgroundColor: m.hex }}
+                        className={`absolute top-3 right-3 w-5 h-5 rounded-full items-center justify-center ${m.bgClass}`}
                       >
                         <MaterialCommunityIcons
                           name="check"

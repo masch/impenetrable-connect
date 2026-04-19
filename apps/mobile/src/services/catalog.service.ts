@@ -15,6 +15,7 @@ import { addMockOrder, getMockOrders, updateMockOrder } from "../mocks/orders";
 import { isMockUserLoggedIn } from "../mocks/users";
 import { logger } from "./logger.service";
 import env from "../config/env";
+import { toISODate } from "../logic/formatters";
 
 // Re-export for convenience
 export type { CatalogServiceItem };
@@ -203,7 +204,7 @@ const RestCatalogService: CatalogServiceInterface = {
         reservation_id: 0,
         catalog_category_id: 1, // Example ID
         time_of_day: moment,
-        service_date: date.toISOString().split("T")[0],
+        service_date: toISODate(date),
         notes: notes ?? null,
         items: items,
       }),

@@ -4,6 +4,7 @@ import { logger } from "../services/logger.service";
 import { INITIAL_MOCK_ORDERS, MOCK_RESERVATIONS } from "./orders.data";
 import { MOCK_CATALOG_ITEMS } from "./catalog";
 import { MOCK_USERS } from "./users.data";
+import { MOCK_VENTURES } from "./ventures.data";
 
 /**
  * Mock services for orders
@@ -50,7 +51,19 @@ export function getAllMockOrders(): Order[] {
       ...item,
       catalog_item: MOCK_CATALOG_ITEMS[item.catalog_item_id],
     }));
-    return { ...order, reservation, items: enrichedItems };
+    const confirmedVenture = order.confirmed_venture_id
+      ? MOCK_VENTURES.find((v) => v.id === order.confirmed_venture_id)
+      : undefined;
+    const currentOfferVenture = order.current_offer_venture_id
+      ? MOCK_VENTURES.find((v) => v.id === order.current_offer_venture_id)
+      : undefined;
+    return {
+      ...order,
+      reservation,
+      items: enrichedItems,
+      confirmed_venture: confirmedVenture,
+      current_offer_venture: currentOfferVenture,
+    };
   });
 }
 
@@ -75,7 +88,19 @@ export function getMockOrders(): Order[] {
       ...item,
       catalog_item: MOCK_CATALOG_ITEMS[item.catalog_item_id],
     }));
-    return { ...order, reservation, items: enrichedItems };
+    const confirmedVenture = order.confirmed_venture_id
+      ? MOCK_VENTURES.find((v) => v.id === order.confirmed_venture_id)
+      : undefined;
+    const currentOfferVenture = order.current_offer_venture_id
+      ? MOCK_VENTURES.find((v) => v.id === order.current_offer_venture_id)
+      : undefined;
+    return {
+      ...order,
+      reservation,
+      items: enrichedItems,
+      confirmed_venture: confirmedVenture,
+      current_offer_venture: currentOfferVenture,
+    };
   });
 }
 

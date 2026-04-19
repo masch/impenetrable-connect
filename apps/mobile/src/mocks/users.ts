@@ -16,13 +16,11 @@ export function getDemoUsersByRole(role: UserRole): User[] {
 }
 
 export function findUserByAlias(alias: string): User | undefined {
-  return MOCK_USERS.find(
-    (u) => u.user_type === "TOURIST" && u.alias?.toLowerCase() === alias.toLowerCase(),
-  );
+  return MOCK_USERS.find((u) => u.user_type === "TOURIST" && u.alias === alias);
 }
 
 export function findUserByEmail(email: string): User | undefined {
-  return MOCK_USERS.find((u) => u.email?.toLowerCase() === email.toLowerCase());
+  return MOCK_USERS.find((u) => u.email === email);
 }
 
 export function getMockUserId(): string {

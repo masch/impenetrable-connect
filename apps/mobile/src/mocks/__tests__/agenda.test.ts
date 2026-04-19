@@ -1,10 +1,11 @@
 import { getMockAgendaOrders } from "../agenda";
+import { toISODate } from "../../logic/formatters";
 
 describe("Agenda Mocks", () => {
   it("should have at least one order for today", () => {
-    const todayStr = new Date().toISOString().split("T")[0];
+    const todayStr = toISODate(new Date());
     const todayOrders = getMockAgendaOrders().filter(
-      (o) => (o.reservation?.service_date || new Date()).toISOString().split("T")[0] === todayStr,
+      (o) => toISODate(o.reservation?.service_date || new Date()) === todayStr,
     );
     expect(todayOrders.length).toBeGreaterThan(0);
   });
