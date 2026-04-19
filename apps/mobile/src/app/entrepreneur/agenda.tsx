@@ -41,7 +41,7 @@ export default function AgendaScreen() {
     });
 
     return (
-      <View className="mb-6">
+      <View className="mb-4">
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View className="flex-row pb-2 px-1">
             {days.map((date) => {
@@ -78,7 +78,11 @@ export default function AgendaScreen() {
                             name={isToday ? "star" : "calendar-arrow-right"}
                             size={22}
                             color={
-                              isSelected ? "white" : isToday ? COLORS.secondary : COLORS.primary
+                              isSelected
+                                ? COLORS["on-primary"]
+                                : isToday
+                                  ? COLORS.secondary
+                                  : COLORS.primary
                             }
                           />
                         </View>
@@ -143,8 +147,8 @@ export default function AgendaScreen() {
           <LoadingView className="py-20" />
         ) : (
           <ScrollView
-            className="flex-1 px-5 bg-surface-container-low"
-            contentContainerClassName="pt-[10px] pb-[30px]"
+            className="flex-1 px-2 bg-surface-container-low"
+            contentContainerClassName="pt-[10px] pb-4"
             showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl
@@ -182,7 +186,7 @@ export default function AgendaScreen() {
               const momentIcon = getMomentIcon(moment);
 
               return (
-                <View key={moment} className="mb-6">
+                <View key={moment} className="mb-4">
                   <View className="flex-row items-center mb-3.5 px-1">
                     <View
                       className="p-2 rounded-xl mr-3"

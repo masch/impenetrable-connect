@@ -63,23 +63,19 @@ export default function OrderSetupScreen() {
   return (
     <Screen>
       <ScreenContent>
-        <ScrollView
-          className="flex-1"
-          showsVerticalScrollIndicator={false}
-          contentContainerClassName="pb-[60px]"
-        >
+        <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
           {/* Header Section */}
-          <View className="px-2 pt-12 pb-6">
-            <Text className="text-4xl font-display font-bold text-on-surface leading-tight">
+          <View className="px-2 pt-6 pb-4">
+            <Text className="text-3xl font-display font-bold text-on-surface leading-tight">
               {t("order_setup.title")}
             </Text>
-            <Text className="text-base font-body text-on-surface/50 mt-2">
+            <Text className="text-sm font-body text-on-surface/50 mt-1">
               {t("order_setup.subtitle")}
             </Text>
           </View>
 
           {/* Date Selection */}
-          <View className="px-2 mb-8">
+          <View className="px-2 mb-6">
             <View className="flex-row items-center mb-4">
               <MaterialCommunityIcons name="calendar-clock" size={20} color={COLORS.primary} />
               <Text className="text-lg font-display font-bold text-on-surface ml-2">
@@ -94,7 +90,7 @@ export default function OrderSetupScreen() {
           </View>
 
           {/* Moment Selection */}
-          <View className="px-2 mb-10">
+          <View className="px-2 mb-8">
             <View className="flex-row items-center mb-4">
               <MaterialCommunityIcons name="clock-outline" size={20} color={COLORS.primary} />
               <Text className="text-lg font-display font-bold text-on-surface ml-2">
@@ -105,37 +101,35 @@ export default function OrderSetupScreen() {
             <View className="flex-row flex-wrap justify-between gap-y-4">
               {SERVICE_MOMENTS.map((m) => {
                 const isSelected = moment === m.id;
-                const momentKey = m.id.toLowerCase();
                 const label = t(m.labelKey);
                 return (
                   <Button
                     key={m.id}
+                    variant="ghost"
                     onPress={() => setMoment(m.id)}
                     accessibilityLabel={`${label}${isSelected ? `, ${t("common.selected")}` : ""}`}
                     accessibilityRole="radio"
                     accessibilityState={{ selected: isSelected }}
-                    className={`w-[48%] items-center justify-center p-6 border-2 rounded-3xl transition-all shadow-sm ${
+                    className={`w-[48%] items-center justify-center p-5 border rounded-3xl transition-all ${
                       isSelected
-                        ? `bg-moment-${momentKey}/10 shadow-md border-moment-${momentKey} shadow-moment-${momentKey}/20`
-                        : "bg-surface-container-low border-outline-variant/30"
+                        ? "shadow-lg"
+                        : "bg-surface-container-low/30 border-outline-variant/20"
                     }`}
+                    style={isSelected ? { borderColor: m.hex, backgroundColor: `${m.hex}15` } : {}}
                   >
-                    <View
-                      className={`w-14 h-14 rounded-full items-center justify-center mb-3 ${
-                        isSelected ? `bg-moment-${momentKey}/20` : "bg-surface-container-high"
-                      }`}
-                    >
+                    <View className="items-center justify-center mb-3">
                       <MaterialCommunityIcons
                         name={m.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-                        size={34}
+                        size={42}
                         color={isSelected ? m.hex : COLORS["on-surface-variant"]}
+                        style={!isSelected ? { opacity: 0.4 } : {}}
                       />
                     </View>
                     <Text
-                      className={`text-base font-display transition-colors ${
+                      className={`text-lg font-display transition-colors ${
                         isSelected
                           ? "text-on-surface font-bold"
-                          : "text-on-surface-variant font-medium"
+                          : "text-on-surface-variant font-medium opacity-60"
                       }`}
                     >
                       {label}
@@ -143,7 +137,8 @@ export default function OrderSetupScreen() {
 
                     {isSelected && (
                       <View
-                        className={`absolute top-3 right-3 w-5 h-5 rounded-full items-center justify-center bg-moment-${momentKey}`}
+                        className="absolute top-3 right-3 w-5 h-5 rounded-full items-center justify-center"
+                        style={{ backgroundColor: m.hex }}
                       >
                         <MaterialCommunityIcons
                           name="check"

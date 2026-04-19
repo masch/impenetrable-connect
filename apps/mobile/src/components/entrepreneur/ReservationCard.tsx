@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Text } from "react-native";
 import { Button } from "../../components/Button";
 import { type Order, type OrderStatus, COLORS } from "@repo/shared";
@@ -80,9 +79,9 @@ export default function ReservationCard({
       {/* Visual Indicator Line */}
       <View className="h-1.5 w-full" style={{ backgroundColor: status.color }} />
 
-      <View className="p-4">
+      <View className="p-3">
         {/* Header: Status and Items Count */}
-        <View className="flex-row justify-between items-center mb-4">
+        <View className="flex-row justify-between items-center mb-3">
           <View
             className="flex-row items-center px-3 py-1.5 rounded-full"
             style={{ backgroundColor: `${status.color}15` }}
@@ -170,9 +169,9 @@ export default function ReservationCard({
         )}
 
         {/* Footer: Actions or Details */}
-        <View className="pt-4 border-t border-outline-variant/10">
-          <View className="flex-row items-center justify-between mb-4">
-            <View className="flex-row items-center bg-surface-container-low px-4 py-2 rounded-xl">
+        <View className="pt-3 border-t border-outline-variant/10">
+          <View className="flex-row items-center justify-between mb-3">
+            <View className="flex-row items-center bg-surface-container-low px-3 py-1.5 rounded-xl">
               <MaterialCommunityIcons
                 name="silverware-variant"
                 size={14}
@@ -185,10 +184,13 @@ export default function ReservationCard({
             </View>
 
             <View
-              className="px-4 py-2 rounded-xl shadow-sm"
-              style={{ backgroundColor: `${status.color}20` }}
+              className="px-4 py-1.5 rounded-2xl overflow-hidden"
+              style={{ backgroundColor: `${status.color}15` }}
             >
-              <Text className="font-display-black text-lg" style={{ color: status.color }}>
+              <Text
+                className="font-display-black text-[17px] leading-tight"
+                style={{ color: status.color }}
+              >
                 $
                 {order.items
                   ?.reduce((sum, item) => sum + item.price * item.quantity, 0)

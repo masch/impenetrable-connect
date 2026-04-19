@@ -10,7 +10,7 @@ interface ScreenProps {
 export default function Screen({ children, className = "" }: ScreenProps) {
   // Use Tailwind classes for horizontal padding based on platform
   // Android/Web: px-4 (16px), iOS: no horizontal padding (handled by safe area)
-  const horizontalPadding = Platform.OS === "web" || Platform.OS === "android" ? "px-4" : "";
+  const horizontalPadding = Platform.OS === "web" || Platform.OS === "android" ? "px-2" : "";
 
   return (
     <SafeAreaView edges={["top"]} className={`flex-1 bg-surface ${horizontalPadding} ${className}`}>
@@ -25,5 +25,15 @@ interface ScreenContentProps {
 }
 
 export function ScreenContent({ children, className = "" }: ScreenContentProps) {
-  return <View className={`flex-1 w-full max-w-md mx-auto ${className}`}>{children}</View>;
+  const bottomPadding = Platform.select({
+    web: "",
+    android: "pb-4",
+    ios: "pb-20",
+    default: "pb-20",
+  });
+  return (
+    <View className={`flex-1 w-full max-w-xl mx-auto ${bottomPadding} ${className}`}>
+      {children}
+    </View>
+  );
 }

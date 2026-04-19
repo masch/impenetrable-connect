@@ -499,7 +499,7 @@ export default function OrderScreen() {
 
   return (
     <Screen>
-      <ScreenContent className="pb-20">
+      <ScreenContent>
         <View className="py-6">
           <Text className="text-3xl font-display font-bold text-on-surface">
             {t("orders.title")}
@@ -560,8 +560,7 @@ export default function OrderScreen() {
               </>
             )}
           </ScrollView>
-        )}{" "}
-        // !isLoading
+        )}
       </ScreenContent>
       <AppAlert
         {...alertConfig}

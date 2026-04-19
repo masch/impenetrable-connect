@@ -8,6 +8,8 @@ import { View, Text, Platform } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { useTranslations } from "../hooks/useI18n";
 import { Button } from "./Button";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { COLORS } from "@repo/shared";
 
 const isWeb = Platform.OS === "web";
 
@@ -132,24 +134,24 @@ export function DatePicker({
         </View>
 
         {webPickerOpen && (
-          <View className="mt-2 bg-surface-container-low border border-outline-variant p-4">
-            <View className="flex-row justify-between items-center mb-6 bg-surface-container-high/50 p-2 rounded-2xl">
+          <View className="mt-4 bg-surface-container-low border border-outline-variant p-3 rounded-2xl">
+            <View className="flex-row justify-between items-center mb-4 bg-surface-container-high/50 p-1.5 rounded-xl">
               <Button
                 size="sm"
                 variant="outline"
                 leftIcon="chevron-left"
-                className="border-0 bg-surface-container-highest"
+                className="border-0 bg-surface-container-highest w-10 h-10"
                 onPress={() => adjustDate(-1)}
                 accessibilityLabel={t("common.previous")}
               />
-              <Text className="text-xl font-display font-bold text-on-surface">
+              <Text className="text-lg font-display font-bold text-on-surface">
                 {formatDate(currentValue)}
               </Text>
               <Button
                 size="sm"
                 variant="outline"
                 leftIcon="chevron-right"
-                className="border-0 bg-surface-container-highest"
+                className="border-0 bg-surface-container-highest w-10 h-10"
                 onPress={() => adjustDate(1)}
                 accessibilityLabel={t("common.next")}
               />
@@ -158,9 +160,8 @@ export function DatePicker({
               <Button
                 variant="primary"
                 title={t("orders.confirm")}
-                className="px-12 py-4 rounded-2xl shadow-md"
+                className="px-8 py-3 rounded-xl shadow-md"
                 onPress={() => {
-                  // Set the current value as the selected date
                   onChange(currentValue);
                   setWebPickerOpen(false);
                 }}
@@ -177,28 +178,78 @@ export function DatePicker({
       {/* Quick select in single line */}
       <View className="flex-row gap-3">
         <Button
-          className="flex-1 rounded-2xl px-1"
-          variant={isDateSelected() && isToday() ? "secondary" : "outline"}
-          title={t("orders.today")}
+          className={`flex-1 rounded-3xl py-4 border-2 ${
+            isDateSelected() && isToday()
+              ? "bg-secondary/10 border-secondary shadow-sm"
+              : "bg-surface-container-low/30 border-outline-variant/20"
+          }`}
+          variant="ghost"
           onPress={() => handleQuickSelect(0)}
           accessibilityLabel={t("orders.today")}
-        />
+        >
+          <Text
+            className={`text-base font-display ${
+              isDateSelected() && isToday()
+                ? "text-secondary font-bold"
+                : "text-on-surface-variant font-medium opacity-60"
+            }`}
+          >
+            {t("orders.today")}
+          </Text>
+        </Button>
         <Button
-          className="flex-1 rounded-2xl px-1"
-          variant={isDateSelected() && isTomorrow() ? "secondary" : "outline"}
-          title={t("orders.tomorrow")}
+          className={`flex-1 rounded-3xl py-4 border-2 ${
+            isDateSelected() && isTomorrow()
+              ? "bg-secondary/10 border-secondary shadow-sm"
+              : "bg-surface-container-low/30 border-outline-variant/20"
+          }`}
+          variant="ghost"
           onPress={() => handleQuickSelect(1)}
           accessibilityLabel={t("orders.tomorrow")}
-        />
+        >
+          <Text
+            className={`text-base font-display ${
+              isDateSelected() && isTomorrow()
+                ? "text-secondary font-bold"
+                : "text-on-surface-variant font-medium opacity-60"
+            }`}
+          >
+            {t("orders.tomorrow")}
+          </Text>
+        </Button>
         <Button
-          className="flex-1 rounded-2xl px-1"
-          variant={isCustomDate() ? "secondary" : "outline"}
-          title={isCustomDate() ? formatDate(currentValue) : t("orders.choose")}
-          rightIcon={isCustomDate() ? "pencil" : undefined}
-          leftIcon={!isCustomDate() ? "calendar" : undefined}
+          className={`flex-1 rounded-3xl py-4 border-2 ${
+            isCustomDate()
+              ? "bg-secondary/10 border-secondary shadow-sm"
+              : "bg-surface-container-low/30 border-outline-variant/20"
+          }`}
+          variant="ghost"
           onPress={() => setShowPicker(!showPicker)}
           accessibilityLabel={isCustomDate() ? formatDate(currentValue) : t("orders.choose")}
-        />
+        >
+          <View className="flex-row items-center gap-2">
+            {!isCustomDate() && (
+              <MaterialCommunityIcons
+                name="calendar-month-outline"
+                size={18}
+                color={COLORS["on-surface-variant"]}
+                style={{ opacity: 0.4 }}
+              />
+            )}
+            <Text
+              className={`text-base font-display ${
+                isCustomDate()
+                  ? "text-secondary font-bold"
+                  : "text-on-surface-variant font-medium opacity-60"
+              }`}
+            >
+              {isCustomDate() ? formatDate(currentValue) : t("orders.choose")}
+            </Text>
+            {isCustomDate() && (
+              <MaterialCommunityIcons name="pencil" size={14} color={COLORS.secondary} />
+            )}
+          </View>
+        </Button>
       </View>
 
       {showPicker && (

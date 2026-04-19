@@ -1,4 +1,12 @@
-import { Pressable, Text, View, AccessibilityRole, AccessibilityState } from "react-native";
+import {
+  Pressable,
+  Text,
+  View,
+  AccessibilityRole,
+  AccessibilityState,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 interface ButtonVariantStyle {
@@ -10,7 +18,7 @@ interface ButtonVariantStyle {
 interface ButtonProps {
   title?: string;
   subtitle?: string;
-  variant?: "primary" | "secondary" | "danger" | "outline";
+  variant?: "primary" | "secondary" | "danger" | "outline" | "ghost";
   onPress: () => void;
   disabled?: boolean;
   icon?: string;
@@ -24,6 +32,7 @@ interface ButtonProps {
   accessibilityRole?: AccessibilityRole;
   accessibilityState?: AccessibilityState;
   children?: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
 }
 
 const variantStyles: Record<string, ButtonVariantStyle> = {
@@ -47,6 +56,11 @@ const variantStyles: Record<string, ButtonVariantStyle> = {
     text: "text-tertiary-container",
     pressed: "text-tertiary-container opacity-70",
   },
+  ghost: {
+    container: "",
+    text: "text-on-surface",
+    pressed: "opacity-70",
+  },
 };
 
 export function Button({
@@ -66,6 +80,7 @@ export function Button({
   accessibilityState,
   children,
   textClassName = "",
+  style,
 }: ButtonProps) {
   const styles = variantStyles[variant];
 
@@ -86,6 +101,7 @@ export function Button({
       `}
       onPress={onPress}
       disabled={disabled}
+      style={style}
     >
       {({ pressed }) => (
         <>
