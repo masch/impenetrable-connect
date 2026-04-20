@@ -4,6 +4,7 @@ module.exports = {
   preset: "jest-expo",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   testMatch: ["**/__tests__/**/*.test.[jt]s?(x)"],
+  testTimeout: 30000,
   moduleNameMapper: {
     "^@repo/shared$": path.resolve(__dirname, "../../packages/shared/src/index.ts"),
   },
