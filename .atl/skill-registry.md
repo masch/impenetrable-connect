@@ -1,4 +1,4 @@
-# Skill Registry - rewilding-connect
+# Skill Registry - impenetrable-connect
 
 ## Project Standards
 
