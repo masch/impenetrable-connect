@@ -12,8 +12,10 @@ help:
 	@echo "    make dev                          - Start full monorepo"
 	@echo ""
 	@echo "  🧪 TESTS"
-	@echo "    make test                          - Run mobile tests"
-	@echo "    make test-coverage                 - Run tests with coverage report"
+	@echo "    make test                          - Run all tests (mobile + backend)"
+	@echo "    make test-mobile                   - Run mobile tests"
+	@echo "    make test-backend                  - Run backend tests"
+	@echo "    make test-coverage                 - Run mobile tests with coverage report"
 	@echo ""
 	@echo "  📱 MOBILE"
 	@echo "    make mobile                       - Start mobile with Expo"
@@ -38,8 +40,12 @@ help:
 	@echo "    make format                       - Format code"
 	@echo "    make typecheck                    - Run TypeScript check"
 	@echo "    make gga                          - Run Gentleman Guardian Angel"
-	@echo "    make check-static                 - Typecheck + lint + format"
-	@echo "    make check                        - Typecheck + lint + format + gga"
+	@echo "    make check                        - All checks (mobile + backend + gga)"
+	@echo "    make check-mobile                 - Full check for mobile (static + gga)"
+	@echo "    make check-backend                - Full check for backend"
+	@echo "    make check-static                 - Static checks for all packages"
+	@echo "    make check-static-mobile          - Static checks for mobile only"
+	@echo "    make check-static-backend         - Static checks for backend only"
 	@echo ""
 	@echo "  🤖 ANDROID EMULATOR"
 	@echo "    make android-app-stop             - Stop app"
@@ -141,7 +147,12 @@ dev:
 # 🧪 TESTS
 # ==========================================
 
-test:
+test: test-mobile test-backend
+
+test-backend:
+	cd $(BACKEND_DIR) && bun run test
+
+test-mobile:
 	cd $(MOBILE_DIR) && bun run test
 
 test-coverage:
@@ -163,15 +174,42 @@ lint:
 format:
 	bun run format
 
-typecheck:
+typecheck: typecheck-mobile typecheck-backend
+
+typecheck-mobile:
 	cd $(MOBILE_DIR) && bun run typecheck
+
+typecheck-backend:
+	cd $(BACKEND_DIR) && bun run typecheck
+
+lint: lint-mobile lint-backend
+
+lint-mobile:
+	cd $(MOBILE_DIR) && bun run lint
+
+lint-backend:
+	cd $(BACKEND_DIR) && bun run lint
+
+format: format-mobile format-backend
+
+format-mobile:
+	bunx prettier --write "$(MOBILE_DIR)/**/*.ts*"
+
+format-backend:
+	bunx prettier --write "$(BACKEND_DIR)/**/*.ts*"
 
 gga:
 	gga run
 
-check-static: typecheck lint format
+check-static: check-static-mobile check-static-backend
+
+check-static-mobile: typecheck-mobile lint-mobile format-mobile
+check-static-backend: typecheck-backend lint-backend format-backend
 
 check: check-static gga
+
+check-mobile: check-static-mobile gga
+check-backend: check-static-backend
 
 # ==========================================
 # 🤖 EAS
