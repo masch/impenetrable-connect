@@ -10,7 +10,7 @@ Initialize the backend application within the monorepo structure and implement t
 
 ## 2. Context
 
-The `rewilding-connect` project is a Bun-based monorepo. While the mobile app and shared packages are present, the backend infrastructure (Hono + Drizzle) is not yet initialized.
+The `impenetrable-connect` project is a Bun-based monorepo. While the mobile app and shared packages are present, the backend infrastructure (Hono + Drizzle) is not yet initialized.
 
 ## 3. Goals
 

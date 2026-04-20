@@ -12,7 +12,7 @@ import { MOCK_VENTURES } from "./ventures.data";
  */
 
 // Shared in-memory state for orders and reservations
-const GLOBAL_ORDERS_KEY = "__REWILDING_MOCK_ORDERS_STATE__";
+const GLOBAL_ORDERS_KEY = "__IMPENETRABLE_MOCK_ORDERS_STATE__";
 
 // Initialize global orders state if not already present
 const ordersStateContainer = globalThis as unknown as {
@@ -44,22 +44,26 @@ const getEffectiveUserId = () => {
 export function getAllMockOrders(): Order[] {
   return ordersState.orders.map((order) => {
     const reservation = ordersState.reservations.find((r) => r.id === order.reservation_id);
-    if (reservation) {
-      reservation.user = MOCK_USERS.find((u) => u.id === reservation.user_id);
-    }
+    const enrichedReservation = reservation
+      ? { ...reservation, user: MOCK_USERS.find((u) => u.id === reservation.user_id) }
+      : undefined;
+
     const enrichedItems = (order.items || []).map((item) => ({
       ...item,
       catalog_item: MOCK_CATALOG_ITEMS[item.catalog_item_id],
     }));
+
     const confirmedVenture = order.confirmed_venture_id
       ? MOCK_VENTURES.find((v) => v.id === order.confirmed_venture_id)
       : undefined;
+
     const currentOfferVenture = order.current_offer_venture_id
       ? MOCK_VENTURES.find((v) => v.id === order.current_offer_venture_id)
       : undefined;
+
     return {
       ...order,
-      reservation,
+      reservation: enrichedReservation,
       items: enrichedItems,
       confirmed_venture: confirmedVenture,
       current_offer_venture: currentOfferVenture,
@@ -81,22 +85,26 @@ export function getMockOrders(): Order[] {
 
   return orders.map((order) => {
     const reservation = ordersState.reservations.find((r) => r.id === order.reservation_id);
-    if (reservation) {
-      reservation.user = MOCK_USERS.find((u) => u.id === reservation.user_id);
-    }
+    const enrichedReservation = reservation
+      ? { ...reservation, user: MOCK_USERS.find((u) => u.id === reservation.user_id) }
+      : undefined;
+
     const enrichedItems = (order.items || []).map((item) => ({
       ...item,
       catalog_item: MOCK_CATALOG_ITEMS[item.catalog_item_id],
     }));
+
     const confirmedVenture = order.confirmed_venture_id
       ? MOCK_VENTURES.find((v) => v.id === order.confirmed_venture_id)
       : undefined;
+
     const currentOfferVenture = order.current_offer_venture_id
       ? MOCK_VENTURES.find((v) => v.id === order.current_offer_venture_id)
       : undefined;
+
     return {
       ...order,
-      reservation,
+      reservation: enrichedReservation,
       items: enrichedItems,
       confirmed_venture: confirmedVenture,
       current_offer_venture: currentOfferVenture,
@@ -138,8 +146,8 @@ export const getMockOrderById = (id: number): Order | undefined => {
  * Update an order status
  */
 export function updateMockOrderStatus(id: number, status: Order["global_status"]) {
-  const order = ordersState.orders.find((o: Order) => Number(o.id) === Number(id));
-  if (order) {
-    order.global_status = status;
-  }
+  ordersState.orders = ordersState.orders.map((o: Order) =>
+    Number(o.id) === Number(id) ? { ...o, global_status: status } : o,
+  );
+  logger.info(`[MOCK] Updated order status ${id} to ${status}`);
 }

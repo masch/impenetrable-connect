@@ -1,8 +1,10 @@
-# Skill Registry - rewilding-connect
+# Skill Registry - impenetrable-connect
 
 ## Project Standards
 
 ### Global Context
+
+- **AI Review Formatting (gga)**: MANDATORY: Every automated review MUST start with `STATUS: PASSED` or `STATUS: FAILED` on the **VERY FIRST LINE** of the output. No exceptions. Detailed analysis must follow ONLY after this status line.
 
 - **Language Policy**: ALL technical metadata, including code comments, docstrings, and Git metadata (Commit messages, PR descriptions), MUST be written in **English**. The project's "Technical Esperanto" is English, regardless of the conversation language.
 - **Command Policy: Make-First**: ALWAYS use `make <command>` for ANY development execution. Direct use of `bun`, `npm`, or `yarn` is STRICTLY PROHIBITED. If a required command is missing from the `Makefile`, ASK the user to add it first.
@@ -100,7 +102,6 @@
   - **Label Verification**: ALWAYS run `gh label list` before adding labels to a PR to ensure compliance with project-specific naming (e.g., `type:feature` vs `type:feat`).
   - Descriptions must not paste full logs; use the summary format instead.
   - MUST link to an approved issue ("Closes #XX").
-- **AI Review Formatting (gga)**: When performing an automated code review via `gga`, the response MUST start with `STATUS: PASSED` or `STATUS: FAILED` on the VERY FIRST LINE of the output. Concise justifications and key verifications should follow below. This ensures the automated gate can reliably parse the result.
 - **Post-Merge Cleanup**: When the user says "mergeado" (merged), the agent MUST:
   1. Confirm the PR and its linked issue are closed (`gh pr view` / `gh issue view`).
   2. Switch to `main` branch.
