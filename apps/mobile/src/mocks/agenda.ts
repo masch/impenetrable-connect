@@ -12,11 +12,12 @@ export { MOCK_VENTURE_WITH_ORDERS };
  * Orders specifically for the agenda view.
  * Uses a function to ensure we always get the latest state from the mock system.
  */
-export function getMockAgendaOrders(): Order[] {
+export function getMockAgendaOrders(ventureIds: number[] = [MOCK_VENTURE_WITH_ORDERS.id]): Order[] {
   return getAllMockOrders().filter(
     (order) =>
-      order.confirmed_venture_id === MOCK_VENTURE_WITH_ORDERS.id ||
+      (order.confirmed_venture_id && ventureIds.includes(order.confirmed_venture_id)) ||
       (order.global_status === "OFFER_PENDING" &&
-        order.current_offer_venture_id === MOCK_VENTURE_WITH_ORDERS.id),
+        order.current_offer_venture_id &&
+        ventureIds.includes(order.current_offer_venture_id)),
   );
 }

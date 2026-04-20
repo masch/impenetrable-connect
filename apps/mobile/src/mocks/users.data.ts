@@ -81,6 +81,39 @@ export const MOCK_USER_ADMIN: User = {
 /**
  * Pure mock data for users to avoid circular dependencies
  */
+export const MOCK_USER_ENTREPRENEUR_LUCIA: User = {
+  id: "entrepreneur_003",
+  alias: null,
+  email: "lucia@river-tours.com",
+  first_name: "Lucía",
+  last_name: "Fernández",
+  whatsapp: "+5493624333333",
+  user_type: "ENTREPRENEUR",
+  failed_login_attempts: 0,
+  locked_until: null,
+  last_login_at: new Date("2026-04-11T09:15:00Z"),
+  is_active: true,
+  created_at: new Date("2023-09-05T00:00:00Z"),
+};
+
+export const MOCK_USER_ENTREPRENEUR_CARLOS: User = {
+  id: "entrepreneur_004",
+  alias: null,
+  email: "carlos@chaqueño-outdoor.com",
+  first_name: "Carlos",
+  last_name: "Sosa",
+  whatsapp: "+5493624444444",
+  user_type: "ENTREPRENEUR",
+  failed_login_attempts: 0,
+  locked_until: null,
+  last_login_at: new Date("2026-04-09T16:00:00Z"),
+  is_active: true,
+  created_at: new Date("2023-10-12T00:00:00Z"),
+};
+
+/**
+ * Pure mock data for users to avoid circular dependencies
+ */
 export const MOCK_USERS: User[] = [
   // === TOURISTS (3) ===
   MOCK_USER_TOURIST_WITH_ORDERS,
@@ -103,34 +136,8 @@ export const MOCK_USERS: User[] = [
   // === ENTREPRENEURS (4) ===
   MOCK_USER_ENTREPRENEUR_WITH_ORDERS,
   MOCK_USER_ENTREPRENEUR_WITHOUT_ORDERS,
-  {
-    id: "entrepreneur_003",
-    alias: null,
-    email: "lucia@river-tours.com",
-    first_name: "Lucía",
-    last_name: "Fernández",
-    whatsapp: "+5493624333333",
-    user_type: "ENTREPRENEUR",
-    failed_login_attempts: 0,
-    locked_until: null,
-    last_login_at: new Date("2026-04-11T09:15:00Z"),
-    is_active: true,
-    created_at: new Date("2023-09-05T00:00:00Z"),
-  },
-  {
-    id: "entrepreneur_004",
-    alias: null,
-    email: "carlos@chaqueño-outdoor.com",
-    first_name: "Carlos",
-    last_name: "Sosa",
-    whatsapp: "+5493624444444",
-    user_type: "ENTREPRENEUR",
-    failed_login_attempts: 0,
-    locked_until: null,
-    last_login_at: new Date("2026-04-09T16:00:00Z"),
-    is_active: true,
-    created_at: new Date("2023-10-12T00:00:00Z"),
-  },
+  MOCK_USER_ENTREPRENEUR_LUCIA,
+  MOCK_USER_ENTREPRENEUR_CARLOS,
 
   // === ADMINS (2) ===
   MOCK_USER_ADMIN,

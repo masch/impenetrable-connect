@@ -6,6 +6,7 @@ import {
   formatMoment,
   toISODate,
   getNativeLocale,
+  formatUserDisplayName,
 } from "../formatters";
 import { useLocaleStore } from "../../stores/locale.store";
 
@@ -124,6 +125,21 @@ describe("Formatters Logic", () => {
 
     it("should fallback to 'en-US' for unknown locales", () => {
       expect(getNativeLocale("fr")).toBe("en-US");
+    });
+  });
+
+  describe("formatUserDisplayName", () => {
+    it("should extract handle from email", () => {
+      expect(formatUserDisplayName("maria@river-tours.com")).toBe("maria");
+    });
+
+    it("should return alias as is if no @", () => {
+      expect(formatUserDisplayName("Viaje Familiar")).toBe("Viaje Familiar");
+    });
+
+    it("should return empty string for null or undefined", () => {
+      expect(formatUserDisplayName(null)).toBe("");
+      expect(formatUserDisplayName(undefined)).toBe("");
     });
   });
 });

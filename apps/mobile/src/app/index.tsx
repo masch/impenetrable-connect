@@ -9,6 +9,9 @@ import { useTranslations } from "../hooks/useI18n";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 
 import { Button } from "../components/Button";
+import { getVentureIdsByUserId } from "../mocks/venture-members";
+import { MOCK_VENTURES } from "../mocks/ventures.data";
+import { formatUserDisplayName } from "../logic/formatters";
 
 // Role colors from design system - mapped for icons and backgrounds
 const ROLE_COLORS = {
@@ -188,6 +191,21 @@ export default function RoleSelectorScreen() {
                 <View className="flex flex-row flex-wrap gap-2">
                   {group.users.map((user) => {
                     const identifier = getUserIdentifier(user, group.role);
+
+                    // Resolve venture name for entrepreneurs
+                    let subtitle = undefined;
+                    if (group.role === "ENTREPRENEUR") {
+                      const ventureIds = getVentureIdsByUserId(user.id);
+                      if (ventureIds.length > 0) {
+                        const venture = MOCK_VENTURES.find((v) => v.id === ventureIds[0]);
+                        if (venture) {
+                          subtitle = venture.name;
+                        }
+                      }
+                    }
+
+                    const displayName = formatUserDisplayName(identifier);
+
                     return (
                       <Button
                         key={user.id}
@@ -196,7 +214,8 @@ export default function RoleSelectorScreen() {
                         leftIcon="account-outline"
                         rightIcon="chevron-right"
                         iconColor={config.color}
-                        title={identifier.split("@")[0]}
+                        title={subtitle || displayName}
+                        subtitle={subtitle ? displayName : undefined}
                         className={`flex-1 min-w-[45%] border ${config.borderClass} bg-surface-container-low px-3 py-2.5 rounded-lg`}
                         accessibilityLabel={`Login as ${identifier}`}
                       />

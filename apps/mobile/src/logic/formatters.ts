@@ -93,6 +93,20 @@ export const toISODate = (date: Date): string => {
  * @param locale - The base locale from i18n (e.g., "es", "en")
  * @returns A full locale string (e.g., "es-AR", "en-US")
  */
+/**
+ * Formats a user's display name, extracting the handle from an email if necessary.
+ *
+ * @param name - The raw identifier or email
+ * @returns Formatted display name
+ */
+export const formatUserDisplayName = (name: string | null | undefined): string => {
+  if (!name) return "";
+  if (name.includes("@")) {
+    return name.split("@")[0];
+  }
+  return name;
+};
+
 export const getNativeLocale = (locale: string): string => {
   const map: Record<string, string> = {
     es: "es-AR",

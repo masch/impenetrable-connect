@@ -8,6 +8,7 @@ import type { Order } from "@repo/shared";
 import { logger } from "../services/logger.service";
 import { getMockAgendaOrders } from "../mocks/agenda";
 import { mockGetCurrentUser } from "../services/auth-state";
+import { getVentureIdsByUserId } from "../mocks/venture-members";
 import { toISODate } from "../logic/formatters";
 
 interface AgendaState {
@@ -39,9 +40,12 @@ export const useAgendaStore = create<AgendaState>((set, get) => ({
       const currentUser = mockGetCurrentUser();
       const dateStr = toISODate(date);
 
+      // Dynamically resolve venture IDs for the current user
+      const ventureIds = currentUser ? getVentureIdsByUserId(currentUser.id) : [];
+
       const filtered =
-        currentUser?.id === "entrepreneur_001"
-          ? getMockAgendaOrders().filter(
+        ventureIds.length > 0
+          ? getMockAgendaOrders(ventureIds).filter(
               (o) => toISODate(o.reservation?.service_date || new Date()) === dateStr,
             )
           : [];
