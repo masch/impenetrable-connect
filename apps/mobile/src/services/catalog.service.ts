@@ -8,11 +8,17 @@
 
 import { z } from "zod";
 
-import type { Order, ServiceMoment } from "@repo/shared";
+import type { Order, Reservation, ServiceMoment } from "@repo/shared";
 import { ServiceMomentSchema } from "@repo/shared";
 import { MOCK_CATALOG_SERVICES, type CatalogServiceItem } from "../mocks/catalog";
-import { addMockOrder, getMockOrders, updateMockOrder } from "../mocks/orders";
-import { isMockUserLoggedIn } from "../mocks/users";
+import {
+  addMockOrder,
+  addMockReservation,
+  getMockOrders,
+  updateMockOrder,
+  updateMockReservation,
+} from "../mocks/orders";
+import { isMockUserLoggedIn, getMockUserId } from "../mocks/users";
 import { logger } from "./logger.service";
 import env from "../config/env";
 import { toISODate } from "../logic/formatters";
@@ -92,10 +98,17 @@ const MockCatalogService: CatalogServiceInterface = {
     if (!firstService) throw new Error("Service not found");
 
     const orderId = Date.now();
+    const reservation = addMockReservation({
+      user_id: isMockUserLoggedIn() ? getMockUserId() : "unknown",
+      service_date: date,
+      time_of_day: moment,
+      status: "CREATED",
+      created_at: new Date(),
+    });
 
     const newOrder: Order = {
       id: orderId,
-      reservation_id: Math.floor(Math.random() * 100000),
+      reservation_id: reservation.id,
       catalog_type_id: firstService.catalog_category_id,
       confirmed_venture_id: null,
       notes: notes ?? null,
@@ -150,16 +163,14 @@ const MockCatalogService: CatalogServiceInterface = {
       // In a real system, we might move the order to a different reservation
       // or update the existing one. For mocks, we'll handle this by updating the reservation.
       const { getMockOrderById } = await import("../mocks/orders");
-      const order = getMockOrderById(Number(id));
-      if (order?.reservation_id) {
+      const foundOrder = getMockOrderById(Number(id));
+      if (foundOrder?.reservation_id) {
         // This is a bit of a shortcut for the mock, updating the reservation in state
-        const { getMockReservations } = await import("../mocks/orders");
-        const reservations = getMockReservations();
-        const res = reservations.find((r) => r.id === order.reservation_id);
-        if (res) {
-          if (input.date) res.service_date = input.date;
-          if (input.moment) res.time_of_day = input.moment;
-        }
+        const reservationUpdates: Partial<Reservation> = {};
+        if (input.date) reservationUpdates.service_date = input.date;
+        if (input.moment) reservationUpdates.time_of_day = input.moment;
+
+        updateMockReservation(foundOrder.reservation_id, reservationUpdates);
       }
     }
 

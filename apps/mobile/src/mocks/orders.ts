@@ -151,3 +151,26 @@ export function updateMockOrderStatus(id: number, status: Order["global_status"]
   );
   logger.info(`[MOCK] Updated order status ${id} to ${status}`);
 }
+
+/**
+ * Add a reservation to the mock collection
+ */
+export function addMockReservation(reservation: Omit<Reservation, "id">): Reservation {
+  const newReservation: Reservation = {
+    id: Math.floor(Math.random() * 100000),
+    ...reservation,
+  };
+  ordersState.reservations = [newReservation, ...ordersState.reservations];
+  logger.info("[MOCK API] Created reservation:", { ...newReservation });
+  return newReservation;
+}
+
+/**
+ * Update a mock reservation with new data
+ */
+export function updateMockReservation(id: number, updates: Partial<Reservation>) {
+  ordersState.reservations = ordersState.reservations.map((r: Reservation) =>
+    Number(r.id) === Number(id) ? { ...r, ...updates } : r,
+  );
+  logger.info(`[MOCK] Updated reservation ${id} (new array reference created)`);
+}
