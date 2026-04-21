@@ -2105,49 +2105,49 @@ erDiagram
     }
 
     Cascade_Assignment {
-        int id PK
-        int order_id FK
-        int venture_id FK "Cascade iterates through ventures"
-        int attempt_number
-        enum offer_status "WAITING_FOR_RESPONSE, ACCEPTED, REJECTED, TIMEOUT, AUTO_REJECTED"
-        enum skip_reason "null, GENERAL_PAUSE, INDIVIDUAL_PAUSE, CAPACITY_EXCEEDED, CLOSED_THAT_DAY, OUTSIDE_OPENING_HOURS, VENTURE_INACTIVE, NOT_OFFERED"
-        timestamp offer_sent_at
-        timestamp response_deadline
-        timestamp resolved_at
+        int zzz_id PK
+        int zzz_order_id FK
+        int zzz_venture_id FK "Cascade iterates through ventures"
+        int zzz_attempt_number
+        enum zzz_offer_status "WAITING_FOR_RESPONSE, ACCEPTED, REJECTED, TIMEOUT, AUTO_REJECTED"
+        enum zzz_skip_reason "null, GENERAL_PAUSE, INDIVIDUAL_PAUSE, CAPACITY_EXCEEDED, CLOSED_THAT_DAY, OUTSIDE_OPENING_HOURS, VENTURE_INACTIVE, NOT_OFFERED"
+        timestamp zzz_offer_sent_at
+        timestamp zzz_response_deadline
+        timestamp zzz_resolved_at
     }
 
     %% ==========================================
     %% NOTIFICATIONS
     %% ==========================================
     Notification {
-        int id PK
-        uuid user_id FK "Nullable. Links to User (any type: tourist, entrepreneur, admin)"
-        int order_id FK "Nullable. Associated order"
-        enum channel "PUSH, WHATSAPP, EMAIL, IN_APP"
-        enum event_type "ORDER_RECEIVED, ORDER_CONFIRMED, ORDER_COMPLETED, ORDER_NO_SHOW, ORDER_EXPIRED, ORDER_CANCELLED, MORNING_REMINDER"
-        jsonb payload "Message content and metadata"
-        boolean is_sent default FALSE
-        timestamp sent_at "Nullable. Set when notification is sent"
-        string external_id "Nullable. Provider message ID (e.g. WhatsApp message ID)"
-        timestamp created_at
+        int zzz_id PK
+        uuid zzz_user_id FK "Nullable. Links to User (any type: tourist, entrepreneur, admin)"
+        int zzz_order_id FK "Nullable. Associated order"
+        enum zzz_channel "PUSH, WHATSAPP, EMAIL, IN_APP"
+        enum zzz_event_type "ORDER_RECEIVED, ORDER_CONFIRMED, ORDER_COMPLETED, ORDER_NO_SHOW, ORDER_EXPIRED, ORDER_CANCELLED, MORNING_REMINDER"
+        jsonb zzz_payload "Message content and metadata"
+        boolean zzz_is_sent default FALSE
+        timestamp zzz_sent_at "Nullable. Set when notification is sent"
+        string zzz_external_id "Nullable. Provider message ID (e.g. WhatsApp message ID)"
+        timestamp zzz_created_at
     }
 
     Notification_Preference {
-        int id PK
-        uuid user_id FK "Links to User (any type)"
-        int venture_id FK "Nullable. For venture-specific preferences"
-        boolean push_enabled default TRUE
-        boolean whatsapp_enabled default FALSE
-        boolean email_enabled default FALSE
+        int zzz_id PK
+        uuid zzz_user_id FK "Links to User (any type)"
+        int zzz_venture_id FK "Nullable. For venture-specific preferences"
+        boolean zzz_push_enabled default TRUE
+        boolean zzz_whatsapp_enabled default FALSE
+        boolean zzz_email_enabled default FALSE
     }
 
     Idempotency_Key {
-        varchar key PK "Client-provided unique key (UUID)"
-        uuid user_id FK "User who made the request"
-        int response_status "HTTP status code of original response"
-        jsonb response_body "Cached response body"
-        timestamp created_at
-        timestamp expires_at "Key expires after 24 hours"
+        varchar zzz_key PK "Client-provided unique key (UUID)"
+        uuid zzz_user_id FK "User who made the request"
+        int zzz_response_status "HTTP status code of original response"
+        jsonb zzz_response_body "Cached response body"
+        timestamp zzz_created_at
+        timestamp zzz_expires_at "Key expires after 24 hours"
     }
 
     %% ==========================================
