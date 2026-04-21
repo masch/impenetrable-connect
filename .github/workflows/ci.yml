@@ -9,10 +9,18 @@ on:
       - "apps/mobile/**"
       - "packages/shared/**"
       - "apps/backend/**"
+      - "!**/*.md"
+      - "!openspec/**"
       - "!apps/mobile/assets/**"
-      - "!apps/mobile/**/*.md"
   pull_request:
     branches: [main]
+    paths:
+      - "apps/mobile/**"
+      - "packages/shared/**"
+      - "apps/backend/**"
+      - "!**/*.md"
+      - "!openspec/**"
+      - "!apps/mobile/assets/**"
 
 jobs:
   ci:

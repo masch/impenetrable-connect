@@ -7,8 +7,9 @@ on:
       - "apps/mobile/**"
       - "packages/shared/**"
       - "apps/backend/**"
+      - "!**/*.md"
+      - "!openspec/**"
       - "!apps/mobile/assets/**"
-      - "!apps/mobile/**/*.md"
   workflow_dispatch:
 
 jobs:
