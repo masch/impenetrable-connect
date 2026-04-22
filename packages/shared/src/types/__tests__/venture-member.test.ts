@@ -4,20 +4,20 @@ import { VentureMemberSchema } from "../venture-member";
 describe("VentureMemberSchema", () => {
   it("should validate a valid venture member", () => {
     const validMember = {
-      zzz_id: 1,
-      zzz_venture_id: 10,
-      zzz_user_id: "123e4567-e89b-12d3-a456-426614174000",
-      zzz_role: "MANAGER",
+      id: 1,
+      ventureId: 10,
+      userId: "123e4567-e89b-12d3-a456-426614174000",
+      role: "MANAGER",
     };
     expect(VentureMemberSchema.parse(validMember)).toEqual(validMember);
   });
 
-  it("should fail with invalid user_id (not a uuid)", () => {
+  it("should fail with invalid userId (not a uuid)", () => {
     const invalidMember = {
-      zzz_id: 1,
-      zzz_venture_id: 10,
-      zzz_user_id: "not-a-uuid",
-      zzz_role: "MANAGER",
+      id: 1,
+      ventureId: 10,
+      userId: "not-a-uuid",
+      role: "MANAGER",
     };
     expect(() => VentureMemberSchema.parse(invalidMember)).toThrow();
   });

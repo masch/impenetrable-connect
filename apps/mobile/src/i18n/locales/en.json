@@ -190,7 +190,11 @@
   "errors": {
     "login_required_title": "Login required",
     "login_required_message": "You must be logged in to make a reservation",
-    "reservation_failed": "Failed to create reservation"
+    "reservation_failed": "Failed to create reservation",
+    "auth": {
+      "connection_failed": "Could not connect to the server. Please check if the backend is running.",
+      "invalid_credentials": "Invalid email or password."
+    }
   },
   "common": {
     "ok": "OK",

@@ -41,7 +41,7 @@ export const useAgendaStore = create<AgendaState>((set, get) => ({
       const dateStr = toISODate(date);
 
       // Dynamically resolve venture IDs for the current user
-      const ventureIds = currentUser ? getVentureIdsByUserId(currentUser.zzz_id) : [];
+      const ventureIds = currentUser ? getVentureIdsByUserId(currentUser.id) : [];
 
       const filtered =
         ventureIds.length > 0

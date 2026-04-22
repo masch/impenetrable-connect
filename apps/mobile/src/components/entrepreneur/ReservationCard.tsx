@@ -128,9 +128,9 @@ export default function ReservationCard({
   const headerTitle =
     title ||
     (role === "entrepreneur"
-      ? order.zzz_reservation?.zzz_user?.zzz_alias ||
-        (order.zzz_reservation?.zzz_user?.zzz_first_name
-          ? `${order.zzz_reservation.zzz_user.zzz_first_name} ${order.zzz_reservation.zzz_user.zzz_last_name || ""}`
+      ? order.zzz_reservation?.zzz_user?.alias ||
+        (order.zzz_reservation?.zzz_user?.firstName
+          ? `${order.zzz_reservation.zzz_user.firstName} ${order.zzz_reservation.zzz_user.lastName || ""}`
           : t("orders.registeredTourist"))
       : t("orders.registeredVenture")); // Fallback for venture name if not provided
 

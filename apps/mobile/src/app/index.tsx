@@ -2,16 +2,16 @@ import { useAuthStore } from "../stores/auth.store";
 import { View, Text, ScrollView } from "react-native";
 import Screen, { ScreenContent } from "../components/Screen";
 import { router } from "expo-router";
-import { CreateUserInput, COLORS, type User, type UserRole } from "@repo/shared";
+import { COLORS, type User, type UserRole } from "@repo/shared";
 import { getDemoUsersByRole } from "../mocks/users";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslations } from "../hooks/useI18n";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 
 import { Button } from "../components/Button";
-import { getVentureIdsByUserId } from "../mocks/venture-members";
-import { MOCK_VENTURES } from "../mocks/ventures.data";
 import { formatUserDisplayName } from "../logic/formatters";
+import env from "../config/env";
+import { logger } from "../services/logger.service";
 
 // Role colors from design system - mapped for icons and backgrounds
 const ROLE_COLORS = {
@@ -65,73 +65,53 @@ const ROLE_CONFIG = {
   },
 } as const;
 
-// Role metadata moved to i18n
-
 export default function RoleSelectorScreen() {
+  logger.debug("env.USE_MOCKS", { value: env.USE_MOCKS });
+  logger.debug("EXPO_PUBLIC_USE_MOCKS", { value: process.env.EXPO_PUBLIC_USE_MOCKS });
   const { setUserRole } = useAuthStore();
   const login = useAuthStore((state) => state.login);
 
   const getUserIdentifier = (user: User, role: UserRole): string => {
     if (role === "TOURIST") {
-      return user.zzz_alias || user.zzz_first_name || "Tourist";
+      return user.alias || user.firstName || "Tourist";
     }
-    return user.zzz_email || "";
+    return user.email || "";
   };
 
-  const handleDemoLogin = (user: User) => {
-    const role = user.zzz_user_type;
+  const handleDemoLogin = async (user: User) => {
+    const role = user.role;
     const isTourist = role === "TOURIST";
-    const identifier = getUserIdentifier(user, role);
 
-    const userData: CreateUserInput = isTourist
-      ? {
-          zzz_alias: identifier,
-          zzz_user_type: role,
-          zzz_email: null,
-          zzz_first_name: null,
-          zzz_last_name: null,
-          zzz_whatsapp: null,
-        }
-      : {
-          zzz_alias: null,
-          zzz_email: identifier,
-          zzz_user_type: role,
-          zzz_first_name: null,
-          zzz_last_name: null,
-          zzz_whatsapp: null,
-        };
+    try {
+      if (isTourist) {
+        await login({ alias: user.alias! });
+      } else {
+        await login({ email: user.email!, password: "password123" });
+      }
 
-    login(userData);
-    setUserRole(role);
+      setUserRole(role);
 
-    if (role === "TOURIST") {
-      router.push("/tourist");
-    } else if (role === "ENTREPRENEUR") {
-      router.push("/entrepreneur/agenda");
-    } else if (role === "ADMIN") {
-      router.push("/admin/project");
+      if (role === "TOURIST") {
+        router.replace("/tourist");
+      } else if (role === "ENTREPRENEUR") {
+        router.replace("/entrepreneur/agenda");
+      } else if (role === "ADMIN") {
+        router.replace("/admin/project");
+      }
+    } catch (error) {
+      logger.error("Demo login failed", error);
     }
   };
 
   const handleTouristSignUp = () => {
-    // Create a new tourist user with minimal data - will be filled in the form
-    const newUserData: CreateUserInput = {
-      zzz_alias: "",
-      zzz_user_type: "TOURIST",
-      zzz_email: null,
-      zzz_first_name: null,
-      zzz_last_name: null,
-      zzz_whatsapp: null,
-    };
-    login(newUserData);
     setUserRole("TOURIST");
     router.push("/tourist/login");
   };
 
   const demoUsersByRole = [
-    { role: "TOURIST" as const, users: getDemoUsersByRole("TOURIST") },
-    { role: "ENTREPRENEUR" as const, users: getDemoUsersByRole("ENTREPRENEUR") },
-    { role: "ADMIN" as const, users: getDemoUsersByRole("ADMIN") },
+    { role: "TOURIST" as const, users: env.USE_MOCKS ? getDemoUsersByRole("TOURIST") : [] },
+    { role: "ENTREPRENEUR" as const, users: env.USE_MOCKS ? getDemoUsersByRole("ENTREPRENEUR") : [] },
+    { role: "ADMIN" as const, users: env.USE_MOCKS ? getDemoUsersByRole("ADMIN") : [] },
   ] as const;
 
   const { t } = useTranslations();
@@ -187,41 +167,40 @@ export default function RoleSelectorScreen() {
                   />
                 )}
 
+                {/* Real Login Button - For Entrepreneur and Admin in Real Mode */}
+                {!env.USE_MOCKS && (group.role === "ENTREPRENEUR" || group.role === "ADMIN") && (
+                  <Button
+                    variant="primary"
+                    onPress={() => {
+                      setUserRole(group.role);
+                      router.push("/auth/login");
+                    }}
+                    leftIcon="login"
+                    title={t("common.login")}
+                    className="mb-3"
+                  />
+                )}
+
                 {/* Demo Users Grid */}
-                <View className="flex flex-row flex-wrap gap-2">
-                  {group.users.map((user) => {
-                    const identifier = getUserIdentifier(user, group.role);
+                {env.USE_MOCKS && (
+                  <View className="flex flex-row flex-wrap gap-2">
+                    {group.users.map((user) => {
+                      const identifier = getUserIdentifier(user, group.role);
+                      const displayName = formatUserDisplayName(identifier);
 
-                    // Resolve venture name for entrepreneurs
-                    let subtitle = undefined;
-                    if (group.role === "ENTREPRENEUR") {
-                      const ventureIds = getVentureIdsByUserId(user.zzz_id);
-                      if (ventureIds.length > 0) {
-                        const venture = MOCK_VENTURES.find((v) => v.zzz_id === ventureIds[0]);
-                        if (venture) {
-                          subtitle = venture.zzz_name;
-                        }
-                      }
-                    }
-
-                    const displayName = formatUserDisplayName(identifier);
-
-                    return (
-                      <Button
-                        key={user.zzz_id}
-                        variant="secondary"
-                        onPress={() => handleDemoLogin(user)}
-                        leftIcon="account-outline"
-                        rightIcon="chevron-right"
-                        iconColor={config.color}
-                        title={subtitle || displayName}
-                        subtitle={subtitle ? displayName : undefined}
-                        className={`flex-1 min-w-[45%] border ${config.borderClass} bg-surface-container-low px-3 py-2.5 rounded-lg`}
-                        accessibilityLabel={`Login as ${identifier}`}
-                      />
-                    );
-                  })}
-                </View>
+                      return (
+                        <Button
+                          key={user.id}
+                          variant="secondary"
+                          onPress={() => handleDemoLogin(user)}
+                          leftIcon="account-outline"
+                          title={displayName}
+                          className={`flex-1 min-w-[45%] border ${config.borderClass} bg-surface-container-low px-3 py-2.5 rounded-lg`}
+                        />
+                      );
+                    })}
+                  </View>
+                )}
               </View>
             );
           })}
