@@ -1,5 +1,5 @@
 import type { User } from "@repo/shared";
-import { MOCK_USERS } from "../mocks/users.data";
+import { MOCK_USERS } from "@repo/shared";
 
 /**
  * Shared auth state for mock usage.
@@ -15,7 +15,7 @@ interface AuthState {
 // Module-level state - always initialized with the first entrepreneur (Maria)
 const authState: AuthState = {
   users: [...MOCK_USERS],
-  currentUser: MOCK_USERS.find((u) => u.zzz_id === "entrepreneur_001") || null,
+  currentUser: MOCK_USERS.find((u) => u.id === "entrepreneur_001") || null,
   nextId: MOCK_USERS.length + 1,
 };
 

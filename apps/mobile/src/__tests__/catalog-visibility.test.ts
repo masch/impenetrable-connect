@@ -1,9 +1,9 @@
 import { CatalogService } from "../services/catalog.service";
 import { mockSetCurrentUser } from "../services/auth-state";
-import { MOCK_USERS } from "../mocks/users.data";
+import { MOCK_USERS } from "@repo/shared";
 
 describe("Catalog Visibility Integration", () => {
-  const touristUser = MOCK_USERS.find((u) => u.zzz_user_type === "TOURIST")!;
+  const touristUser = MOCK_USERS.find((u) => u.role === "TOURIST")!;
 
   beforeEach(() => {
     mockSetCurrentUser(touristUser);

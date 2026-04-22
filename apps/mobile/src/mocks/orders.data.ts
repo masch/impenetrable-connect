@@ -1,4 +1,9 @@
-import { Order, Reservation } from "@repo/shared";
+import {
+  Order,
+  Reservation,
+  MOCK_USER_TOURIST_WITH_ORDERS,
+  MOCK_VENTURE_WITH_ORDERS,
+} from "@repo/shared";
 import {
   ASADO_POLLO,
   EMPANADAS_VERDURA_DOCENA,
@@ -6,8 +11,6 @@ import {
   REPOLLO_ASADO,
   SERVICE_CATEGORY_IDS,
 } from "./catalog";
-import { MOCK_USER_TOURIST_WITH_ORDERS } from "./users.data";
-import { MOCK_VENTURE_WITH_ORDERS } from "./ventures.data";
 
 // Helper for dates relative to today
 const daysFromNow = (days: number) => {
@@ -22,7 +25,7 @@ const tomorrow = daysFromNow(1);
 
 const MOCK_RESERVATION_TODAY_LUNCH_CREATED: Reservation = {
   zzz_id: 1,
-  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.zzz_id,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
   zzz_service_date: today,
   zzz_time_of_day: "LUNCH",
   zzz_status: "CREATED",
@@ -30,7 +33,7 @@ const MOCK_RESERVATION_TODAY_LUNCH_CREATED: Reservation = {
 
 const MOCK_RESERVATION_TODAY_BREAKFAST_SEARCHING: Reservation = {
   zzz_id: 2,
-  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.zzz_id,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
   zzz_service_date: today,
   zzz_time_of_day: "BREAKFAST",
   zzz_status: "SEARCHING",
@@ -38,7 +41,7 @@ const MOCK_RESERVATION_TODAY_BREAKFAST_SEARCHING: Reservation = {
 
 const MOCK_RESERVATION_TOMORROW_DINNER_CONFIRMED: Reservation = {
   zzz_id: 3,
-  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.zzz_id,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
   zzz_service_date: tomorrow,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
@@ -46,7 +49,7 @@ const MOCK_RESERVATION_TOMORROW_DINNER_CONFIRMED: Reservation = {
 
 const MOCK_RESERVATION_TOMORROW_BREAKFAST_CANCELLED: Reservation = {
   zzz_id: 4,
-  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.zzz_id,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
   zzz_service_date: tomorrow,
   zzz_time_of_day: "BREAKFAST",
   zzz_status: "CANCELLED",
@@ -54,7 +57,7 @@ const MOCK_RESERVATION_TOMORROW_BREAKFAST_CANCELLED: Reservation = {
 
 const MOCK_RESERVATION_TODAY_LUNCH_CANCELLED: Reservation = {
   zzz_id: 5,
-  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.zzz_id,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
   zzz_service_date: today,
   zzz_time_of_day: "LUNCH",
   zzz_status: "CANCELLED",
@@ -62,7 +65,7 @@ const MOCK_RESERVATION_TODAY_LUNCH_CANCELLED: Reservation = {
 
 const MOCK_RESERVATION_TOMORROW_DINNER_CANCELLED: Reservation = {
   zzz_id: 6,
-  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.zzz_id,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
   zzz_service_date: tomorrow,
   zzz_time_of_day: "DINNER",
   zzz_status: "CANCELLED",
@@ -70,7 +73,7 @@ const MOCK_RESERVATION_TOMORROW_DINNER_CANCELLED: Reservation = {
 
 const MOCK_RESERVATION_TODAY_SNACK_CONFIRMED: Reservation = {
   zzz_id: 7,
-  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.zzz_id,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
   zzz_service_date: today,
   zzz_time_of_day: "SNACK",
   zzz_status: "CONFIRMED",
@@ -78,7 +81,7 @@ const MOCK_RESERVATION_TODAY_SNACK_CONFIRMED: Reservation = {
 
 const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_2: Reservation = {
   zzz_id: 8,
-  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.zzz_id,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
   zzz_service_date: today,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
@@ -86,7 +89,7 @@ const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_2: Reservation = {
 
 const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_3: Reservation = {
   zzz_id: 9,
-  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.zzz_id,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
   zzz_service_date: today,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
@@ -94,7 +97,7 @@ const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_3: Reservation = {
 
 const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_4: Reservation = {
   zzz_id: 10,
-  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.zzz_id,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
   zzz_service_date: today,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
@@ -102,7 +105,7 @@ const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_4: Reservation = {
 
 const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_5: Reservation = {
   zzz_id: 11,
-  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.zzz_id,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
   zzz_service_date: today,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
@@ -161,7 +164,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
     zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "OFFER_PENDING",
     zzz_confirmed_venture_id: null,
-    zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.zzz_id,
+    zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
       {
         zzz_id: 3,
@@ -187,7 +190,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
     zzz_reservation_id: MOCK_RESERVATION_TOMORROW_DINNER_CONFIRMED.zzz_id,
     zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CONFIRMED",
-    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.zzz_id,
+    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
       {
         zzz_id: 5,
@@ -206,7 +209,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
     zzz_reservation_id: MOCK_RESERVATION_TOMORROW_BREAKFAST_CANCELLED.zzz_id,
     zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CANCELLED",
-    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.zzz_id,
+    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
       {
         zzz_id: 6,
@@ -225,7 +228,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
     zzz_reservation_id: MOCK_RESERVATION_TODAY_LUNCH_CANCELLED.zzz_id,
     zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CANCELLED",
-    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.zzz_id,
+    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
       {
         zzz_id: 7,
@@ -244,7 +247,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
     zzz_reservation_id: MOCK_RESERVATION_TOMORROW_DINNER_CANCELLED.zzz_id,
     zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CANCELLED",
-    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.zzz_id,
+    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
       {
         zzz_id: 8,
@@ -270,7 +273,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
     zzz_reservation_id: MOCK_RESERVATION_TODAY_SNACK_CONFIRMED.zzz_id,
     zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CONFIRMED",
-    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.zzz_id,
+    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
       {
         zzz_id: 10,
@@ -289,7 +292,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
     zzz_reservation_id: MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_2.zzz_id,
     zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CONFIRMED",
-    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.zzz_id,
+    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
       {
         zzz_id: 11,
@@ -308,7 +311,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
     zzz_reservation_id: MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_3.zzz_id,
     zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CONFIRMED",
-    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.zzz_id,
+    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
       {
         zzz_id: 12,
@@ -334,7 +337,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
     zzz_reservation_id: MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_4.zzz_id,
     zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CONFIRMED",
-    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.zzz_id,
+    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
       {
         zzz_id: 13,
@@ -360,7 +363,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
     zzz_reservation_id: MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_5.zzz_id,
     zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CONFIRMED",
-    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.zzz_id,
+    zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
       {
         zzz_id: 14,

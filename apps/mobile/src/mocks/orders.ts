@@ -1,10 +1,8 @@
-import { Order, Reservation } from "@repo/shared";
+import { Order, Reservation, MOCK_USERS, MOCK_VENTURES } from "@repo/shared";
 import { getMockUserId } from "./users";
 import { logger } from "../services/logger.service";
 import { INITIAL_MOCK_ORDERS, MOCK_RESERVATIONS } from "./orders.data";
 import { MOCK_CATALOG_ITEMS } from "./catalog";
-import { MOCK_USERS } from "./users.data";
-import { MOCK_VENTURES } from "./ventures.data";
 
 /**
  * Mock services for orders
@@ -33,7 +31,7 @@ export function getMockReservations(): Reservation[] {
   return ordersState.reservations.filter((r: Reservation) => r.zzz_user_id === userId);
 }
 
-// Fallback for zzz_user ID to ensure visibility in mock mode
+// Fallback for user ID to ensure visibility in mock mode
 const getEffectiveUserId = () => {
   return getMockUserId();
 };
@@ -43,13 +41,11 @@ const getEffectiveUserId = () => {
  */
 export function getAllMockOrders(): Order[] {
   return ordersState.orders.map((order) => {
-    const zzz_reservation = ordersState.reservations.find(
-      (r) => r.zzz_id === order.zzz_reservation_id,
-    );
-    const enrichedReservation = zzz_reservation
+    const reservation = ordersState.reservations.find((r) => r.zzz_id === order.zzz_reservation_id);
+    const enrichedReservation = reservation
       ? {
-          ...zzz_reservation,
-          zzz_user: MOCK_USERS.find((u) => u.zzz_id === zzz_reservation.zzz_user_id),
+          ...reservation,
+          zzz_user: MOCK_USERS.find((u) => u.id === reservation.zzz_user_id),
         }
       : undefined;
 
@@ -59,11 +55,11 @@ export function getAllMockOrders(): Order[] {
     }));
 
     const confirmedVenture = order.zzz_confirmed_venture_id
-      ? MOCK_VENTURES.find((v) => v.zzz_id === order.zzz_confirmed_venture_id)
+      ? MOCK_VENTURES.find((v) => v.id === order.zzz_confirmed_venture_id)
       : undefined;
 
     const currentOfferVenture = order.zzz_current_offer_venture_id
-      ? MOCK_VENTURES.find((v) => v.zzz_id === order.zzz_current_offer_venture_id)
+      ? MOCK_VENTURES.find((v) => v.id === order.zzz_current_offer_venture_id)
       : undefined;
 
     return {
@@ -77,25 +73,23 @@ export function getAllMockOrders(): Order[] {
 }
 
 /**
- * Get mock orders for the current zzz_user (filtered)
+ * Get mock orders for the current user (filtered)
  */
 export function getMockOrders(): Order[] {
   const userId = getEffectiveUserId();
 
-  // Filter orders by checking their zzz_reservation's zzz_user_id
+  // Filter orders by checking their reservation's user_id
   const orders = ordersState.orders.filter((o: Order) => {
-    const zzz_reservation = ordersState.reservations.find((r) => r.zzz_id === o.zzz_reservation_id);
-    return zzz_reservation?.zzz_user_id === userId;
+    const reservation = ordersState.reservations.find((r) => r.zzz_id === o.zzz_reservation_id);
+    return reservation?.zzz_user_id === userId;
   });
 
   return orders.map((order) => {
-    const zzz_reservation = ordersState.reservations.find(
-      (r) => r.zzz_id === order.zzz_reservation_id,
-    );
-    const enrichedReservation = zzz_reservation
+    const reservation = ordersState.reservations.find((r) => r.zzz_id === order.zzz_reservation_id);
+    const enrichedReservation = reservation
       ? {
-          ...zzz_reservation,
-          zzz_user: MOCK_USERS.find((u) => u.zzz_id === zzz_reservation.zzz_user_id),
+          ...reservation,
+          zzz_user: MOCK_USERS.find((u) => u.id === reservation.zzz_user_id),
         }
       : undefined;
 
@@ -105,11 +99,11 @@ export function getMockOrders(): Order[] {
     }));
 
     const confirmedVenture = order.zzz_confirmed_venture_id
-      ? MOCK_VENTURES.find((v) => v.zzz_id === order.zzz_confirmed_venture_id)
+      ? MOCK_VENTURES.find((v) => v.id === order.zzz_confirmed_venture_id)
       : undefined;
 
     const currentOfferVenture = order.zzz_current_offer_venture_id
-      ? MOCK_VENTURES.find((v) => v.zzz_id === order.zzz_current_offer_venture_id)
+      ? MOCK_VENTURES.find((v) => v.id === order.zzz_current_offer_venture_id)
       : undefined;
 
     return {
@@ -131,56 +125,56 @@ export function addMockOrder(order: Omit<Order, "zzz_id">) {
     ...order,
   };
   ordersState.orders = [newOrder, ...ordersState.orders];
-  logger.info("[MOCK API] Created order from zzz_reservation:", { ...newOrder });
+  logger.info("[MOCK API] Created order from reservation:", { ...newOrder });
   return newOrder;
 }
 
 /**
  * Update a mock order with new data
  */
-export function updateMockOrder(zzz_id: number, updates: Partial<Order>) {
+export function updateMockOrder(id: number, updates: Partial<Order>) {
   ordersState.orders = ordersState.orders.map((o: Order) =>
-    Number(o.zzz_id) === Number(zzz_id) ? { ...o, ...updates } : o,
+    Number(o.zzz_id) === Number(id) ? { ...o, ...updates } : o,
   );
-  logger.info(`[MOCK] Updated order ${zzz_id} (new array reference created)`);
+  logger.info(`[MOCK] Updated order ${id} (new array reference created)`);
 }
 
 /**
  * Get a single order by ID
  */
-export const getMockOrderById = (zzz_id: number): Order | undefined => {
-  return ordersState.orders.find((o: Order) => Number(o.zzz_id) === Number(zzz_id));
+export const getMockOrderById = (id: number): Order | undefined => {
+  return ordersState.orders.find((o: Order) => Number(o.zzz_id) === Number(id));
 };
 
 /**
- * Update an order zzz_status
+ * Update an order status
  */
-export function updateMockOrderStatus(zzz_id: number, zzz_status: Order["zzz_global_status"]) {
+export function updateMockOrderStatus(id: number, status: Order["zzz_global_status"]) {
   ordersState.orders = ordersState.orders.map((o: Order) =>
-    Number(o.zzz_id) === Number(zzz_id) ? { ...o, zzz_global_status: zzz_status } : o,
+    Number(o.zzz_id) === Number(id) ? { ...o, zzz_global_status: status } : o,
   );
-  logger.info(`[MOCK] Updated order zzz_status ${zzz_id} to ${zzz_status}`);
+  logger.info(`[MOCK] Updated order status ${id} to ${status}`);
 }
 
 /**
- * Add a zzz_reservation to the mock collection
+ * Add a reservation to the mock collection
  */
-export function addMockReservation(zzz_reservation: Omit<Reservation, "zzz_id">): Reservation {
+export function addMockReservation(reservation: Omit<Reservation, "zzz_id">): Reservation {
   const newReservation: Reservation = {
     zzz_id: Math.floor(Math.random() * 100000),
-    ...zzz_reservation,
+    ...reservation,
   };
   ordersState.reservations = [newReservation, ...ordersState.reservations];
-  logger.info("[MOCK API] Created zzz_reservation:", { ...newReservation });
+  logger.info("[MOCK API] Created reservation:", { ...newReservation });
   return newReservation;
 }
 
 /**
- * Update a mock zzz_reservation with new data
+ * Update a mock reservation with new data
  */
-export function updateMockReservation(zzz_id: number, updates: Partial<Reservation>) {
+export function updateMockReservation(id: number, updates: Partial<Reservation>) {
   ordersState.reservations = ordersState.reservations.map((r: Reservation) =>
-    Number(r.zzz_id) === Number(zzz_id) ? { ...r, ...updates } : r,
+    Number(r.zzz_id) === Number(id) ? { ...r, ...updates } : r,
   );
-  logger.info(`[MOCK] Updated zzz_reservation ${zzz_id} (new array reference created)`);
+  logger.info(`[MOCK] Updated reservation ${id} (new array reference created)`);
 }

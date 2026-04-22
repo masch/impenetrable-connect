@@ -34,7 +34,11 @@
     "whatsapp_placeholder": "3624 000000",
     "first_name_label": "Nombre",
     "last_name_label": "Apellido",
-    "submit_button": "Comenzar"
+    "submit_button": "Comenzar",
+    "email_label": "Email",
+    "password_label": "Contraseña",
+    "admin_portal": "Portal de Administrador",
+    "entrepreneur_panel": "Panel de Emprendedor"
   },
   "validation": {
     "name_required": "El nombre es requerido",
@@ -190,7 +194,11 @@
   "errors": {
     "login_required_title": "Login requerido",
     "login_required_message": "Debes iniciar sesión para hacer una reserva",
-    "reservation_failed": "Error al hacer la reserva"
+    "reservation_failed": "Error al hacer la reserva",
+    "auth": {
+      "connection_failed": "No se pudo conectar con el servidor. Por favor, verificá si el backend está encendido.",
+      "invalid_credentials": "Email o contraseña incorrectos."
+    }
   },
   "common": {
     "ok": "OK",
@@ -214,7 +222,8 @@
     "tomorrow_short": "MAÑ",
     "total": "Total",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "back": "Volver"
   },
   "role_selector": {
     "welcome": "Bienvenido",

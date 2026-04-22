@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "./utils/test-utils";
+import { render, screen, fireEvent, waitFor } from "./utils/test-utils";
 import RoleSelectorScreen from "../app/index";
 import TouristTabsLayout from "../app/tourist/_layout";
 import { mockAuthState } from "./utils/auth-utils";
@@ -26,19 +26,18 @@ describe("Tourist Role Flow", () => {
       });
     });
 
-    it("navigates to the catalog when 'Familia Gómez' is selected", () => {
+    it("navigates to the catalog when 'Familia Gómez' is selected", async () => {
       render(<RoleSelectorScreen />);
       const gomezButton = screen.getByText("Familia Gómez");
       fireEvent.press(gomezButton);
 
-      expect(mockSetUserRole).toHaveBeenCalledWith("TOURIST");
-      expect(mockLogin).toHaveBeenCalledWith(
-        expect.objectContaining({
-          zzz_user_type: "TOURIST",
-          zzz_alias: "Familia Gómez",
-        }),
-      );
-      expect(router.push).toHaveBeenCalledWith("/tourist");
+      await waitFor(() => {
+        expect(mockSetUserRole).toHaveBeenCalledWith("TOURIST");
+        expect(mockLogin).toHaveBeenCalledWith({
+          alias: "Familia Gómez",
+        });
+        expect(router.replace).toHaveBeenCalledWith("/tourist");
+      });
     });
   });
 
@@ -47,7 +46,7 @@ describe("Tourist Role Flow", () => {
       mockAuthState({
         userRole: "TOURIST",
         isAuthenticated: true,
-        currentUser: { zzz_id: "tourist_001", zzz_user_type: "TOURIST" },
+        currentUser: { id: "tourist_001", role: "TOURIST" },
       });
     });
 

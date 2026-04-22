@@ -1,5 +1,4 @@
-import { Order } from "@repo/shared";
-import { MOCK_VENTURE_WITH_ORDERS } from "./ventures.data";
+import { Order, MOCK_VENTURE_WITH_ORDERS } from "@repo/shared";
 import { getAllMockOrders } from "./orders";
 
 export { MOCK_VENTURE_WITH_ORDERS };
@@ -12,9 +11,7 @@ export { MOCK_VENTURE_WITH_ORDERS };
  * Orders specifically for the agenda view.
  * Uses a function to ensure we always get the latest state from the mock system.
  */
-export function getMockAgendaOrders(
-  ventureIds: number[] = [MOCK_VENTURE_WITH_ORDERS.zzz_id],
-): Order[] {
+export function getMockAgendaOrders(ventureIds: number[] = [MOCK_VENTURE_WITH_ORDERS.id]): Order[] {
   return getAllMockOrders().filter(
     (order) =>
       (order.zzz_confirmed_venture_id && ventureIds.includes(order.zzz_confirmed_venture_id)) ||

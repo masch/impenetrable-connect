@@ -1949,27 +1949,12 @@ erDiagram
     %% ==========================================
     %% SECURITY & ACCESS LAYER
     %% ==========================================
-    User_Session {
+    refresh_tokens {
         uuid zzz_id PK
-        int zzz_user_id FK "References User"
-        string zzz_access_token_hash "Hash of JWT access token"
-        string zzz_refresh_token_hash "Hash of refresh token"
-        timestamp zzz_access_token_expires_at
-        timestamp zzz_refresh_token_expires_at
+        uuid zzz_user_id FK "References users"
+        string zzz_token "Opaque refresh token"
+        timestamp zzz_expires_at
         timestamp zzz_created_at
-        timestamp zzz_last_used_at
-        boolean zzz_is_revoked "Default FALSE"
-    }
-
-    Tourist_Device {
-        uuid zzz_id PK
-        uuid zzz_user_id FK "Links to User"
-        string zzz_device_fingerprint "Browser fingerprint (User-Agent + Screen + Timezone)"
-        string zzz_refresh_token_hash "Opaque refresh token (not JWT)"
-        string zzz_push_token "Optional push notification token"
-        timestamp zzz_expires_at "When this refresh token expires"
-        timestamp zzz_created_at
-        timestamp zzz_last_used_at
     }
 
     %% ==========================================
@@ -1992,15 +1977,8 @@ erDiagram
         uuid zzz_id PK
         string zzz_alias "Nullable - tourists only"
         string zzz_email "Nullable - admin/entrepreneur only"
-        string zzz_password_hash "bcrypt or argon2 - admin/entrepreneur only"
-        string zzz_first_name "Nullable"
-        string zzz_last_name "Nullable"
-        string zzz_whatsapp "Nullable. For order notifications"
-        enum zzz_user_type "TOURIST, ADMIN, ENTREPRENEUR"
-        int zzz_failed_login_attempts "Default 0. Lock after 5 failed attempts"
-        timestamp zzz_locked_until "Nullable. Lockout expiration time"
-        timestamp zzz_last_login_at
-        boolean zzz_is_active "Default TRUE"
+        string zzz_password "Hashed - admin/entrepreneur only"
+        enum zzz_role "TOURIST, ADMIN, ENTREPRENEUR"
         timestamp zzz_created_at
     }
 

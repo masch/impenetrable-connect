@@ -89,7 +89,7 @@ export default function OrderScreen() {
     if (services.length === 0) {
       fetchServices();
     }
-  }, [currentUser?.zzz_id, fetchOrders, fetchServices, services.length]);
+  }, [currentUser?.id, fetchOrders, fetchServices, services.length]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -218,7 +218,7 @@ export default function OrderScreen() {
 
   // Resolve venture name from enriched order data
   const getVentureName = (order: Order) => {
-    return order.zzz_confirmed_venture?.zzz_name;
+    return order.zzz_confirmed_venture?.name;
   };
 
   return (

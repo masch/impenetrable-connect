@@ -1,6 +1,13 @@
 import { z } from "zod";
 import type { ZodIssue, ZodSchema } from "zod";
-import { User, CreateUserSchema, CreateUserInput } from "@repo/shared";
+import {
+  User,
+  LoginInput,
+  LoginInputSchema,
+  AuthResponse,
+  CreateUserInput,
+  CreateUserInputSchema,
+} from "@repo/shared";
 import env from "../config/env";
 import { findUserByAlias, findUserByEmail } from "../mocks/users";
 import { getAuthState } from "./auth-state";
@@ -20,45 +27,67 @@ function validateData<S extends ZodSchema>(data: unknown, schema: S): z.output<S
 }
 
 interface AuthServiceInterface {
-  login(userData: CreateUserInput): Promise<User>;
+  login(input: LoginInput): Promise<AuthResponse>;
+  createTourist(input: CreateUserInput): Promise<AuthResponse>;
   getCurrentUser(): Promise<User | null>;
   logout(): Promise<void>;
 }
 
 const MockAuthService: AuthServiceInterface = {
-  login: async (userData: CreateUserInput) => {
+  login: async (input: LoginInput) => {
     await new Promise((r) => setTimeout(r, 500));
     // Validate input using Zod
-    const validated = validateData(userData, CreateUserSchema);
-    // Check if user exists in mock data
-    const alias = validated.zzz_alias ?? "";
-    const existingUser = findUserByAlias(alias);
+    const validated = validateData(input, LoginInputSchema);
     const state = getAuthState();
-    if (existingUser) {
-      state.currentUser = {
-        ...existingUser,
-        zzz_last_login_at: new Date(),
-      };
-      return state.currentUser;
+
+    let existingUser: User | undefined;
+
+    if ("email" in validated) {
+      existingUser = findUserByEmail(validated.email);
+    } else {
+      existingUser = findUserByAlias(validated.alias);
     }
-    // Create new user
-    const newUser: User = {
-      zzz_id: `user_${state.nextId++}`,
-      zzz_alias: validated.zzz_alias,
-      zzz_email: validated.zzz_email,
-      zzz_first_name: validated.zzz_first_name,
-      zzz_last_name: validated.zzz_last_name,
-      zzz_whatsapp: validated.zzz_whatsapp,
-      zzz_user_type: validated.zzz_user_type ?? "TOURIST",
-      zzz_failed_login_attempts: 0,
-      zzz_locked_until: null,
+
+    if (!existingUser) {
+      throw new Error("Invalid credentials (Mock)");
+    }
+
+    state.currentUser = {
+      ...existingUser,
       zzz_last_login_at: new Date(),
-      zzz_is_active: true,
-      zzz_created_at: new Date(),
     };
+
+    return {
+      accessToken: "mock-access-token",
+      refreshToken: "mock-refresh-token",
+      user: state.currentUser,
+    };
+  },
+
+  createTourist: async (input: CreateUserInput) => {
+    await new Promise((r) => setTimeout(r, 500));
+    const validated = validateData(input, CreateUserInputSchema);
+    const state = getAuthState();
+
+    const newUser: User = {
+      id: `user_${state.nextId++}`,
+      ...validated,
+      role: "TOURIST",
+      zzz_failed_login_attempts: 0,
+      zzz_last_login_at: new Date(),
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
     state.users.push(newUser);
     state.currentUser = newUser;
-    return state.currentUser;
+
+    return {
+      accessToken: "mock-access-token",
+      refreshToken: "mock-refresh-token",
+      user: newUser,
+    };
   },
 
   getCurrentUser: async () => {
@@ -73,81 +102,51 @@ const MockAuthService: AuthServiceInterface = {
 };
 
 const RestAuthService: AuthServiceInterface = {
-  login: async (userData: CreateUserInput) => {
+  login: async (input: LoginInput) => {
+    try {
+      const response = await fetch(`${env.API_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const message = errorData.message === "Invalid credentials" 
+          ? "errors.auth.invalid_credentials" 
+          : (errorData.message || "errors.auth.invalid_credentials");
+        throw new Error(message);
+      }
+      return response.json();
+    } catch (error) {
+      if (error instanceof TypeError && error.message === "Network request failed") {
+        throw new Error("errors.auth.connection_failed");
+      }
+      throw error;
+    }
+  },
+
+  createTourist: async (input: CreateUserInput) => {
     const response = await fetch(`${env.API_URL}/auth/tourist/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData),
+      body: JSON.stringify(input),
     });
-    if (!response.ok) throw new Error("API error creating user");
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Registration failed");
+    }
     return response.json();
   },
 
   getCurrentUser: async () => {
-    const response = await fetch(`${env.API_URL}/auth/me`);
-    if (response.status === 401) return null;
-    if (!response.ok) throw new Error("API error fetching user");
-    return response.json();
+    // In a real app, this would check tokens and maybe call /auth/me
+    return getAuthState().currentUser;
   },
 
   logout: async () => {
-    await fetch(`${env.API_URL}/auth/logout`, { method: "POST" });
+    // In a real app, this would invalidate the session on the server
+    getAuthState().currentUser = null;
   },
 };
 
-export const AuthService = env.USE_MOCKS ? MockAuthService : RestAuthService;
-
-/**
- * Mock login - searches in mock users or creates new one
- * - Tourists: found by alias
- * - Entrepreneurs/Admins: found by email
- */
-export function mockLogin(userData: CreateUserInput): User {
-  const state = getAuthState();
-
-  // Check if user exists in mock data
-  // Try alias first (for tourists)
-  if (userData.zzz_alias) {
-    const existingUser = findUserByAlias(userData.zzz_alias);
-    if (existingUser) {
-      state.currentUser = {
-        ...existingUser,
-        zzz_last_login_at: new Date(),
-      };
-      return state.currentUser;
-    }
-  }
-
-  // Try email (for entrepreneurs/admins)
-  if (userData.zzz_email) {
-    const existingUser = findUserByEmail(userData.zzz_email);
-    if (existingUser) {
-      state.currentUser = {
-        ...existingUser,
-        zzz_last_login_at: new Date(),
-      };
-      return state.currentUser;
-    }
-  }
-
-  // Create new user only if not found (convert null to undefined)
-  const newUser: User = {
-    zzz_id: `user_${state.nextId++}`,
-    zzz_alias: userData.zzz_alias ?? null,
-    zzz_email: userData.zzz_email ?? null,
-    zzz_first_name: userData.zzz_first_name ?? null,
-    zzz_last_name: userData.zzz_last_name ?? null,
-    zzz_whatsapp: userData.zzz_whatsapp ?? null,
-    zzz_user_type: userData.zzz_user_type ?? "TOURIST",
-    zzz_failed_login_attempts: 0,
-    zzz_locked_until: null,
-    zzz_last_login_at: new Date(),
-    zzz_is_active: true,
-    zzz_created_at: new Date(),
-  };
-  state.users.push(newUser);
-  state.currentUser = newUser;
-  return state.currentUser;
-}
-
-export { mockLogout, mockGetCurrentUser, mockSetCurrentUser } from "./auth-state";
+export const authService: AuthServiceInterface = env.USE_MOCKS ? MockAuthService : RestAuthService;

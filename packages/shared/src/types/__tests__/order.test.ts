@@ -39,8 +39,8 @@ describe("OrderSchema", () => {
     // If we use .strict() or if ZodError is triggered by missing items
     // But since I'm removing the field from schema, Zod will just ignore it.
     // I'll test that the parsed result DOES NOT have catalog_item_id.
-    const result = OrderSchema.parse(deprecatedOrder) as any;
-    expect(result.zzz_catalog_item_id).toBeUndefined();
+    const result = OrderSchema.parse(deprecatedOrder);
+    expect(result).not.toHaveProperty("zzz_catalog_item_id");
   });
 
   it("should fail if reservation_id is missing", () => {

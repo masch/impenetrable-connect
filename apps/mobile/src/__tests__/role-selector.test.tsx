@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "./utils/test-utils";
+import { render, screen, fireEvent, waitFor } from "./utils/test-utils";
 import RoleSelectorScreen from "../app/index";
 import { useAuthStore } from "../stores/auth.store";
 import { router } from "expo-router";
@@ -55,29 +55,23 @@ describe("RoleSelectorScreen UI (Archetypal Test)", () => {
     fireEvent.press(signUpButton);
 
     expect(mockSetUserRole).toHaveBeenCalledWith("TOURIST");
-    expect(mockLogin).toHaveBeenCalledWith(
-      expect.objectContaining({
-        zzz_user_type: "TOURIST",
-        zzz_alias: "",
-      }),
-    );
+    expect(mockLogin).not.toHaveBeenCalled();
     expect(router.push).toHaveBeenCalledWith("/tourist/login");
   });
 
-  it("handles demo user login correctly", () => {
+  it("handles demo user login correctly", async () => {
     render(<RoleSelectorScreen />);
 
     // Click on a demo tourist
     const demoUserButton = screen.getByText("Familia Gómez");
     fireEvent.press(demoUserButton);
 
-    expect(mockSetUserRole).toHaveBeenCalledWith("TOURIST");
-    expect(mockLogin).toHaveBeenCalledWith(
-      expect.objectContaining({
-        zzz_user_type: "TOURIST",
-        zzz_alias: "Familia Gómez",
-      }),
-    );
-    expect(router.push).toHaveBeenCalledWith("/tourist");
+    await waitFor(() => {
+      expect(mockSetUserRole).toHaveBeenCalledWith("TOURIST");
+      expect(mockLogin).toHaveBeenCalledWith({
+        alias: "Familia Gómez",
+      });
+      expect(router.replace).toHaveBeenCalledWith("/tourist");
+    });
   });
 });

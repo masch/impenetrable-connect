@@ -1,73 +1,92 @@
 import { create } from "zustand";
-import { User, CreateUserInput, UserRole } from "@repo/shared";
-import env from "../config/env";
-import { mockLogin, mockLogout } from "../services/auth.service";
+import { User, UserRole, LoginInput, CreateUserInput } from "@repo/shared";
+import { authService } from "../services/auth.service";
+import { logger } from "../services/logger.service";
 
 interface AuthState {
-  // User state - using User entity from shared package (DER)
   currentUser: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  error: string | null;
 
   // Role for tab routing
   userRole: UserRole;
   setUserRole: (role: UserRole) => void;
 
   // Actions
-  login: (userData: CreateUserInput) => void;
-  logout: () => void;
+  login: (input: LoginInput) => Promise<void>;
+  register: (input: CreateUserInput) => Promise<void>;
+  logout: () => Promise<void>;
   setLoading: (loading: boolean) => void;
+  clearError: () => void;
 }
 
-// Mock auth for early development - will be replaced with real auth API
 export const useAuthStore = create<AuthState>((set) => ({
   currentUser: null,
   isAuthenticated: false,
   isLoading: false,
+  error: null,
   userRole: "TOURIST",
 
   setUserRole: (role) => set({ userRole: role }),
 
-  login: (userData) => {
-    if (env.USE_MOCKS) {
-      const user = mockLogin(userData);
+  login: async (input: LoginInput) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await authService.login(input);
       set({
-        currentUser: user,
+        currentUser: response.user,
         isAuthenticated: true,
         isLoading: false,
-        userRole: user.zzz_user_type,
+        userRole: response.user.role,
       });
-    } else {
-      // TODO: Call real auth API
-      const user: User = {
-        zzz_id: `user_${Date.now()}`,
-        zzz_alias: userData.zzz_alias,
-        zzz_email: userData.zzz_email,
-        zzz_first_name: userData.zzz_first_name,
-        zzz_last_name: userData.zzz_last_name,
-        zzz_whatsapp: userData.zzz_whatsapp,
-        zzz_user_type: userData.zzz_user_type ?? "TOURIST",
-        zzz_failed_login_attempts: 0,
-        zzz_locked_until: null,
-        zzz_last_login_at: new Date(),
-        zzz_is_active: true,
-        zzz_created_at: new Date(),
-      };
+      // Note: In a production app, we would persist tokens to SecureStore here
+    } catch (error) {
       set({
-        currentUser: user,
-        isAuthenticated: true,
+        error: error instanceof Error ? error.message : "Login failed",
         isLoading: false,
-        userRole: user.zzz_user_type,
+        isAuthenticated: false,
       });
+      throw error;
     }
   },
 
-  logout: () => {
-    if (env.USE_MOCKS) {
-      mockLogout();
+  register: async (input: CreateUserInput) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await authService.createTourist(input);
+      set({
+        currentUser: response.user,
+        isAuthenticated: true,
+        isLoading: false,
+        userRole: response.user.role,
+      });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : "Registration failed",
+        isLoading: false,
+        isAuthenticated: false,
+      });
+      throw error;
     }
-    set({ currentUser: null, isAuthenticated: false, userRole: "TOURIST" });
+  },
+
+  logout: async () => {
+    set({ isLoading: true });
+    try {
+      await authService.logout();
+      set({
+        currentUser: null,
+        isAuthenticated: false,
+        isLoading: false,
+        userRole: "TOURIST",
+      });
+    } catch (error) {
+      set({ isLoading: false });
+      logger.error("Logout failed", error);
+    }
   },
 
   setLoading: (loading) => set({ isLoading: loading }),
+  clearError: () => set({ error: null }),
 }));

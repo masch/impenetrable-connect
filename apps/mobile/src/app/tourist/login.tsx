@@ -9,34 +9,34 @@ import { useTranslations } from "../../hooks/useI18n";
 import { useAuthStore } from "../../stores/auth.store";
 import { CreateUserInput } from "@repo/shared";
 import jaguarHero from "../../../assets/jaguar-hero.png";
+import { logger } from "../../services/logger.service";
 
 interface LoginFormData {
-  zzz_alias: string;
-  zzz_whatsapp: string;
-  zzz_first_name: string;
-  zzz_last_name: string;
+  alias: string;
+  phoneNumber: string;
+  firstName: string;
+  lastName: string;
 }
 
 interface FormErrors {
-  zzz_alias?: string;
+  alias?: string;
 }
 
 export default function LoginScreen() {
   const { t } = useTranslations();
   const router = useRouter();
-  const login = useAuthStore((state) => state.login);
   const [formData, setFormData] = useState<LoginFormData>({
-    zzz_alias: "",
-    zzz_whatsapp: "",
-    zzz_first_name: "",
-    zzz_last_name: "",
+    alias: "",
+    phoneNumber: "",
+    firstName: "",
+    lastName: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
-    if (!formData.zzz_alias.trim()) {
-      newErrors.zzz_alias = t("login.alias_required");
+    if (!formData.alias.trim()) {
+      newErrors.alias = t("login.alias_required");
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -48,15 +48,21 @@ export default function LoginScreen() {
     }
     const toNullable = (v: string | undefined) => (v ? v : null);
     const userData: CreateUserInput = {
-      zzz_alias: formData.zzz_alias.trim(),
-      zzz_first_name: toNullable(formData.zzz_first_name.trim()) || null,
-      zzz_last_name: toNullable(formData.zzz_last_name.trim()) || null,
-      zzz_whatsapp: toNullable(formData.zzz_whatsapp.trim()) || null,
-      zzz_user_type: "TOURIST",
-      zzz_email: null,
+      alias: formData.alias.trim(),
+      firstName: toNullable(formData.firstName.trim()) || null,
+      lastName: toNullable(formData.lastName.trim()) || null,
+      phoneNumber: toNullable(formData.phoneNumber.trim()) || null,
+      role: "TOURIST",
+      email: null,
     };
-    login(userData);
-    router.push("/tourist");
+    const register = useAuthStore.getState().register;
+    register(userData)
+      .then(() => {
+        router.replace("/tourist");
+      })
+      .catch((error) => {
+        logger.error("Registration failed", error);
+      });
   };
 
   const updateField = (field: keyof LoginFormData, value: string) => {
@@ -101,10 +107,10 @@ export default function LoginScreen() {
                   <FormInput
                     label={t("login.alias_label")}
                     placeholder={t("login.alias_placeholder")}
-                    value={formData.zzz_alias}
-                    onChangeText={(value) => updateField("zzz_alias", value)}
+                    value={formData.alias}
+                    onChangeText={(value) => updateField("alias", value)}
                     required
-                    error={errors.zzz_alias}
+                    error={errors.alias}
                   />
 
                   <View className="pt-2 space-y-3">
@@ -120,19 +126,19 @@ export default function LoginScreen() {
                       label={t("login.whatsapp_label")}
                       placeholder={t("login.whatsapp_placeholder")}
                       keyboardType="phone-pad"
-                      value={formData.zzz_whatsapp}
-                      onChangeText={(value) => updateField("zzz_whatsapp", value)}
+                      value={formData.phoneNumber}
+                      onChangeText={(value) => updateField("phoneNumber", value)}
                     />
                     <View className="grid grid-cols-2 gap-3">
                       <FormInput
                         label={t("login.first_name_label")}
-                        value={formData.zzz_first_name}
-                        onChangeText={(value) => updateField("zzz_first_name", value)}
+                        value={formData.firstName}
+                        onChangeText={(value) => updateField("firstName", value)}
                       />
                       <FormInput
                         label={t("login.last_name_label")}
-                        value={formData.zzz_last_name}
-                        onChangeText={(value) => updateField("zzz_last_name", value)}
+                        value={formData.lastName}
+                        onChangeText={(value) => updateField("lastName", value)}
                       />
                     </View>
                   </View>

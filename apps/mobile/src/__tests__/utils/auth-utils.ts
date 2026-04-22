@@ -18,24 +18,24 @@ export const mockAuthState = (overrides: {
   // Create a base user that satisfies all mandatory fields
   const baseUser: User | null = overrides.currentUser
     ? ({
-        zzz_id: "test-user-id",
-        zzz_alias: null,
-        zzz_email: null,
-        zzz_first_name: null,
-        zzz_last_name: null,
-        zzz_whatsapp: null,
-        zzz_user_type: "TOURIST",
+        id: "test-user-id",
+        alias: null,
+        email: null,
+        firstName: null,
+        lastName: null,
+        phoneNumber: null,
+        role: "TOURIST",
         zzz_failed_login_attempts: 0,
-        zzz_locked_until: null,
         zzz_last_login_at: null,
-        zzz_is_active: true,
-        zzz_created_at: new Date(),
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         ...overrides.currentUser,
       } as User)
     : null;
 
   const defaultState = {
-    userRole: overrides.userRole ?? baseUser?.zzz_user_type ?? "TOURIST",
+    userRole: overrides.userRole ?? baseUser?.role ?? "TOURIST",
     isAuthenticated: overrides.isAuthenticated ?? !!baseUser,
     currentUser: baseUser,
     setUserRole: overrides.setUserRole ?? jest.fn(),

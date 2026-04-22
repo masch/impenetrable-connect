@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "./utils/test-utils";
+import { render, screen, fireEvent, waitFor } from "./utils/test-utils";
 import RoleSelectorScreen from "../app/index";
 import EntrepreneurTabsLayout from "../app/entrepreneur/_layout";
 import { mockAuthState } from "./utils/auth-utils";
@@ -26,19 +26,19 @@ describe("Entrepreneur Role Flow", () => {
       });
     });
 
-    it("navigates to the agenda when an entrepreneur demo user is selected", () => {
+    it("navigates to the agenda when an entrepreneur demo user is selected", async () => {
       render(<RoleSelectorScreen />);
       const mariaButton = screen.getByText("maria");
       fireEvent.press(mariaButton);
 
-      expect(mockSetUserRole).toHaveBeenCalledWith("ENTREPRENEUR");
-      expect(mockLogin).toHaveBeenCalledWith(
-        expect.objectContaining({
-          zzz_user_type: "ENTREPRENEUR",
-          zzz_email: "maria@forst-stew.com",
-        }),
-      );
-      expect(router.push).toHaveBeenCalledWith("/entrepreneur/agenda");
+      await waitFor(() => {
+        expect(mockSetUserRole).toHaveBeenCalledWith("ENTREPRENEUR");
+        expect(mockLogin).toHaveBeenCalledWith({
+          email: "maria@forst-stew.com",
+          password: "password123",
+        });
+        expect(router.replace).toHaveBeenCalledWith("/entrepreneur/agenda");
+      });
     });
   });
 
@@ -47,7 +47,7 @@ describe("Entrepreneur Role Flow", () => {
       mockAuthState({
         userRole: "ENTREPRENEUR",
         isAuthenticated: true,
-        currentUser: { zzz_id: "entrepreneur_001", zzz_user_type: "ENTREPRENEUR" },
+        currentUser: { id: "entrepreneur_001", role: "ENTREPRENEUR" },
       });
     });
 

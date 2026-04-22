@@ -1,4 +1,4 @@
-.PHONY: help setup install dev clean lint gga format check check-static typecheck test test-shared test-coverage mobile mobile-native mobile-clean mobile-web mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed db-up db-down db-push db-reset eas-login eas-whoami eas-init eas-build-configure eas-build-dev eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator eas-export-web eas-deploy-web eas-deploy-web-prod android-app-stop android-app-restart android-reset android-stop android-kill android-restart
+.PHONY: help setup install dev dev-api dev-web-api clean lint gga format check check-static typecheck test test-shared test-coverage mobile mobile-mock mobile-api mobile-native mobile-clean mobile-web mobile-web-api mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed db-up db-down db-push db-reset eas-login eas-whoami eas-init eas-build-configure eas-build-dev eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator eas-export-web eas-deploy-web eas-deploy-web-prod android-app-stop android-app-restart android-reset android-stop android-kill android-restart check-backend-alive
 
 # ==========================================
 # 📋 HELP
@@ -9,7 +9,9 @@ help:
 	@echo "  🔧 SETUP"
 	@echo "    make setup                        - Install dependencies"
 	@echo "    make install                      - Same as setup"
-	@echo "    make dev                          - Start full monorepo"
+	@echo "    make dev                          - Start all services (Backend + Mobile API)"
+	@echo "    make dev-mock                     - Start mobile only with Mocks (no DB/API)"
+	@echo "    make dev-web-api                  - Start all services (Backend + Mobile Web API)"
 	@echo ""
 	@echo "  🧪 TESTS"
 	@echo "    make test                          - Run all tests (mobile + backend + shared)"
@@ -19,10 +21,13 @@ help:
 	@echo "    make test-coverage                 - Run mobile tests with coverage report"
 	@echo ""
 	@echo "  📱 MOBILE"
-	@echo "    make mobile                       - Start mobile with Expo"
+	@echo "    make mobile                       - Start mobile with Expo (Mocks by default)"
+	@echo "    make mobile-mock                  - Start mobile with Mocks"
+	@echo "    make mobile-api                   - Start mobile connected to Backend API"
 	@echo "    make mobile-native                - Start mobile native"
 	@echo "    make mobile-clean                 - Start mobile clean"
 	@echo "    make mobile-web                   - Start mobile web"
+	@echo "    make mobile-web-api               - Start mobile web connected to Backend API"
 	@echo "    make mobile-android 	             - Start mobile Android"
 	@echo "    make mobile-android-native        - Start mobile Android native"
 	@echo "    make mobile-ios                   - Start mobile iOS"
@@ -44,12 +49,8 @@ help:
 	@echo "    make format                       - Format code"
 	@echo "    make typecheck                    - Run TypeScript check"
 	@echo "    make gga                          - Run Gentleman Guardian Angel"
-	@echo "    make check                        - All checks (mobile + backend + gga)"
-	@echo "    make check-mobile                 - Full check for mobile (static + gga)"
-	@echo "    make check-backend                - Full check for backend"
-	@echo "    make check-static                 - Static checks for all packages"
-	@echo "    make check-static-mobile          - Static checks for mobile only"
-	@echo "    make check-static-backend         - Static checks for backend only"
+	@echo "    make check                        - Run all checks (mobile + backend + gga)"
+	@echo "    make db-reset                     - Full database reset and seed"
 	@echo ""
 	@echo "  🤖 ANDROID EMULATOR"
 	@echo "    make android-app-stop             - Stop app"
@@ -72,6 +73,7 @@ help:
 	@echo "    make eas-export-web               - Export web build"
 	@echo "    make eas-deploy-web               - Deploy web (preview)"
 	@echo "    make eas-deploy-web-prod          - Deploy web (production)"
+	@echo ""
 
 # ==========================================
 # 🔧 CONFIG
@@ -97,7 +99,14 @@ install: setup
 # 📱 MOBILE APP
 # ==========================================
 
-mobile:
+mobile: mobile-mock
+
+mobile-mock:
+	cp $(MOBILE_DIR)/.env.mock $(MOBILE_DIR)/.env.local
+	cd $(MOBILE_DIR) && bun run start
+
+mobile-api: check-backend-alive
+	cp $(MOBILE_DIR)/.env.api $(MOBILE_DIR)/.env.local
 	cd $(MOBILE_DIR) && bun run start
 
 mobile-native:
@@ -110,16 +119,21 @@ mobile-clean:
 	cd $(MOBILE_DIR) && bun run start:clean
 
 mobile-web:
+	cp $(MOBILE_DIR)/.env.mock $(MOBILE_DIR)/.env.local
 	cd $(MOBILE_DIR) && bun run web
 
+mobile-web-api: check-backend-alive
+	cp $(MOBILE_DIR)/.env.api $(MOBILE_DIR)/.env.local
+	cd $(MOBILE_DIR) && bun run web -- --clear
+
 mobile-android:
-	cd $(MOBILE_DIR) && bun run android
+	cd $(MOBILE_DIR) && EXPO_PUBLIC_USE_MOCKS=true bun run android
 
 mobile-android-native:
 	cd $(MOBILE_DIR) && bun run android:native
 
 mobile-ios:
-	cd $(MOBILE_DIR) && bun run ios
+	cd $(MOBILE_DIR) && EXPO_PUBLIC_USE_MOCKS=true bun run ios
 
 mobile-ios-native:
 	cd $(MOBILE_DIR) && bun run ios:native
@@ -130,12 +144,26 @@ mobile-expo-fix-deps:
 mobile-expo-doctor:
 	cd $(MOBILE_DIR) && bunx --bun expo-doctor
 
+check-backend-alive:
+	@echo "⏳ Waiting for Backend API to be ready..."
+	@for i in $$(seq 1 15); do \
+		if curl -s http://localhost:3000/health > /dev/null; then \
+			echo "✅ Backend is ready!"; \
+			exit 0; \
+		fi; \
+		echo "🕒 Backend not ready yet, retrying in 2s ($$i/15)..."; \
+		sleep 2; \
+	done; \
+	echo "❌ Error: Backend API is not running at http://localhost:3000."; \
+	echo "👉 Run 'make backend' in another terminal or use 'make dev-api'."; \
+	exit 1
+
 # ==========================================
 # 🖥️ BACKEND
 # ==========================================
 
 backend:
-	cd $(BACKEND_DIR) && bun run dev
+	cd $(BACKEND_DIR) && bun --env-file=../../.env run dev
 
 seed:
 	cd $(BACKEND_DIR) && bun --env-file=../../.env run db:seed
@@ -169,8 +197,26 @@ db-wait:
 # 🚀 FULL MONOREPO
 # ==========================================
 
-dev:
-	bun run dev
+dev: db-up db-wait
+	@bunx concurrently \
+		--kill-others \
+		--prefix "[{name}]" \
+		--names "BACKEND,MOBILE" \
+		--prefix-colors "blue,magenta" \
+		"make backend" \
+		"make mobile-api"
+
+dev-mock:
+	make mobile-mock
+
+dev-web-api: db-up db-wait
+	@bunx concurrently \
+		--kill-others \
+		--prefix "[{name}]" \
+		--names "BACKEND,MOBILE" \
+		--prefix-colors "blue,magenta" \
+		"make backend" \
+		"make mobile-web-api"
 
 # Determine if we are in CI to skip podman/provisioning steps.
 # In GitHub Actions, $(CI) is usually set to 'true'.
@@ -185,6 +231,10 @@ test-backend: $(if $(SKIP_DB_PROVISIONING),,db-up db-wait)
 	cd $(BACKEND_DIR) && bun --env-file=../../.env run test
 
 test-mobile:
+	cd $(MOBILE_DIR) && EXPO_PUBLIC_USE_MOCKS=true bun run test
+
+test-mobile-api:
+	cp $(MOBILE_DIR)/.env.api $(MOBILE_DIR)/.env.local
 	cd $(MOBILE_DIR) && bun run test
 
 test-shared:
@@ -202,9 +252,6 @@ clean:
 	rm -rf node_modules apps/*/node_modules packages/*/node_modules
 	bun pm cache rm
 	@echo "🧼 All clean. Run 'make setup' again."
-
-lint:
-	bun run lint
 
 format:
 	bun run format
@@ -225,67 +272,64 @@ lint-mobile:
 lint-backend:
 	cd $(BACKEND_DIR) && bun run lint
 
-format: format-mobile format-backend
-
-format-mobile:
-	bunx prettier --write "$(MOBILE_DIR)/**/*.ts*"
-
-format-backend:
-	bunx prettier --write "$(BACKEND_DIR)/**/*.ts*"
-
 gga:
 	gga run
 
-check-static: check-static-mobile check-static-backend
-
-check-static-mobile: typecheck-mobile lint-mobile format-mobile
-check-static-backend: typecheck-backend lint-backend format-backend
-
 check: check-static gga
 
+check-static: check-static-mobile check-static-backend
+
 check-mobile: check-static-mobile gga
+
 check-backend: check-static-backend
+
+check-static-mobile: typecheck-mobile lint-mobile
+
+check-static-backend: typecheck-backend lint-backend
+
+db-reset: db-down db-up db-wait db-push seed
+	@echo "🔄 Database reset and seeded!"
 
 # ==========================================
 # 🤖 EAS
 # ==========================================
 
 eas-login:
-	cd $(MOBILE_DIR) && eas login -b
+	cd $(MOBILE_DIR) && bunx eas-cli login -b
 
 eas-whoami:
-	cd $(MOBILE_DIR) && eas whoami
+	cd $(MOBILE_DIR) && bunx eas-cli whoami
 
 eas-init:
-	cd $(MOBILE_DIR) && eas init
+	cd $(MOBILE_DIR) && bunx eas-cli init
 
 eas-build-configure:
-	cd $(MOBILE_DIR) && eas build:configure
+	cd $(MOBILE_DIR) && bunx eas-cli build:configure
 
 eas-build-dev:
-	cd $(MOBILE_DIR) && eas build --profile development
+	cd $(MOBILE_DIR) && bunx eas-cli build --profile development
 
 eas-build-android-dev:
-	cd $(MOBILE_DIR) && eas build --platform android --profile development
+	cd $(MOBILE_DIR) && bunx eas-cli build --profile development --platform android
 
 eas-build-android-preview:
-	cd $(MOBILE_DIR) && eas build --platform android --profile preview
+	cd $(MOBILE_DIR) && bunx eas-cli build --profile preview --platform android
 
 eas-build-android-production:
-	cd $(MOBILE_DIR) && eas build --platform android --profile production
+	cd $(MOBILE_DIR) && bunx eas-cli build --profile production --platform android
 
 eas-build-ios-simulator:
-	cd $(MOBILE_DIR) && eas build --platform ios --profile ios-simulator
+	cd $(MOBILE_DIR) && bunx eas-cli build --profile development --platform ios --simulator
 
 eas-export-web:
-	cd $(MOBILE_DIR) && bunx expo export --platform web
+	cd $(MOBILE_DIR) && bunx expo export:web
 
-eas-deploy-web:
-	cd $(MOBILE_DIR) && eas deploy
+eas-deploy-web: eas-export-web
+	cd $(MOBILE_DIR) && bunx eas-cli deploy
 
-eas-deploy-web-prod:
-	cd $(MOBILE_DIR) && bunx --package eas-cli@18.6.0 eas deploy --prod
-	
+eas-deploy-web-prod: eas-export-web
+		cd $(MOBILE_DIR) && bunx eas-cli deploy --prod
+
 # ==========================================
 # 🤖 ANDROID EMULATOR
 # ==========================================
