@@ -9,6 +9,10 @@ export const env = {
 
   // Backend URL (only used when USE_MOCKS = false)
   API_URL: process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000/v1",
+
+  // GitHub configuration for Status Dashboard
+  GITHUB_TOKEN: process.env.EXPO_PUBLIC_GITHUB_TOKEN,
+  GITHUB_REPO: process.env.EXPO_PUBLIC_GITHUB_REPO || "masch/impenetrable-connect",
 } as const;
 
 // Default export for cleaner imports

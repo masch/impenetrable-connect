@@ -79,7 +79,11 @@ function StatusCard({
       <View className="flex-1 items-start">
         <View className="flex-row items-center justify-between w-full pr-2">
           <View className="flex-row items-center gap-2">
-            <Text testID="status-title" className={`text-lg font-bold ${titleColors}`}>
+            <Text
+              testID="status-title"
+              accessibilityLabel={title}
+              className={`text-lg font-bold ${titleColors}`}
+            >
               {title}
             </Text>
             {url && <MaterialCommunityIcons name="open-in-new" size={14} color="gray" />}
@@ -90,19 +94,18 @@ function StatusCard({
           </View>
         </View>
 
-        {description && (
-          <View
-            className={`mt-2 self-start px-2 py-1 rounded-md ${badgeStyle?.bg || "bg-on-surface/5"} border ${badgeStyle?.border || "border-on-surface/10"}`}
+        <View
+          className={`mt-2 self-start px-2 py-1 rounded-md ${badgeStyle?.bg || "bg-on-surface/5"} border ${badgeStyle?.border || "border-on-surface/10"} flex-row items-center gap-1`}
+        >
+          {(status === "error" || badgeStyle?.text === "text-error") && (
+            <MaterialCommunityIcons name="alert" size={10} color={COLORS.error} />
+          )}
+          <Text
+            className={`font-bold tracking-wider ${badgeStyle?.text || "text-on-surface/60"} text-[10px] uppercase`}
           >
-            <Text
-              className={`font-bold tracking-wider ${badgeStyle?.text || "text-on-surface/60"} text-[10px] uppercase`}
-            >
-              {status === "error" || badgeStyle?.text === "text-error"
-                ? `⚠️ ${description}`
-                : description}
-            </Text>
-          </View>
-        )}
+            {description}
+          </Text>
+        </View>
 
         {detail && <Text className="mt-2 text-sm text-on-surface/40 font-medium">{detail}</Text>}
 
@@ -113,7 +116,7 @@ function StatusCard({
                 <MaterialCommunityIcons
                   name="alert-circle-outline"
                   size={12}
-                  color="#EAB308"
+                  color={COLORS.warning}
                   className="mt-0.5"
                 />
                 <Text className="text-[11px] text-warning/80 font-medium leading-tight flex-1">
@@ -148,8 +151,7 @@ function StatusCard({
 
 export default function StatusScreen() {
   const { t } = useTranslations();
-  const { debug } = useLocalSearchParams<{ debug: string }>();
-  const isDetailed = debug === "true";
+  const isDetailed = useLocalSearchParams<{ debug: string }>().debug === "true";
 
   const [health, setHealth] = useState<BackendHealthWithLatency | null>(null);
   const [runs, setRuns] = useState<GitHubRun[] | null>(null);
@@ -167,12 +169,12 @@ export default function StatusScreen() {
     // We fetch independently so GitHub failures don't block the backend status
     const [healthData, runsData] = await Promise.all([
       StatusService.fetchBackendHealth().catch((err) => {
-        logger.error("❌ [ERROR] Backend health fetch failed", err);
+        logger.error("[ERROR] Backend health fetch failed", err);
         setFetchError("unreachable");
         return null;
       }),
       StatusService.fetchGitHubRuns().catch((err) => {
-        logger.error("❌ [ERROR] GitHub runs fetch failed", err);
+        logger.error("[ERROR] GitHub runs fetch failed", err);
         return null; // Return null on failure instead of empty array
       }),
     ]);
@@ -264,8 +266,6 @@ export default function StatusScreen() {
   const uptimeMinutes = Math.floor(((health?.uptime || 0) % 3600) / 60);
   const uptimeStr = `${uptimeHours}h ${uptimeMinutes}m`;
 
-  const isMock = process.env.EXPO_PUBLIC_USE_MOCKS === "true";
-
   const envColors = {
     production: { text: "text-error", bg: "bg-error/10", border: "border-error/20" },
     staging: { text: "text-warning", bg: "bg-warning/10", border: "border-warning/20" },
@@ -274,16 +274,18 @@ export default function StatusScreen() {
     default: { text: "text-on-surface/60", bg: "bg-on-surface/5", border: "border-on-surface/10" },
   };
 
-  const env = health?.environment || (isMock ? "mock" : "default");
+  const env = health?.environment && health.environment !== "mock" ? health.environment : "default";
   const colors = envColors[env as keyof typeof envColors] || envColors.default;
 
-  const apiDesc = health?.environment
-    ? `${t("status.env_label")}: ${t(`status.env_${health.environment}`)}`
-    : isMock
-      ? `${t("status.env_label")}: ${t("status.env_mock")}`
+  const apiDesc =
+    health?.environment && health.environment !== "mock"
+      ? `${t("status.env_label")}: ${t(`status.env_${health.environment}`)}`
       : t("status.api_desc");
 
-  const dbDesc = isMock ? `${t("status.env_label")}: ${t("status.mock_db")}` : t("status.db_desc");
+  const dbDesc =
+    health?.environment && health.environment !== "mock"
+      ? `${t("status.env_label")}: ${t(`status.env_${health.environment}`)}`
+      : t("status.db_desc");
 
   return (
     <Screen>
@@ -297,7 +299,11 @@ export default function StatusScreen() {
       <ScrollView
         className="flex-1"
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#8B4513" />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={COLORS.primary}
+          />
         }
       >
         <ScreenContent className="pt-24 px-4 items-start">

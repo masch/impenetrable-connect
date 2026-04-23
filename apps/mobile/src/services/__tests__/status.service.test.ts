@@ -115,23 +115,40 @@ describe("StatusService", () => {
       const result = await RestStatusService.fetchCheckRuns("abcdef1");
 
       expect(globalThis.fetch).toHaveBeenCalledTimes(3);
-      expect(result.annotations_count).toBe(2);
-      // Even though there are 2 annotations, the message is the same, so it should be deduplicated
-      expect(result.messages.length).toBe(1);
+      expect(result.messages.length).toBe(2);
       expect(result.messages[0]).toBe("[CI] Node.js 20 actions are deprecated.");
+      expect(result.messages[1]).toBe("[Deploy] Node.js 20 actions are deprecated.");
     });
   });
 
   describe("MockStatusService", () => {
-    it("should return mock data", async () => {
+    it("should return mock health data", async () => {
       const health = await MockStatusService.fetchBackendHealth();
       expect(health.status).toBe("ok");
       expect(health.apiLatency).toBe("0ms");
     });
 
-    it("should return mock runs", async () => {
+    it("should fetch real github runs even in mock mode", async () => {
+      const mockRuns = {
+        workflow_runs: [
+          {
+            id: 1,
+            name: "CI",
+            status: "completed",
+            conclusion: "success",
+            head_commit: { message: "test commit", id: "123" },
+          },
+        ],
+      };
+
+      (globalThis.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockRuns,
+      });
+
       const runs = await MockStatusService.fetchGitHubRuns();
-      expect(runs.length).toBeGreaterThan(0);
+      expect(globalThis.fetch).toHaveBeenCalled();
+      expect(runs.length).toBe(1);
       expect(runs[0].name).toBe("CI");
     });
   });
