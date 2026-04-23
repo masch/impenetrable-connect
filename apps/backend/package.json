@@ -9,10 +9,13 @@
     "lint": "bunx eslint src",
     "typecheck": "bunx tsc --noEmit",
     "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "bun run src/db/migrate.ts && bun run src/db/db-setup-advanced.ts",
     "db:seed": "bun run src/db/seed.ts"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.7.6",
+    "@neondatabase/serverless": "^1.1.0",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.7.2",
     "pino": "^10.3.1",
@@ -20,7 +23,7 @@
   },
   "devDependencies": {
     "@repo/shared": "workspace:*",
-    "@types/node": "latest",
+    "@types/node": "^25.6.0",
     "@typescript-eslint/eslint-plugin": "^8.59.0",
     "@typescript-eslint/parser": "^8.59.0",
     "bun-types": "1.3.13",

@@ -1,4 +1,5 @@
-import { pgTable, uuid, timestamp, text } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
+import { auditColumns } from "./base";
 import { users } from "./users";
 
 export const refreshTokens = pgTable("refresh_tokens", {
@@ -9,7 +10,7 @@ export const refreshTokens = pgTable("refresh_tokens", {
   tokenHash: text("token_hash").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   revokedAt: timestamp("revoked_at"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  ...auditColumns,
 });
 
 export type RefreshTokenSelect = typeof refreshTokens.$inferSelect;

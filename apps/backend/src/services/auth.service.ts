@@ -73,8 +73,8 @@ export class AuthService {
       isActive: user.isActive,
       zzz_failed_login_attempts: user.zzz_failed_login_attempts,
       zzz_last_login_at: user.zzz_last_login_at,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
+      createdAt: user.zzzCreatedAt,
+      updatedAt: user.zzzUpdatedAt,
     };
 
     return {

@@ -1,4 +1,5 @@
 import { pgTable, uuid, varchar, timestamp, pgEnum, integer, boolean } from "drizzle-orm/pg-core";
+import { auditColumns } from "./base";
 
 export const userRoleEnum = pgEnum("user_role", ["ADMIN", "ENTREPRENEUR", "TOURIST"]);
 
@@ -14,8 +15,7 @@ export const users = pgTable("users", {
   zzz_failed_login_attempts: integer("zzz_failed_login_attempts").notNull().default(0),
   zzz_last_login_at: timestamp("zzz_last_login_at"),
   isActive: boolean("is_active").notNull().default(true),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  ...auditColumns,
 });
 
 export type UserSelect = typeof users.$inferSelect;

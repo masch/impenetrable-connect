@@ -1,4 +1,4 @@
-.PHONY: help setup install dev dev-api dev-web-api clean lint gga format check check-static typecheck test test-shared test-coverage mobile mobile-mock mobile-api mobile-native mobile-clean mobile-web mobile-web-api mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed db-up db-down db-push db-reset eas-login eas-whoami eas-init eas-build-configure eas-build-dev eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator eas-export-web eas-deploy-web eas-deploy-web-prod android-app-stop android-app-restart android-reset android-stop android-kill android-restart check-backend-alive
+.PHONY: help setup install dev dev-api dev-web-api clean lint gga format check check-static typecheck test test-shared test-coverage mobile mobile-mock mobile-api mobile-native mobile-clean mobile-web mobile-web-api mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed db-up db-down db-push db-generate db-migrate db-push-neon db-generate-neon db-migrate-neon db-reset eas-login eas-whoami eas-init eas-build-configure eas-build-dev eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator eas-export-web eas-deploy-web eas-deploy-web-prod android-app-stop android-app-restart android-reset android-stop android-kill android-restart check-backend-alive
 
 # ==========================================
 # 📋 HELP
@@ -41,7 +41,10 @@ help:
 	@echo "    make seed                         - Seed database"
 	@echo "    make db-up                        - Start database container (Podman)"
 	@echo "    make db-down                      - Stop database container"
-	@echo "    make db-push                      - Push Drizzle schema to database"
+	@echo "    make db-push                      - Push Drizzle schema to database (Local)"
+	@echo "    make db-generate                  - Generate SQL migrations"
+	@echo "    make db-migrate                   - Apply SQL migrations and expert patterns"
+	@echo "    make db-migrate-neon              - Deploy to Neon using .env.neon"
 	@echo ""
 	@echo "  🔧 UTILS"
 	@echo "    make clean                        - Clean node_modules"
@@ -174,8 +177,26 @@ db-up:
 db-down:
 	podman-compose down
 
+ENV_FILE ?= .env
+
 db-push:
-	cd $(BACKEND_DIR) && bun --env-file=../../.env run db:push
+	cd $(BACKEND_DIR) && bun --env-file=../../$(ENV_FILE) run db:push
+
+db-generate:
+	cd $(BACKEND_DIR) && bun --env-file=../../$(ENV_FILE) run db:generate $(if $(NAME),--name $(NAME),)
+
+db-migrate:
+	cd $(BACKEND_DIR) && bun --env-file=../../$(ENV_FILE) run db:migrate
+
+# Shortcuts for Neon
+db-push-neon:
+	$(MAKE) db-push ENV_FILE=.env.neon
+
+db-generate-neon:
+	$(MAKE) db-generate ENV_FILE=.env.neon
+
+db-migrate-neon:
+	$(MAKE) db-migrate ENV_FILE=.env.neon
 
 db-shell:
 	podman exec -it impenetrable-db psql -U impenetrable -d impenetrable_db

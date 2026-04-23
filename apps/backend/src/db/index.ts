@@ -1,9 +1,20 @@
-import { drizzle } from "drizzle-orm/postgres-js";
+import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
+import { drizzle as drizzleNeon } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
 import postgres from "postgres";
-import { projects, users, ventures, refreshTokens, userRoleEnum } from "./schema";
+import * as schema from "./schema";
 
-const schema = { projects, users, ventures, refreshTokens, userRoleEnum };
+const databaseUrl = process.env.DATABASE_URL;
 
-const queryClient = postgres(process.env.DATABASE_URL!);
-export const db = drizzle(queryClient, { schema });
+if (!databaseUrl) {
+  throw new Error("DATABASE_URL is not defined");
+}
+
+// DBA Expert Rule: Detect Neon to use the optimal HTTP driver
+const isNeon = databaseUrl.includes("neon.tech");
+
+export const db = isNeon
+  ? drizzleNeon(neon(databaseUrl), { schema })
+  : drizzlePostgres(postgres(databaseUrl), { schema });
+
 export type Db = typeof db;

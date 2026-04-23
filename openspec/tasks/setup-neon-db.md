@@ -1,0 +1,23 @@
+# Implementation Tasks: Neon Postgres Setup
+
+- [ ] **T1: Install Dependencies**
+  - Run `bun add @neondatabase/serverless` in `apps/backend`.
+- [ ] **T2: Update Environment Variables**
+  - Update `.env.example` to include `DATABASE_URL` and `DIRECT_URL`.
+- [ ] **T3: Refactor Database Connection**
+  - Modify `apps/backend/src/db/index.ts`.
+  - Add detection logic for Neon vs Local.
+  - Implement `@neondatabase/serverless` adaptor.
+- [ ] **T4: Update Drizzle Configuration**
+  - Modify `apps/backend/drizzle.config.ts` to use `DIRECT_URL`.
+- [ ] **T5: Verification**
+  - Run `make db-push` (local) to ensure compatibility.
+  - Run `make test` to verify logic consistency.
+- [ ] **T6: Advanced Schema Patterns**
+  - Implement `updated_at` triggers via a custom migration.
+  - Enable RLS for sensitive tables (users, projects).
+  - Add missing indexes for all Foreign Keys.
+- [ ] **T7: Health Check Endpoint**
+  - Create a new route in Hono to monitor DB connectivity.
+- [ ] **T8: Branching Documentation**
+  - Create a `DOCS_NEON.md` explaining the workflow.

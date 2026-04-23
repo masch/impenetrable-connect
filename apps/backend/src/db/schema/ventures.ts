@@ -1,4 +1,5 @@
-import { pgTable, serial, varchar, uuid, boolean, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, uuid, boolean, integer } from "drizzle-orm/pg-core";
+import { auditColumns } from "./base";
 import { users } from "./users";
 
 export const ventures = pgTable("ventures", {
@@ -11,6 +12,5 @@ export const ventures = pgTable("ventures", {
   zzz_cascade_order: integer("zzz_cascade_order").notNull().default(0),
   zzz_is_paused: boolean("zzz_is_paused").notNull().default(false),
   zzz_is_active: boolean("zzz_is_active").notNull().default(true),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  ...auditColumns,
 });

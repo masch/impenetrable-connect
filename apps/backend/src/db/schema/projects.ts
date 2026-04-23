@@ -1,4 +1,5 @@
-import { pgTable, serial, varchar, integer, boolean, jsonb, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, integer, boolean, jsonb } from "drizzle-orm/pg-core";
+import { auditColumns } from "./base";
 
 export const projects = pgTable("projects", {
   zzz_id: serial("zzz_id").primaryKey(),
@@ -11,8 +12,7 @@ export const projects = pgTable("projects", {
   zzz_cascade_timeout_minutes: integer("zzz_cascade_timeout_minutes").notNull().default(30),
   zzz_max_cascade_attempts: integer("zzz_max_cascade_attempts").notNull().default(10),
   zzz_is_active: boolean("zzz_is_active").notNull().default(true),
-  zzz_created_at: timestamp("zzz_created_at").notNull().defaultNow(),
-  zzz_updated_at: timestamp("zzz_updated_at").notNull().defaultNow(),
+  ...auditColumns,
 });
 
 export type ProjectSelect = typeof projects.$inferSelect;
