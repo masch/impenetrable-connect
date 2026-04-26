@@ -106,6 +106,21 @@ export const MOCK_USER_ENTREPRENEUR_CARLOS: User = {
   updatedAt: new Date("2023-10-12T00:00:00Z"),
 };
 
+export const MOCK_USER_ENTREPRENEUR_PEDRO: User = {
+  id: "entrepreneur_005",
+  alias: null,
+  email: "pedro@don-esteban.com",
+  firstName: "Pedro",
+  lastName: "Colaborador",
+  phoneNumber: "+5493624555555",
+  role: UserRole.ENTREPRENEUR,
+  zzz_failed_login_attempts: 0,
+  zzz_last_login_at: new Date("2026-04-11T10:00:00Z"),
+  isActive: true,
+  createdAt: new Date("2024-01-15T00:00:00Z"),
+  updatedAt: new Date("2024-01-15T00:00:00Z"),
+};
+
 export const MOCK_USERS: User[] = [
   MOCK_USER_TOURIST_WITH_ORDERS,
   MOCK_USER_TOURIST_WITHOUT_ORDERS,
@@ -127,6 +142,7 @@ export const MOCK_USERS: User[] = [
   MOCK_USER_ENTREPRENEUR_WITHOUT_ORDERS,
   MOCK_USER_ENTREPRENEUR_LUCIA,
   MOCK_USER_ENTREPRENEUR_CARLOS,
+  MOCK_USER_ENTREPRENEUR_PEDRO,
   MOCK_USER_ADMIN,
   {
     id: "admin_002",

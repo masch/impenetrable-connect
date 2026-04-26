@@ -49,5 +49,8 @@ export const mockAuthState = (overrides: {
     return typeof selector === "function" ? selector(defaultState) : defaultState;
   });
 
+  // Mock static getState()
+  mockedUseAuthStore.getState = jest.fn().mockReturnValue(defaultState);
+
   return defaultState;
 };

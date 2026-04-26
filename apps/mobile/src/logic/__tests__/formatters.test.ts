@@ -1,10 +1,12 @@
 import {
   formatCurrency,
   formatDate,
+  formatTime,
   getRelativeDateLabel,
   isSameDay,
   formatMoment,
   toISODate,
+  parseISODate,
   getNativeLocale,
   formatUserDisplayName,
 } from "../formatters";
@@ -47,6 +49,34 @@ describe("Formatters Logic", () => {
       expect(result.toLowerCase()).toContain("abril");
       expect(result).toContain("2026");
     });
+
+    it("should handle ISO string input", () => {
+      const result = formatDate("2026-04-20");
+      expect(result).toBeTruthy();
+    });
+
+    it("should return empty string for null", () => {
+      expect(formatDate(null)).toBe("");
+    });
+  });
+
+  describe("formatTime", () => {
+    it("should format time correctly", () => {
+      const date = new Date(2026, 3, 20, 14, 53);
+      const result = formatTime(date);
+      // Result should contain 14 or 2 (if 12h) and 53
+      expect(result).toMatch(/(14|2|02).*53/);
+    });
+
+    it("should handle ISO string input", () => {
+      const result = formatTime("2026-04-20T14:53:00");
+      expect(result).toMatch(/(14|2|02).*53/);
+    });
+
+    it("should return empty string for null", () => {
+      expect(formatTime(null)).toBe("");
+      expect(formatTime(undefined)).toBe("");
+    });
   });
 
   describe("isSameDay", () => {
@@ -65,6 +95,10 @@ describe("Formatters Logic", () => {
 
   describe("getRelativeDateLabel", () => {
     const t = jest.fn((key) => key);
+
+    it("should return empty string for null", () => {
+      expect(getRelativeDateLabel(null, t)).toBe("");
+    });
 
     it("should return 'Hoy' for current date", () => {
       const today = new Date();
@@ -103,6 +137,29 @@ describe("Formatters Logic", () => {
     it("should pad single digits with zeros", () => {
       const date = new Date(2026, 0, 5); // Jan 5, 2026
       expect(toISODate(date)).toBe("2026-01-05");
+    });
+  });
+
+  describe("parseISODate", () => {
+    it("should parse YYYY-MM-DD into LOCAL time correctly", () => {
+      const dateStr = "2026-04-20";
+      const result = parseISODate(dateStr);
+
+      expect(result.getFullYear()).toBe(2026);
+      expect(result.getMonth()).toBe(3); // April is 3
+      expect(result.getDate()).toBe(20);
+
+      // Verify it's midnight local
+      expect(result.getHours()).toBe(0);
+      expect(result.getMinutes()).toBe(0);
+    });
+
+    it("should handle months and days with leading zeros", () => {
+      const dateStr = "2026-01-05";
+      const result = parseISODate(dateStr);
+      expect(result.getFullYear()).toBe(2026);
+      expect(result.getMonth()).toBe(0); // January is 0
+      expect(result.getDate()).toBe(5);
     });
   });
 

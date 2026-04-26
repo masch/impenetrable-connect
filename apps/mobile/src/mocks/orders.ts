@@ -1,8 +1,10 @@
-import { Order, Reservation, MOCK_USERS, MOCK_VENTURES } from "@repo/shared";
+import { Order, Reservation, MOCK_USERS, MOCK_VENTURES, UserRole } from "@repo/shared";
 import { getMockUserId } from "./users";
 import { logger } from "../services/logger.service";
 import { INITIAL_MOCK_ORDERS, MOCK_RESERVATIONS } from "./orders.data";
 import { MOCK_CATALOG_ITEMS } from "./catalog";
+import { mockGetCurrentUser } from "../services/auth-state";
+import { getVentureIdsByUserId } from "./venture-members";
 
 /**
  * Mock services for orders
@@ -75,14 +77,37 @@ export function getAllMockOrders(): Order[] {
 /**
  * Get mock orders for the current user (filtered)
  */
-export function getMockOrders(): Order[] {
-  const userId = getEffectiveUserId();
+export function getMockOrders(overrideUserId?: string): Order[] {
+  // If no override provided, try to get the current user WITHOUT fallback
+  const user = mockGetCurrentUser();
+  const userId = overrideUserId || user?.id;
 
-  // Filter orders by checking their reservation's user_id
-  const orders = ordersState.orders.filter((o: Order) => {
-    const reservation = ordersState.reservations.find((r) => r.zzz_id === o.zzz_reservation_id);
-    return reservation?.zzz_user_id === userId;
-  });
+  if (!userId) {
+    logger.debug("getMockOrders called without userId, returning empty");
+    return [];
+  }
+
+  // Find user directly in MOCK_USERS
+  const currentUser = MOCK_USERS.find((u) => u.id === userId);
+  const isEntrepreneur = currentUser?.role === UserRole.ENTREPRENEUR;
+
+  let orders;
+  if (isEntrepreneur) {
+    const ventureIds = getVentureIdsByUserId(userId);
+    orders = ordersState.orders.filter(
+      (o: Order) =>
+        (o.zzz_confirmed_venture_id && ventureIds.includes(o.zzz_confirmed_venture_id)) ||
+        (o.zzz_current_offer_venture_id && ventureIds.includes(o.zzz_current_offer_venture_id)),
+    );
+  } else {
+    // Filter orders by checking their reservation's user_id (Tourist view)
+    orders = ordersState.orders.filter((o: Order) => {
+      const reservation = ordersState.reservations.find(
+        (r: Reservation) => r.zzz_id === o.zzz_reservation_id,
+      );
+      return reservation?.zzz_user_id === userId;
+    });
+  }
 
   return orders.map((order) => {
     const reservation = ordersState.reservations.find((r) => r.zzz_id === order.zzz_reservation_id);

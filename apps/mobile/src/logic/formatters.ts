@@ -104,6 +104,15 @@ export const toISODate = (date: Date): string => {
 };
 
 /**
+ * Parses a normalized ISO date string (YYYY-MM-DD) into a local Date object.
+ * Prevents UTC offset issues common with new Date(string).
+ */
+export const parseISODate = (dateStr: string): Date => {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
+
+/**
  * Returns a locale string compatible with native components (like DateTimePicker).
  *
  * @param locale - The base locale from i18n (e.g., "es", "en")

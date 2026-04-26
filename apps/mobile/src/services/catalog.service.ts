@@ -53,7 +53,8 @@ export interface CatalogServiceInterface {
     notes?: string,
   ): Promise<Order>;
   updateOrder(id: number, input: Partial<BookingInput>): Promise<Order>;
-  getOrders(): Promise<Order[]>;
+  updateOrderStatus(id: number, status: string): Promise<Order>;
+  getOrders(userId?: string): Promise<Order[]>;
 }
 
 /**
@@ -178,13 +179,27 @@ const MockCatalogService: CatalogServiceInterface = {
     }
 
     updateMockOrder(Number(id), updates);
-
     return { ...order, ...updates };
   },
 
-  getOrders: async () => {
+  updateOrderStatus: async (id: number, status: string) => {
+    await new Promise((r) => setTimeout(r, 600));
+    const existingOrders = getMockOrders();
+    const order = existingOrders.find((o) => Number(o.zzz_id) === Number(id));
+    if (!order) throw new Error("Order not found");
+
+    const updates: Partial<Order> = { zzz_global_status: status as Order["zzz_global_status"] };
+    if (status === "CONFIRMED") {
+      updates.zzz_confirmed_at = new Date();
+    }
+
+    updateMockOrder(Number(id), updates);
+    return { ...order, ...updates };
+  },
+
+  getOrders: async (userId?: string) => {
     await new Promise((r) => setTimeout(r, 500));
-    return getMockOrders();
+    return getMockOrders(userId);
   },
 };
 
@@ -239,8 +254,19 @@ const RestCatalogService: CatalogServiceInterface = {
     return response.json();
   },
 
-  getOrders: async () => {
-    const response = await fetch(`${env.API_URL}/orders`);
+  updateOrderStatus: async (id: number, status: string) => {
+    const response = await fetch(`${env.API_URL}/orders/${id}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    if (!response.ok) throw new Error("API error updating status");
+    return response.json();
+  },
+
+  getOrders: async (userId?: string) => {
+    const url = userId ? `${env.API_URL}/orders?userId=${userId}` : `${env.API_URL}/orders`;
+    const response = await fetch(url);
     if (!response.ok) throw new Error("API error fetching orders");
     return response.json();
   },

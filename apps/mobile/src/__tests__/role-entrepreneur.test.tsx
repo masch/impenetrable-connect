@@ -27,15 +27,30 @@ describe("Entrepreneur Role Flow", () => {
       });
     });
 
-    it("navigates to the agenda when an entrepreneur demo user is selected", async () => {
+    it("navigates to the request tab when an entrepreneur with pending requests (Maria) is selected", async () => {
       render(<RoleSelectorScreen />);
-      const mariaButton = screen.getByText("maria");
+      const mariaButton = screen.getByText(/maria/i);
       fireEvent.press(mariaButton);
 
       await waitFor(() => {
         expect(mockSetUserRole).toHaveBeenCalledWith(UserRole.ENTREPRENEUR);
         expect(mockLogin).toHaveBeenCalledWith({
           email: "maria@forst-stew.com",
+          password: "password123",
+        });
+        expect(router.replace).toHaveBeenCalledWith("/entrepreneur/request");
+      });
+    });
+
+    it("navigates to the agenda tab when an entrepreneur without pending requests (José) is selected", async () => {
+      render(<RoleSelectorScreen />);
+      const joseButton = screen.getByText(/josé/i);
+      fireEvent.press(joseButton);
+
+      await waitFor(() => {
+        expect(mockSetUserRole).toHaveBeenCalledWith(UserRole.ENTREPRENEUR);
+        expect(mockLogin).toHaveBeenCalledWith({
+          email: "pepe@regional-grill.com",
           password: "password123",
         });
         expect(router.replace).toHaveBeenCalledWith("/entrepreneur/agenda");

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { User, UserRole, LoginInput, CreateUserInput } from "@repo/shared";
 import { authService } from "../services/auth.service";
 import { logger } from "../services/logger.service";
+import { useAgendaStore } from "./agenda.store";
 
 interface AuthState {
   currentUser: User | null;
@@ -75,6 +76,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true });
     try {
       await authService.logout();
+      // Reset other stores
+      useAgendaStore.getState().reset();
+
       set({
         currentUser: null,
         isAuthenticated: false,

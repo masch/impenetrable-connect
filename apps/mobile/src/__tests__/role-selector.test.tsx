@@ -14,13 +14,23 @@ describe("RoleSelectorScreen UI (Archetypal Test)", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Using a cleaner implementation for Zustand mock
+    const mockLogout = jest.fn().mockResolvedValue(undefined);
+
+    // Implementation for hook usage
     mockedUseAuthStore.mockImplementation((selector: unknown) => {
       const state = {
         setUserRole: mockSetUserRole,
         login: mockLogin,
+        logout: mockLogout,
+        currentUser: null,
       };
       return typeof selector === "function" ? selector(state) : state;
+    });
+
+    // Implementation for static getState usage
+    mockedUseAuthStore.getState = jest.fn().mockReturnValue({
+      logout: mockLogout,
+      currentUser: null,
     });
   });
 
@@ -40,11 +50,11 @@ describe("RoleSelectorScreen UI (Archetypal Test)", () => {
     expect(screen.getByText("Familia Gómez")).toBeTruthy();
     expect(screen.getByText("Adventure Seekers")).toBeTruthy();
 
-    // Entrepreneurs (shown by email prefix)
-    expect(screen.getByText("maria")).toBeTruthy(); // maria@forst-stew.com
-    expect(screen.getByText("pepe")).toBeTruthy(); // pepe@regional-grill.com
+    // Entrepreneurs (shown by firstName or email prefix)
+    expect(screen.getByText("Maria")).toBeTruthy();
+    expect(screen.getByText("José")).toBeTruthy();
 
-    // Admins (shown by email prefix)
+    // Admins (shown by firstName or email prefix)
     expect(screen.getByText("admin")).toBeTruthy(); // admin@impenetrable.com
   });
 

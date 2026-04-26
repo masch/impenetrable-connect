@@ -1,11 +1,17 @@
-import type { Order } from "@repo/shared";
 import { useAgendaStore } from "../agenda.store";
+import { useAuthStore } from "../auth.store";
 import { getMockAgendaOrders } from "../../mocks/agenda";
+import { MOCK_USER_ENTREPRENEUR_WITH_ORDERS, Order } from "@repo/shared";
 
 describe("Agenda Store", () => {
   beforeEach(() => {
-    // Reset store state if needed, though Zustand persists between tests unless cleared
+    // Reset store states
     useAgendaStore.setState({ orders: [], isLoading: false, error: null });
+    // Set a default user for fetching logic
+    useAuthStore.setState({
+      currentUser: MOCK_USER_ENTREPRENEUR_WITH_ORDERS,
+      isAuthenticated: true,
+    });
   });
 
   it("should fetch agenda orders for a specific date", async () => {
@@ -25,8 +31,8 @@ describe("Agenda Store", () => {
 
     const stats = useAgendaStore.getState().getOccupationStats(20); // Max capacity 20
 
-    // Today in mocks has several orders for Maria's venture totaling 23 guests
-    expect(stats.occupied).toBe(23);
+    // Updated: Today in mocks now has 34 guests (including the new pending order we added earlier)
+    expect(stats.occupied).toBe(34);
     expect(stats.total).toBe(20);
   });
 

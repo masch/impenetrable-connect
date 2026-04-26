@@ -12,11 +12,19 @@ describe("AgendaScreen", () => {
     jest.clearAllMocks();
     mockedUseAgendaStore.mockImplementation((selector) => {
       const state = {
+        allOrders: [],
         orders: [],
+        pendingOrders: [],
         isLoading: false,
+        isLoadingPending: false,
         error: null,
         fetchAgenda: jest.fn(),
+        fetchPendingOrders: jest.fn(),
+        acceptOrder: jest.fn(),
+        declineOrder: jest.fn(),
         getOccupationStats: () => ({ occupied: 0, total: 20 }),
+        getDayCount: () => 0,
+        reset: jest.fn(),
       };
       return typeof selector === "function" ? selector(state) : state;
     });
@@ -31,11 +39,19 @@ describe("AgendaScreen", () => {
     const fetchAgenda = jest.fn();
     mockedUseAgendaStore.mockImplementation((selector) => {
       const state = {
+        allOrders: [],
         orders: [],
+        pendingOrders: [],
         isLoading: false,
+        isLoadingPending: false,
         error: null,
-        fetchAgenda,
+        fetchAgenda: fetchAgenda, // Use the mock we defined
+        fetchPendingOrders: jest.fn(),
+        acceptOrder: jest.fn(),
+        declineOrder: jest.fn(),
         getOccupationStats: () => ({ occupied: 0, total: 20 }),
+        getDayCount: () => 0,
+        reset: jest.fn(),
       };
       return typeof selector === "function" ? selector(state) : state;
     });

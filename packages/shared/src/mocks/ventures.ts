@@ -1,10 +1,16 @@
 import { Venture } from "../types/venture";
+import {
+  MOCK_USER_ENTREPRENEUR_WITH_ORDERS,
+  MOCK_USER_ENTREPRENEUR_WITHOUT_ORDERS,
+  MOCK_USER_ENTREPRENEUR_LUCIA,
+  MOCK_USER_ENTREPRENEUR_CARLOS,
+} from "./users";
 
 export const MOCK_VENTURES: Venture[] = [
   {
     id: 1,
     name: "Parador Don Esteban",
-    ownerId: "entrepreneur_001",
+    ownerId: MOCK_USER_ENTREPRENEUR_WITH_ORDERS.id,
     zzz_max_capacity: 20,
     zzz_is_paused: false,
     zzz_is_active: true,
@@ -15,7 +21,7 @@ export const MOCK_VENTURES: Venture[] = [
   {
     id: 2,
     name: "Parador Bermejito",
-    ownerId: "entrepreneur_001",
+    ownerId: MOCK_USER_ENTREPRENEUR_WITHOUT_ORDERS.id,
     zzz_max_capacity: 50,
     zzz_is_paused: false,
     zzz_is_active: true,
@@ -26,7 +32,7 @@ export const MOCK_VENTURES: Venture[] = [
   {
     id: 3,
     name: "Parador Campo Alegre",
-    ownerId: "entrepreneur_001",
+    ownerId: MOCK_USER_ENTREPRENEUR_LUCIA.id,
     zzz_max_capacity: 20,
     zzz_is_paused: false,
     zzz_is_active: true,
@@ -37,7 +43,7 @@ export const MOCK_VENTURES: Venture[] = [
   {
     id: 4,
     name: "Plazoleta Nancy",
-    ownerId: "entrepreneur_001",
+    ownerId: MOCK_USER_ENTREPRENEUR_CARLOS.id,
     zzz_max_capacity: 20,
     zzz_is_paused: false,
     zzz_is_active: true,

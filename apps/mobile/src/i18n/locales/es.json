@@ -171,7 +171,11 @@
     "itemNumber": "Ítem #",
     "registeredTourist": "Turista Registrado",
     "registeredVenture": "Emprendimiento Registrado",
-    "notes": "Notas"
+    "notes": "Notas",
+    "pending_requests_count": "Tenés {{count}} solicitudes esperando respuesta",
+    "no_pending_requests": "No hay solicitudes pendientes",
+    "empty_inbox_title": "¡Todo al día!",
+    "empty_inbox_desc": "No tenés solicitudes pendientes por ahora. Cuando llegue una nueva, aparecerá acá."
   },
   "agenda": {
     "title": "Tu Agenda",

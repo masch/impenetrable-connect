@@ -22,6 +22,7 @@ const daysFromNow = (days: number) => {
 
 const today = daysFromNow(0);
 const tomorrow = daysFromNow(1);
+const afterTomorrow = daysFromNow(2);
 
 const MOCK_RESERVATION_TODAY_LUNCH_CREATED: Reservation = {
   zzz_id: 1,
@@ -122,6 +123,42 @@ const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_5: Reservation = {
   zzz_guest_count: 2,
 };
 
+const MOCK_RESERVATION_TOMORROW_LUNCH_PENDING_1: Reservation = {
+  zzz_id: 12,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
+  zzz_service_date: tomorrow,
+  zzz_time_of_day: "LUNCH",
+  zzz_status: "SEARCHING",
+  zzz_guest_count: 4,
+};
+
+const MOCK_RESERVATION_TOMORROW_LUNCH_PENDING_2: Reservation = {
+  zzz_id: 13,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
+  zzz_service_date: tomorrow,
+  zzz_time_of_day: "LUNCH",
+  zzz_status: "SEARCHING",
+  zzz_guest_count: 2,
+};
+
+const MOCK_RESERVATION_AFTER_TOMORROW_BREAKFAST_PENDING: Reservation = {
+  zzz_id: 14,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
+  zzz_service_date: afterTomorrow,
+  zzz_time_of_day: "BREAKFAST",
+  zzz_status: "SEARCHING",
+  zzz_guest_count: 3,
+};
+
+const MOCK_RESERVATION_TODAY_DINNER_PEND_RESTRICTION: Reservation = {
+  zzz_id: 15,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
+  zzz_service_date: today,
+  zzz_time_of_day: "DINNER",
+  zzz_status: "SEARCHING",
+  zzz_guest_count: 2,
+};
+
 /**
  * Reservations (parent entities for orders)
  */
@@ -137,6 +174,10 @@ export const MOCK_RESERVATIONS: Reservation[] = [
   MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_3,
   MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_4,
   MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_5,
+  MOCK_RESERVATION_TOMORROW_LUNCH_PENDING_1,
+  MOCK_RESERVATION_TOMORROW_LUNCH_PENDING_2,
+  MOCK_RESERVATION_AFTER_TOMORROW_BREAKFAST_PENDING,
+  MOCK_RESERVATION_TODAY_DINNER_PEND_RESTRICTION,
 ];
 
 /**
@@ -394,5 +435,78 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
     zzz_notify_whatsapp: false,
     zzz_created_at: today,
     zzz_confirmed_at: today,
+  },
+  {
+    zzz_id: 12,
+    zzz_reservation_id: MOCK_RESERVATION_TOMORROW_LUNCH_PENDING_1.zzz_id,
+    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_global_status: "OFFER_PENDING",
+    zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
+    zzz_items: [
+      {
+        zzz_id: 18,
+        zzz_order_id: 12,
+        zzz_catalog_item_id: ASADO_POLLO.zzz_id,
+        zzz_quantity: 4,
+        zzz_price: ASADO_POLLO.zzz_price,
+      },
+    ],
+    zzz_created_at: today,
+    zzz_notify_whatsapp: true,
+  },
+  {
+    zzz_id: 13,
+    zzz_reservation_id: MOCK_RESERVATION_TOMORROW_LUNCH_PENDING_2.zzz_id,
+    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_global_status: "OFFER_PENDING",
+    zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
+    zzz_items: [
+      {
+        zzz_id: 19,
+        zzz_order_id: 13,
+        zzz_catalog_item_id: EMPANADAS_VERDURA_DOCENA.zzz_id,
+        zzz_quantity: 1,
+        zzz_price: EMPANADAS_VERDURA_DOCENA.zzz_price,
+      },
+    ],
+    zzz_created_at: today,
+    zzz_notify_whatsapp: true,
+  },
+  {
+    zzz_id: 14,
+    zzz_reservation_id: MOCK_RESERVATION_AFTER_TOMORROW_BREAKFAST_PENDING.zzz_id,
+    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_global_status: "OFFER_PENDING",
+    zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
+    zzz_items: [
+      {
+        zzz_id: 20,
+        zzz_order_id: 14,
+        zzz_catalog_item_id: REPOLLO_ASADO.zzz_id,
+        zzz_quantity: 3,
+        zzz_price: REPOLLO_ASADO.zzz_price,
+      },
+    ],
+    zzz_created_at: today,
+    zzz_notify_whatsapp: true,
+  },
+  {
+    zzz_id: 15,
+    zzz_reservation_id: MOCK_RESERVATION_TODAY_DINNER_PEND_RESTRICTION.zzz_id,
+    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_global_status: "OFFER_PENDING",
+    zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
+    zzz_notes: "Una persona es Celíaca (por favor, sin gluten)",
+    zzz_items: [
+      {
+        zzz_id: 21,
+        zzz_order_id: 15,
+        zzz_catalog_item_id: POSTRE_REGIONAL.zzz_id,
+        zzz_quantity: 2,
+        zzz_price: POSTRE_REGIONAL.zzz_price,
+      },
+    ],
+    zzz_created_at: today,
+    zzz_notify_whatsapp: true,
   },
 ];

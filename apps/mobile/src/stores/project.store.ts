@@ -35,7 +35,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     try {
       const projects = await ProjectService.getProjects();
       set({ projects, isLoading: false });
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error("Error fetching projects", err);
       set({ error: "Failed to fetch projects", isLoading: false });
     }
@@ -46,7 +46,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     try {
       const project = await ProjectService.getProjectById(id);
       set({ selectedProject: project, isLoading: false });
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error(`Error fetching project with ID: ${id}`, err);
       set({ error: "Project not found", isLoading: false });
     }
@@ -59,7 +59,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       const currentProjects = get().projects;
       set({ projects: [...currentProjects, newProject], isSaving: false });
       return newProject;
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error("Error creating project", err);
       set({ error: "Failed to create project", isSaving: false });
       return null;
@@ -74,7 +74,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       const updatedList = currentProjects.map((p) => (p.zzz_id === id ? updatedProject : p));
       set({ projects: updatedList, selectedProject: updatedProject, isSaving: false });
       return updatedProject;
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error(`Error updating project with ID: ${id}`, err);
       set({ error: "Failed to update project", isSaving: false });
       return null;
@@ -94,7 +94,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         });
       }
       return success;
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error(`Error deleting project with ID: ${id}`, err);
       set({ error: "Failed to delete project", isSaving: false });
       return false;

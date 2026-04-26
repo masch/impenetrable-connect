@@ -1,10 +1,18 @@
+import { useEffect } from "react";
 import { Tabs } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../../hooks/useI18n";
 import { SHARED_SCREEN_OPTIONS } from "../../constants/theme";
+import { useAgendaStore } from "../../stores/agenda.store";
 
 export default function EntrepreneurTabsLayout() {
   const { t } = useTranslations();
+  const { pendingOrders, fetchPendingOrders } = useAgendaStore();
+  const pendingCount = pendingOrders.length;
+
+  useEffect(() => {
+    fetchPendingOrders();
+  }, [fetchPendingOrders]);
 
   return (
     <Tabs screenOptions={SHARED_SCREEN_OPTIONS}>
@@ -30,6 +38,7 @@ export default function EntrepreneurTabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="file-document" size={size} color={color} />
           ),
+          tabBarBadge: pendingCount > 0 ? pendingCount : undefined,
         }}
       />
       <Tabs.Screen

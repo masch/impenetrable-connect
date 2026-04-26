@@ -4,6 +4,7 @@ import {
   MOCK_USER_ENTREPRENEUR_WITHOUT_ORDERS,
   MOCK_USER_ENTREPRENEUR_LUCIA,
   MOCK_USER_ENTREPRENEUR_CARLOS,
+  MOCK_USER_ENTREPRENEUR_PEDRO,
   MOCK_VENTURE_WITH_ORDERS,
   MOCK_VENTURE_JOSE,
   MOCK_VENTURE_CAMPO_ALEGRE,
@@ -37,6 +38,12 @@ export const MOCK_VENTURE_MEMBERS: VentureMember[] = [
     id: 4,
     userId: MOCK_USER_ENTREPRENEUR_CARLOS.id, // Carlos Sosa
     ventureId: MOCK_VENTURE_PLAZOLETA_NANCY.id, // Plazoleta Nancy
+    role: "MANAGER",
+  },
+  {
+    id: 5,
+    userId: MOCK_USER_ENTREPRENEUR_PEDRO.id, // Pedro
+    ventureId: MOCK_VENTURE_WITH_ORDERS.id, // Parador Don Esteban
     role: "MANAGER",
   },
 ];

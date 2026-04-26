@@ -171,7 +171,11 @@
     "itemNumber": "Item #",
     "registeredTourist": "Registered Tourist",
     "registeredVenture": "Registered Venture",
-    "notes": "Notes"
+    "notes": "Notes",
+    "pending_requests_count": "You have {{count}} requests awaiting confirmation",
+    "no_pending_requests": "No pending requests",
+    "empty_inbox_title": "All caught up!",
+    "empty_inbox_desc": "You have no pending requests for now. When a new one arrives, it will appear here."
   },
   "agenda": {
     "title": "Your Agenda",

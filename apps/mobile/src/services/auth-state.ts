@@ -15,7 +15,7 @@ interface AuthState {
 // Module-level state - always initialized with the first entrepreneur (Maria)
 const authState: AuthState = {
   users: [...MOCK_USERS],
-  currentUser: MOCK_USERS.find((u) => u.id === "entrepreneur_001") || null,
+  currentUser: null,
   nextId: MOCK_USERS.length + 1,
 };
 

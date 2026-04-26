@@ -22,6 +22,10 @@ export function findUserByEmail(email: string): User | undefined {
   return MOCK_USERS.find((u) => u.email === email);
 }
 
+export function findUserById(id: string): User | undefined {
+  return MOCK_USERS.find((u) => u.id === id);
+}
+
 export function getMockUserId(): string {
   const user = mockGetCurrentUser();
   return user?.id ?? MOCK_USER_TOURIST_WITH_ORDERS.id;

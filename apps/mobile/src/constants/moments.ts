@@ -61,7 +61,7 @@ export const MOMENTS = ServiceMomentSchema.options;
 /**
  * Get full config for a service moment
  */
-export function getMomentConfig(moment: string) {
+export function getMomentConfig(moment: ServiceMoment) {
   const found = SERVICE_MOMENTS.find((m) => m.zzz_id === moment);
   return (
     found || {
@@ -79,13 +79,13 @@ export function getMomentConfig(moment: string) {
 /**
  * Get icon for a service moment
  */
-export function getMomentIcon(moment: string): string {
+export function getMomentIcon(moment: ServiceMoment): string {
   return getMomentConfig(moment).icon;
 }
 
 /**
  * Get hex color for a service moment
  */
-export function getMomentColor(moment: string): string {
+export function getMomentColor(moment: ServiceMoment): string {
   return getMomentConfig(moment).hex;
 }

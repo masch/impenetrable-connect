@@ -6,28 +6,17 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { getOrderActions } from "../../logic/order-actions";
 import { formatCurrency } from "../../logic/formatters";
 
-interface BaseReservationCardProps {
+export interface ReservationCardProps {
   order: Order;
   title?: string;
   hideBorder?: boolean;
   hideShadow?: boolean;
+  hideStatus?: boolean;
+  role: "entrepreneur" | "tourist";
+  onAccept?: () => void;
+  onDecline?: () => void;
+  onCancel?: () => void;
 }
-
-interface EntrepreneurReservationCardProps extends BaseReservationCardProps {
-  role: "entrepreneur";
-  onAccept: () => void;
-  onDecline: () => void;
-  onCancel?: never;
-}
-
-interface TouristReservationCardProps extends BaseReservationCardProps {
-  role: "tourist";
-  onCancel: () => void;
-  onAccept?: never;
-  onDecline?: never;
-}
-
-type ReservationCardProps = EntrepreneurReservationCardProps | TouristReservationCardProps;
 
 interface StatusConfig {
   color: string;
@@ -117,13 +106,16 @@ export default function ReservationCard({
   title,
   hideBorder = false,
   hideShadow = false,
+  hideStatus = false,
   onAccept,
   onDecline,
   onCancel,
 }: ReservationCardProps) {
   const { t, locale } = useTranslations();
   const status = getStatusConfig(t, order.zzz_global_status);
-  const containerClass = `bg-surface-container-lowest overflow-hidden ${hideBorder ? "" : "border border-outline-variant/50 rounded-3xl mb-4"} ${hideShadow ? "" : "shadow-md"}`;
+  const isPending = order.zzz_global_status === "OFFER_PENDING";
+  const bgClass = isPending ? "bg-status-pending/5" : "bg-surface-container-lowest";
+  const containerClass = `${bgClass} overflow-hidden ${hideBorder ? "" : "border border-outline-variant/50 rounded-3xl mb-4"} ${hideShadow ? "" : "shadow-md"}`;
 
   const headerTitle =
     title ||
@@ -150,28 +142,38 @@ export default function ReservationCard({
 
       <View className="p-3">
         {/* Header: Status and Items Count */}
-        <View className="flex-row justify-between items-center mb-3">
-          <View className={`flex-row items-center px-3 py-1.5 rounded-full ${status.bgClass}/15`}>
-            <MaterialCommunityIcons
-              name={status.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-              size={14}
-              color={status.color}
-            />
-            <Text
-              className={`font-display-bold text-[10px] uppercase tracking-[1px] ml-1.5 ${status.textClass}`}
-            >
-              {status.label}
-            </Text>
-          </View>
+        <View
+          className={`flex-row items-center mb-3 ${hideStatus ? "justify-center" : "justify-between"}`}
+        >
+          {!hideStatus && (
+            <View className={`flex-row items-center px-3 py-1.5 rounded-full ${status.bgClass}/15`}>
+              <MaterialCommunityIcons
+                name={status.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+                size={14}
+                color={status.color}
+              />
+              <Text
+                className={`font-display-bold text-[10px] uppercase tracking-[1px] ml-1.5 ${status.textClass}`}
+              >
+                {status.label}
+              </Text>
+            </View>
+          )}
 
-          <View className="flex-row items-center bg-surface-container-low px-3 py-1.5 rounded-full max-w-[60%]">
+          <View
+            className={`flex-row items-center px-4 py-2 rounded-full max-w-[90%] ${
+              hideStatus ? "bg-primary/10 border border-primary/20" : "bg-surface-container-low"
+            }`}
+          >
             <MaterialCommunityIcons
               name={headerIcon as keyof typeof MaterialCommunityIcons.glyphMap}
-              size={14}
-              color={COLORS["on-surface-variant"]}
+              size={hideStatus ? 18 : 14}
+              color={hideStatus ? COLORS.primary : COLORS["on-surface-variant"]}
             />
             <Text
-              className="text-on-surface-variant font-display-bold text-[11px] ml-1.5"
+              className={`font-display-black ml-2 ${
+                hideStatus ? "text-on-surface text-[14px]" : "text-on-surface-variant text-[11px]"
+              }`}
               numberOfLines={1}
             >
               {headerTitle}
@@ -185,10 +187,7 @@ export default function ReservationCard({
             order.zzz_items.map((item, idx) => (
               <View key={item.zzz_id} className={`flex-row items-center ${idx > 0 ? "mt-4" : ""}`}>
                 <View className="flex-1 mr-2">
-                  <Text
-                    className="text-on-surface font-display-bold text-[15px] leading-tight"
-                    numberOfLines={2}
-                  >
+                  <Text className="text-on-surface font-display-bold text-[15px]" numberOfLines={2}>
                     {item.zzz_catalog_item?.zzz_name_i18n?.[locale as "es" | "en"] ||
                       `${t("orders.itemNumber")}${item.zzz_catalog_item_id}`}
                   </Text>
@@ -262,7 +261,7 @@ export default function ReservationCard({
             </View>
 
             <View className={`px-4 py-1.5 rounded-2xl overflow-hidden ${status.bgClass}/15`}>
-              <Text className={`font-display-black text-[17px] leading-tight ${status.textClass}`}>
+              <Text className={`font-display-black text-[17px] ${status.textClass}`}>
                 $
                 {formatCurrency(
                   order.zzz_items?.reduce(

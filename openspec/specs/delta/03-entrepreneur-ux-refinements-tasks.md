@@ -31,12 +31,12 @@
 
 ### 2.3 Implement "Solicitudes" Screen
 
-- [ ] Replace placeholder in `entrepreneur/request.tsx` with `OFFER_PENDING` list.
+- [x] Replace placeholder in `entrepreneur/request.tsx` with `OFFER_PENDING` list.
 - [ ] Add polling logic (every 20s) or refresh control.
 
 ### 2.4 Implement Tab Indicators
 
-- [ ] Add badge component to the "Solicitudes" tab icon in `entrepreneur/_layout.tsx`.
+- [x] Add badge component to the "Solicitudes" tab icon in `entrepreneur/_layout.tsx`.
 
 ### 2.5 Update Agenda Stats
 

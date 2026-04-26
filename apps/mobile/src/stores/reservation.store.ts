@@ -65,7 +65,7 @@ export const useReservationStore = create<ReservationState>((set, get) => ({
         );
 
       set({ activeOrders: active, historyOrders: history, isLoading: false });
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error("Error fetching orders", err);
       set({ error: "Failed to fetch orders", isLoading: false });
     }
@@ -77,7 +77,7 @@ export const useReservationStore = create<ReservationState>((set, get) => ({
     try {
       await orderService.cancelOrder(orderId);
       await get().fetchOrders();
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error(`Error cancelling order ${orderId}`, err);
       set({ error: "Failed to cancel order", isLoading: false });
     }
@@ -122,7 +122,7 @@ export const useReservationStore = create<ReservationState>((set, get) => ({
         });
       }
       await get().fetchOrders();
-    } catch (err) {
+    } catch (err: unknown) {
       logger.error("Error moving orders", err);
       set({ error: "Failed to move orders", isLoading: false });
     }

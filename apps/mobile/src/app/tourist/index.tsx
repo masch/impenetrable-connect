@@ -60,7 +60,7 @@ export default function OrderSetupScreen() {
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
           {/* Header Section */}
           <View className="px-2 pt-6 pb-4">
-            <Text className="text-3xl font-display font-bold text-on-surface leading-tight">
+            <Text className="text-3xl font-display font-bold text-on-surface">
               {t("order_setup.title")}
             </Text>
             <Text className="text-sm font-body text-on-surface/50 mt-1">
