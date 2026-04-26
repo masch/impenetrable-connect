@@ -33,6 +33,7 @@ interface CatalogState {
     date: Date,
     moment: ServiceMoment,
     zzz_items: Array<{ zzz_catalog_item_id: number; zzz_quantity: number }>,
+    guestCount: number,
     zzz_notes?: string,
   ) => Promise<Order | null>;
   fetchOrders: () => Promise<void>;
@@ -89,10 +90,10 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
   },
 
   // Place a new order
-  placeOrder: async (date, moment, items, notes) => {
+  placeOrder: async (date, moment, items, guestCount, notes) => {
     set({ isSaving: true, error: null });
     try {
-      const newOrder = await CatalogService.placeOrder(date, moment, items, notes);
+      const newOrder = await CatalogService.placeOrder(date, moment, items, guestCount, notes);
       const currentOrders = get().orders;
       if (newOrder) {
         set({ orders: [...currentOrders, newOrder], isSaving: false });

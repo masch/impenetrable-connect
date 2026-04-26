@@ -20,6 +20,7 @@ export const ReservationDbSchema = z.object({
    * - CANCELLED: Slot is no longer active.
    */
   zzz_status: ReservationStatusSchema.default("CREATED"),
+  zzz_guest_count: z.number().int().positive().default(1),
   zzz_created_at: z.date().optional(),
   zzz_updated_at: z.date().optional(),
 });

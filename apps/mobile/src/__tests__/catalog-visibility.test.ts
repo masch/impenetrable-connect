@@ -18,7 +18,7 @@ describe("Catalog Visibility Integration", () => {
     const moment = "BREAKFAST";
     const items = [{ zzz_catalog_item_id: 1, zzz_quantity: 1 }];
 
-    const newOrder = await CatalogService.placeOrder(date, moment, items, "Test order");
+    const newOrder = await CatalogService.placeOrder(date, moment, items, 2, "Test order");
 
     expect(newOrder).toBeDefined();
     expect(newOrder.zzz_id).toBeDefined();

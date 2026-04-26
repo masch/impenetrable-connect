@@ -10,10 +10,12 @@ interface CartItem {
 interface CartState {
   selectedDate: Date | null;
   selectedMoment: ServiceMoment | null;
+  guestCount: number;
   cartItems: CartItem[];
 
   // Actions
   setContext: (date: Date, moment: ServiceMoment) => void;
+  setGuestCount: (count: number) => void;
   resetContext: () => void;
   isValid: () => boolean;
 
@@ -27,11 +29,15 @@ interface CartState {
 export const useCartStore = create<CartState>((set, get) => ({
   selectedDate: null,
   selectedMoment: null,
+  guestCount: 2, // Default to 2 people
   cartItems: [],
 
   setContext: (selectedDate, selectedMoment) => set({ selectedDate, selectedMoment }),
 
-  resetContext: () => set({ selectedDate: null, selectedMoment: null, cartItems: [] }),
+  setGuestCount: (guestCount) => set({ guestCount }),
+
+  resetContext: () =>
+    set({ selectedDate: null, selectedMoment: null, guestCount: 2, cartItems: [] }),
 
   isValid: () => {
     const { selectedDate, selectedMoment } = get();

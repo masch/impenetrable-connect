@@ -59,7 +59,7 @@ const getStatusConfig = (t: (key: string) => string, globalStatus: OrderStatus):
     },
     CANCELLED: {
       color: COLORS.error,
-      label: t("orders.status.cancelled"),
+      label: t("orders.status.rejected"),
       icon: "close-circle-outline",
       bgClass: "bg-error",
       textClass: "text-error",
@@ -236,16 +236,29 @@ export default function ReservationCard({
         {/* Footer: Actions or Details */}
         <View className="pt-3 border-t border-outline-variant/10">
           <View className="flex-row items-center justify-between mb-3">
-            <View className="flex-row items-center bg-surface-container-low px-3 py-1.5 rounded-xl">
-              <MaterialCommunityIcons
-                name="silverware-variant"
-                size={14}
-                color={COLORS["on-surface-variant"]}
-              />
-              <Text className="text-on-surface-variant font-display-black text-[11px] ml-2 uppercase tracking-tighter">
-                {order.zzz_items?.reduce((sum, item) => sum + item.zzz_quantity, 0) || 0}{" "}
-                {t("common.dishes_other")}
-              </Text>
+            <View className="flex-row items-center gap-2">
+              <View className="flex-row items-center bg-surface-container-low px-3 py-1.5 rounded-xl">
+                <MaterialCommunityIcons
+                  name="silverware-variant"
+                  size={14}
+                  color={COLORS["on-surface-variant"]}
+                />
+                <Text className="text-on-surface-variant font-display-black text-[11px] ml-2 uppercase tracking-tighter">
+                  {order.zzz_items?.reduce((sum, item) => sum + item.zzz_quantity, 0) || 0}{" "}
+                  {t("common.dishes_other")}
+                </Text>
+              </View>
+
+              <View className="flex-row items-center bg-surface-container-low px-3 py-1.5 rounded-xl border border-primary/10">
+                <MaterialCommunityIcons
+                  name="account-group-outline"
+                  size={14}
+                  color={COLORS.primary}
+                />
+                <Text className="text-primary font-display-black text-[11px] ml-2 uppercase tracking-tighter">
+                  {order.zzz_reservation?.zzz_guest_count || 1} {t("common.pax")}
+                </Text>
+              </View>
             </View>
 
             <View className={`px-4 py-1.5 rounded-2xl overflow-hidden ${status.bgClass}/15`}>

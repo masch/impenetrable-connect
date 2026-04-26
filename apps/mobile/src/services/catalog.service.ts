@@ -49,6 +49,7 @@ export interface CatalogServiceInterface {
     date: Date,
     moment: ServiceMoment,
     items: Array<{ zzz_catalog_item_id: number; zzz_quantity: number }>,
+    guestCount: number,
     notes?: string,
   ): Promise<Order>;
   updateOrder(id: number, input: Partial<BookingInput>): Promise<Order>;
@@ -80,6 +81,7 @@ const MockCatalogService: CatalogServiceInterface = {
     date: Date,
     moment: ServiceMoment,
     items: Array<{ zzz_catalog_item_id: number; zzz_quantity: number }>,
+    guestCount: number,
     notes?: string,
   ) => {
     // Require user to be logged in
@@ -103,6 +105,7 @@ const MockCatalogService: CatalogServiceInterface = {
       zzz_service_date: date,
       zzz_time_of_day: moment,
       zzz_status: "CREATED",
+      zzz_guest_count: guestCount,
       zzz_created_at: new Date(),
     });
 
@@ -207,13 +210,13 @@ const RestCatalogService: CatalogServiceInterface = {
     return response.json();
   },
 
-  placeOrder: async (date, moment, items, notes) => {
+  placeOrder: async (date, moment, items, guestCount, notes) => {
     const response = await fetch(`${env.API_URL}/orders`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         zzz_reservation_id: 0,
-        catalog_category_id: 1, // Example ID
+        zzz_guest_count: guestCount,
         zzz_time_of_day: moment,
         zzz_service_date: toISODate(date),
         zzz_notes: notes ?? null,

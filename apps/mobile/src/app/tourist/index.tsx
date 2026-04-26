@@ -83,6 +83,55 @@ export default function OrderSetupScreen() {
             />
           </View>
 
+          {/* Guest Count Selection */}
+          <View className="px-2 mb-6">
+            <View className="flex-row items-center mb-4">
+              <MaterialCommunityIcons
+                name="account-group-outline"
+                size={20}
+                color={COLORS.primary}
+              />
+              <Text className="text-lg font-display font-bold text-on-surface ml-2">
+                {t("order_setup.guests_label")}
+              </Text>
+            </View>
+
+            <View className="bg-surface-container-low/30 border border-outline-variant/20 rounded-3xl p-6 flex-row items-center justify-between">
+              <Button
+                variant="ghost"
+                onPress={() =>
+                  useCartStore
+                    .getState()
+                    .setGuestCount(Math.max(1, useCartStore.getState().guestCount - 1))
+                }
+                className="w-14 h-14 rounded-2xl bg-surface-container-high items-center justify-center border border-outline-variant/10"
+              >
+                <MaterialCommunityIcons name="minus" size={24} color={COLORS.primary} />
+              </Button>
+
+              <View className="items-center">
+                <Text className="text-4xl font-display font-bold text-on-surface">
+                  {useCartStore((state) => state.guestCount)}
+                </Text>
+                <Text className="text-[10px] font-display font-bold text-on-surface-variant uppercase tracking-widest mt-1">
+                  {t("common.pax")}
+                </Text>
+              </View>
+
+              <Button
+                variant="ghost"
+                onPress={() =>
+                  useCartStore
+                    .getState()
+                    .setGuestCount(Math.min(20, useCartStore.getState().guestCount + 1))
+                }
+                className="w-14 h-14 rounded-2xl bg-surface-container-high items-center justify-center border border-outline-variant/10"
+              >
+                <MaterialCommunityIcons name="plus" size={24} color={COLORS.primary} />
+              </Button>
+            </View>
+          </View>
+
           {/* Moment Selection */}
           <View className="px-2 mb-8">
             <View className="flex-row items-center mb-4">

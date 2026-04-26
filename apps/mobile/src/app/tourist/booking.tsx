@@ -258,7 +258,7 @@ export default function BookingScreen() {
       router,
       addItem,
       updateOrderInStore,
-      editingOrder?.zzz_id,
+      editingOrder,
     ],
   );
 
@@ -586,6 +586,7 @@ export default function BookingScreen() {
                                       zzz_catalog_item_id: i.zzz_catalog_item_id,
                                       zzz_quantity: i.zzz_quantity,
                                     })),
+                                    useCartStore.getState().guestCount,
                                   );
                                   if (newOrder) {
                                     addOrderToStore(newOrder);

@@ -29,6 +29,7 @@ const MOCK_RESERVATION_TODAY_LUNCH_CREATED: Reservation = {
   zzz_service_date: today,
   zzz_time_of_day: "LUNCH",
   zzz_status: "CREATED",
+  zzz_guest_count: 2,
 };
 
 const MOCK_RESERVATION_TODAY_BREAKFAST_SEARCHING: Reservation = {
@@ -37,6 +38,7 @@ const MOCK_RESERVATION_TODAY_BREAKFAST_SEARCHING: Reservation = {
   zzz_service_date: today,
   zzz_time_of_day: "BREAKFAST",
   zzz_status: "SEARCHING",
+  zzz_guest_count: 3,
 };
 
 const MOCK_RESERVATION_TOMORROW_DINNER_CONFIRMED: Reservation = {
@@ -45,6 +47,7 @@ const MOCK_RESERVATION_TOMORROW_DINNER_CONFIRMED: Reservation = {
   zzz_service_date: tomorrow,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
+  zzz_guest_count: 3,
 };
 
 const MOCK_RESERVATION_TOMORROW_BREAKFAST_CANCELLED: Reservation = {
@@ -53,6 +56,7 @@ const MOCK_RESERVATION_TOMORROW_BREAKFAST_CANCELLED: Reservation = {
   zzz_service_date: tomorrow,
   zzz_time_of_day: "BREAKFAST",
   zzz_status: "CANCELLED",
+  zzz_guest_count: 2,
 };
 
 const MOCK_RESERVATION_TODAY_LUNCH_CANCELLED: Reservation = {
@@ -61,6 +65,7 @@ const MOCK_RESERVATION_TODAY_LUNCH_CANCELLED: Reservation = {
   zzz_service_date: today,
   zzz_time_of_day: "LUNCH",
   zzz_status: "CANCELLED",
+  zzz_guest_count: 5,
 };
 
 const MOCK_RESERVATION_TOMORROW_DINNER_CANCELLED: Reservation = {
@@ -69,6 +74,7 @@ const MOCK_RESERVATION_TOMORROW_DINNER_CANCELLED: Reservation = {
   zzz_service_date: tomorrow,
   zzz_time_of_day: "DINNER",
   zzz_status: "CANCELLED",
+  zzz_guest_count: 1,
 };
 
 const MOCK_RESERVATION_TODAY_SNACK_CONFIRMED: Reservation = {
@@ -77,6 +83,7 @@ const MOCK_RESERVATION_TODAY_SNACK_CONFIRMED: Reservation = {
   zzz_service_date: today,
   zzz_time_of_day: "SNACK",
   zzz_status: "CONFIRMED",
+  zzz_guest_count: 6,
 };
 
 const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_2: Reservation = {
@@ -85,6 +92,7 @@ const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_2: Reservation = {
   zzz_service_date: today,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
+  zzz_guest_count: 2,
 };
 
 const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_3: Reservation = {
@@ -93,6 +101,7 @@ const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_3: Reservation = {
   zzz_service_date: today,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
+  zzz_guest_count: 3,
 };
 
 const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_4: Reservation = {
@@ -101,6 +110,7 @@ const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_4: Reservation = {
   zzz_service_date: today,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
+  zzz_guest_count: 4,
 };
 
 const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_5: Reservation = {
@@ -109,6 +119,7 @@ const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_5: Reservation = {
   zzz_service_date: today,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
+  zzz_guest_count: 2,
 };
 
 /**

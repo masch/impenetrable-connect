@@ -4,15 +4,14 @@
 
 ### 1.1 Fix Capacity Logic
 
-- **File**: `apps/backend/src/services/order.service.ts` (or relevant occupation logic)
-- **Task**: Change occupation calculation to use `SUM(total_guests)` instead of `SUM(quantity)`.
-- **Validation**: Seed a venture with `max_capacity: 10` and create an order for 12 guests. It must skip the venture.
+- [x] Change mobile store occupation calculation to use `zzz_guest_count`.
+- [ ] Change backend occupation calculation to use `SUM(total_guests)` instead of `SUM(quantity)`.
+- [x] Verify with tests that capacity is correctly calculated (PASSing).
 
 ### 1.2 Add Suggested Time Field
 
-- **File**: `apps/backend/src/db/schema/orders.ts` and `@repo/shared`
-- **Task**: Add `suggested_time` (varchar) field to Order schema.
-- **Task**: Update Order creation validation (Zod) to include optional `suggested_time`.
+- [ ] Add `suggested_time` (varchar) field to Order schema in `@repo/shared`.
+- [ ] Update Order creation validation (Zod) to include optional `suggested_time`.
 
 ---
 
@@ -20,29 +19,33 @@
 
 ### 2.1 Update Vocabulary (Labels)
 
-- **File**: `apps/mobile/src/i18n/es.json`
-- **Task**: Rename `orders.status.cancelled` to "Cancelado" and ensure "Rechazado" is used for entrepreneur declines.
+- [x] Rename `orders.status.cancelled` to "Cancelado" / "Rejected" in i18n files.
+- [x] Rename translation keys from `cancel` to `reject` throughout the codebase.
+- [x] Ensure "Rechazado" is used consistently for entrepreneur actions.
 
-### 2.2 Implement "Solicitudes" Screen
+### 2.2 Guest Count Selector (Tourist)
 
-- **File**: `apps/mobile/src/app/entrepreneur/request.tsx`
-- **Task**: Replace placeholder with a list of `OFFER_PENDING` orders using `ReservationCard`.
-- **Task**: Add polling logic (every 20s) to refresh the list.
+- [x] Add `guestCount` state to `cart.store.ts`.
+- [x] Implement stepper UI in `OrderSetupScreen` (`tourist/index.tsx`).
+- [x] Pass `guestCount` through CatalogService to the final order placement.
 
-### 2.3 Implement Tab Indicators
+### 2.3 Implement "Solicitudes" Screen
 
-- **File**: `apps/mobile/src/app/entrepreneur/_layout.tsx`
-- **Task**: Add a badge component to the "Solicitudes" tab icon that displays the count of pending offers from the order store.
+- [ ] Replace placeholder in `entrepreneur/request.tsx` with `OFFER_PENDING` list.
+- [ ] Add polling logic (every 20s) or refresh control.
 
-### 2.4 Update Agenda Stats
+### 2.4 Implement Tab Indicators
 
-- **File**: `apps/mobile/src/stores/agenda.store.ts`
-- **Task**: Update `getOccupationStats` to use `order.zzz_reservation?.zzz_guest_count`.
+- [ ] Add badge component to the "Solicitudes" tab icon in `entrepreneur/_layout.tsx`.
 
-### 2.5 Expand Profile Screen
+### 2.5 Update Agenda Stats
 
-- **File**: `apps/mobile/src/app/entrepreneur/profile.tsx`
-- **Task**: Add "Venture Management" section with Pause/Resume toggles.
+- [x] Update `getOccupationStats` in `agenda.store.ts` to use `zzz_guest_count`.
+- [x] Add party size badge to `ReservationCard.tsx`.
+
+### 2.6 Expand Profile Screen
+
+- [ ] Add "Venture Management" section to `profile.tsx` with Pause/Resume toggles.
 
 ---
 
@@ -50,10 +53,10 @@
 
 ### 3.1 Expo Push Integration (Scaffolding)
 
-- **Task**: Configure `expo-notifications` handler in `apps/mobile/src/app/_layout.tsx`.
-- **Task**: Create a service to register push tokens with the backend on login.
+- [ ] Configure `expo-notifications` handler in `apps/mobile/src/app/_layout.tsx`.
+- [ ] Create service to register push tokens with the backend.
 
 ### 3.2 WhatsApp Fallback UI
 
-- **File**: `apps/mobile/src/app/tourist/booking.tsx`
-- **Task**: Add "Notify me via WhatsApp" checkbox and phone number input field.
+- [ ] Add "Notify me via WhatsApp" checkbox to `booking.tsx`.
+- [ ] Implement phone number input for tourist notifications.

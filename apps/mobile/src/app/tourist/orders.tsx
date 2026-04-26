@@ -290,8 +290,8 @@ export default function OrderScreen() {
                               onCancel={() => {
                                 setAlertConfig({
                                   visible: true,
-                                  title: t("orders.cancelTitle"),
-                                  message: t("orders.cancelConfirm"),
+                                  title: t("orders.rejectTitle"),
+                                  message: t("orders.rejectConfirm"),
                                   actions: [
                                     {
                                       text: t("common.no"),

@@ -50,8 +50,8 @@ export const getOrderActions = (
     const isCancellable = ["SEARCHING", "OFFER_PENDING"].includes(zzz_global_status);
     if (isCancellable && callbacks.onCancel) {
       actions.push({
-        zzz_id: "cancel",
-        label: t("orders.cancel"),
+        zzz_id: "reject",
+        label: t("orders.reject"),
         variant: "outline",
         onPress: callbacks.onCancel,
       });
