@@ -59,8 +59,9 @@ describe("Health Router Integration", () => {
     };
     const mockAnnotations = [{ message: "Trailing whitespace" }];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const fetchSpy = spyOn(globalThis, "fetch").mockImplementation((async (url: any) => {
+    const fetchSpy = spyOn(globalThis, "fetch").mockImplementation((async (
+      url: string | URL | Request,
+    ) => {
       if (url.toString().includes("check-runs")) {
         return new Response(JSON.stringify(mockCheckRuns));
       }
@@ -68,8 +69,7 @@ describe("Health Router Integration", () => {
         return new Response(JSON.stringify(mockAnnotations));
       }
       return new Response("Not Found", { status: 404 });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any as any);
+    }) as unknown as typeof fetch);
 
     const res = await testApp.request("/health/check-runs/ref123");
     expect(res.status).toBe(200);

@@ -3,14 +3,14 @@
  * Centralized logging for the mobile application.
  * Handles formatting, environment-specific transports, and error destructuring.
  */
-export type LogLevel = "debug" | "info" | "warn" | "error";
+export type LogLevel = "DEBUG" | "INFO" | "WARN" | "ERROR";
 
 interface LogEntry {
   level: LogLevel;
   message: string;
   context?: Record<string, unknown>;
   error?: unknown;
-  timestamp: string;
+  timestamp?: string;
 }
 
 class LoggerService {
@@ -30,13 +30,21 @@ class LoggerService {
    */
   private formatError(error: unknown) {
     if (error instanceof Error) {
-      return {
+      const formatted: Record<string, unknown> = {
         name: error.name,
         message: error.message,
         stack: error.stack,
         cause: error.cause,
-        // Any other common custom error fields can be added here
       };
+
+      // Capture any other custom properties (e.g. code, status, etc.)
+      Object.getOwnPropertyNames(error).forEach((key) => {
+        if (!(key in formatted)) {
+          formatted[key] = (error as unknown as Record<string, unknown>)[key];
+        }
+      });
+
+      return formatted;
     }
     return error;
   }
@@ -48,14 +56,15 @@ class LoggerService {
 
     // 1. Development Transport (Console)
     if (__DEV__) {
-      const emoji = {
-        debug: "🔍",
-        info: "ℹ️",
-        warn: "⚠️",
-        error: "❌",
-      }[level];
+      const emoji: Record<LogLevel, string> = {
+        DEBUG: "🔍",
+        INFO: "ℹ️",
+        WARN: "⚠️",
+        ERROR: "❌",
+      };
 
-      console.log(`${emoji} [${level.toUpperCase()}] ${message}`, {
+      const consoleTransport = globalThis.console;
+      consoleTransport.info(`${emoji[level]} [${level}] ${message}`, {
         timestamp,
         ...(context || {}),
         ...(formattedError ? { error: formattedError } : {}),
@@ -70,20 +79,20 @@ class LoggerService {
   }
 
   debug(message: string, context?: Record<string, unknown>) {
-    this.log({ level: "debug", message, context });
+    this.log({ level: "DEBUG", message, context });
   }
 
   info(message: string, context?: Record<string, unknown>) {
-    this.log({ level: "info", message, context });
+    this.log({ level: "INFO", message, context });
   }
 
   warn(message: string, context?: Record<string, unknown>) {
-    this.log({ level: "warn", message, context });
+    this.log({ level: "WARN", message, context });
   }
 
   error(message: string, error: unknown, context?: Record<string, unknown>) {
     this.log({
-      level: "error",
+      level: "ERROR",
       message,
       error,
       context,
