@@ -54,7 +54,13 @@ describe("VentureConfigScreen", () => {
     });
 
     // Maria's venture has capacity 20 in mocks
-    expect(screen.getByText("20")).toBeTruthy();
+    // We need to wait for VentureCapacitySection to finish its own internal loading
+    await waitFor(
+      () => {
+        expect(screen.getByText("20")).toBeTruthy();
+      },
+      { timeout: 5000 },
+    );
   });
 
   it("should allow updating capacity", async () => {
@@ -62,9 +68,12 @@ describe("VentureConfigScreen", () => {
 
     render(<VentureConfigScreen />);
 
-    await waitFor(() => {
-      expect(screen.getByTestId("plus-button")).toBeTruthy();
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByTestId("plus-button")).toBeTruthy();
+      },
+      { timeout: 5000 },
+    );
 
     const plusButton = screen.getByTestId("plus-button");
     fireEvent.press(plusButton); // 20 -> 21
