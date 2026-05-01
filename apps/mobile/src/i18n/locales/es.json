@@ -181,7 +181,15 @@
     "current_value": "Valor actual",
     "capacity_legend": "Este es el límite máximo de personas que podés recibir simultáneamente.",
     "minus": "Disminuir capacidad",
-    "plus": "Aumentar capacidad"
+    "plus": "Aumentar capacidad",
+    "management": "Gestión de Disponibilidad",
+    "is_paused": "Emprendimiento Activo",
+    "is_paused_help": "Si desactivás esta opción, tu emprendimiento dejará de ser visible en el catálogo y no recibirás nuevas solicitudes temporalmente.",
+    "pause_confirm_title": "¿Desactivar emprendimiento?",
+    "pause_confirm_message": "Al desactivarlo, tu emprendimiento no será visible en el catálogo y no recibirás nuevas solicitudes de reserva.",
+    "resume_confirm_title": "¿Activar emprendimiento?",
+    "resume_confirm_message": "¡Genial! Tu emprendimiento volverá a estar visible para todos los turistas y podrás recibir nuevos pedidos de inmediato.",
+    "deactivate_warning": "ADVERTENCIA: Desactivar este emprendimiento cancelará su visibilidad en el catálogo de forma inmediata."
   },
   "orders": {
     "title": "Mis Pedidos",
@@ -247,9 +255,14 @@
     "status": "Estado",
     "created_at": "Creado el",
     "updated_at": "Actualizado el",
-    "is_active": "Activo",
     "max_capacity_limit": "Límite de capacidad máx.",
-    "not_selected_error": "No se seleccionó ningún proyecto"
+    "not_selected_error": "No se seleccionó ningún proyecto",
+    "is_active_help": "Al desactivar el proyecto, todos los emprendimientos y servicios asociados dejarán de estar operativos de inmediato para los turistas.",
+    "deactivate_confirm_title": "¿Desactivar proyecto?",
+    "deactivate_confirm_message": "Esta acción ocultará el proyecto y todos sus servicios del catálogo. ¿Deseas continuar?",
+    "activate_confirm_title": "¿Activar proyecto?",
+    "activate_confirm_message": "El proyecto y sus servicios volverán a estar visibles y operativos de inmediato.",
+    "deactivate_warning": "¡ATENCIÓN! Desactivar el proyecto deshabilitará automáticamente todos los emprendimientos y servicios asociados."
   },
   "errors": {
     "login_required_title": "Login requerido",

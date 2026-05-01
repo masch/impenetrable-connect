@@ -168,6 +168,37 @@ export default function ProjectFormScreen() {
     }
   };
 
+  const handleToggleActive = (value: boolean) => {
+    const title = value
+      ? t("project.activate_confirm_title")
+      : t("project.deactivate_confirm_title");
+    const message = value
+      ? t("project.activate_confirm_message")
+      : t("project.deactivate_confirm_message");
+
+    setAlertConfig({
+      visible: true,
+      title,
+      message,
+      type: "alert",
+      actions: [
+        {
+          text: t("common.cancel"),
+          onPress: () => setAlertConfig((prev) => ({ ...prev, visible: false })),
+          style: "cancel",
+        },
+        {
+          text: t("common.confirm"),
+          onPress: () => {
+            updateField("zzz_is_active", value);
+            setAlertConfig((prev) => ({ ...prev, visible: false }));
+          },
+          variant: "primary",
+        },
+      ],
+    });
+  };
+
   const handleLanguageToggle = (lang: Language) => {
     setFormData((prev) => {
       const isSelected = prev.zzz_supported_languages.includes(lang);
@@ -304,7 +335,10 @@ export default function ProjectFormScreen() {
               <FormSwitch
                 label={t("active")}
                 value={formData.zzz_is_active}
-                onValueChange={(value) => updateField("zzz_is_active", value)}
+                onValueChange={handleToggleActive}
+                testID="project-active-switch"
+                warning={t("project.deactivate_warning")}
+                helperText={t("project.is_active_help")}
               />
 
               {/* Action Buttons */}

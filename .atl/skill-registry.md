@@ -31,7 +31,7 @@
 
 - **Functional Components**: Use functional components with hooks only.
 - **Imports**: No legacy `import * as Library`. Use named imports (e.g., `import { useState }`, `import { impactAsync }`). This rule is **UNIVERSAL** for all libraries (React, Expo, etc.) to ensure consistency and support effective tree-shaking.
-- **Button Standardization (Zero-Pressable Policy)**: Manual use of `TouchableOpacity` or `Pressable` is STRICTLY PROHIBITED across the entire mobile application, NO EXCEPTIONS. For ANY interactive element—including standard buttons, custom Cards, Date Selectors, or List Items—you MUST use the centralized `Button` component (`src/components/Button.tsx`). Even if you only need a touchable wrapper for a complex layout, use the `children` prop of the `Button` component (with `variant="ghost"` if no styling is needed). This ensures consistent touch feedback, accessibility roles, and centralized interaction management. Using `Pressable` is considered a critical architectural failure.
+- **Button Standardization (Zero-Pressable Policy)**: Manual use of `TouchableOpacity` or `Pressable` is STRICTLY PROHIBITED across the entire mobile application, NO EXCEPTIONS. **[EXCEPTION: `src/components/FormSwitch.tsx` is permitted to use `Pressable` to maintain high-precision toggle animations and custom layout density that conflict with standard Button padding/ripple behaviors]**. For ANY other interactive element—including standard buttons, custom Cards, Date Selectors, or List Items—you MUST use the centralized `Button` component (`src/components/Button.tsx`). Even if you only need a touchable wrapper for a complex layout, use the `children` prop of the `Button` component (with `variant="ghost"` if no styling is needed). This ensures consistent touch feedback, accessibility roles, and centralized interaction management. Using `Pressable` elsewhere is considered a critical architectural failure.
 - **Accessibility**: All images must have descriptive `alt` text (web) or `accessibilityLabel` (native).
 - **Performance**: Use dynamic components with `FlashList` for long lists and avoid heavy JS-side animations.
 - **Localization (i18n)**:
@@ -53,6 +53,10 @@
   - **Attribute-Focused**: They must exclusively manage and return the **attributes** being edited.
   - **Closure-Based Binding**: The **Parent** component is responsible for binding the specific ID or context using functional closures in callbacks (e.g., `onConfirm={(data) => handleUpdate(data, entityId)}`).
   - **Explicit Intent**: Use a semantic `mode: 'add' | 'edit'` prop to drive UI states/labels instead of using the presence or absence of data/IDs as a proxy for intent.
+- **Testability Standard (testID Policy)**: ALL interactive components (Buttons, Inputs, Switches) and key data containers (Labels, Cards, Sections) MUST expose and implement a `testID` prop. This ensures tests remain decoupled from implementation details like text content or translations (i18n), preventing fragile tests that break upon copy changes. Selectors in tests MUST prioritize `testID` over text-based matching whenever possible.
+- **Safety-First Toggles (Guardrail Pattern)**: For switches controlling critical business states (e.g., Venture Activation, Project Shutdown, Data Deletion):
+  - **Contextual Legend**: MUST display a clear, high-visibility explanation of the impact below the toggle. For negative impacts, use a dedicated warning box with an icon.
+  - **Explicit Confirmation**: MUST trigger a mandatory confirmation dialog (`AppAlert`) detailing the specific consequences before the change is applied to the state.
 
 ### Styling (NativeWind v4 + Tailwind v3)
 

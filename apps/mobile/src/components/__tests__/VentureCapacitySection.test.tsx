@@ -1,72 +1,75 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react-native";
+import { render, screen, fireEvent } from "@testing-library/react-native";
 import VentureCapacitySection from "../VentureCapacitySection";
-import { useProjectStore } from "../../stores/project.store";
 
-// Mock hooks and services
-jest.mock("../../services/logger.service", () => ({
-  logger: {
-    info: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
-    debug: jest.fn(),
-  },
-}));
-
-jest.mock("../../services/venture.service", () => ({
-  VentureService: {
-    getVentureByUserId: jest.fn().mockResolvedValue({
-      zzz_id: 1,
-      zzz_name: "Test Venture",
-      zzz_max_capacity: 50,
-      zzz_max_capacity_limit: 50,
-    }),
-    updateVenture: jest.fn().mockResolvedValue({ success: true }),
-  },
-}));
-
+// Mock hooks
 jest.mock("../../hooks/useI18n", () => ({
   useTranslations: () => ({
-    t: (key: string, params?: Record<string, unknown>) => {
-      if (params?.limit) return `${key} ${params.limit}`;
-      return key;
-    },
+    t: (key: string) => key,
   }),
 }));
 
 describe("VentureCapacitySection", () => {
-  const userId = "entrepreneur_001";
+  const mockOnValueChange = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("should render capacity adjustment UI even if selectedProject is missing (using venture fallback)", async () => {
-    useProjectStore.setState({ selectedProject: null });
+  it("should render capacity adjustment UI with current value", () => {
+    render(
+      <VentureCapacitySection
+        capacity={50}
+        onValueChange={mockOnValueChange}
+        originalCapacity={50}
+      />,
+    );
 
-    render(<VentureCapacitySection userId={userId} />);
-
-    // Now it should NOT show the error, but the loading first, then the UI
-    await waitFor(() => {
-      expect(screen.getByText("venture.capacity_label")).toBeTruthy();
-    });
-
-    // Check that it shows the capacity from the venture mock (50)
+    expect(screen.getByText("venture.capacity_label")).toBeTruthy();
     expect(screen.getByTestId("capacity-text").props.children).toBe(50);
   });
 
-  it("should display the current value reference and descriptive legend", async () => {
-    render(<VentureCapacitySection userId={userId} />);
+  it("should call onValueChange when plus button is pressed", () => {
+    render(
+      <VentureCapacitySection
+        capacity={50}
+        onValueChange={mockOnValueChange}
+        originalCapacity={50}
+      />,
+    );
 
-    await waitFor(() => {
-      expect(screen.getByText("venture.capacity_label")).toBeTruthy();
-    });
+    const plusButton = screen.getByTestId("plus-button");
+    fireEvent.press(plusButton);
 
-    // Check for the "Actual" label and original value (which appears twice: current and editable)
-    expect(screen.getByText(/venture.current_value/)).toBeTruthy();
-    expect(screen.getAllByText("50")).toHaveLength(2);
+    expect(mockOnValueChange).toHaveBeenCalledWith(51);
+  });
 
-    // Check for the descriptive legend
-    expect(screen.getByText("venture.capacity_legend")).toBeTruthy();
+  it("should call onValueChange when minus button is pressed", () => {
+    render(
+      <VentureCapacitySection
+        capacity={50}
+        onValueChange={mockOnValueChange}
+        originalCapacity={50}
+      />,
+    );
+
+    const minusButton = screen.getByTestId("minus-button");
+    fireEvent.press(minusButton);
+
+    expect(mockOnValueChange).toHaveBeenCalledWith(49);
+  });
+
+  it("should display original capacity as reference", () => {
+    render(
+      <VentureCapacitySection
+        capacity={55}
+        onValueChange={mockOnValueChange}
+        originalCapacity={50}
+      />,
+    );
+
+    // Should show 55 as current editable value and 50 as reference
+    expect(screen.getByText("50")).toBeTruthy();
+    expect(screen.getByText("55")).toBeTruthy();
   });
 });

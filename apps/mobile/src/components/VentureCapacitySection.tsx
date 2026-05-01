@@ -1,82 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { View, Text } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../hooks/useI18n";
-import { useProjectStore } from "../stores/project.store";
-import { VentureService } from "../services/venture.service";
-import { Venture, COLORS } from "@repo/shared";
+import { COLORS } from "@repo/shared";
 import { Button } from "./Button";
-import { logger } from "../services/logger.service";
-import LoadingView from "./LoadingView";
 
 interface VentureCapacitySectionProps {
-  userId: string;
+  capacity: number;
+  onValueChange: (value: number) => void;
+  disabled?: boolean;
+  originalCapacity: number;
 }
 
-export default function VentureCapacitySection({ userId }: VentureCapacitySectionProps) {
+export default function VentureCapacitySection({
+  capacity,
+  onValueChange,
+  disabled,
+  originalCapacity,
+}: VentureCapacitySectionProps) {
   const { t } = useTranslations();
-  const { selectedProject, projects, setSelectedProject } = useProjectStore();
-
-  const [venture, setVenture] = useState<Venture | null>(null);
-  const [capacity, setCapacity] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await VentureService.getVentureByUserId(userId);
-        if (data) {
-          setVenture(data);
-          setCapacity(data.zzz_max_capacity);
-
-          if (
-            data.zzz_project_id &&
-            (!selectedProject || selectedProject.zzz_id !== data.zzz_project_id)
-          ) {
-            const project = projects.find((p) => p.zzz_id === data.zzz_project_id);
-            if (project) {
-              setSelectedProject(project);
-            }
-          }
-        }
-      } catch (error) {
-        logger.error("Error loading venture capacity:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    load();
-  }, [userId, projects, selectedProject, setSelectedProject]);
-
-  const handleSave = async () => {
-    if (!venture || isSaving) return;
-    setIsSaving(true);
-    try {
-      await VentureService.updateVenture(venture.id, {
-        zzz_max_capacity: capacity,
-      });
-      setVenture({ ...venture, zzz_max_capacity: capacity });
-    } catch (error) {
-      logger.error("Error saving capacity:", error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  if (isLoading) {
-    return <LoadingView />;
-  }
-
-  if (!venture) {
-    return (
-      <View className="bg-surface-container-low rounded-3xl p-5 mb-4 border border-outline-variant/30">
-        <Text className="text-on-surface-variant font-body italic text-center">
-          {t("errors.no_venture_found")}
-        </Text>
-      </View>
-    );
-  }
 
   return (
     <View className="bg-surface-container-low rounded-3xl border border-outline-variant/30 p-5 shadow-sm mb-4">
@@ -97,10 +39,11 @@ export default function VentureCapacitySection({ userId }: VentureCapacitySectio
       <View className="flex-row items-center justify-between bg-surface-container-highest/30 p-4 rounded-2xl mb-4">
         <Button
           variant="outline"
-          onPress={() => setCapacity(Math.max(1, capacity - 1))}
+          onPress={() => onValueChange(Math.max(1, capacity - 1))}
           className="w-12 h-12 rounded-xl border-outline-variant/50"
-          disabled={capacity <= 1 || isSaving}
+          disabled={capacity <= 1 || disabled}
           testID="minus-button"
+          accessibilityLabel={t("venture.minus")}
         >
           <MaterialCommunityIcons
             name="minus"
@@ -116,7 +59,7 @@ export default function VentureCapacitySection({ userId }: VentureCapacitySectio
               {t("venture.current_value")}:{" "}
             </Text>
             <Text className="text-[10px] font-display font-bold text-on-surface-variant">
-              {venture.zzz_max_capacity}
+              {originalCapacity}
             </Text>
           </View>
 
@@ -130,10 +73,11 @@ export default function VentureCapacitySection({ userId }: VentureCapacitySectio
 
         <Button
           variant="outline"
-          onPress={() => setCapacity(capacity + 1)}
+          onPress={() => onValueChange(capacity + 1)}
           className="w-12 h-12 rounded-xl border-outline-variant/50"
-          disabled={capacity >= 999 || isSaving}
+          disabled={capacity >= 999 || disabled}
           testID="plus-button"
+          accessibilityLabel={t("venture.plus")}
         >
           <MaterialCommunityIcons
             name="plus"
@@ -144,18 +88,9 @@ export default function VentureCapacitySection({ userId }: VentureCapacitySectio
         </Button>
       </View>
 
-      <Text className="text-[11px] font-body text-on-surface-variant/70 text-center px-4 mb-6 italic">
+      <Text className="text-[11px] font-body text-on-surface-variant/70 text-center px-4 mb-2 italic">
         {t("venture.capacity_legend")}
       </Text>
-
-      <Button
-        onPress={handleSave}
-        disabled={capacity === (venture?.zzz_max_capacity || 0) || isSaving}
-        className="rounded-2xl"
-        isLoading={isSaving}
-      >
-        <Text className="text-on-primary font-bold">{t("common.save")}</Text>
-      </Button>
     </View>
   );
 }

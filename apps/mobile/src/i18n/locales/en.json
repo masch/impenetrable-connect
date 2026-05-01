@@ -181,7 +181,15 @@
     "current_value": "Current value",
     "capacity_legend": "This is the maximum number of people you can receive simultaneously.",
     "minus": "Decrease capacity",
-    "plus": "Increase capacity"
+    "plus": "Increase capacity",
+    "management": "Availability Management",
+    "is_paused": "Venture Active",
+    "is_paused_help": "If you deactivate this option, your venture will no longer be visible in the catalog and you will not receive new requests temporarily.",
+    "pause_confirm_title": "Deactivate venture?",
+    "pause_confirm_message": "By deactivating it, your venture will not be visible in the catalog and you will not receive new booking requests.",
+    "resume_confirm_title": "Activate venture?",
+    "resume_confirm_message": "Great! Your venture will be visible to all tourists again and you will be able to receive new orders immediately.",
+    "deactivate_warning": "WARNING: Deactivating this venture will immediately cancel its visibility in the catalog."
   },
   "orders": {
     "title": "My Orders",
@@ -247,9 +255,14 @@
     "status": "Status",
     "created_at": "Created at",
     "updated_at": "Updated at",
-    "is_active": "Is active",
     "max_capacity_limit": "Max capacity limit",
-    "not_selected_error": "No project selected"
+    "not_selected_error": "No project selected",
+    "is_active_help": "Deactivating the project will immediately disable all associated ventures and services for tourists.",
+    "deactivate_confirm_title": "Deactivate project?",
+    "deactivate_confirm_message": "This action will hide the project and all its services from the catalog. Do you want to continue?",
+    "activate_confirm_title": "Activate project?",
+    "activate_confirm_message": "The project and its services will be visible and operational again immediately.",
+    "deactivate_warning": "ATTENTION! Deactivating the project will automatically disable all associated ventures and services."
   },
   "errors": {
     "login_required_title": "Login Required",
