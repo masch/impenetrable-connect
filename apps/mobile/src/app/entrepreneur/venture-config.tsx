@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { View, Text, ScrollView } from "react-native";
 import { Stack } from "expo-router";
 import { useTranslations } from "../../hooks/useI18n";
@@ -12,10 +12,10 @@ import { VentureService } from "../../services/venture.service";
 export default function VentureConfigScreen() {
   const { t } = useTranslations();
   const { currentUser } = useAuthStore();
-  const [ventureName, setVentureName] = React.useState("");
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [ventureName, setVentureName] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     async function load() {
       if (currentUser?.id) {
         try {
