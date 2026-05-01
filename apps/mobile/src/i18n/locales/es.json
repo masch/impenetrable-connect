@@ -100,7 +100,8 @@
         "LUNCH": "Almuerzo",
         "SNACK": "Merienda",
         "DINNER": "Cena"
-      }
+      },
+      "active_context": "Tu reserva para"
     },
     "active_order_title": "Detalle del pedido",
     "items": {
@@ -109,7 +110,8 @@
     },
     "total_items": "Items totales",
     "total_cost": "Total pedido",
-    "each": "c/u"
+    "each": "c/u",
+    "view_details": "Ver detalles"
   },
   "roles": {
     "TOURIST": {

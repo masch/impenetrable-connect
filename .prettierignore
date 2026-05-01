@@ -9,3 +9,4 @@ android
 package-lock.json
 bun.lock
 yarn.lock
+coverage

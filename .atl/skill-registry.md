@@ -40,7 +40,7 @@
   - **Variables**: Always pass context variables (count, name, etc.) to the translation function instead of hardcoding formatted strings.
     - **Localization & Data (Zero-Transformation Policy)**: ALL data formatting and text transformations are STRICTLY PROHIBITED via native JavaScript methods (`.toUpperCase()`, `.toLocaleString()`, `.toLocaleDateString()`, etc.) directly within components.
     - **For Display**: ALWAYS use CSS/Tailwind utilities (e.g., `uppercase`, `capitalize`) for text styling.
-    - **For Formatting**: ALWAYS use centralized utility functions (e.g., `formatCurrency`, `formatDate` from `src/logic/formatters.ts`). This ensures a Single Source of Truth (SSoT) for project-wide formatting standards and facilitates future locale changes.
+    - **For Formatting**: ALWAYS use centralized utility functions (e.g., `formatCurrency`, `formatDate` from `src/logic/formatters.ts`). **For dates representing near-term context (like reservations or selections), ALWAYS prioritize relative semantic labels (e.g., "TODAY", "TOMORROW") using `getRelativeDateLabel` over raw dates to maintain a conversational UI flow.**
     - **For Logic**: Data MUST be normalized at the source (API/Store/Enums). Using transformations to compare values is considered an architectural failure.
     - **Observability**: This ensures translation keys (e.g., `[missing_key]`) remain raw and identifiable in the UI, avoiding "disguised" keys that hinder development.
 - **Loading State Standard**: Every screen OR **independent section** that fetches async data MUST use the centralized `LoadingView` component (`src/components/LoadingView.tsx`). Manual use of `ActivityIndicator` for screen-level or section-level loading is STRICTLY PROHIBITED. The component handles both the spinner and the `t('loading')` label by default.
@@ -64,6 +64,7 @@
 - **Design Tokens**: Never hardcode colors/spacing. Use the established design system tokens.
 - **Mobile Footer Density**: For sticky footers in mobile views, prioritize a **compact single-row layout**. Avoid multi-row footers that consume excessive vertical screen real estate, especially on devices with small aspect ratios or web browsers.
 - **Native Context**: Be aware of NativeWind v4 limitations vs v5/v6.
+- **NativeWind Image Overflow (Local Images)**: When using high-resolution local images (`require(...)`) within a fixed-height NativeWind container (e.g., `h-48`), the container MUST explicitly include `overflow-hidden`. Without it, the `Image` component will overflow the bounds and obscure subsequent sibling elements. Additionally, use `absolute w-full h-full` along with inline `style={{ width: "100%", height: "100%" }}` on the `Image` to guarantee constraint compliance.
 
 ### UI/UX & Interaction Patterns
 

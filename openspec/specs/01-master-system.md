@@ -1797,7 +1797,7 @@ describe('Order API', () => {
 
 ### 4.6.4 E2E Tests
 
-**Framework:** Playwright (recommended)
+**Framework:** Maestro (Mobile) / Playwright (Web)
 
 **Scenarios:**
 
@@ -1807,7 +1807,24 @@ describe('Order API', () => {
 | **Entrepreneur: Accept Order** | 1. Login → 2. See pending order → 3. Tap Accept → 4. See confirmation                                                           |
 | **Full Cascade**               | 1. Tourist creates order → 2. Venture A rejects → 3. Venture B accepts → 4. Tourist sees CONFIRMED                              |
 
-**Example:**
+**Example (Mobile - Maestro):**
+
+```yaml
+appId: com.impenetrable.connect
+---
+- launchApp
+- assertVisible: "Empanadas de carne"
+- tapOn: "Empanadas de carne"
+- assertVisible: "CANTIDAD"
+- tapOn:
+    id: "quantity-plus-button"
+- assertVisible: "2"
+- tapOn:
+    id: "confirm-reservation-button"
+- assertNotVisible: "CANTIDAD"
+```
+
+**Example (Web - Playwright):**
 
 ```typescript
 import { test, expect } from "@playwright/test";

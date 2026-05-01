@@ -140,4 +140,45 @@ describe("Booking & Cart Integration", () => {
     const totalPriceText = await screen.findByText(/\$?\s*28[.,]500/i);
     expect(totalPriceText).toBeTruthy();
   });
+
+  it("should use test IDs to edit and remove cart items from the summary", async () => {
+    const mockCartItems = [
+      {
+        zzz_catalog_item_id: 1,
+        zzz_quantity: 3,
+        zzz_price: 9500,
+      },
+    ];
+
+    setupMocks({
+      cart: {
+        cartItems: mockCartItems,
+        isValid: () => true,
+        selectedDate: mockDate,
+        selectedMoment: "DINNER",
+      },
+    });
+
+    render(<BookingScreen />);
+
+    // Expand the order summary using its test ID
+    const toggleSummaryBtn = await screen.findByTestId("toggle-order-summary-button");
+    fireEvent.press(toggleSummaryBtn);
+
+    // Edit the item using the edit test ID
+    const editBtn = await screen.findByTestId("edit-cart-item-1");
+    fireEvent.press(editBtn);
+
+    // The modal should open (we can verify by looking for the close button test ID)
+    const closeModalBtn = await screen.findByTestId("close-modal-button");
+    expect(closeModalBtn).toBeTruthy();
+    fireEvent.press(closeModalBtn);
+
+    // Remove the item using the remove test ID
+    const removeBtn = await screen.findByTestId("remove-cart-item-1");
+    fireEvent.press(removeBtn);
+
+    // Verify the alert opens by searching for the "Cancel" action or just ensuring it didn't crash
+    expect(await screen.findByText(/remove_confirm_title/i)).toBeTruthy();
+  });
 });

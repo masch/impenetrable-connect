@@ -25,10 +25,10 @@ describe("CatalogItemSchema", () => {
       zzz_name_i18n: { es: "Guiso" },
       zzz_description_i18n: { es: "Rico" },
       zzz_price: 15.0,
-      zzz_max_participants: null,
+      zzz_max_participants: 20,
       zzz_global_pause: false,
     };
     const result = CatalogItemSchema.parse(masterItem);
-    expect(result.zzz_max_participants).toBeNull();
+    expect(result.zzz_max_participants).toBe(20);
   });
 });

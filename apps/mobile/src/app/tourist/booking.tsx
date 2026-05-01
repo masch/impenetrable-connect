@@ -16,8 +16,9 @@ import { useTranslations } from "../../hooks/useI18n";
 import { formatCurrency, getRelativeDateLabel, isSameDay } from "../../logic/formatters";
 import Screen, { ScreenContent } from "../../components/Screen";
 import LoadingView from "../../components/LoadingView";
-import { ServiceCard } from "../../components/ServiceCard";
-import { ReservationModal } from "../../components/ReservationModal";
+import { ServiceCard } from "../../components/catalog/ServiceCard";
+import { ReservationModal } from "../../components/catalog/ReservationModal";
+import { SectionHeader } from "../../components/catalog/SectionHeader";
 import { AppAlert, type AppAlertAction } from "../../components/AppAlert";
 import { useCatalogStore } from "../../stores/catalog.store";
 import { useReservationStore } from "../../stores/reservation.store";
@@ -79,7 +80,6 @@ export default function BookingScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedService, setSelectedService] = useState<CatalogServiceItem | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [alertConfig, setAlertConfig] = useState<{
     visible: boolean;
@@ -169,14 +169,11 @@ export default function BookingScreen() {
         return;
       }
 
-      setIsSubmitting(true);
       try {
         await cancelOrder(orderId);
         handleCloseModal();
       } catch (error) {
         logger.error("Error removing order", error);
-      } finally {
-        setIsSubmitting(false);
       }
     },
     [cancelOrder, handleCloseModal, removeItem, selectedService],
@@ -208,7 +205,6 @@ export default function BookingScreen() {
         return;
       }
 
-      setIsSubmitting(true);
       handleCloseModal();
 
       try {
@@ -245,8 +241,6 @@ export default function BookingScreen() {
             },
           ],
         });
-      } finally {
-        setIsSubmitting(false);
       }
     },
     [
@@ -261,10 +255,6 @@ export default function BookingScreen() {
       editingOrder,
     ],
   );
-
-  const contextServiceIds = useMemo(() => {
-    return new Set(cartItems.map((i) => i.zzz_catalog_item_id));
-  }, [cartItems]);
 
   const totalAmount = useMemo(() => {
     return cartItems.reduce((acc, item) => acc + item.zzz_price * item.zzz_quantity, 0);
@@ -296,6 +286,7 @@ export default function BookingScreen() {
               leftIcon="cog-outline"
               iconColor={COLORS.primary}
               className="w-12 h-12 rounded-2xl border border-outline-variant/30 shadow-sm p-0 px-0"
+              testID="profile-button"
             />
           </View>
         </View>
@@ -322,13 +313,17 @@ export default function BookingScreen() {
             {/* Gastronomy Section */}
             {gastronomyServices.length > 0 && (
               <View className="mb-4">
+                <SectionHeader
+                  title={t("catalog.gastronomy")}
+                  subtitle={t("catalog.gastronomy_subtitle")}
+                  className="mb-4 bg-transparent border-0 px-2"
+                />
                 {gastronomyServices.map((service) => (
                   <ServiceCard
                     key={service.zzz_id}
-                    service={service}
-                    isEditing={contextServiceIds.has(Number(service.zzz_id))}
-                    onPress={handleServicePress}
-                    accessibilityLabel={getLocalizedName(service.zzz_name_i18n)}
+                    item={service}
+                    categoryName={t("catalog.category.gastronomy")}
+                    onPress={() => handleServicePress(service)}
                   />
                 ))}
               </View>
@@ -337,13 +332,17 @@ export default function BookingScreen() {
             {/* Excursions Section */}
             {excursionServices.length > 0 && (
               <View className="mb-4">
+                <SectionHeader
+                  title={t("catalog.excursions")}
+                  subtitle={t("catalog.excursions_subtitle")}
+                  className="mb-4 bg-transparent border-0 px-2"
+                />
                 {excursionServices.map((service) => (
                   <ServiceCard
                     key={service.zzz_id}
-                    service={service}
-                    isEditing={contextServiceIds.has(Number(service.zzz_id))}
-                    onPress={handleServicePress}
-                    accessibilityLabel={getLocalizedName(service.zzz_name_i18n)}
+                    item={service}
+                    categoryName={t("catalog.category.excursion")}
+                    onPress={() => handleServicePress(service)}
                   />
                 ))}
               </View>
@@ -367,23 +366,21 @@ export default function BookingScreen() {
               selectedService?.zzz_id ? `service-${selectedService.zzz_id}` : "reservation-modal"
             }
             visible={modalVisible}
-            service={selectedService}
+            item={selectedService}
             onClose={handleCloseModal}
-            onConfirm={handleBooking}
+            onConfirm={(quantity, notes) => {
+              if (selectedMoment && selectedDate) {
+                handleBooking(selectedMoment, quantity, selectedDate, notes);
+              }
+            }}
             onDelete={() => handleDeleteOrder(editingOrder?.zzz_id)}
-            isLoading={isSubmitting}
-            initialNotes={editingOrder?.zzz_notes || undefined}
             initialQuantity={
-              selectedService
-                ? editingOrder
-                  ? editingOrder.zzz_items?.find(
-                      (i) => Number(i.zzz_catalog_item_id) === Number(selectedService.zzz_id),
-                    )?.zzz_quantity
-                  : cartItems.find(
-                      (i) => Number(i.zzz_catalog_item_id) === Number(selectedService.zzz_id),
-                    )?.zzz_quantity
-                : undefined
+              editingOrder?.zzz_items?.[0]?.zzz_quantity ||
+              cartItems.find(
+                (i) => Number(i.zzz_catalog_item_id) === Number(selectedService?.zzz_id),
+              )?.zzz_quantity
             }
+            initialNotes={editingOrder?.zzz_notes || undefined}
             mode={
               editingOrder ||
               cartItems.some(
@@ -430,6 +427,7 @@ export default function BookingScreen() {
                               if (service) handleServicePress(service);
                             }}
                             className="flex-1 flex-row items-center justify-between py-1.5 rounded-none"
+                            testID={`edit-cart-item-${item.zzz_catalog_item_id}`}
                           >
                             <View className="flex-1 mr-3">
                               <Text
@@ -452,6 +450,7 @@ export default function BookingScreen() {
                                   name="pencil"
                                   size={14}
                                   color={COLORS.primary}
+                                  accessibilityLabel={t("common.edit")}
                                 />
                               </View>
                             </View>
@@ -459,6 +458,7 @@ export default function BookingScreen() {
 
                           <Button
                             variant="ghost"
+                            testID={`remove-cart-item-${item.zzz_catalog_item_id}`}
                             onPress={() => {
                               setAlertConfig({
                                 visible: true,
@@ -488,6 +488,7 @@ export default function BookingScreen() {
                               name="trash-can-outline"
                               size={18}
                               color={COLORS.error}
+                              accessibilityLabel={t("common.delete")}
                             />
                           </Button>
                         </View>
@@ -501,6 +502,7 @@ export default function BookingScreen() {
                     variant="ghost"
                     onPress={() => setShowOrderSummary(!showOrderSummary)}
                     className="flex-row items-center min-w-0 p-0"
+                    testID="toggle-order-summary-button"
                   >
                     <View>
                       <View className="flex-row items-center gap-1">
@@ -511,6 +513,9 @@ export default function BookingScreen() {
                           name={showOrderSummary ? "chevron-down" : "chevron-up"}
                           size={10}
                           color={COLORS.primary}
+                          accessibilityLabel={
+                            showOrderSummary ? t("common.collapse") : t("common.expand")
+                          }
                         />
                       </View>
                       <Text className="text-lg font-display font-bold text-on-surface -mt-1">
@@ -523,6 +528,7 @@ export default function BookingScreen() {
                     <Button
                       variant="secondary"
                       className="flex-row items-center p-0 px-2.5 h-10 rounded-xl border border-outline-variant/30 bg-surface-container-solid"
+                      testID="change-date-time-button"
                       onPress={() => {
                         impactAsync(ImpactFeedbackStyle.Light);
                         router.replace("/tourist");
@@ -533,6 +539,7 @@ export default function BookingScreen() {
                         size={12}
                         color={COLORS.primary}
                         className="opacity-80"
+                        accessibilityLabel={t("catalog.reservation.change_date")}
                       />
                       <Text className="text-[9px] font-display font-bold text-on-surface-variant uppercase tracking-tighter ml-1">
                         {relativeDateLabel}
@@ -550,6 +557,7 @@ export default function BookingScreen() {
                             }
                             size={12}
                             color={currentMoment.hex}
+                            accessibilityLabel={t("catalog.reservation.change_time")}
                           />
                         </View>
                       )}
@@ -559,6 +567,7 @@ export default function BookingScreen() {
                       title={t("orders.confirm")}
                       variant="primary"
                       className="px-4 h-10 rounded-xl"
+                      testID="confirm-order-button"
                       size="sm"
                       onPress={() => {
                         setAlertConfig({
@@ -577,7 +586,6 @@ export default function BookingScreen() {
                               variant: "primary",
                               onPress: async () => {
                                 if (!selectedDate || !selectedMoment) return;
-                                setIsSubmitting(true);
                                 try {
                                   const newOrder = await placeOrder(
                                     selectedDate,
@@ -596,8 +604,6 @@ export default function BookingScreen() {
                                   }
                                 } catch (err) {
                                   logger.error("Final confirmation failed", err);
-                                } finally {
-                                  setIsSubmitting(false);
                                 }
                               },
                             },

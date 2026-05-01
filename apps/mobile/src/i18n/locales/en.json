@@ -100,7 +100,8 @@
         "LUNCH": "Lunch",
         "SNACK": "Snack",
         "DINNER": "Dinner"
-      }
+      },
+      "active_context": "Your reservation for"
     },
     "active_order_title": "Order detail",
     "items": {
@@ -109,7 +110,8 @@
     },
     "total_items": "Total items",
     "total_cost": "Total cost",
-    "each": "each"
+    "each": "each",
+    "view_details": "View details"
   },
   "roles": {
     "TOURIST": {

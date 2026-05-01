@@ -58,7 +58,7 @@ export const EMPANADAS_CARNE_MEDIA_DOCENA: CatalogItem = {
     en: "Minimum 6 empanadas. Lean beef empanadas, homemade dough",
   },
   zzz_price: 9500,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: empanadas6,
   zzz_global_pause: false,
 };
@@ -72,7 +72,7 @@ export const EMPANADAS_CARNE_DOCENA: CatalogItem = {
     en: "Lean beef empanadas, homemade dough",
   },
   zzz_price: 18000,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: empanadas12,
   zzz_global_pause: false,
 };
@@ -86,7 +86,7 @@ export const EMPANADAS_CHARQUI_MEDIA_DOCENA: CatalogItem = {
     en: "Minimum 6 empanadas. Artisan charqui empanadas",
   },
   zzz_price: 12500,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: empanadas6,
   zzz_global_pause: false,
 };
@@ -97,7 +97,7 @@ export const EMPANADAS_CHARQUI_DOCENA: CatalogItem = {
   zzz_name_i18n: { es: "Empanadas de charqui 1 docena", en: "Charqui Empanadas dozen" },
   zzz_description_i18n: { es: "Empanadas de charqui artesanal", en: "Artisan charqui empanadas" },
   zzz_price: 24000,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: empanadas12,
   zzz_global_pause: false,
 };
@@ -111,7 +111,7 @@ export const EMPANADAS_VERDURA_MEDIA_DOCENA: CatalogItem = {
     en: "Minimum 6 empanadas. Fresh garden vegetable empanadas",
   },
   zzz_price: 9000,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: empanadas12,
   zzz_global_pause: false,
 };
@@ -125,7 +125,7 @@ export const EMPANADAS_VERDURA_DOCENA: CatalogItem = {
     en: "Fresh garden vegetable empanadas",
   },
   zzz_price: 17000,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: empanadas12,
   zzz_global_pause: false,
 };
@@ -139,7 +139,7 @@ export const EMPANADAS_POLLO_MEDIA_DOCENA: CatalogItem = {
     en: "Minimum 6 empanadas. Shredded chicken empanadas",
   },
   zzz_price: 9000,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: empanadas6,
   zzz_global_pause: false,
 };
@@ -150,7 +150,7 @@ export const EMPANADAS_POLLO_DOCENA: CatalogItem = {
   zzz_name_i18n: { es: "Empanadas de pollo 1 docena", en: "Chicken Empanadas dozen" },
   zzz_description_i18n: { es: "Empanadas de pollo deshilachado", en: "Shredded chicken empanadas" },
   zzz_price: 17000,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: empanadas12,
   zzz_global_pause: false,
 };
@@ -164,7 +164,7 @@ export const ASADO_POLLO: CatalogItem = {
     en: "Roasted chicken with rice and salad garnish",
   },
   zzz_price: 17000,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400",
   zzz_global_pause: false,
 };
@@ -178,7 +178,7 @@ export const PASTEL_ZAPALLO_CHIVO: CatalogItem = {
     en: "Pumpkin or potato pie with goat meat",
   },
   zzz_price: 18000,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: pastelCalabaza,
   zzz_global_pause: false,
 };
@@ -192,7 +192,7 @@ export const ESTOFADO_CHIVO: CatalogItem = {
     en: "Traditional Chaco goat stew",
   },
   zzz_price: 20000,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: chivoEstofado,
   zzz_global_pause: false,
 };
@@ -206,7 +206,7 @@ export const GUISO_CHIVO: CatalogItem = {
     en: "Authentic Chaco goat guiso",
   },
   zzz_price: 20000,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: chivoGuiso,
   zzz_global_pause: false,
 };
@@ -220,7 +220,7 @@ export const REPOLLO_ASADO: CatalogItem = {
     en: "Roasted cabbage with seasonal vegetables",
   },
   zzz_price: 18000,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: repollo,
   zzz_global_pause: false,
 };
@@ -234,7 +234,7 @@ export const POSTRE_REGIONAL: CatalogItem = {
     en: "Typical dessert from the Chaco region",
   },
   zzz_price: 7000,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: "https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?w=400",
   zzz_global_pause: false,
 };
@@ -248,7 +248,7 @@ export const DESAYUNO: CatalogItem = {
     en: "Breakfast with regional products",
   },
   zzz_price: 9000,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400",
   zzz_global_pause: false,
 };
@@ -262,7 +262,7 @@ export const MERIENDA: CatalogItem = {
     en: "Snack with regional products",
   },
   zzz_price: 9000,
-  zzz_max_participants: null,
+  zzz_max_participants: 20,
   zzz_image_url: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400",
   zzz_global_pause: false,
 };
