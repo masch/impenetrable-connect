@@ -291,18 +291,18 @@ function getTranslation(
 
 When a tourist creates an order, the following validations must pass:
 
-| Field                     | Validation Rule               | Error Message                               |
-| ------------------------- | ----------------------------- | ------------------------------------------- |
-| `service_date`            | Required                      | "Date is required"                          |
-| `service_date`            | Must be >= TODAY              | "Cannot order for past dates"               |
-| `service_date`            | Must be <= TODAY + 30 days    | "Cannot order more than 30 days in advance" |
-| `guest_count`             | Required                      | "Number of guests is required"              |
-| `guest_count`             | Must be >= 1                  | "At least 1 guest is required"              |
-| `guest_count`             | Must be <= 100                | "Maximum 100 guests per order"              |
-| `items`                   | Required, array, min 1, max 1 | "Only 1 item per order"                     |
-| `items[].catalog_item_id` | Required                      | "Item is required"                          |
-| `items[].quantity`        | Required, min 1               | "Quantity must be at least 1"               |
-| `time_of_day_id`          | Required                      | "Time of day is required"                   |
+| Field                     | Validation Rule                             | Error Message                                |
+| ------------------------- | ------------------------------------------- | -------------------------------------------- |
+| `service_date`            | Required                                    | "Date is required"                           |
+| `service_date`            | Must be >= TODAY                            | "Cannot order for past dates"                |
+| `service_date`            | Must be <= TODAY + 30 days                  | "Cannot order more than 30 days in advance"  |
+| `guest_count`             | Required                                    | "Number of guests is required"               |
+| `guest_count`             | Must be >= 1                                | "At least 1 guest is required"               |
+| `guest_count`             | Must be <= `Project.zzz_max_capacity_limit` | "Maximum capacity exceeded for this project" |
+| `items`                   | Required, array, min 1, max 1               | "Only 1 item per order"                      |
+| `items[].catalog_item_id` | Required                                    | "Item is required"                           |
+| `items[].quantity`        | Required, min 1                             | "Quantity must be at least 1"                |
+| `time_of_day_id`          | Required                                    | "Time of day is required"                    |
 
 #### 3.3.2 Venture Availability Validations (Filter Phase)
 
@@ -319,6 +319,12 @@ Before offering an order to a venture, the engine validates:
 > **⚠️ IMPORTANT — Capacity Unit:** Capacity is ALWAYS measured by **number of guests (personas/guest_count)**, NEVER by number of items or dishes ordered. A Venture with `max_capacity = 20` can serve 20 **people** regardless of how many dishes each person orders. All capacity checks (`CAPACITY_EXCEEDED`), occupation calculations (`getCurrentOccupation`), and calendar displays (`occupied_seats / max_capacity`) use `guest_count` as the unit.
 > | Individual Pause | `catalog_item_id NOT IN (SELECT catalog_item_id FROM venture_paused_item WHERE venture_id = venture.id)` | `INDIVIDUAL_PAUSE` |
 > | **Opening Hours** | Order time within `venture.opening_hours` for the day | `CLOSED_THAT_DAY` |
+
+> **🛑 PROJECT CAPACITY CEILING:** In addition to Venture-specific capacity, each project defines a global `zzz_max_capacity_limit` that acts as a hard ceiling.
+>
+> 1. **Tourist Enforcement**: The UI (OrderSetupScreen, ReservationModal) MUST prevent selecting a `guest_count` or `quantity` higher than the project limit.
+> 2. **Entrepreneur Enforcement**: The UI (VentureConfigScreen) MUST prevent configuring a `Venture.max_capacity` higher than the project limit.
+> 3. **API Validation**: The backend MUST reject any order or configuration update that exceeds the `Project.zzz_max_capacity_limit`.
 
 **Opening Hours Logic:**
 
@@ -1943,6 +1949,7 @@ erDiagram
         jsonb zzz_supported_languages "Array of supported language codes, e.g. ['es', 'en']"
         int zzz_cascade_timeout_minutes "Default: 30. Timeout per attempt before cascading to next venture"
         int zzz_max_cascade_attempts "Default: 10. Maximum times the engine will try before marking order as EXPIRED"
+        int zzz_max_capacity_limit "Maximum seats/items per order in this project (e.g. 50)"
         boolean zzz_is_active
     }
 
