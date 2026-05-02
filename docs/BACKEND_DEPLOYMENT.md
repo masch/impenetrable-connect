@@ -88,9 +88,9 @@ Hono's JWT middleware requires an explicit algorithm. We use **`HS256`** for sha
 
 ### Password Hashing
 
-- **Local (Bun)**: Uses `Bun.password` (Argon2id) for maximum performance.
-- **Production (Edge)**: Uses `bcryptjs` (Bcrypt) since `Bun.password` is not available in the Workers runtime.
-- **Verification**: The `AuthService` automatically handles both formats to ensure a smooth transition.
+- **Unified Implementation**: Uses **PBKDF2** via the native **Web Crypto API** (`crypto.subtle`).
+- **Compatibility**: This ensures the exact same hashing logic and performance profile across Bun (local), Cloudflare Workers (production), and modern browsers.
+- **Security**: Uses SHA-256 with 100,000 iterations and a 16-byte random salt, compliant with modern security standards.
 
 ### Shared Dependencies
 
