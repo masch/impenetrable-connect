@@ -46,7 +46,7 @@ RULES_FILE=".atl/skill-registry.md"
 
 # Strict mode: fail if AI response is ambiguous
 # Default: true
-STRICT_MODE="false"
+STRICT_MODE="true"
 
 # Timeout in seconds for AI provider response
 # Default: 300 (5 minutes)
