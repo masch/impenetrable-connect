@@ -135,6 +135,7 @@ describe("OrderScreen (Tourist)", () => {
         zzz_cascade_order: 1,
         zzz_is_paused: false,
         zzz_is_active: true,
+        zzz_project_id: 1,
       },
     };
 

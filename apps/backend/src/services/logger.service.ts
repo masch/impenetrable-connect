@@ -1,33 +1,16 @@
 import pino from "pino";
 import pretty from "pino-pretty";
-
-/**
- * Logger Service
- * Centralized logging for the backend application using Pino.
- * Complies with the project's centralized observability standard.
- */
-const isProduction = process.env.NODE_ENV === "production";
-
-const stream = isProduction
-  ? undefined
-  : pretty({
-      colorize: true,
-      translateTime: "HH:MM:ss Z",
-      ignore: "pid,hostname",
-    });
-
-const pinoLogger = isProduction
-  ? pino({
-      level: process.env.LOG_LEVEL || "info",
-    })
-  : pino({ level: process.env.LOG_LEVEL || "info" }, stream!);
-
-export type LogLevel = "debug" | "info" | "warn" | "error";
+import { type AppConfig } from "../config/env";
 
 class LoggerService {
   private static instance: LoggerService;
+  private pinoLogger: pino.Logger;
+  private isInitialized = false;
 
-  private constructor() {}
+  private constructor() {
+    // Initial safe state: assume production JSON logging to avoid performance hits or unparseable logs
+    this.pinoLogger = pino({ level: "info" });
+  }
 
   static getInstance(): LoggerService {
     if (!LoggerService.instance) {
@@ -36,20 +19,43 @@ class LoggerService {
     return LoggerService.instance;
   }
 
+  /**
+   * Reconfigures the logger with the actual application configuration.
+   * This should be called by the logging middleware as soon as the context is available.
+   */
+  init(config: AppConfig) {
+    if (this.isInitialized) return;
+
+    const isProduction = config.isProduction;
+    const level = config.logLevel || "info";
+
+    const stream = isProduction
+      ? undefined
+      : pretty({
+          colorize: true,
+          translateTime: "HH:MM:ss Z",
+          ignore: "pid,hostname",
+        });
+
+    this.pinoLogger = isProduction ? pino({ level }) : pino({ level }, stream!);
+
+    this.isInitialized = true;
+  }
+
   debug(message: string, context?: Record<string, unknown>) {
-    pinoLogger.debug(context || {}, message);
+    this.pinoLogger.debug(context || {}, message);
   }
 
   info(message: string, context?: Record<string, unknown>) {
-    pinoLogger.info(context || {}, message);
+    this.pinoLogger.info(context || {}, message);
   }
 
   warn(message: string, context?: Record<string, unknown>) {
-    pinoLogger.warn(context || {}, message);
+    this.pinoLogger.warn(context || {}, message);
   }
 
   error(message: string, error: Error | unknown, context?: Record<string, unknown>) {
-    pinoLogger.error({ err: error, ...context }, message);
+    this.pinoLogger.error({ err: error, ...context }, message);
   }
 }
 

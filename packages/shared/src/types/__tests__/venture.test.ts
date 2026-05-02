@@ -11,6 +11,7 @@ describe("VentureSchema", () => {
       zzz_max_capacity: 20,
       zzz_is_paused: false,
       zzz_is_active: true,
+      zzz_project_id: 1,
       createdAt: now,
       updatedAt: now,
       zzz_members: [
@@ -35,6 +36,7 @@ describe("VentureSchema", () => {
       zzz_max_capacity: 20,
       zzz_is_paused: false,
       zzz_is_active: true,
+      zzz_project_id: 1,
       createdAt: now,
       updatedAt: now,
       zzz_members: [],

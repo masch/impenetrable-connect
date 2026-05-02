@@ -42,6 +42,7 @@ jobs:
 
     env:
       DATABASE_URL: postgres://impenetrable:password@localhost:5432/impenetrable_db
+      JWT_SECRET: ci-dummy-secret-for-tests
       CI: true
 
     steps:

@@ -5,6 +5,8 @@ import { Hono } from "hono";
 process.env.DATABASE_URL = "postgres://user:pass@localhost:5432/db";
 process.env.GITHUB_REPO = "masch/impenetrable-connect";
 process.env.GITHUB_TOKEN = "test-token";
+process.env.HEALTH_TOKEN = "test-secret";
+process.env.JWT_SECRET = "test-secret";
 
 // Use require to bypass import hoisting and ensure environment is set first
 const { healthRouter } = require("./health");
@@ -20,7 +22,16 @@ describe("Health Router Integration", () => {
       new Response(JSON.stringify(mockRuns)),
     );
 
-    const res = await testApp.request("/health");
+    const res = await testApp.request(
+      "/health",
+      { headers: { "X-Health-Key": "test-secret" } },
+      {
+        HEALTH_TOKEN: "test-secret",
+        GITHUB_REPO: "masch/impenetrable-connect",
+        GITHUB_TOKEN: "test-token",
+        JWT_SECRET: "test-secret",
+      },
+    );
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -31,12 +42,33 @@ describe("Health Router Integration", () => {
     fetchSpy.mockRestore();
   });
 
+  it("should hide github data if key is missing or incorrect", async () => {
+    const res = await testApp.request(
+      "/health",
+      {},
+      { HEALTH_TOKEN: "test-secret", JWT_SECRET: "test-secret" },
+    );
+    expect(res.status).toBe(200);
+
+    const body = await res.json();
+    expect(body.github).toBeUndefined();
+  });
+
   it("should handle github fetch failure gracefully", async () => {
     const fetchSpy = spyOn(globalThis, "fetch").mockResolvedValue(
       new Response("Error", { status: 500 }),
     );
 
-    const res = await testApp.request("/health");
+    const res = await testApp.request(
+      "/health",
+      { headers: { "X-Health-Key": "test-secret" } },
+      {
+        HEALTH_TOKEN: "test-secret",
+        GITHUB_REPO: "masch/impenetrable-connect",
+        GITHUB_TOKEN: "test-token",
+        JWT_SECRET: "test-secret",
+      },
+    );
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -71,7 +103,16 @@ describe("Health Router Integration", () => {
       return new Response("Not Found", { status: 404 });
     }) as unknown as typeof fetch);
 
-    const res = await testApp.request("/health/check-runs/ref123");
+    const res = await testApp.request(
+      "/health/check-runs/ref123",
+      { headers: { "X-Health-Key": "test-secret" } },
+      {
+        HEALTH_TOKEN: "test-secret",
+        GITHUB_REPO: "masch/impenetrable-connect",
+        GITHUB_TOKEN: "test-token",
+        JWT_SECRET: "test-secret",
+      },
+    );
     expect(res.status).toBe(200);
 
     const body = await res.json();
@@ -79,5 +120,14 @@ describe("Health Router Integration", () => {
     expect(body.messages[0]).toBe("[Lint] Trailing whitespace");
 
     fetchSpy.mockRestore();
+  });
+
+  it("should return 401 for check-runs if key is missing", async () => {
+    const res = await testApp.request(
+      "/health/check-runs/ref123",
+      {},
+      { HEALTH_TOKEN: "test-secret", JWT_SECRET: "test-secret" },
+    );
+    expect(res.status).toBe(401);
   });
 });

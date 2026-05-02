@@ -3,12 +3,7 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
 import path from "path";
 import { logger } from "../services/logger.service";
-
-const databaseUrl = process.env.DIRECT_URL || process.env.DATABASE_URL;
-
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL or DIRECT_URL is not defined");
-}
+import { getAppConfig } from "../config/env";
 
 /**
  * Database Migration Script
@@ -16,9 +11,15 @@ if (!databaseUrl) {
  * This can be run in CI/CD without user interaction.
  */
 async function runMigration() {
+  const config = getAppConfig();
+
+  if (!config.directUrl) {
+    throw new Error("DATABASE_URL or DIRECT_URL is not defined in AppConfig");
+  }
+
   logger.info("⏳ Starting database migrations...");
 
-  const migrationClient = postgres(databaseUrl!, { max: 1 });
+  const migrationClient = postgres(config.directUrl, { max: 1 });
   const db = drizzle(migrationClient);
 
   try {

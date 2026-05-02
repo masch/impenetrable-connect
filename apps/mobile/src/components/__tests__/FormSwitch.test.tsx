@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react-native";
+import { render, screen, fireEvent, act } from "@testing-library/react-native";
 import { FormSwitch } from "../FormSwitch";
 
 describe("FormSwitch", () => {
@@ -7,6 +7,11 @@ describe("FormSwitch", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it("should render correctly with label", () => {
@@ -16,16 +21,20 @@ describe("FormSwitch", () => {
     expect(screen.getByRole("switch")).toBeTruthy();
   });
 
-  it("should call onValueChange when pressed", () => {
+  it("should call onValueChange when pressed", async () => {
     render(<FormSwitch label="Test Label" value={false} onValueChange={mockOnValueChange} />);
 
     const switchComp = screen.getByRole("switch");
-    fireEvent.press(switchComp);
+
+    await act(async () => {
+      fireEvent.press(switchComp);
+      jest.runAllTimers();
+    });
 
     expect(mockOnValueChange).toHaveBeenCalledWith(true);
   });
 
-  it("should respect the disabled prop", () => {
+  it("should respect the disabled prop", async () => {
     render(
       <FormSwitch
         label="Test Label"
@@ -36,7 +45,10 @@ describe("FormSwitch", () => {
     );
 
     const switchComp = screen.getByRole("switch");
-    fireEvent.press(switchComp);
+    await act(async () => {
+      fireEvent.press(switchComp);
+      jest.runAllTimers();
+    });
 
     expect(mockOnValueChange).not.toHaveBeenCalled();
     // Check accessibility state

@@ -1,16 +1,16 @@
 import { sign } from "hono/jwt";
-import { db } from "../db";
 import { users, refreshTokens } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { LoginInput, User, UserRole } from "@repo/shared";
+import { PasswordService } from "./password.service";
+import { type Db } from "../db";
 import { logger } from "./logger.service";
 
-const JWT_SECRET = process.env.JWT_SECRET || "super-secret-dev-key";
-const ACCESS_TOKEN_EXPIRY = 15 * 60; // 15 minutes
-const REFRESH_TOKEN_EXPIRY_DAYS = 7;
-
 export class AuthService {
-  static async login(input: LoginInput) {
+  static async login(input: LoginInput, db: Db, jwtSecret: string) {
+    const ACCESS_TOKEN_EXPIRY = 15 * 60; // 15 minutes
+    const REFRESH_TOKEN_EXPIRY_DAYS = 7;
+
     // 1. Find user by email or alias
     let user;
     if ("email" in input) {
@@ -21,8 +21,8 @@ export class AuthService {
         return null;
       }
 
-      // 2. Verify password
-      const isPasswordValid = await Bun.password.verify(input.password, user.passwordHash!);
+      // 2. Verify password (Modern Unified Implementation)
+      const isPasswordValid = await this.verifyPassword(input.password, user.passwordHash!);
       if (!isPasswordValid) {
         logger.warn(`Failed login attempt for email: ${input.email} (Invalid password)`);
         return null;
@@ -44,13 +44,13 @@ export class AuthService {
         role: user.role as UserRole,
         exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_EXPIRY,
       },
-      JWT_SECRET,
+      jwtSecret,
       "HS256",
     );
 
     // 4. Generate Refresh Token
     const refreshTokenStr = crypto.randomUUID();
-    const refreshTokenHash = await Bun.password.hash(refreshTokenStr);
+    const refreshTokenHash = await this.hashPassword(refreshTokenStr);
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + REFRESH_TOKEN_EXPIRY_DAYS);
@@ -84,11 +84,11 @@ export class AuthService {
     };
   }
 
-  static async hashPassword(password: string) {
-    return Bun.password.hash(password, {
-      algorithm: "argon2id",
-      memoryCost: 65536,
-      timeCost: 2,
-    });
+  static async verifyPassword(password: string, hash: string): Promise<boolean> {
+    return PasswordService.verify(password, hash);
+  }
+
+  static async hashPassword(password: string): Promise<string> {
+    return PasswordService.hash(password);
   }
 }

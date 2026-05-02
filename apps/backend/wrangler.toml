@@ -1,0 +1,15 @@
+name = "impenetrable-backend"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+
+# Secrets to be set via 'make backend-secret-set':
+# DATABASE_URL: Neon connection string
+# JWT_SECRET: Auth signing key
+# ALLOWED_ORIGINS: Comma-separated list of allowed domains for CORS
+# HEALTH_TOKEN: Secret key for detailed diagnostics (/health)
+# GITHUB_REPO: Repository path (e.g., owner/repo)
+# GITHUB_TOKEN: GitHub Personal Access Token for check-runs

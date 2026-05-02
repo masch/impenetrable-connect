@@ -1,20 +1,17 @@
-import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
-import { drizzle as drizzleNeon } from "drizzle-orm/neon-http";
-import { neon } from "@neondatabase/serverless";
-import postgres from "postgres";
-import * as schema from "./schema";
+import { createDb, type Db } from "./factory";
 
-const databaseUrl = process.env.DATABASE_URL;
+/**
+ * Re-exporting from factory for convenience.
+ * Core database logic resides in factory.ts to prevent circular dependencies.
+ */
+export { createDb, type Db };
 
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL is not defined");
-}
-
-// DBA Expert Rule: Detect Neon to use the optimal HTTP driver
-const isNeon = databaseUrl.includes("neon.tech");
-
-export const db = isNeon
-  ? drizzleNeon(neon(databaseUrl), { schema })
-  : drizzlePostgres(postgres(databaseUrl), { schema });
-
-export type Db = typeof db;
+/**
+ * ARCHITECT WARNING:
+ * Do NOT export a static 'db' instance here that calls getAppConfig() at the module level.
+ * This will trigger a circular dependency loop (env -> factory -> env).
+ *
+ * For CLI scripts or tools, always use:
+ * const config = getAppConfig();
+ * const db = createDb(config.databaseUrl);
+ */
