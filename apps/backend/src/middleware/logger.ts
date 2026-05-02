@@ -1,19 +1,20 @@
 import { Context, Next } from "hono";
 import { logger } from "../services/logger.service";
-
-interface LoggerOptions {
-  logBody?: boolean;
-}
+import { getAppConfig } from "../config/env";
 
 /**
- * Request Logger Middleware Factory
- * Creates a middleware that logs incoming requests and their responses.
- * @param options.logBody If true, captures request and response bodies.
+ * Request Logger Middleware
+ * Logs incoming requests and their responses.
+ * Automatically resolves configuration (logBody) via getAppConfig.
  */
-export const requestLogger = (options: LoggerOptions = {}) => {
-  const { logBody = false } = options;
-
+export const requestLogger = () => {
   return async (c: Context, next: Next) => {
+    const config = getAppConfig(c);
+
+    // Architect Rule: Tune the global logger with actual config on the first request
+    logger.init(config);
+
+    const { logBody } = config;
     const { method, url } = c.req;
     const start = Date.now();
 

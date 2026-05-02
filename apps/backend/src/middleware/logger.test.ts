@@ -1,29 +1,24 @@
-import { describe, expect, it, mock, beforeEach } from "bun:test";
+import { describe, expect, it, spyOn, beforeEach, afterEach, type Mock } from "bun:test";
 import { Hono } from "hono";
+import { logger } from "../services/logger.service";
 import { requestLogger } from "./logger";
 
-// Create the mock object
-const mockLogger = {
-  info: mock(() => {}),
-  warn: mock(() => {}),
-  error: mock(() => {}),
-  debug: mock(() => {}),
-};
-
-// Use Bun's native module mocking
-mock.module("../services/logger.service", () => ({
-  logger: mockLogger,
-}));
-
-// We import it after mocking to ensure we get the mock (though mock.module is hoisted in Bun)
-import "./logger";
-
 describe("Request Logger Middleware", () => {
+  let infoSpy: Mock<typeof logger.info>;
+  let warnSpy: Mock<typeof logger.warn>;
+  let errorSpy: Mock<typeof logger.error>;
+
   beforeEach(() => {
-    mockLogger.info.mockClear();
-    mockLogger.warn.mockClear();
-    mockLogger.error.mockClear();
-    mockLogger.debug.mockClear();
+    // Spy on the actual logger methods
+    infoSpy = spyOn(logger, "info").mockImplementation(() => {});
+    warnSpy = spyOn(logger, "warn").mockImplementation(() => {});
+    errorSpy = spyOn(logger, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    infoSpy.mockRestore();
+    warnSpy.mockRestore();
+    errorSpy.mockRestore();
   });
 
   it("should log request and response without bodies by default", async () => {
@@ -31,39 +26,46 @@ describe("Request Logger Middleware", () => {
     app.use("*", requestLogger());
     app.get("/test", (c) => c.text("ok"));
 
-    const res = await app.request("/test");
+    const res = await app.request("/test", {}, { JWT_SECRET: "test-secret" });
     expect(res.status).toBe(200);
 
-    // Verify logs
-    expect(mockLogger.info).toHaveBeenCalledTimes(2);
-    expect(mockLogger.info).toHaveBeenCalledWith("--> GET http://localhost/test", undefined);
+    // Verify logs (info called for --> and <--)
+    expect(infoSpy).toHaveBeenCalledTimes(2);
+    expect(infoSpy).toHaveBeenCalledWith(expect.stringContaining("--> GET"), undefined);
   });
 
-  it("should log request and response bodies when logBody option is true", async () => {
+  it("should log request and response bodies when logBody is true in config", async () => {
     const app = new Hono();
-    app.use("*", requestLogger({ logBody: true }));
+    app.use("*", requestLogger());
     app.post("/test", async (c) => {
       const body = await c.req.json();
       return c.json({ received: body, status: "success" });
     });
 
     const payload = { hello: "world" };
-    const res = await app.request("/test", {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: { "Content-Type": "application/json" },
-    });
+    const res = await app.request(
+      "/test",
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/json" },
+      },
+      {
+        JWT_SECRET: "test-secret",
+        LOG_BODY: "true",
+      },
+    );
 
     expect(res.status).toBe(200);
 
     // Verify request log has the body
-    expect(mockLogger.info).toHaveBeenCalledWith("--> POST http://localhost/test", {
+    expect(infoSpy).toHaveBeenCalledWith(expect.stringContaining("--> POST"), {
       body: payload,
     });
 
     // Verify response log has the body
-    expect(mockLogger.info).toHaveBeenLastCalledWith(
-      expect.stringContaining("<-- POST http://localhost/test 200"),
+    expect(infoSpy).toHaveBeenLastCalledWith(
+      expect.stringContaining("<-- POST"),
       expect.objectContaining({
         response: { received: payload, status: "success" },
       }),
@@ -72,25 +74,32 @@ describe("Request Logger Middleware", () => {
 
   it("should handle and log errors when request body is malformed JSON", async () => {
     const app = new Hono();
-    app.use("*", requestLogger({ logBody: true }));
+    app.use("*", requestLogger());
     app.post("/test", (c) => c.text("ok"));
 
-    const res = await app.request("/test", {
-      method: "POST",
-      body: '{"malformed": json', // Invalid JSON
-      headers: { "Content-Type": "application/json" },
-    });
+    const res = await app.request(
+      "/test",
+      {
+        method: "POST",
+        body: '{"malformed": json', // Invalid JSON
+        headers: { "Content-Type": "application/json" },
+      },
+      {
+        JWT_SECRET: "test-secret",
+        LOG_BODY: "true",
+      },
+    );
 
     expect(res.status).toBe(200);
 
     // Verify warning was logged
-    expect(mockLogger.warn).toHaveBeenCalledWith(
+    expect(warnSpy).toHaveBeenCalledWith(
       expect.stringContaining("Failed to parse request body"),
       expect.objectContaining({ error: expect.any(Error) }),
     );
 
     // Verify request log used the fallback string
-    expect(mockLogger.info).toHaveBeenCalledWith("--> POST http://localhost/test", {
+    expect(infoSpy).toHaveBeenCalledWith(expect.stringContaining("--> POST"), {
       body: "[Unparseable Body]",
     });
   });

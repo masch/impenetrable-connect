@@ -11,7 +11,7 @@ export const VentureSchema = z.object({
   zzz_is_active: z.boolean().default(true),
   createdAt: z.date(),
   updatedAt: z.date(),
-  zzz_project_id: z.number().int().optional(),
+  zzz_project_id: z.number().int(),
   zzz_members: z.array(VentureMemberSchema).optional(),
 });
 

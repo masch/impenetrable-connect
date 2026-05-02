@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react-native";
+import { render, screen, fireEvent, act } from "@testing-library/react-native";
 import VentureStatusSection from "../VentureStatusSection";
 
 // Mock hooks
@@ -14,6 +14,11 @@ describe("VentureStatusSection", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it("should render correctly in active state", () => {
@@ -31,13 +36,17 @@ describe("VentureStatusSection", () => {
     expect(screen.queryByText("venture.deactivate_warning")).toBeNull();
   });
 
-  it("should show confirmation alert when toggling status", () => {
+  it("should show confirmation alert when toggling status", async () => {
     render(<VentureStatusSection isPaused={false} onValueChange={mockOnValueChange} />);
 
     // Switch for "Venture Active" is ON when isPaused is false
     // We toggle it (turn OFF)
     const switchComp = screen.getByTestId("venture-active-switch");
-    fireEvent.press(switchComp);
+
+    await act(async () => {
+      fireEvent.press(switchComp);
+      jest.runAllTimers();
+    });
 
     // Should show alert title for pausing (deactivating)
     expect(screen.getByText("venture.pause_confirm_title")).toBeTruthy();
@@ -47,27 +56,39 @@ describe("VentureStatusSection", () => {
     expect(mockOnValueChange).not.toHaveBeenCalled();
   });
 
-  it("should call onValueChange after confirming alert", () => {
+  it("should call onValueChange after confirming alert", async () => {
     render(<VentureStatusSection isPaused={false} onValueChange={mockOnValueChange} />);
 
     const switchComp = screen.getByTestId("venture-active-switch");
-    fireEvent.press(switchComp);
+    await act(async () => {
+      fireEvent.press(switchComp);
+      jest.runAllTimers();
+    });
 
     const confirmButton = screen.getByText("common.confirm");
-    fireEvent.press(confirmButton);
+    await act(async () => {
+      fireEvent.press(confirmButton);
+      jest.runAllTimers();
+    });
 
     // If isPaused was false, and we toggled to pause, new isPaused value should be true
     expect(mockOnValueChange).toHaveBeenCalledWith(true);
   });
 
-  it("should not call onValueChange if alert is cancelled", () => {
+  it("should not call onValueChange if alert is cancelled", async () => {
     render(<VentureStatusSection isPaused={false} onValueChange={mockOnValueChange} />);
 
     const switchComp = screen.getByTestId("venture-active-switch");
-    fireEvent.press(switchComp);
+    await act(async () => {
+      fireEvent.press(switchComp);
+      jest.runAllTimers();
+    });
 
     const cancelButton = screen.getByText("common.cancel");
-    fireEvent.press(cancelButton);
+    await act(async () => {
+      fireEvent.press(cancelButton);
+      jest.runAllTimers();
+    });
 
     expect(mockOnValueChange).not.toHaveBeenCalled();
     expect(screen.queryByText("venture.pause_confirm_title")).toBeNull();

@@ -1,4 +1,4 @@
-.PHONY: help setup install dev dev-api dev-web-api clean lint gga format check check-static typecheck test test-shared test-coverage mobile mobile-mock mobile-api mobile-native mobile-clean mobile-web mobile-web-api mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed db-up db-down db-push db-generate db-migrate db-push-neon db-generate-neon db-migrate-neon db-reset eas-login eas-whoami eas-init eas-build-configure eas-build-dev eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator eas-export-web eas-deploy-web eas-deploy-web-prod android-app-stop android-app-restart android-reset android-stop android-kill android-restart check-backend-alive
+.PHONY: help setup install dev dev-api dev-web-api clean lint gga format check check-static typecheck test test-shared test-coverage mobile mobile-mock mobile-api mobile-native mobile-clean mobile-web mobile-web-api mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed db-up db-down db-push db-generate db-migrate db-push-neon db-generate-neon db-migrate-neon db-reset eas-login eas-whoami eas-init eas-build-configure eas-build-dev eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator eas-export-web eas-deploy-web eas-deploy-web-prod android-app-stop android-app-restart android-reset android-stop android-kill android-restart check-backend-alive backend-login backend-deploy backend-logs backend-secret-set
 
 # ==========================================
 # 📋 HELP
@@ -37,7 +37,14 @@ help:
 	@echo "    make mobile-expo-doctor           - Doctor mobile dependencies"
 	@echo ""
 	@echo "  🖥️ BACKEND"
-	@echo "    make backend                      - Start backend API"
+	@echo "    make backend                      - Start backend API (Local)"
+	@echo "    make backend-login                - Login to Cloudflare"
+	@echo "    make backend-deploy               - Deploy backend to production"
+	@echo "    make backend-logs                 - View production logs"
+	@echo "    make backend-secret-set           - Set a secret in production"
+	@echo "    make backend-secret-delete        - Delete a secret in production"
+	@echo "    make backend-health               - Check production health (Keychain auto-auth)"
+	@echo "    make backend-check-runs           - Check GitHub build status (Keychain auto-auth)"
 	@echo "    make seed                         - Seed database"
 	@echo "    make db-up                        - Start database container (Podman)"
 	@echo "    make db-down                      - Stop database container"
@@ -88,6 +95,7 @@ MOBILE_BUNDLE_ID = org.impenetrable.connect
 ANDROID_FIRST_AVD = $(shell $(ANDROID_EMULATOR) -list-avds | head -n 1)
 MOBILE_DIR = apps/mobile
 BACKEND_DIR = apps/backend
+BACKEND_PROD_URL = https://impenetrable-backend.impenetrable-connect.workers.dev
 EAS_CLI_VERSION = 18.8.1
 
 # ==========================================
@@ -198,6 +206,39 @@ db-generate-neon:
 
 db-migrate-neon:
 	$(MAKE) db-migrate ENV_FILE=.env.neon
+	
+backend-login:
+	cd $(BACKEND_DIR) && bunx wrangler login
+
+backend-deploy:
+	cd $(BACKEND_DIR) && bunx wrangler deploy
+
+backend-logs:
+	cd $(BACKEND_DIR) && bunx wrangler tail
+
+backend-secret-set:
+	@read -p "Enter secret name: " name; \
+	read -p "Enter secret value: " value; \
+	cd $(BACKEND_DIR) && echo $$value | bunx wrangler secret put $$name
+
+backend-secret-delete:
+	@read -p "Enter secret name to delete: " name; \
+	cd $(BACKEND_DIR) && bunx wrangler secret delete $$name
+
+# Local health token support (Keychain or CLI)
+# We use a shell variable to prevent Makefile from misinterpreting special chars
+GET_H_KEY = $(if $(KEY),$(KEY),$(shell which secret-tool > /dev/null && secret-tool lookup project impenetrable-connect secret health_token))
+
+backend-health: ## Check production health (usage: make backend-health [KEY=...])
+	@TOKEN='$(subst ','\'',$(GET_H_KEY))'; \
+	if [ -z "$$TOKEN" ]; then echo "Error: No key provided. Use KEY=... or store it in keychain with secret-tool."; exit 1; fi; \
+	curl -s -H "X-Health-Key: $$TOKEN" $(BACKEND_PROD_URL)/health | jq .
+
+backend-check-runs: ## Check production build status (usage: make backend-check-runs [KEY=...] [REF=main])
+	@TOKEN='$(subst ','\'',$(GET_H_KEY))'; \
+	if [ -z "$$TOKEN" ]; then echo "Error: No key provided. Use KEY=... or store it in keychain with secret-tool."; exit 1; fi; \
+	REF=$(or $(REF),main); \
+	curl -s -H "X-Health-Key: $$TOKEN" $(BACKEND_PROD_URL)/health/check-runs/$$REF | jq .
 
 db-shell:
 	podman exec -it impenetrable-db psql -U impenetrable -d impenetrable_db

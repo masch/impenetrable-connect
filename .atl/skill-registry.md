@@ -4,6 +4,7 @@
 
 ### Global Context
 
+- **Project Identity**: The official name of this project is **impenetrable-connect**. Any reference to "Rewilding Connect" or other variations is considered legacy or incorrect.
 - **AI Review Formatting (gga)**: MANDATORY: Every automated review MUST start with `STATUS: PASSED` or `STATUS: FAILED` on the **VERY FIRST LINE** of the output. No exceptions. Detailed analysis must follow ONLY after this status line.
 
 - **Language Policy**: ALL technical metadata, including code comments, docstrings, and Git metadata (Commit messages, PR descriptions), MUST be written in **English**. The project's "Technical Esperanto" is English, regardless of the conversation language.
@@ -84,10 +85,27 @@
   - **Rationale**: This ensures structured logging, consistent metadata (levels, context), and professional observability. Direct console calls are considered a critical architectural failure and will be flagged as a violation.
 - **Mock Data SSoT**: NEVER duplicate mock data across multiple files. Centralize shared entity mocks (Orders, Users, Catalog) in `src/mocks/*.data.ts` to ensure consistency across different user roles (Tourist vs. Entrepreneur).
 
+### Backend Security & Configuration
+
+- **Environment Abstraction (Zero-Direct-Env Policy)**: Direct access to `c.env` or `process.env` within middlewares or services is STRICTLY PROHIBITED.
+  - **Single Source of Truth**: ALWAYS use the centralized `getAppConfig(c)` helper (`apps/backend/src/config/env.ts`).
+  - **Bindings Priority**: The config helper MUST prioritize `c.env` (Cloudflare Bindings) over `process.env` (system variables) to ensure consistency between development, integration tests, and production.
+  - **Strong Typing**: ALWAYS use the literal union types `Environment` and `LogLevel` defined in `env.ts`. Avoid generic strings for these values.
+  - **Semantic Flags**: ALWAYS prioritize boolean flags like `config.isProduction` or `config.isDevelopment` over manual string comparisons (`config.environment === 'production'`).
+- **Service Dependency Management (Dynamic Initialization Policy)**: Global services (e.g., LoggerService) that depend on environment configuration MUST NOT be fully initialized at the module level.
+  - **Strategy**: Implement an `init(config)` method and call it from a middleware (e.g., `requestLogger`) during the first request to ensure the service has access to the correct infrastructure bindings.
+- **Middleware Purity**: NEVER instantiate a middleware factory (e.g., `jwt()`) inside another middleware function.
+  - **Rationale**: This avoids "middleware inception" overhead and ensures clean, predictable execution.
+  - **Strategy**: Use low-level primitives (e.g., `verify` from `hono/jwt`) to implement dynamic logic within custom middlewares.
+- **Fail-Fast Security**: Critical security keys (e.g., `JWT_SECRET`, `DATABASE_URL`) MUST NOT have hardcoded fallbacks for production environments. The application should fail-fast and reject requests with a 500 error if they are missing.
+- **Sensitive Route Hardening**: Diagnostic or administrative routes (e.g., `/health`) MUST be protected by header-based authorization (`X-Health-Key`) and MUST return minimal information to unauthorized requests.
+
 ### Testing
 
 - **TDD First**: Follow the strict TDD protocol when implementing new features.
 - **Coverage**: Verify critical paths with `@testing-library/react-native`.
+- **Binding Injection (Hono)**: When testing Hono applications, ALWAYS inject environment variables using the 3rd argument of `app.request(path, options, bindings)`.
+- **Database Mocking (Backend)**: For integration tests, mock the database factory (`spyOn(dbFactory, "createDb")`) instead of connecting to local instances to ensure speed and environmental isolation.
 - **Resilient Matchers**: Use **RegExp with case-insensitivity** for text matching (e.g., `findByText(/3[.,]000/i)`) to handle locale differences, dynamic spacing, and currency formatting.
 - **Zustand Mocking**: When mocking Zustand stores (especially with `useShallow`), use a **selector-aware mock implementation**: `(sel) => (sel ? sel(state) : state)`. This ensures that both direct destructuring and selector-based hooks receive the correct state.
 

@@ -1,23 +1,39 @@
 import { Context, Next } from "hono";
-import { jwt } from "hono/jwt";
+import { verify } from "hono/jwt";
+import { type AppEnv, getAppConfig } from "../config/env";
 import { UserRole } from "@repo/shared";
 import { logger } from "../services/logger.service";
 
-const JWT_SECRET = process.env.JWT_SECRET || "super-secret-dev-key";
-
 /**
- * Basic JWT middleware to verify the token
+ * Clean & Dynamic JWT authentication middleware.
+ * Uses the low-level 'verify' function to avoid middleware-in-middleware overhead.
  */
-export const authMiddleware = jwt({
-  secret: JWT_SECRET,
-  alg: "HS256",
-});
+export const authMiddleware = async (c: Context<AppEnv>, next: Next) => {
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return c.json({ message: "Unauthorized: Missing or invalid token format" }, 401);
+  }
+
+  const token = authHeader.split(" ")[1];
+  const { jwtSecret } = getAppConfig(c);
+
+  try {
+    const payload = await verify(token, jwtSecret, "HS256");
+    c.set("jwtPayload", payload);
+    await next();
+  } catch (error) {
+    logger.warn(
+      `JWT Verification failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
+    return c.json({ message: "Unauthorized: Invalid or expired token" }, 401);
+  }
+};
 
 /**
  * Role-based access control guard
  */
 export const roleGuard = (allowedRoles: UserRole[]) => {
-  return async (c: Context, next: Next) => {
+  return async (c: Context<AppEnv>, next: Next) => {
     const payload = c.get("jwtPayload") as { sub: string; role: UserRole } | undefined;
 
     if (!payload || !payload.role) {

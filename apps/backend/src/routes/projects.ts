@@ -1,14 +1,17 @@
 import { Hono } from "hono";
-import { db } from "../db";
 import { projects } from "../db/schema/projects";
 import { desc } from "drizzle-orm";
-
 import { CreateProjectSchema } from "@repo/shared";
 import { logger } from "../services/logger.service";
+import { type AppEnv } from "../config/env";
+import { authMiddleware } from "../middleware/auth";
 
-const router = new Hono();
+const router = new Hono<AppEnv>();
+
+router.use("*", authMiddleware);
 
 router.get("/", async (c) => {
+  const db = c.var.db;
   const result = await db
     .select()
     .from(projects)
@@ -18,6 +21,7 @@ router.get("/", async (c) => {
 
 router.post("/", async (c) => {
   try {
+    const db = c.var.db;
     const body = await c.req.json();
     const validated = CreateProjectSchema.parse(body);
 

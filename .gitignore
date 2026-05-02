@@ -1,12 +1,82 @@
 **/node_modules
 **/.env
 **/.env.*
-!.env.example
+!**/.env.example
 
 # IDEs
-.vscode/
-.idea/
+**/.vscode/
+**/.idea/
 
 # OS files
-.DS_Store
-Thumbs.db
+**/.DS_Store
+**/Thumbs.db
+
+# Secrets
+**/.health-token
+
+# Cloudflare Wrangler
+**/.wrangler/
+
+# Agent/AI Temporary folders
+**/brain/
+**/scratch/
+**/.agent/
+**/.gemini/
+
+# Logs and cache
+**/*.log
+**/npm-debug.*
+**/yarn-debug.*
+**/yarn-error.*
+**/.expo/
+**/.turbo/
+**/.next/
+**/dist/
+**/web-build/
+**/coverage/
+**/*.tsbuildinfo
+
+# Mobile / Expo Specific
+**/ios/
+**/android/
+**/.kotlin/
+**/expo-env.d.ts
+**/.metro-health-check*
+
+# Xcode / iOS Specific
+**/build/
+**/DerivedData/
+**/*.pbxuser
+!**/default.pbxuser
+**/*.mode1v3
+!**/default.mode1v3
+**/*.mode2v3
+!**/default.mode2v3
+**/*.perspectivev3
+!**/default.perspectivev3
+**/xcuserdata/
+**/*.xccheckout
+**/*.moved-aside
+**/*.hmap
+**/*.ipa
+**/*.xcuserstate
+**/project.xcworkspace
+**/.xcode.env.local
+**/Pods/
+
+# Android Specific
+**/.gradle/
+**/local.properties
+**/*.iml
+**/*.hprof
+**/.cxx/
+
+# Certificates and Keys
+**/*.jsbundle
+**/*.jks
+**/*.p8
+**/*.p12
+**/*.key
+**/*.mobileprovision
+**/*.pem
+**/*.orig.*

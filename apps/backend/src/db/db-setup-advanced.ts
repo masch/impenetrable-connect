@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
-import { db } from "./index";
+import { createDb } from "./index";
+import { getAppConfig } from "../config/env";
 import { logger } from "../services/logger.service";
 
 /**
@@ -10,6 +11,9 @@ async function setupAdvancedPatterns() {
   logger.info("🚀 Applying Advanced Database Patterns...");
 
   try {
+    const config = getAppConfig();
+    const db = createDb(config.databaseUrl);
+
     // 1. Global Trigger Function for updated_at
     logger.info("  - Creating update_updated_at_column function...");
     await db.execute(sql`
