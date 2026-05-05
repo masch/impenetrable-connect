@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun --hot src/index.ts",
-    "test": "bun test",
+    "test": "bun test --preload ./test-setup.ts",
     "lint": "bunx eslint src",
     "typecheck": "bunx tsc --noEmit",
     "db:push": "drizzle-kit push",

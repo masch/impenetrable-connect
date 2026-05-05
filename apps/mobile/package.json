@@ -17,8 +17,8 @@
     "format": "prettier --write src",
     "typecheck": "tsc --noEmit",
     "expo:fix:deps": "expo install --fix",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "test": "bunx jest",
+    "test:watch": "bunx jest --watch"
   },
   "dependencies": {
     "@expo/metro-config": "~55.0.9",
