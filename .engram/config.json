@@ -1,0 +1,8 @@
+{
+    "project_name": "impenetrable-connect",
+    "artifact_store": "hybrid",
+    "strict_tdd": true,
+    "test_command": "make test",
+    "default_language": "en",
+    "delivery_strategy": "ask-on-risk"
+}
