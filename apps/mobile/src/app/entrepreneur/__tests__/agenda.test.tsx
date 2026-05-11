@@ -61,7 +61,7 @@ describe("AgendaScreen", () => {
     expect(fetchAgenda).toHaveBeenCalled();
   });
 
-  it("should render reservation notes when present in orders", () => {
+  it("should render reservation notes in orders", () => {
     const mockNotes = "Una persona es hipertensa, por favor cocinar sin sal.";
     const mockOrder: Order = {
       zzz_id: 9,
@@ -93,7 +93,7 @@ describe("AgendaScreen", () => {
       zzz_reservation: {
         zzz_id: 1,
         zzz_user_id: "user-1",
-        zzz_service_date: new Date(),
+        zzz_service_at: "2024-01-15T20:30:00-03:00",
         zzz_time_of_day: "DINNER",
         zzz_status: "CONFIRMED",
         zzz_guest_count: 3,
@@ -135,7 +135,6 @@ describe("AgendaScreen", () => {
 
     render(<AgendaScreen />);
 
-    // Verify that the notes are rendered
     expect(screen.getByText(mockNotes)).toBeTruthy();
   });
 });

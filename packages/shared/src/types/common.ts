@@ -81,3 +81,33 @@ export const SkipReasonSchema = z.enum([
   "NOT_OFFERED",
 ]);
 export type SkipReason = z.infer<typeof SkipReasonSchema>;
+
+/**
+ * Branded type for time in HH:mm format (e.g., "09:30", "23:45")
+ * Ensures type safety for time values across the app
+ */
+const HourMinuteBrand = Symbol("HourMinute");
+export type HourMinute = string & { readonly [HourMinuteBrand]: typeof HourMinuteBrand };
+
+/**
+ * Regex pattern for HH:mm validation
+ */
+const HHMM_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+/**
+ * Creates a validated HourMinute from a string
+ * @throws if the string is not in HH:mm format
+ */
+export const createHourMinute = (value: string): HourMinute => {
+  if (!HHMM_REGEX.test(value)) {
+    throw new Error(`Invalid HH:mm format: "${value}". Expected format like "09:30" or "23:45"`);
+  }
+  return value as HourMinute;
+};
+
+/**
+ * Validates if a string is in HH:mm format
+ */
+export const isHourMinute = (value: string): value is HourMinute => {
+  return HHMM_REGEX.test(value);
+};

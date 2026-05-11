@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { ServiceMoment } from "@repo/shared";
+import type { ServiceMoment, HourMinute } from "@repo/shared";
 
 interface CartItem {
   zzz_catalog_item_id: number;
@@ -10,12 +10,14 @@ interface CartItem {
 interface CartState {
   selectedDate: Date | null;
   selectedMoment: ServiceMoment | null;
+  selectedTime: HourMinute | undefined;
   guestCount: number;
   cartItems: CartItem[];
 
   // Actions
-  setContext: (date: Date, moment: ServiceMoment) => void;
+  setContext: (date: Date, moment: ServiceMoment, time?: HourMinute) => void;
   setGuestCount: (count: number) => void;
+  setSelectedTime: (time: HourMinute | undefined) => void;
   resetContext: () => void;
   isValid: () => boolean;
 
@@ -29,15 +31,25 @@ interface CartState {
 export const useCartStore = create<CartState>((set, get) => ({
   selectedDate: null,
   selectedMoment: null,
+  selectedTime: undefined,
   guestCount: 2, // Default to 2 people
   cartItems: [],
 
-  setContext: (selectedDate, selectedMoment) => set({ selectedDate, selectedMoment }),
+  setContext: (selectedDate, selectedMoment, selectedTime) =>
+    set({ selectedDate, selectedMoment, selectedTime }),
 
   setGuestCount: (guestCount) => set({ guestCount }),
 
+  setSelectedTime: (selectedTime) => set({ selectedTime }),
+
   resetContext: () =>
-    set({ selectedDate: null, selectedMoment: null, guestCount: 2, cartItems: [] }),
+    set({
+      selectedDate: null,
+      selectedMoment: null,
+      selectedTime: undefined,
+      guestCount: 2,
+      cartItems: [],
+    }),
 
   isValid: () => {
     const { selectedDate, selectedMoment } = get();

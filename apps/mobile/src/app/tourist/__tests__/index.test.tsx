@@ -2,7 +2,7 @@ import React from "react";
 import { render, fireEvent, screen, waitFor } from "@testing-library/react-native";
 import OrderSetupScreen from "../index";
 import { useProjectStore } from "../../../stores/project.store";
-import { Project, ServiceMoment } from "@repo/shared";
+import { Project, ServiceMoment, createHourMinute } from "@repo/shared";
 import { useCartStore } from "../../../stores/cart.store";
 
 // Mock hooks and stores
@@ -111,6 +111,7 @@ describe("OrderSetupScreen", () => {
     useCartStore.setState({
       selectedDate: new Date(),
       selectedMoment: "LUNCH" as ServiceMoment,
+      selectedTime: createHourMinute("13:00"),
       guestCount: 2,
     });
 

@@ -13,8 +13,9 @@ import {
   formatMoment,
   getRelativeDateLabel,
   parseISODate,
+  extractTimeFromISO,
 } from "../../logic/formatters";
-import { getMomentConfig, MOMENTS } from "../../constants/moments";
+import { getMomentConfig, MOMENTS, formatMomentTimeRange } from "../../constants/moments";
 
 export default function RequestScreen() {
   const { t } = useTranslations();
@@ -27,22 +28,28 @@ export default function RequestScreen() {
 
   const onRefresh = () => fetchPendingOrders();
 
-  // Grouping logic
+  // Grouping logic: date -> moment -> time
   const groupedOrders = pendingOrders.reduce(
     (acc, order) => {
-      const dateKey = order.zzz_reservation?.zzz_service_date
-        ? toISODate(new Date(order.zzz_reservation.zzz_service_date))
+      const dateKey = order.zzz_reservation?.zzz_service_at
+        ? toISODate(new Date(order.zzz_reservation.zzz_service_at))
         : "no_date";
 
       if (!acc[dateKey]) acc[dateKey] = {};
 
       const momentKey = order.zzz_reservation?.zzz_time_of_day || "OTHER";
-      if (!acc[dateKey][momentKey]) acc[dateKey][momentKey] = [];
+      if (!acc[dateKey][momentKey]) acc[dateKey][momentKey] = {};
 
-      acc[dateKey][momentKey].push(order);
+      const timeKey = order.zzz_reservation?.zzz_service_at
+        ? extractTimeFromISO(order.zzz_reservation.zzz_service_at)
+        : "";
+
+      if (!acc[dateKey][momentKey][timeKey]) acc[dateKey][momentKey][timeKey] = [];
+
+      acc[dateKey][momentKey][timeKey].push(order);
       return acc;
     },
-    {} as Record<string, Record<string, typeof pendingOrders>>,
+    {} as Record<string, Record<string, Record<string, typeof pendingOrders>>>,
   );
 
   const sortedDates = Object.keys(groupedOrders).sort();
@@ -120,10 +127,11 @@ export default function RequestScreen() {
 
                   {/* Moments in that Date */}
                   {MOMENTS.map((moment) => {
-                    const momentOrders = groupedOrders[dateKey][moment];
-                    if (!momentOrders || momentOrders.length === 0) return null;
+                    const momentGroups = groupedOrders[dateKey][moment];
+                    if (!momentGroups || Object.keys(momentGroups).length === 0) return null;
 
                     const config = getMomentConfig(moment);
+                    const sortedTimes = Object.keys(momentGroups).sort();
 
                     return (
                       <View key={moment} className="mb-6 px-4">
@@ -144,22 +152,56 @@ export default function RequestScreen() {
                         </View>
 
                         <View className="bg-surface-container-lowest/50 rounded-3xl border border-outline-variant/10 overflow-hidden">
-                          {momentOrders.map((order, idx) => (
-                            <View key={order.zzz_id}>
-                              <ReservationCard
-                                order={order}
-                                role="entrepreneur"
-                                hideBorder
-                                hideShadow
-                                hideStatus
-                                onAccept={() => acceptOrder(Number(order.zzz_id))}
-                                onDecline={() => declineOrder(Number(order.zzz_id))}
-                              />
-                              {idx < momentOrders.length - 1 && (
-                                <View className="h-[1px] mx-4 bg-outline-variant/10" />
-                              )}
-                            </View>
-                          ))}
+                          {sortedTimes.map((time, timeIndex) => {
+                            const ordersForTime = momentGroups[time];
+                            const displayTime = time || formatMomentTimeRange(moment);
+
+                            return (
+                              <View key={time || "range"}>
+                                {/* Time Badge - centered */}
+                                {time ? (
+                                  <View className="flex-row justify-center items-center py-2 bg-surface-container-low/30">
+                                    <View
+                                      className="flex-row items-center px-3 py-1 rounded-full gap-1.5"
+                                      style={{ backgroundColor: config.hex }}
+                                    >
+                                      <MaterialCommunityIcons
+                                        name="clock-outline"
+                                        size={14}
+                                        color="#FFFFFF"
+                                      />
+                                      <Text className="font-display-bold text-sm text-white">
+                                        {displayTime}
+                                      </Text>
+                                    </View>
+                                  </View>
+                                ) : null}
+
+                                {/* Orders for this time */}
+                                {ordersForTime.map((order, orderIdx) => (
+                                  <View key={order.zzz_id}>
+                                    <ReservationCard
+                                      order={order}
+                                      role="entrepreneur"
+                                      hideBorder
+                                      hideShadow
+                                      hideStatus
+                                      onAccept={() => acceptOrder(Number(order.zzz_id))}
+                                      onDecline={() => declineOrder(Number(order.zzz_id))}
+                                    />
+                                    {orderIdx < ordersForTime.length - 1 && (
+                                      <View className="h-[1px] mx-4 bg-outline-variant/10" />
+                                    )}
+                                  </View>
+                                ))}
+
+                                {/* Separator between time groups */}
+                                {timeIndex < sortedTimes.length - 1 && (
+                                  <View className={`h-1 ${config.bgClass}/20`} />
+                                )}
+                              </View>
+                            );
+                          })}
                         </View>
                       </View>
                     );

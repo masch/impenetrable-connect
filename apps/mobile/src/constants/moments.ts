@@ -1,8 +1,14 @@
-import { ServiceMomentSchema, type ServiceMoment } from "@repo/shared";
+import {
+  ServiceMomentSchema,
+  type ServiceMoment,
+  type Timezone,
+  type HourMinute,
+  createHourMinute,
+} from "@repo/shared";
 import { COLORS } from "@repo/shared";
 
 /**
- * Service moment definitions with icons and colors
+ * Service moment definitions with icons, colors, and time ranges
  * Used by Booking and Orders screens
  */
 export const SERVICE_MOMENTS: {
@@ -13,6 +19,9 @@ export const SERVICE_MOMENTS: {
   hex: string;
   bgClass: string;
   textClass: string;
+  startTime: HourMinute;
+  endTime: HourMinute;
+  timezone: Timezone;
 }[] = [
   {
     zzz_id: "BREAKFAST",
@@ -22,6 +31,9 @@ export const SERVICE_MOMENTS: {
     hex: COLORS["moment-breakfast"],
     bgClass: "bg-moment-breakfast",
     textClass: "text-moment-breakfast",
+    startTime: createHourMinute("08:00"),
+    endTime: createHourMinute("11:00"),
+    timezone: "America/Argentina/Buenos_Aires",
   },
   {
     zzz_id: "LUNCH",
@@ -31,6 +43,9 @@ export const SERVICE_MOMENTS: {
     hex: COLORS["moment-lunch"],
     bgClass: "bg-moment-lunch",
     textClass: "text-moment-lunch",
+    startTime: createHourMinute("12:00"),
+    endTime: createHourMinute("15:00"),
+    timezone: "America/Argentina/Buenos_Aires",
   },
   {
     zzz_id: "SNACK",
@@ -40,6 +55,9 @@ export const SERVICE_MOMENTS: {
     hex: COLORS["moment-snack"],
     bgClass: "bg-moment-snack",
     textClass: "text-moment-snack",
+    startTime: createHourMinute("16:00"),
+    endTime: createHourMinute("18:00"),
+    timezone: "America/Argentina/Buenos_Aires",
   },
   {
     zzz_id: "DINNER",
@@ -49,6 +67,9 @@ export const SERVICE_MOMENTS: {
     hex: COLORS["moment-dinner"],
     bgClass: "bg-moment-dinner",
     textClass: "text-moment-dinner",
+    startTime: createHourMinute("19:00"),
+    endTime: createHourMinute("22:00"),
+    timezone: "America/Argentina/Buenos_Aires",
   },
 ];
 
@@ -72,6 +93,9 @@ export function getMomentConfig(moment: ServiceMoment) {
       hex: COLORS["on-surface-variant"],
       bgClass: "bg-on-surface-variant",
       textClass: "text-on-surface-variant",
+      startTime: createHourMinute("00:00"),
+      endTime: createHourMinute("23:59"),
+      timezone: "America/Argentina/Buenos_Aires",
     }
   );
 }
@@ -88,4 +112,26 @@ export function getMomentIcon(moment: ServiceMoment): string {
  */
 export function getMomentColor(moment: ServiceMoment): string {
   return getMomentConfig(moment).hex;
+}
+
+/**
+ * Get default time (Date object) for a moment's start time
+ */
+export function getDefaultTimeForMoment(moment: ServiceMoment): Date {
+  const config = getMomentConfig(moment);
+  const [hours, minutes] = config.startTime.split(":").map(Number);
+  const date = new Date();
+  date.setHours(hours, minutes, 0, 0);
+  return date;
+}
+
+/**
+ * Formats a moment's time range for display.
+ *
+ * @param moment - The service moment ID (e.g., "BREAKFAST", "LUNCH")
+ * @returns Formatted time range string (e.g., "08:00 - 11:00")
+ */
+export function formatMomentTimeRange(moment: ServiceMoment): string {
+  const config = getMomentConfig(moment);
+  return `${config.startTime} - ${config.endTime}`;
 }

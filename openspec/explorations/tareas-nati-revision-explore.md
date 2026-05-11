@@ -25,35 +25,39 @@
 
 ## Affected Areas
 
-| File | Impact |
-|------|--------|
-| `apps/mobile/src/mocks/catalog.ts` | Hardcoded catalog items; needs admin CRUD |
-| `apps/mobile/src/constants/moments.ts` | Service moments without hour ranges |
-| `apps/mobile/src/app/tourist/booking.tsx` | No filtering by moment in catalog display |
-| `apps/mobile/src/app/tourist/index.tsx` | Order setup with moment selection |
-| `apps/mobile/src/app/entrepreneur/venture-config.tsx` | Only capacity/pause, no menu config |
-| `packages/shared/src/types/catalog.ts` | Schema for catalog items (no moment binding) |
-| `packages/shared/src/types/service-category.ts` | Categories only have ID, no type enum |
-| `apps/backend/src/db/schema/` | No catalog tables exist (all mocked) |
+| File                                                  | Impact                                       |
+| ----------------------------------------------------- | -------------------------------------------- |
+| `apps/mobile/src/mocks/catalog.ts`                    | Hardcoded catalog items; needs admin CRUD    |
+| `apps/mobile/src/constants/moments.ts`                | Service moments without hour ranges          |
+| `apps/mobile/src/app/tourist/booking.tsx`             | No filtering by moment in catalog display    |
+| `apps/mobile/src/app/tourist/index.tsx`               | Order setup with moment selection            |
+| `apps/mobile/src/app/entrepreneur/venture-config.tsx` | Only capacity/pause, no menu config          |
+| `packages/shared/src/types/catalog.ts`                | Schema for catalog items (no moment binding) |
+| `packages/shared/src/types/service-category.ts`       | Categories only have ID, no type enum        |
+| `apps/backend/src/db/schema/`                         | No catalog tables exist (all mocked)         |
 
 ## Approaches
 
 ### 1. Add Admin CRUD for Plates/Experiences
+
 - **Pros**: Complete control for entrepreneurs, dynamic menu
 - **Cons**: Requires backend API, database schema, admin UI
 - **Effort**: High
 
 ### 2. Filter Catalog by Moment
+
 - **Pros**: Better UX, shows only relevant items per meal time
 - **Cons**: Requires schema change to bind items to moments
 - **Effort**: Medium
 
 ### 3. Add Time Ranges to Moments
+
 - **Pros**: Clear user expectations, validation possible
 - **Cons**: May restrict flexibility, needs UI for display
 - **Effort**: Low (config change)
 
 ### 4. Add Safari/Cultural Activity Categories
+
 - **Pros**: Complete the category set requested
 - **Cons**: Needs mock data and potentially new service types
 - **Effort**: Low (mock data + category ID)
@@ -61,6 +65,7 @@
 ## Recommendation
 
 Prioritize in this order:
+
 1. **Low-hanging fruit**: Add Safari category (ID 3) to mocks — already have gastronomy/excursions structure
 2. **High value**: Add moment filtering to booking — major UX improvement
 3. **Required**: Admin CRUD for plates/experiences — core business need
@@ -76,6 +81,7 @@ The time ranges can be added later as configuration, not blocking.
 ## Ready for Proposal
 
 **Yes** — Enough clarity to create a proposal. The main decisions needed:
+
 1. Scope: Which features to include in first iteration
 2. Data model: How to store moment bindings (new field? separate table?)
 3. Admin UX: Simple list or full CRUD with images/pricing?

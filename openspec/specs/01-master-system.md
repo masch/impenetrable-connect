@@ -69,8 +69,9 @@ When a tourist submits a request:
     - Skip if `venture.is_paused = true` → record `skip_reason = GENERAL_PAUSE`
     - Skip if `catalog_item_id` is in `Venture_Paused_Item` for this venture → record `skip_reason = INDIVIDUAL_PAUSE`
     - Skip if `(current_occupation + guest_count) > venture.max_capacity` → record `skip_reason = CAPACITY_EXCEEDED`
-    - Skip if no matching `Venture_Schedule` for service_date day → record `skip_reason = CLOSED_THAT_DAY`
+    - Skip if no matching `Venture_Schedule` for service_at day → record `skip_reason = CLOSED_THAT_DAY`
     - Skip if requested time is outside `Venture_Schedule` range → record `skip_reason = OUTSIDE_OPENING_HOURS`
+    - Skip if order time is outside moment's allowed time range (BREAKFAST 08:00-11:00, etc.) → record `skip_reason = OUTSIDE_MOMENT_HOURS`
 3.  **Offer Phase**: First venture that passes filters gets the offer:
     - Create Cascade_Assignment with `offer_status = WAITING_FOR_RESPONSE`
     - Set `response_deadline = now + project.cascade_timeout_minutes`
@@ -293,16 +294,17 @@ When a tourist creates an order, the following validations must pass:
 
 | Field                     | Validation Rule                             | Error Message                                |
 | ------------------------- | ------------------------------------------- | -------------------------------------------- |
-| `service_date`            | Required                                    | "Date is required"                           |
-| `service_date`            | Must be >= TODAY                            | "Cannot order for past dates"                |
-| `service_date`            | Must be <= TODAY + 30 days                  | "Cannot order more than 30 days in advance"  |
+| `service_at`              | Required, ISO datetime with timezone        | "Service time is required"                   |
+| `service_at`              | Must be >= NOW                              | "Cannot order for past times"                |
+| `service_at`              | Must be <= NOW + 30 days                    | "Cannot order more than 30 days in advance"  |
+| `service_at`              | Must be within selected moment's time range | "Selected time is outside moment's hours"    |
 | `guest_count`             | Required                                    | "Number of guests is required"               |
 | `guest_count`             | Must be >= 1                                | "At least 1 guest is required"               |
 | `guest_count`             | Must be <= `Project.zzz_max_capacity_limit` | "Maximum capacity exceeded for this project" |
 | `items`                   | Required, array, min 1, max 1               | "Only 1 item per order"                      |
 | `items[].catalog_item_id` | Required                                    | "Item is required"                           |
 | `items[].quantity`        | Required, min 1                             | "Quantity must be at least 1"                |
-| `time_of_day_id`          | Required                                    | "Time of day is required"                    |
+| `moment`                  | Required (BREAKFAST, LUNCH, SNACK, DINNER)  | "Moment is required"                         |
 
 #### 3.3.2 Venture Availability Validations (Filter Phase)
 
@@ -329,16 +331,25 @@ Before offering an order to a venture, the engine validates:
 **Opening Hours Logic:**
 
 ```typescript
-function isVentureOpen(venture: Venture, serviceDate: Date, timeOfDayId: number): boolean {
-  const dayOfWeek = getDayOfWeek(serviceDate); // 'mon', 'tue', ...
+function isVentureOpen(venture: Venture, serviceAt: string): boolean {
+  // serviceAt: "2024-01-15T12:30:00-03:00"
+  const orderDateTime = parseISO(serviceAt); // Extract date and time
+  const dayOfWeek = getDayOfWeek(orderDateTime.date); // 'mon', 'tue', ...
   const hours = venture.opening_hours[dayOfWeek];
 
   if (!hours) return false; // Venture is closed that day
 
   const [openTime, closeTime] = hours.split("-");
-  const orderTime = getStartTimeForTimeOfDay(timeOfDayId); // e.g., '12:00' for LUNCH
+  const orderTime = orderDateTime.time; // e.g., '12:30'
 
   return orderTime >= openTime && orderTime < closeTime;
+}
+
+// Validate order time is within moment's allowed range
+function isWithinMomentRange(serviceAt: string, moment: ServiceMoment): boolean {
+  const momentConfig = getMomentConfig(moment);
+  const orderTime = extractTime(serviceAt); // e.g., '12:30'
+  return orderTime >= momentConfig.startTime && orderTime <= momentConfig.endTime;
 }
 ```
 
@@ -380,6 +391,7 @@ Complete list of skip reasons in `Cascade_Assignment.skip_reason`:
 | `CAPACITY_EXCEEDED`     | (current_occupation + guest_count) > venture.max_capacity     |
 | `CLOSED_THAT_DAY`       | Venture is closed on the requested day (not in opening_hours) |
 | `OUTSIDE_OPENING_HOURS` | Requested time is outside venture's operating hours           |
+| `OUTSIDE_MOMENT_HOURS`  | Requested time is outside the moment's allowed time range     |
 | `VENTURE_INACTIVE`      | Venture.is_active = false                                     |
 | `NOT_OFFERED`           | Venture was not in the rotation list                          |
 
@@ -387,7 +399,7 @@ Complete list of skip reasons in `Cascade_Assignment.skip_reason`:
 
 A tourist cannot have multiple active orders for the same:
 
-- `service_date` + `time_of_day_id`
+- `service_at` (exact datetime with timezone)
 
 If such order exists with status `SEARCHING` or `CONFIRMED`, the system returns error: "You already have an order for this time slot"
 
@@ -396,24 +408,52 @@ If such order exists with status `SEARCHING` or `CONFIRMED`, the system returns 
 When checking if a venture can accept an order, the system calculates **accumulated occupation** from all CONFIRMED orders for that time slot:
 
 ```typescript
-function getCurrentOccupation(ventureId: number, serviceDate: Date, timeOfDayId: number): number {
-    // Sum of guest_count for CONFIRMED orders at same date/time
+function getCurrentOccupation(ventureId: number, serviceAt: string): number {
+    // Sum of guest_count for CONFIRMED orders at same datetime
     // Only CONFIRMED orders count toward capacity - SEARCHING/OFFER_PENDING orders are not yet assigned
+    // serviceAt: "2024-01-15T12:30:00-03:00" (date + time + timezone)
     return SUM(o.guest_count) FROM Order o
     WHERE o.confirmed_venture_id = ventureId
-      AND o.service_date = serviceDate
-      AND o.time_of_day_id = time_of_day_id
+      AND o.service_at = serviceAt
       AND o.status = 'CONFIRMED';
 }
 
 async function canAcceptOrder(venture: Venture, order: Order): Promise<boolean> {
     const currentOccupation = await getCurrentOccupation(
         venture.id,
-        order.service_date,
-        order.time_of_day_id
+        order.service_at
     );
     // Check if adding new guests would exceed capacity
     return (currentOccupation + order.guest_count) <= venture.max_capacity;
+}
+```
+
+**Cascade Filter Phase**: When the engine evaluates a venture, it calculates current occupation:
+
+```typescript
+if (currentOccupation + order.guest_count > venture.max_capacity) {
+  return {
+    skip: true,
+    reason: "CAPACITY_EXCEEDED",
+    currentOccupation,
+    maxCapacity: venture.max_capacity,
+  };
+}
+```
+
+**Calendar Response** now includes occupation details:
+
+```json
+{
+  "time_slots": [
+    {
+      "service_at": "2024-01-15T12:30:00-03:00",
+      "moment": "LUNCH",
+      "current_occupation": 12,
+      "max_capacity": 20,
+      "available_seats": 8
+    }
+  ]
 }
 ```
 
@@ -892,8 +932,8 @@ Headers:
 
 Request:
 {
-  "service_date": "string (required, YYYY-MM-DD)",
-  "time_of_day_id": "integer (required)",
+  "service_at": "string (required, ISO 8601 with timezone, e.g., '2024-01-15T09:30:00-03:00')",
+  "moment": "string (required, enum: BREAKFAST, LUNCH, SNACK, DINNER)",
   "guest_count": "integer (required, 1-100)",
   "catalog_item_id": "integer (required)",
   "quantity": "integer (required, min 1)",
@@ -904,6 +944,7 @@ Response (201):
 {
   "order_id": 123,
   "status": "SEARCHING",
+  "service_at": "2024-01-15T09:30:00-03:00",
   "created_at": "timestamp"
 }
 ```
@@ -913,15 +954,15 @@ Response (201):
 ```json
 Query Parameters:
 - status: "SEARCHING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "EXPIRED" (optional)
-- service_date: "YYYY-MM-DD" (optional)
+- service_date: "YYYY-MM-DD" (optional, for filtering by date)
 
 Response (200):
 {
   "orders": [
     {
       "id": 123,
-      "service_date": "2024-01-15",
-      "time_of_day_id": 1,
+      "service_at": "2024-01-15T09:30:00-03:00",
+      "moment": "BREAKFAST",
       "guest_count": 4,
       "status": "SEARCHING",
       "items": [...],
@@ -938,8 +979,8 @@ Response (200) - Tourist View:
 {
   "order": {
     "id": 123,
-    "service_date": "2024-01-15",
-    "time_of_day_id": 1,
+    "service_at": "2024-01-15T09:30:00-03:00",
+    "moment": "BREAKFAST",
     "guest_count": 4,
     "status": "CONFIRMED",
     "confirmed_venture": "Parador Don Esteban",
@@ -999,8 +1040,8 @@ Response (200):
       "order_id": 123,
       "venture_id": 1,
       "venture_name": "Parador Don Esteban",
-      "service_date": "2024-01-15",
-      "time_of_day_id": 1,
+      "service_at": "2024-01-15T09:30:00-03:00",
+      "moment": "BREAKFAST",
       "guest_count": 4,
       "items": [
         { "name": "Guiso", "quantity": 2 }
@@ -1100,7 +1141,8 @@ Response (200):
       "date": "2024-01-15",
       "time_slots": [
         {
-          "time_of_day_id": 1,
+          "service_at": "2024-01-15T09:30:00-03:00",
+          "moment": "BREAKFAST",
           "orders": [
             {
               "order_id": 123,
@@ -2076,8 +2118,8 @@ erDiagram
     Reservation {
         int zzz_id PK
         uuid zzz_user_id FK "Links to User (tourist)"
-        date zzz_service_date "Date of the experience"
-        string zzz_time_of_day "Enum: BREAKFAST, LUNCH, SNACK, DINNER"
+        string zzz_service_at "ISO datetime with timezone (e.g., 2024-01-15T09:30:00-03:00)"
+        string zzz_time_of_day "Enum: BREAKFAST, LUNCH, SNACK, DINNER (for fast filtering)"
         enum zzz_status "PENDING, CONFIRMED, CANCELLED, COMPLETED"
         timestamp zzz_created_at
         timestamp zzz_updated_at
@@ -2089,8 +2131,6 @@ erDiagram
         uuid zzz_user_id FK "Links to User (tourist)"
         int zzz_catalog_type_id FK "Determines which ventures can fulfill this order"
         int zzz_confirmed_venture_id FK "Nullable. Set when status becomes CONFIRMED"
-        date zzz_service_date "Used for filtering/cascade logic"
-        string zzz_time_of_day "Used for filtering/cascade logic"
         string zzz_notes "Special requests or dietary restrictions from tourist"
         enum zzz_global_status "SEARCHING, OFFER_PENDING, CONFIRMED, COMPLETED, NO_SHOW, CANCELLED, EXPIRED"
         enum zzz_cancel_reason "null, BY_TOURIST, BY_ENTREPRENEUR, NO_VENTURE_AVAILABLE, SYSTEM_ERROR"

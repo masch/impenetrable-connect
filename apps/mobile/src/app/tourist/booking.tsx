@@ -14,6 +14,7 @@ import {
 import { useRouter } from "expo-router";
 import { useTranslations } from "../../hooks/useI18n";
 import { formatCurrency, getRelativeDateLabel, isSameDay } from "../../logic/formatters";
+import { formatMomentTimeRange } from "../../constants/moments";
 import Screen, { ScreenContent } from "../../components/Screen";
 import LoadingView from "../../components/LoadingView";
 import { ServiceCard } from "../../components/catalog/ServiceCard";
@@ -53,6 +54,7 @@ export default function BookingScreen() {
     isValid: isValidContext,
     selectedDate,
     selectedMoment,
+    selectedTime,
     cartItems,
     addItem,
     removeItem,
@@ -139,7 +141,7 @@ export default function BookingScreen() {
         );
         if (!hasItem) return false;
 
-        const oDate = new Date(order.zzz_reservation?.zzz_service_date || 0);
+        const oDate = new Date(order.zzz_reservation?.zzz_service_at || 0);
         if (!selectedDate) return false;
         const isSameDayResult = isSameDay(oDate, selectedDate);
         const isSameMoment = order.zzz_reservation?.zzz_time_of_day === selectedMoment;
@@ -559,6 +561,13 @@ export default function BookingScreen() {
                             color={currentMoment.hex}
                             accessibilityLabel={t("catalog.reservation.change_time")}
                           />
+                          <Text className="text-[9px] font-display text-primary ml-1">
+                            {selectedTime
+                              ? selectedTime
+                              : currentMoment
+                                ? formatMomentTimeRange(currentMoment.zzz_id)
+                                : ""}
+                          </Text>
                         </View>
                       )}
                     </Button>
@@ -585,7 +594,7 @@ export default function BookingScreen() {
                               text: t("common.confirm"),
                               variant: "primary",
                               onPress: async () => {
-                                if (!selectedDate || !selectedMoment) return;
+                                if (!selectedDate || !selectedMoment || !selectedTime) return;
                                 try {
                                   const newOrder = await placeOrder(
                                     selectedDate,
@@ -595,6 +604,7 @@ export default function BookingScreen() {
                                       zzz_quantity: i.zzz_quantity,
                                     })),
                                     useCartStore.getState().guestCount,
+                                    selectedTime,
                                   );
                                   if (newOrder) {
                                     addOrderToStore(newOrder);

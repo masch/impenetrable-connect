@@ -2,14 +2,14 @@
 
 ## Review Workload Forecast
 
-| Field | Value |
-|-------|-------|
-| Estimated changed lines | 150-250 |
-| 400-line budget risk | Low |
-| Chained PRs recommended | Yes |
-| Suggested split | PR 1 (Mobile) → PR 2 (Backend + Admin) |
-| Delivery strategy | auto-chain |
-| Chain strategy | stacked-to-main |
+| Field                   | Value                                  |
+| ----------------------- | -------------------------------------- |
+| Estimated changed lines | 150-250                                |
+| 400-line budget risk    | Low                                    |
+| Chained PRs recommended | Yes                                    |
+| Suggested split         | PR 1 (Mobile) → PR 2 (Backend + Admin) |
+| Delivery strategy       | auto-chain                             |
+| Chain strategy          | stacked-to-main                        |
 
 Decision needed before apply: No
 Chained PRs recommended: Yes
@@ -18,10 +18,10 @@ Chain strategy: stacked-to-main
 
 ### Suggested Work Units
 
-| Unit | Goal | Likely PR | Notes |
-|------|------|-----------|-------|
-| 1 | Moment filtering, time ranges, category expansion | PR 1 | UI/mocking only; base = main |
-| 2 | Admin CRUD, service time display, vianda price | PR 2 | Requires backend API; base = main |
+| Unit | Goal                                              | Likely PR | Notes                             |
+| ---- | ------------------------------------------------- | --------- | --------------------------------- |
+| 1    | Moment filtering, time ranges, category expansion | PR 1      | UI/mocking only; base = main      |
+| 2    | Admin CRUD, service time display, vianda price    | PR 2      | Requires backend API; base = main |
 
 ## Phase 1: Data & Configuration (PR 1)
 

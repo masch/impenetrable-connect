@@ -306,7 +306,8 @@
     "loading": "Cargando...",
     "saving": "Guardando...",
     "max_capacity_limit": "Límite de Capacidad (Proyecto)",
-    "open_external_link": "Abrir enlace externo"
+    "open_external_link": "Abrir enlace externo",
+    "done": "Listo"
   },
   "role_selector": {
     "welcome": "Bienvenido",
@@ -339,7 +340,11 @@
     "custom_date": "Otra fecha",
     "submit": "Explorar sabores",
     "active_context": "Pedido para {{date}} · {{moment}}",
-    "change_hint": "Tocá acá para cambiar fecha o momento"
+    "change_hint": "Tocá acá para cambiar fecha o momento",
+    "time_label": "Hora del servicio",
+    "select_time": "Seleccionar hora",
+    "time_error_invalid": "Hora inválida",
+    "time_error_outside_range": "Hora fuera del rango permitido ({{start}} - {{end}})"
   },
   "status": {
     "title": "Estado del Sistema",

@@ -10,7 +10,14 @@ import ReservationCard from "../../components/entrepreneur/ReservationCard";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { getMomentConfig, MOMENTS } from "../../constants/moments";
 import { COLORS } from "@repo/shared";
-import { formatDate, isSameDay, toISODate, formatMoment } from "../../logic/formatters";
+import {
+  formatDate,
+  isSameDay,
+  toISODate,
+  formatMoment,
+  extractTimeFromISO,
+} from "../../logic/formatters";
+import { formatMomentTimeRange } from "../../constants/moments";
 import { AppDateTimePicker } from "../../components/AppDateTimePicker";
 
 export default function AgendaScreen() {
@@ -193,16 +200,31 @@ export default function AgendaScreen() {
 
             {renderDateSelector()}
 
+            {/* Group by moment -> time */}
             {MOMENTS.map((moment) => {
+              // Filter orders for this moment
               const momentOrders = orders.filter(
                 (o) => o.zzz_reservation?.zzz_time_of_day === moment,
               );
               if (momentOrders.length === 0) return null;
 
+              // Group by time within moment
+              const timeGroups: Record<string, typeof momentOrders> = {};
+              momentOrders.forEach((order) => {
+                const time = order.zzz_reservation?.zzz_service_at
+                  ? extractTimeFromISO(order.zzz_reservation.zzz_service_at)
+                  : "";
+                if (!timeGroups[time]) timeGroups[time] = [];
+                timeGroups[time].push(order);
+              });
+
+              // Sort times
+              const sortedTimes = Object.keys(timeGroups).sort();
               const config = getMomentConfig(moment);
 
               return (
                 <View key={moment} className="mb-4">
+                  {/* Moment Header */}
                   <View className="flex-row items-center mb-3.5 px-1">
                     <View className={`p-2 rounded-xl mr-3 ${config.bgClass}/15`}>
                       <MaterialCommunityIcons
@@ -218,23 +240,59 @@ export default function AgendaScreen() {
                     </Text>
                     <View className={`h-[0.8px] flex-1 ml-4 opacity-20 ${config.bgClass}`} />
                   </View>
+
+                  {/* Orders grouped by time */}
                   <View className="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 overflow-hidden">
-                    {momentOrders.map((order, index) => (
-                      <View key={order.zzz_id}>
-                        <ReservationCard
-                          order={order}
-                          role="entrepreneur"
-                          hideBorder
-                          hideShadow
-                          hideStatus
-                          onAccept={() => acceptOrder(Number(order.zzz_id))}
-                          onDecline={() => declineOrder(Number(order.zzz_id))}
-                        />
-                        {index < momentOrders.length - 1 && (
-                          <View className={`h-[1px] mx-2 ${config.bgClass}/40`} />
-                        )}
-                      </View>
-                    ))}
+                    {sortedTimes.map((time, timeIndex) => {
+                      const ordersForTime = timeGroups[time];
+                      const displayTime = time || formatMomentTimeRange(moment);
+
+                      return (
+                        <View key={time || "range"}>
+                          {/* Time Badge - centered */}
+                          {time ? (
+                            <View className="flex-row justify-center items-center py-2 bg-surface-container-low/50">
+                              <View
+                                className="flex-row items-center px-3 py-1 rounded-full gap-1.5"
+                                style={{ backgroundColor: config.hex }}
+                              >
+                                <MaterialCommunityIcons
+                                  name="clock-outline"
+                                  size={14}
+                                  color="#FFFFFF"
+                                />
+                                <Text className="font-display-bold text-sm text-white">
+                                  {displayTime}
+                                </Text>
+                              </View>
+                            </View>
+                          ) : null}
+
+                          {/* Orders for this time */}
+                          {ordersForTime.map((order, orderIndex) => (
+                            <View key={order.zzz_id}>
+                              <ReservationCard
+                                order={order}
+                                role="entrepreneur"
+                                hideBorder
+                                hideShadow
+                                hideStatus
+                                onAccept={() => acceptOrder(Number(order.zzz_id))}
+                                onDecline={() => declineOrder(Number(order.zzz_id))}
+                              />
+                              {orderIndex < ordersForTime.length - 1 && (
+                                <View className={`h-[1px] mx-2 ${config.bgClass}/40`} />
+                              )}
+                            </View>
+                          ))}
+
+                          {/* Separator between time groups */}
+                          {timeIndex < sortedTimes.length - 1 && (
+                            <View className={`h-1 ${config.bgClass}/20`} />
+                          )}
+                        </View>
+                      );
+                    })}
                   </View>
                 </View>
               );

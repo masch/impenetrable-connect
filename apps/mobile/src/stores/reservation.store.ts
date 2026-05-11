@@ -42,27 +42,28 @@ export const useReservationStore = create<ReservationState>((set, get) => ({
     try {
       const orders = await orderService.getOrders();
 
+      // Helper to extract service time or throw
+      const getServiceTime = (order: Order): number => {
+        const serviceAt = order.zzz_reservation?.zzz_service_at;
+        if (!serviceAt) {
+          throw new Error(`Order ${order.zzz_id} is missing zzz_service_at`);
+        }
+        return new Date(serviceAt).getTime();
+      };
+
       // Filter active orders: SEARCHING, OFFER_PENDING, CONFIRMED
       const active = orders
         .filter((order) =>
           ["SEARCHING", "OFFER_PENDING", "CONFIRMED"].includes(order.zzz_global_status),
         )
-        .sort(
-          (a, b) =>
-            new Date(a.zzz_reservation?.zzz_service_date || 0).getTime() -
-            new Date(b.zzz_reservation?.zzz_service_date || 0).getTime(),
-        );
+        .sort((a, b) => getServiceTime(a) - getServiceTime(b));
 
       // Filter history orders: COMPLETED, CANCELLED, NO_SHOW, EXPIRED
       const history = orders
         .filter((order) =>
           ["COMPLETED", "CANCELLED", "NO_SHOW", "EXPIRED"].includes(order.zzz_global_status),
         )
-        .sort(
-          (a, b) =>
-            new Date(b.zzz_reservation?.zzz_service_date || 0).getTime() -
-            new Date(a.zzz_reservation?.zzz_service_date || 0).getTime(),
-        );
+        .sort((a, b) => getServiceTime(b) - getServiceTime(a));
 
       set({ activeOrders: active, historyOrders: history, isLoading: false });
     } catch (err: unknown) {

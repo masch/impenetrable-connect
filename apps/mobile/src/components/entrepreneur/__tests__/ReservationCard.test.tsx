@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react-native";
 import ReservationCard from "../ReservationCard";
 import { getMockAgendaOrders } from "../../../mocks/agenda";
+import type { Order } from "@repo/shared";
 
 describe("ReservationCard", () => {
   it("should render client name, items and service name", () => {
@@ -41,5 +42,29 @@ describe("ReservationCard", () => {
       />,
     );
     expect(screen.getByText("Extra napkins please")).toBeTruthy();
+  });
+
+  it("should display time from zzz_service_at on the card", () => {
+    const mockOrder = getMockAgendaOrders()[0];
+    const orderWithTime = {
+      ...mockOrder,
+      zzz_reservation: {
+        ...mockOrder.zzz_reservation!,
+        zzz_service_at: "2024-01-15T20:30:00-03:00", // 8:30 PM
+        zzz_time_of_day: "DINNER",
+      },
+    } as Order;
+
+    render(
+      <ReservationCard
+        order={orderWithTime}
+        role="entrepreneur"
+        onAccept={() => {}}
+        onDecline={() => {}}
+      />,
+    );
+
+    // Verify that the time (20:30) is displayed on screen
+    expect(screen.getByText("20:30")).toBeTruthy();
   });
 });

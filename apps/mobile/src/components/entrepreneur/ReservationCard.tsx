@@ -4,7 +4,8 @@ import { type Order, type OrderStatus, COLORS } from "@repo/shared";
 import { useTranslations } from "../../hooks/useI18n";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { getOrderActions } from "../../logic/order-actions";
-import { formatCurrency } from "../../logic/formatters";
+import { formatCurrency, extractTimeFromISO } from "../../logic/formatters";
+import { getMomentColor } from "../../constants/moments";
 
 export interface ReservationCardProps {
   order: Order;
@@ -128,6 +129,15 @@ export default function ReservationCard({
 
   const headerIcon = role === "entrepreneur" ? "account-outline" : "storefront-outline";
 
+  // Get specific time from order
+  const orderTime = order.zzz_reservation?.zzz_service_at
+    ? extractTimeFromISO(order.zzz_reservation.zzz_service_at)
+    : "";
+
+  // Get moment color for indicator
+  const momentId = order.zzz_reservation?.zzz_time_of_day;
+  const momentColor = momentId ? getMomentColor(momentId) : COLORS.primary;
+
   // Calculate available actions using the logic layer
   const actions = getOrderActions(order, role, t, {
     onAccept,
@@ -136,9 +146,13 @@ export default function ReservationCard({
   });
 
   return (
-    <View className={containerClass} style={hideShadow ? {} : { elevation: 3 }}>
-      {/* Visual Indicator Line */}
-      <View className={`h-1.5 w-full ${status.bgClass}`} />
+    <View
+      testID={`reservation-card-${order.zzz_id}`}
+      className={containerClass}
+      style={hideShadow ? {} : { elevation: 3 }}
+    >
+      {/* Status Color Bar with moment color */}
+      <View className="h-1.5 w-full" style={{ backgroundColor: momentColor }} />
 
       <View className="p-3">
         {/* Header: Status and Items Count */}
@@ -180,6 +194,17 @@ export default function ReservationCard({
             >
               {headerTitle}
             </Text>
+            {orderTime && (
+              <View
+                className="ml-2 px-2.5 py-1 rounded-lg flex-row items-center gap-1"
+                style={{ backgroundColor: momentColor + "20" }}
+              >
+                <MaterialCommunityIcons name="clock-outline" size={12} color={momentColor} />
+                <Text className="font-display-bold text-[11px]" style={{ color: momentColor }}>
+                  {orderTime}
+                </Text>
+              </View>
+            )}
           </View>
         </View>
 
