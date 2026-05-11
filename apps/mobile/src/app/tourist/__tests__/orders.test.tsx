@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react-native";
+import { render } from "@testing-library/react-native";
 import OrderScreen from "../orders";
 import { useReservationStore, type ReservationState } from "../../../stores/reservation.store";
 import { useAuthStore, type AuthState } from "../../../stores/auth.store";
