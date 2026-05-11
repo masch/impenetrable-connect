@@ -12,22 +12,39 @@ import {
   SERVICE_CATEGORY_IDS,
 } from "./catalog";
 
-// Helper for dates relative to today
-const daysFromNow = (days: number) => {
+// Current date reference for order timestamps
+const today = new Date();
+
+// Helper to generate ISO datetime string with timezone from days offset
+const daysFromNow = (days: number, hour: number = 12): string => {
   const d = new Date();
-  d.setHours(0, 0, 0, 0);
+  d.setHours(hour, 0, 0, 0);
   d.setDate(d.getDate() + days);
-  return d;
+  // Format as ISO with Argentina timezone offset (-03:00)
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const hourStr = String(hour).padStart(2, "0");
+  return `${year}-${month}-${day}T${hourStr}:00:00-03:00`;
 };
 
-const today = daysFromNow(0);
-const tomorrow = daysFromNow(1);
-const afterTomorrow = daysFromNow(2);
+const todayLunch = daysFromNow(0, 13);
+const todayBreakfast = daysFromNow(0, 9);
+const todaySnack = daysFromNow(0, 17);
+const todayDinner = daysFromNow(0, 20);
+const todayDinner2 = daysFromNow(0, 21);
+const tomorrowLunch = daysFromNow(1, 13);
+const tomorrowLunch2 = daysFromNow(1, 14);
+const tomorrowDinner = daysFromNow(1, 20);
+const tomorrowBreakfast = daysFromNow(1, 9);
+const afterTomorrowBreakfast = daysFromNow(2, 9);
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
 
 const MOCK_RESERVATION_TODAY_LUNCH_CREATED: Reservation = {
   zzz_id: 1,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: today,
+  zzz_service_at: todayLunch,
   zzz_time_of_day: "LUNCH",
   zzz_status: "CREATED",
   zzz_guest_count: 2,
@@ -36,7 +53,7 @@ const MOCK_RESERVATION_TODAY_LUNCH_CREATED: Reservation = {
 const MOCK_RESERVATION_TODAY_BREAKFAST_SEARCHING: Reservation = {
   zzz_id: 2,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: today,
+  zzz_service_at: todayBreakfast,
   zzz_time_of_day: "BREAKFAST",
   zzz_status: "SEARCHING",
   zzz_guest_count: 3,
@@ -45,7 +62,7 @@ const MOCK_RESERVATION_TODAY_BREAKFAST_SEARCHING: Reservation = {
 const MOCK_RESERVATION_TOMORROW_DINNER_CONFIRMED: Reservation = {
   zzz_id: 3,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: tomorrow,
+  zzz_service_at: tomorrowDinner,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
   zzz_guest_count: 3,
@@ -54,7 +71,7 @@ const MOCK_RESERVATION_TOMORROW_DINNER_CONFIRMED: Reservation = {
 const MOCK_RESERVATION_TOMORROW_BREAKFAST_CANCELLED: Reservation = {
   zzz_id: 4,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: tomorrow,
+  zzz_service_at: tomorrowBreakfast,
   zzz_time_of_day: "BREAKFAST",
   zzz_status: "CANCELLED",
   zzz_guest_count: 2,
@@ -63,7 +80,7 @@ const MOCK_RESERVATION_TOMORROW_BREAKFAST_CANCELLED: Reservation = {
 const MOCK_RESERVATION_TODAY_LUNCH_CANCELLED: Reservation = {
   zzz_id: 5,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: today,
+  zzz_service_at: todayLunch,
   zzz_time_of_day: "LUNCH",
   zzz_status: "CANCELLED",
   zzz_guest_count: 5,
@@ -72,7 +89,7 @@ const MOCK_RESERVATION_TODAY_LUNCH_CANCELLED: Reservation = {
 const MOCK_RESERVATION_TOMORROW_DINNER_CANCELLED: Reservation = {
   zzz_id: 6,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: tomorrow,
+  zzz_service_at: tomorrowDinner,
   zzz_time_of_day: "DINNER",
   zzz_status: "CANCELLED",
   zzz_guest_count: 1,
@@ -81,7 +98,7 @@ const MOCK_RESERVATION_TOMORROW_DINNER_CANCELLED: Reservation = {
 const MOCK_RESERVATION_TODAY_SNACK_CONFIRMED: Reservation = {
   zzz_id: 7,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: today,
+  zzz_service_at: todaySnack,
   zzz_time_of_day: "SNACK",
   zzz_status: "CONFIRMED",
   zzz_guest_count: 6,
@@ -90,7 +107,7 @@ const MOCK_RESERVATION_TODAY_SNACK_CONFIRMED: Reservation = {
 const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_2: Reservation = {
   zzz_id: 8,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: today,
+  zzz_service_at: todayDinner,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
   zzz_guest_count: 2,
@@ -99,7 +116,7 @@ const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_2: Reservation = {
 const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_3: Reservation = {
   zzz_id: 9,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: today,
+  zzz_service_at: todayDinner2,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
   zzz_guest_count: 3,
@@ -108,7 +125,7 @@ const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_3: Reservation = {
 const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_4: Reservation = {
   zzz_id: 10,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: today,
+  zzz_service_at: todayDinner,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
   zzz_guest_count: 4,
@@ -117,7 +134,7 @@ const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_4: Reservation = {
 const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_5: Reservation = {
   zzz_id: 11,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: today,
+  zzz_service_at: todayDinner,
   zzz_time_of_day: "DINNER",
   zzz_status: "CONFIRMED",
   zzz_guest_count: 2,
@@ -126,7 +143,7 @@ const MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_5: Reservation = {
 const MOCK_RESERVATION_TOMORROW_LUNCH_PENDING_1: Reservation = {
   zzz_id: 12,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: tomorrow,
+  zzz_service_at: tomorrowLunch,
   zzz_time_of_day: "LUNCH",
   zzz_status: "SEARCHING",
   zzz_guest_count: 4,
@@ -135,7 +152,7 @@ const MOCK_RESERVATION_TOMORROW_LUNCH_PENDING_1: Reservation = {
 const MOCK_RESERVATION_TOMORROW_LUNCH_PENDING_2: Reservation = {
   zzz_id: 13,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: tomorrow,
+  zzz_service_at: tomorrowLunch2,
   zzz_time_of_day: "LUNCH",
   zzz_status: "SEARCHING",
   zzz_guest_count: 2,
@@ -144,7 +161,7 @@ const MOCK_RESERVATION_TOMORROW_LUNCH_PENDING_2: Reservation = {
 const MOCK_RESERVATION_AFTER_TOMORROW_BREAKFAST_PENDING: Reservation = {
   zzz_id: 14,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: afterTomorrow,
+  zzz_service_at: afterTomorrowBreakfast,
   zzz_time_of_day: "BREAKFAST",
   zzz_status: "SEARCHING",
   zzz_guest_count: 3,
@@ -153,7 +170,7 @@ const MOCK_RESERVATION_AFTER_TOMORROW_BREAKFAST_PENDING: Reservation = {
 const MOCK_RESERVATION_TODAY_DINNER_PEND_RESTRICTION: Reservation = {
   zzz_id: 15,
   zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
-  zzz_service_date: today,
+  zzz_service_at: todayDinner,
   zzz_time_of_day: "DINNER",
   zzz_status: "SEARCHING",
   zzz_guest_count: 2,

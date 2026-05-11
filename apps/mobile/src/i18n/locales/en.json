@@ -306,7 +306,8 @@
     "loading": "Loading...",
     "saving": "Saving...",
     "max_capacity_limit": "Capacity Limit (Project)",
-    "open_external_link": "Open external link"
+    "open_external_link": "Open external link",
+    "done": "Done"
   },
   "role_selector": {
     "welcome": "Welcome",
@@ -339,7 +340,11 @@
     "custom_date": "Other date",
     "submit": "Explore flavors",
     "active_context": "Order for {{date}} · {{moment}}",
-    "change_hint": "Tap here to change date or time"
+    "change_hint": "Tap here to change date or time",
+    "time_label": "Service time",
+    "select_time": "Select time",
+    "time_error_invalid": "Invalid time",
+    "time_error_outside_range": "Time outside allowed range ({{start}} - {{end}})"
   },
   "status": {
     "title": "System Status",

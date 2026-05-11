@@ -8,8 +8,9 @@
 
 import { z } from "zod";
 
-import type { Order, Reservation, ServiceMoment } from "@repo/shared";
+import type { Order, Reservation, ServiceMoment, HourMinute } from "@repo/shared";
 import { ServiceMomentSchema } from "@repo/shared";
+import { combineDateAndTime } from "../logic/formatters";
 import { MOCK_CATALOG_SERVICES, type CatalogServiceItem } from "../mocks/catalog";
 import {
   addMockOrder,
@@ -21,7 +22,6 @@ import {
 import { isMockUserLoggedIn, getMockUserId } from "../mocks/users";
 import { logger } from "./logger.service";
 import env from "../config/env";
-import { toISODate } from "../logic/formatters";
 
 // Re-export for convenience
 export type { CatalogServiceItem };
@@ -51,6 +51,7 @@ export interface CatalogServiceInterface {
     items: Array<{ zzz_catalog_item_id: number; zzz_quantity: number }>,
     guestCount: number,
     notes?: string,
+    time?: HourMinute,
   ): Promise<Order>;
   updateOrder(id: number, input: Partial<BookingInput>): Promise<Order>;
   updateOrderStatus(id: number, status: string): Promise<Order>;
@@ -84,6 +85,7 @@ const MockCatalogService: CatalogServiceInterface = {
     items: Array<{ zzz_catalog_item_id: number; zzz_quantity: number }>,
     guestCount: number,
     notes?: string,
+    time?: HourMinute,
   ) => {
     // Require user to be logged in
     if (!isMockUserLoggedIn()) {
@@ -101,9 +103,10 @@ const MockCatalogService: CatalogServiceInterface = {
     if (!firstService) throw new Error("Service not found");
 
     const orderId = Date.now();
+    const serviceAt = time ? combineDateAndTime(date, time) : date.toISOString();
     const reservation = addMockReservation({
       zzz_user_id: isMockUserLoggedIn() ? getMockUserId() : "unknown",
-      zzz_service_date: date,
+      zzz_service_at: serviceAt,
       zzz_time_of_day: moment,
       zzz_status: "CREATED",
       zzz_guest_count: guestCount,
@@ -171,7 +174,7 @@ const MockCatalogService: CatalogServiceInterface = {
       if (foundOrder?.zzz_reservation_id) {
         // This is a bit of a shortcut for the mock, updating the reservation in state
         const reservationUpdates: Partial<Reservation> = {};
-        if (input.date) reservationUpdates.zzz_service_date = input.date;
+        if (input.date) reservationUpdates.zzz_service_at = input.date.toISOString();
         if (input.moment) reservationUpdates.zzz_time_of_day = input.moment;
 
         updateMockReservation(foundOrder.zzz_reservation_id, reservationUpdates);
@@ -225,7 +228,8 @@ const RestCatalogService: CatalogServiceInterface = {
     return response.json();
   },
 
-  placeOrder: async (date, moment, items, guestCount, notes) => {
+  placeOrder: async (date, moment, items, guestCount, notes, time) => {
+    const serviceAt = time ? combineDateAndTime(date, time) : date.toISOString();
     const response = await fetch(`${env.API_URL}/orders`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -233,7 +237,7 @@ const RestCatalogService: CatalogServiceInterface = {
         zzz_reservation_id: 0,
         zzz_guest_count: guestCount,
         zzz_time_of_day: moment,
-        zzz_service_date: toISODate(date),
+        zzz_service_at: serviceAt,
         zzz_notes: notes ?? null,
         zzz_items: items,
       }),

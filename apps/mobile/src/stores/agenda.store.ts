@@ -56,11 +56,13 @@ export const useAgendaStore = create<AgendaState>((set, get) => ({
 
       const allFetched = ventureIds.length > 0 ? getMockAgendaOrders(ventureIds) : [];
 
-      const filtered = allFetched.filter(
-        (o) =>
-          toISODate(o.zzz_reservation?.zzz_service_date || new Date()) === dateStr &&
-          o.zzz_global_status === "CONFIRMED",
-      );
+      const filtered = allFetched.filter((o) => {
+        const serviceAt = o.zzz_reservation?.zzz_service_at;
+        if (!serviceAt) {
+          throw new Error(`Order ${o.zzz_id} is missing zzz_service_at`);
+        }
+        return toISODate(serviceAt) === dateStr && o.zzz_global_status === "CONFIRMED";
+      });
 
       set({
         allOrders: allFetched,
@@ -140,11 +142,13 @@ export const useAgendaStore = create<AgendaState>((set, get) => ({
 
   getDayCount: (date: Date) => {
     const dateStr = toISODate(date);
-    return get().allOrders.filter(
-      (o) =>
-        toISODate(o.zzz_reservation?.zzz_service_date || new Date()) === dateStr &&
-        o.zzz_global_status === "CONFIRMED",
-    ).length;
+    return get().allOrders.filter((o) => {
+      const serviceAt = o.zzz_reservation?.zzz_service_at;
+      if (!serviceAt) {
+        throw new Error(`Order ${o.zzz_id} is missing zzz_service_at`);
+      }
+      return toISODate(serviceAt) === dateStr && o.zzz_global_status === "CONFIRMED";
+    }).length;
   },
 
   reset: () => {

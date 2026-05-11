@@ -5,7 +5,7 @@ describe("Agenda Mocks", () => {
   it("should have at least one order for today", () => {
     const todayStr = toISODate(new Date());
     const todayOrders = getMockAgendaOrders().filter(
-      (o) => toISODate(o.zzz_reservation?.zzz_service_date || new Date()) === todayStr,
+      (o) => toISODate(new Date(o.zzz_reservation?.zzz_service_at || 0)) === todayStr,
     );
     expect(todayOrders.length).toBeGreaterThan(0);
   });

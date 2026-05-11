@@ -5,9 +5,10 @@
  */
 
 import { create } from "zustand";
-import { CatalogServiceItem, Order, CatalogService } from "../services/catalog.service";
+import type { ServiceMoment, HourMinute, Order } from "@repo/shared";
+import type { CatalogServiceItem } from "../services/catalog.service";
+import { CatalogService } from "../services/catalog.service";
 import { logger } from "../services/logger.service";
-import { ServiceMoment } from "@repo/shared";
 
 export interface CatalogState {
   // Services data
@@ -34,6 +35,7 @@ export interface CatalogState {
     moment: ServiceMoment,
     items: Array<{ zzz_catalog_item_id: number; zzz_quantity: number }>,
     guestCount: number,
+    time: HourMinute,
     notes?: string,
   ) => Promise<Order | null>;
   fetchOrders: () => Promise<void>;
@@ -95,11 +97,19 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
     moment: ServiceMoment,
     items: Array<{ zzz_catalog_item_id: number; zzz_quantity: number }>,
     guestCount: number,
+    time: HourMinute,
     notes?: string,
   ) => {
     set({ isSaving: true, error: null });
     try {
-      const newOrder = await CatalogService.placeOrder(date, moment, items, guestCount, notes);
+      const newOrder = await CatalogService.placeOrder(
+        date,
+        moment,
+        items,
+        guestCount,
+        notes,
+        time,
+      );
       const currentOrders = get().orders;
       if (newOrder) {
         set({ orders: [...currentOrders, newOrder], isSaving: false });

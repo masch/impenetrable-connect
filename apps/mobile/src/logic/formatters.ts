@@ -1,4 +1,5 @@
 import { useLocaleStore } from "../stores/locale.store";
+import type { HourMinute } from "@repo/shared";
 
 /**
  * Formats a numeric value as currency (ARS).
@@ -95,11 +96,19 @@ export const formatMoment = (moment: string, t: (key: string) => string): string
 /**
  * Returns a normalized ISO date string (YYYY-MM-DD).
  * Used for grouping and comparison keys.
+ * Handles both Date objects and ISO string inputs.
  */
-export const toISODate = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+export const toISODate = (date: Date | string): string => {
+  // Handle string input (ISO format like "2024-01-15T09:30:00-03:00")
+  let dateObj: Date;
+  if (typeof date === "string") {
+    dateObj = new Date(date);
+  } else {
+    dateObj = date;
+  }
+  const year = dateObj.getFullYear();
+  const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+  const day = String(dateObj.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
@@ -138,4 +147,75 @@ export const getNativeLocale = (locale: string): string => {
     en: "en-US",
   };
   return map[locale] || "en-US";
+};
+
+/**
+ * Extracts time from ISO datetime string.
+ *
+ * @param isoString - ISO datetime string (e.g., "2024-01-15T09:30:00-03:00")
+ * @returns Formatted time string (e.g., "09:30") or empty string if invalid
+ */
+export const extractTimeFromISO = (isoString: string | null | undefined): string => {
+  if (!isoString) return "";
+  try {
+    // ISO format: "2024-01-15T09:30:00-03:00" - extract time portion
+    const match = isoString.match(/T(\d{2}:\d{2})/);
+    return match ? match[1] : "";
+  } catch {
+    return "";
+  }
+};
+
+/**
+ * Parses a "HH:mm" time string into a Date object (using today as the date).
+ *
+ * @param timeStr - Time string in "HH:mm" format (e.g., "09:30")
+ * @returns Date object with the time set
+ */
+export const parseTimeToDate = (timeStr: string): Date => {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  const now = new Date();
+  now.setHours(hours, minutes, 0, 0);
+  return now;
+};
+
+/**
+ * Formats a Date object to a "HH:mm" time string.
+ *
+ * @param date - Date object to extract time from
+ * @returns Formatted time string (e.g., "09:30")
+ */
+export const formatDateToTime = (date: Date): string => {
+  const h = date.getHours().toString().padStart(2, "0");
+  const m = date.getMinutes().toString().padStart(2, "0");
+  return `${h}:${m}`;
+};
+
+/**
+ * Combines a date with an hour/minute time to create an ISO string with timezone.
+ * Uses the project's default timezone (America/Argentina/Buenos_Aires).
+ *
+ * @param date - The base date
+ * @param time - Time in HH:mm format (e.g., "08:30")
+ * @returns ISO string with timezone (e.g., "2024-01-15T08:30:00-03:00")
+ */
+export const combineDateAndTime = (date: Date, time: HourMinute): string => {
+  const [hours, minutes] = time.split(":").map(Number);
+  const result = new Date(date);
+  result.setHours(hours, minutes, 0, 0);
+  // Format with timezone offset manually to avoid UTC conversion
+  const year = result.getFullYear();
+  const month = (result.getMonth() + 1).toString().padStart(2, "0");
+  const day = result.getDate().toString().padStart(2, "0");
+  const h = result.getHours().toString().padStart(2, "0");
+  const m = result.getMinutes().toString().padStart(2, "0");
+  const s = result.getSeconds().toString().padStart(2, "0");
+  // Get timezone offset
+  const tzOffset = -result.getTimezoneOffset();
+  const tzHours = Math.floor(Math.abs(tzOffset) / 60)
+    .toString()
+    .padStart(2, "0");
+  const tzMins = (Math.abs(tzOffset) % 60).toString().padStart(2, "0");
+  const tzSign = tzOffset >= 0 ? "+" : "-";
+  return `${year}-${month}-${day}T${h}:${m}:${s}${tzSign}${tzHours}:${tzMins}`;
 };

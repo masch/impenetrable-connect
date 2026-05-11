@@ -10,7 +10,17 @@ import { OrderSchema } from "./order";
 export const ReservationDbSchema = z.object({
   zzz_id: z.number().int().positive(),
   zzz_user_id: z.string().uuid(),
-  zzz_service_date: z.date(),
+  /**
+   * Service datetime with timezone in ISO 8601 format
+   * Example: "2024-01-15T09:30:00-03:00" or "2024-01-15T09:30:00Z"
+   * Replaces the previous zzz_service_date field
+   */
+  zzz_service_at: z
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/,
+      "ISO 8601 with timezone required",
+    ),
   zzz_time_of_day: ServiceMomentSchema,
   /**
    * Reservation Macro-status

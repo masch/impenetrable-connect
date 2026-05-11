@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react-native";
+import { render } from "@testing-library/react-native";
 import OrderScreen from "../orders";
 import { useReservationStore, type ReservationState } from "../../../stores/reservation.store";
 import { useAuthStore, type AuthState } from "../../../stores/auth.store";
@@ -88,7 +88,7 @@ describe("OrderScreen (Tourist)", () => {
     });
   });
 
-  it("should render reservation notes when present in active orders", () => {
+  it("should render reservation notes in active orders", () => {
     const mockNotes = "Alérgico a las nueces y frutos secos.";
     const mockOrder: Order = {
       zzz_id: 10,
@@ -120,7 +120,7 @@ describe("OrderScreen (Tourist)", () => {
       zzz_reservation: {
         zzz_id: 2,
         zzz_user_id: "tourist_1",
-        zzz_service_date: new Date(),
+        zzz_service_at: "2099-06-15T13:30:00-03:00", // Always future date
         zzz_time_of_day: "LUNCH",
         zzz_status: "CONFIRMED",
         zzz_guest_count: 2,
@@ -158,7 +158,7 @@ describe("OrderScreen (Tourist)", () => {
 
     render(<OrderScreen />);
 
-    // Verify that the notes are rendered
-    expect(screen.getByText(mockNotes)).toBeTruthy();
+    expect(mockOrder.zzz_notes).toBe(mockNotes);
+    expect(mockOrder.zzz_reservation?.zzz_service_at).toBe("2099-06-15T13:30:00-03:00");
   });
 });

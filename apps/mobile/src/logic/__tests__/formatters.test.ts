@@ -9,7 +9,12 @@ import {
   parseISODate,
   getNativeLocale,
   formatUserDisplayName,
+  extractTimeFromISO,
+  parseTimeToDate,
+  formatDateToTime,
 } from "../formatters";
+import { formatMomentTimeRange } from "../../constants/moments";
+import type { ServiceMoment } from "@repo/shared";
 import { useLocaleStore } from "../../stores/locale.store";
 
 // Mock the locale store
@@ -197,6 +202,114 @@ describe("Formatters Logic", () => {
     it("should return empty string for null or undefined", () => {
       expect(formatUserDisplayName(null)).toBe("");
       expect(formatUserDisplayName(undefined)).toBe("");
+    });
+  });
+
+  describe("formatMomentTimeRange", () => {
+    it("should format breakfast time range as '08:00 - 11:00'", () => {
+      const result = formatMomentTimeRange("BREAKFAST");
+      expect(result).toBe("08:00 - 11:00");
+    });
+
+    it("should format lunch time range as '12:00 - 15:00'", () => {
+      const result = formatMomentTimeRange("LUNCH");
+      expect(result).toBe("12:00 - 15:00");
+    });
+
+    it("should format snack time range as '16:00 - 18:00'", () => {
+      const result = formatMomentTimeRange("SNACK");
+      expect(result).toBe("16:00 - 18:00");
+    });
+
+    it("should format dinner time range as '19:00 - 22:00'", () => {
+      const result = formatMomentTimeRange("DINNER");
+      expect(result).toBe("19:00 - 22:00");
+    });
+
+    it("should return default range for unknown moment", () => {
+      const unknown = "UNKNOWN" as ServiceMoment;
+      const result = formatMomentTimeRange(unknown);
+      expect(result).toBe("00:00 - 23:59");
+    });
+  });
+
+  describe("extractTimeFromISO", () => {
+    it("should extract time from ISO datetime string", () => {
+      const result = extractTimeFromISO("2026-05-10T09:30:00-03:00");
+      expect(result).toBe("09:30");
+    });
+
+    it("should extract time from ISO with different timezone", () => {
+      const result = extractTimeFromISO("2026-05-10T20:45:00Z");
+      expect(result).toBe("20:45");
+    });
+
+    it("should return empty string for null", () => {
+      expect(extractTimeFromISO(null)).toBe("");
+    });
+
+    it("should return empty string for undefined", () => {
+      expect(extractTimeFromISO(undefined)).toBe("");
+    });
+
+    it("should return empty string for empty string", () => {
+      expect(extractTimeFromISO("")).toBe("");
+    });
+
+    it("should return empty string for invalid format", () => {
+      expect(extractTimeFromISO("not-an-iso-string")).toBe("");
+    });
+  });
+
+  describe("parseTimeToDate", () => {
+    it("should parse HH:mm string to Date object", () => {
+      const result = parseTimeToDate("09:30");
+      expect(result.getHours()).toBe(9);
+      expect(result.getMinutes()).toBe(30);
+    });
+
+    it("should handle midnight", () => {
+      const result = parseTimeToDate("00:00");
+      expect(result.getHours()).toBe(0);
+      expect(result.getMinutes()).toBe(0);
+    });
+
+    it("should handle late evening", () => {
+      const result = parseTimeToDate("23:45");
+      expect(result.getHours()).toBe(23);
+      expect(result.getMinutes()).toBe(45);
+    });
+
+    it("should handle single digit hours and minutes with padding", () => {
+      const result = parseTimeToDate("8:5");
+      expect(result.getHours()).toBe(8);
+      expect(result.getMinutes()).toBe(5);
+    });
+  });
+
+  describe("formatDateToTime", () => {
+    it("should format Date to HH:mm string", () => {
+      const date = new Date(2026, 3, 20, 9, 30);
+      const result = formatDateToTime(date);
+      expect(result).toBe("09:30");
+    });
+
+    it("should format midnight correctly", () => {
+      const date = new Date(2026, 3, 20, 0, 0);
+      const result = formatDateToTime(date);
+      expect(result).toBe("00:00");
+    });
+
+    it("should format late evening correctly", () => {
+      const date = new Date(2026, 3, 20, 23, 45);
+      const result = formatDateToTime(date);
+      expect(result).toBe("23:45");
+    });
+
+    it("should pad single digits with zeros", () => {
+      const date = new Date(2026, 3, 20, 8, 5);
+      const result = formatDateToTime(date);
+      expect(result).toBe("08:05");
     });
   });
 });

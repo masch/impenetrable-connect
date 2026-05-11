@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslations } from "../../hooks/useI18n";
 import { useCartStore } from "../../stores/cart.store";
+import { createHourMinute } from "@repo/shared";
 import { useReservationStore } from "../../stores/reservation.store";
 import { useProjectStore } from "../../stores/project.store";
-import { SERVICE_MOMENTS } from "../../constants/moments";
+import { SERVICE_MOMENTS, getMomentConfig, getDefaultTimeForMoment } from "../../constants/moments";
 import { DatePicker } from "../../components/DatePicker";
 import { Button } from "../../components/Button";
+import { AppDateTimePicker } from "../../components/AppDateTimePicker";
 import LoadingView from "../../components/LoadingView";
 import { COLORS, ServiceMoment, Order } from "@repo/shared";
-import { isSameDay } from "../../logic/formatters";
+import { isSameDay, formatDateToTime, parseTimeToDate } from "../../logic/formatters";
+import { isTimeInRange } from "../../hooks/useTimeValidation";
 import Screen, { ScreenContent } from "../../components/Screen";
 
 export default function OrderSetupScreen() {
@@ -19,11 +22,24 @@ export default function OrderSetupScreen() {
   const { t } = useTranslations();
   const { projects, selectedProject, isLoading, error, fetchProjects, selectProject } =
     useProjectStore();
-  const { setContext, selectedDate, selectedMoment, guestCount, setGuestCount } = useCartStore();
+  const {
+    setContext,
+    selectedDate,
+    selectedMoment,
+    selectedTime,
+    guestCount,
+    setGuestCount,
+    setSelectedTime,
+  } = useCartStore();
   const { activeOrders, moveOrders } = useReservationStore();
 
   const [date, setDate] = useState<Date | null>(selectedDate || null);
   const [moment, setMoment] = useState<ServiceMoment | null>(selectedMoment);
+  const [time, setTime] = useState<Date | null>(
+    selectedTime ? parseTimeToDate(selectedTime) : null,
+  );
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [timeError, setTimeError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!selectedProject && !isLoading && !error) {
@@ -71,10 +87,55 @@ export default function OrderSetupScreen() {
     );
   }
 
-  const isValid = date !== null && moment !== null;
+  const handleMomentChange = (newMoment: ServiceMoment) => {
+    setMoment(newMoment);
+    // Reset time when moment changes
+    setTime(null);
+    setSelectedTime(undefined);
+    setTimeError(null);
+  };
+
+  const handleTimeChange = (event: unknown, selectedDate?: Date) => {
+    if (Platform.OS === "android") {
+      setShowTimePicker(false);
+    }
+    if (selectedDate) {
+      const timeStr = createHourMinute(formatDateToTime(selectedDate));
+      setTime(selectedDate);
+      setSelectedTime(timeStr);
+
+      // Validate time against moment range
+      if (moment) {
+        const validation = isTimeInRange(timeStr, moment);
+        if (!validation.valid) {
+          const config = getMomentConfig(moment);
+          setTimeError(
+            t("order_setup.time_error_outside_range", {
+              start: config.startTime,
+              end: config.endTime,
+            }),
+          );
+        } else {
+          setTimeError(null);
+        }
+      }
+    }
+  };
+
+  const handleTimePickerClose = () => {
+    setShowTimePicker(false);
+  };
+
+  const getMomentTimeRange = (): string => {
+    if (!moment) return "";
+    const config = getMomentConfig(moment);
+    return `${config.startTime} - ${config.endTime}`;
+  };
 
   const handleProceed = async () => {
-    if (!isValid || !date || !moment) return;
+    if (!date || !moment) return;
+    // Prevent proceeding if time is outside valid range
+    if (timeError) return;
 
     // Detect if we need to move existing items to a new context
     const hasContextChanged =
@@ -84,7 +145,7 @@ export default function OrderSetupScreen() {
     if (hasContextChanged && selectedDate && selectedMoment) {
       // Find orders in the PREVIOUS context to move them
       const itemsToMove = activeOrders.filter((o: Order) => {
-        const oDate = new Date(o.zzz_reservation?.zzz_service_date || 0);
+        const oDate = new Date(o.zzz_reservation?.zzz_service_at || 0);
         const isSameDayResult = isSameDay(oDate, selectedDate);
         const isSameMoment = o.zzz_reservation?.zzz_time_of_day === selectedMoment;
 
@@ -100,7 +161,7 @@ export default function OrderSetupScreen() {
       }
     }
 
-    setContext(date, moment);
+    setContext(date, moment, selectedTime);
     router.push("/tourist/booking");
   };
 
@@ -192,7 +253,7 @@ export default function OrderSetupScreen() {
                   <Button
                     key={m.zzz_id}
                     variant="ghost"
-                    onPress={() => setMoment(m.zzz_id)}
+                    onPress={() => handleMomentChange(m.zzz_id)}
                     accessibilityLabel={`${label}${isSelected ? `, ${t("common.selected")}` : ""}`}
                     accessibilityRole="radio"
                     accessibilityState={{ selected: isSelected }}
@@ -235,6 +296,117 @@ export default function OrderSetupScreen() {
                 );
               })}
             </View>
+
+            {/* Time Picker - Show when a moment is selected */}
+            {moment && (
+              <View className="mt-4">
+                <View className="flex-row items-center mb-3">
+                  <MaterialCommunityIcons
+                    name="clock-edit-outline"
+                    size={20}
+                    color={COLORS.primary}
+                  />
+                  <Text className="text-base font-display font-bold text-on-surface ml-2">
+                    {t("order_setup.time_label")}
+                  </Text>
+                  <Text className="text-sm text-on-surface-variant ml-2">
+                    ({getMomentTimeRange()})
+                  </Text>
+                </View>
+
+                <Button
+                  variant={time ? "secondary" : "outline"}
+                  onPress={() => {
+                    // Don't auto-select - user must explicitly pick a time
+                    setShowTimePicker(true);
+                  }}
+                  title={time ? formatDateToTime(time) : t("order_setup.select_time")}
+                  leftIcon={time ? "clock-check-outline" : "clock-outline"}
+                  className="w-full"
+                />
+
+                {timeError && (
+                  <View className="flex-row items-center mt-2">
+                    <MaterialCommunityIcons name="alert-circle" size={16} color={COLORS.error} />
+                    <Text className="text-sm text-error ml-1">{timeError}</Text>
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Time Picker - Native component or web fallback */}
+            {showTimePicker && moment && (
+              <View className="mt-4">
+                {Platform.OS === "web" ? (
+                  /* Web fallback: Simple time selector */
+                  <View className="bg-surface-container-low/30 border border-outline-variant/20 rounded-3xl p-4">
+                    <Text className="text-sm font-display text-on-surface-variant mb-3">
+                      {t("order_setup.select_time")}
+                    </Text>
+                    <View className="flex-row flex-wrap gap-2">
+                      {(() => {
+                        const config = getMomentConfig(moment);
+                        const [startHour] = config.startTime.split(":").map(Number);
+                        const [endHour] = config.endTime.split(":").map(Number);
+                        const hours = [];
+                        for (let h = startHour; h < endHour; h++) {
+                          for (let m = 0; m < 60; m += 30) {
+                            hours.push(
+                              `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`,
+                            );
+                          }
+                        }
+                        return hours.map((h) => (
+                          <Button
+                            key={h}
+                            variant={selectedTime === h ? "secondary" : "outline"}
+                            title={h}
+                            onPress={() => {
+                              const date = new Date();
+                              const [hours, mins] = h.split(":").map(Number);
+                              date.setHours(hours, mins, 0, 0);
+                              setTime(date);
+                              setSelectedTime(createHourMinute(h));
+                              const validation = isTimeInRange(h, moment);
+                              if (!validation.valid) {
+                                setTimeError(
+                                  t("order_setup.time_error_outside_range", {
+                                    start: config.startTime,
+                                    end: config.endTime,
+                                  }),
+                                );
+                              } else {
+                                setTimeError(null);
+                              }
+                              setShowTimePicker(false);
+                            }}
+                            className="px-4 py-2"
+                          />
+                        ));
+                      })()}
+                    </View>
+                  </View>
+                ) : (
+                  /* Native picker for iOS/Android */
+                  <>
+                    <AppDateTimePicker
+                      value={time || getDefaultTimeForMoment(moment!)}
+                      onChange={handleTimeChange}
+                      mode="time"
+                      display={Platform.OS === "ios" ? "spinner" : "default"}
+                    />
+                    {Platform.OS === "ios" && (
+                      <Button
+                        variant="ghost"
+                        title={t("common.done")}
+                        onPress={handleTimePickerClose}
+                        className="mt-2"
+                      />
+                    )}
+                  </>
+                )}
+              </View>
+            )}
           </View>
 
           {/* Action Button */}
@@ -243,7 +415,7 @@ export default function OrderSetupScreen() {
               variant="primary"
               title={t("order_setup.submit")}
               onPress={handleProceed}
-              disabled={!isValid}
+              disabled={!date || !moment || !time || !!timeError}
               rightIcon="arrow-right"
               className="py-5 rounded-2xl shadow-lg"
               accessibilityLabel={t("order_setup.submit")}
