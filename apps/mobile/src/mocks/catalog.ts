@@ -61,6 +61,7 @@ export const EMPANADAS_CARNE_MEDIA_DOCENA: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: empanadas6,
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const EMPANADAS_CARNE_DOCENA: CatalogItem = {
@@ -75,6 +76,7 @@ export const EMPANADAS_CARNE_DOCENA: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: empanadas12,
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const EMPANADAS_CHARQUI_MEDIA_DOCENA: CatalogItem = {
@@ -89,6 +91,7 @@ export const EMPANADAS_CHARQUI_MEDIA_DOCENA: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: empanadas6,
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const EMPANADAS_CHARQUI_DOCENA: CatalogItem = {
@@ -100,6 +103,7 @@ export const EMPANADAS_CHARQUI_DOCENA: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: empanadas12,
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const EMPANADAS_VERDURA_MEDIA_DOCENA: CatalogItem = {
@@ -114,6 +118,7 @@ export const EMPANADAS_VERDURA_MEDIA_DOCENA: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: empanadas12,
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const EMPANADAS_VERDURA_DOCENA: CatalogItem = {
@@ -128,6 +133,7 @@ export const EMPANADAS_VERDURA_DOCENA: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: empanadas12,
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const EMPANADAS_POLLO_MEDIA_DOCENA: CatalogItem = {
@@ -142,6 +148,7 @@ export const EMPANADAS_POLLO_MEDIA_DOCENA: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: empanadas6,
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const EMPANADAS_POLLO_DOCENA: CatalogItem = {
@@ -153,6 +160,7 @@ export const EMPANADAS_POLLO_DOCENA: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: empanadas12,
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const ASADO_POLLO: CatalogItem = {
@@ -167,6 +175,7 @@ export const ASADO_POLLO: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400",
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const PASTEL_ZAPALLO_CHIVO: CatalogItem = {
@@ -181,6 +190,7 @@ export const PASTEL_ZAPALLO_CHIVO: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: pastelCalabaza,
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const ESTOFADO_CHIVO: CatalogItem = {
@@ -195,6 +205,7 @@ export const ESTOFADO_CHIVO: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: chivoEstofado,
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const GUISO_CHIVO: CatalogItem = {
@@ -209,6 +220,7 @@ export const GUISO_CHIVO: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: chivoGuiso,
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const REPOLLO_ASADO: CatalogItem = {
@@ -223,6 +235,7 @@ export const REPOLLO_ASADO: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: repollo,
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const POSTRE_REGIONAL: CatalogItem = {
@@ -237,6 +250,7 @@ export const POSTRE_REGIONAL: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: "https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?w=400",
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const DESAYUNO: CatalogItem = {
@@ -251,6 +265,7 @@ export const DESAYUNO: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400",
   zzz_global_pause: false,
+  zzz_service_moments: ["BREAKFAST"],
 };
 
 export const MERIENDA: CatalogItem = {
@@ -265,6 +280,7 @@ export const MERIENDA: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400",
   zzz_global_pause: false,
+  zzz_service_moments: ["SNACK"],
 };
 
 export const VIANDA: CatalogItem = {
@@ -279,6 +295,7 @@ export const VIANDA: CatalogItem = {
   zzz_max_participants: 20,
   zzz_image_url: empanadas6,
   zzz_global_pause: false,
+  zzz_service_moments: ["LUNCH"],
 };
 
 export const PASEO_LANCHA: CatalogItem = {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { I18nStringSchema } from "./common";
+import { I18nStringSchema, ServiceMomentSchema } from "./common";
 import { ServiceCategorySchema } from "./service-category";
 
 export const CatalogItemSchema = z.object({
@@ -14,6 +14,7 @@ export const CatalogItemSchema = z.object({
   zzz_max_participants: z.number().int().positive(),
   zzz_image_url: z.union([z.string(), z.number()]).optional(),
   zzz_global_pause: z.boolean().default(false),
+  zzz_service_moments: z.array(ServiceMomentSchema).optional(),
 });
 
 // Infer TypeScript type directly from the Zod Schema

@@ -20,6 +20,7 @@ const mockServices = [
     zzz_price: 1500,
     zzz_catalog_category_id: 1, // GASTRONOMY
     zzz_image_url: "test.jpg",
+    zzz_service_moments: ["LUNCH", "DINNER"], // Moment-based filtering enabled
   },
 ];
 
