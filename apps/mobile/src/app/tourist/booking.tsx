@@ -27,7 +27,7 @@ import { useAuthStore } from "../../stores/auth.store";
 import { CatalogService } from "../../services/catalog.service";
 import { logger } from "../../services/logger.service";
 import { COLORS, type Order, type ServiceMoment } from "@repo/shared";
-import type { CatalogServiceItem } from "../../mocks/catalog";
+import { SERVICE_CATEGORY_IDS, type CatalogServiceItem } from "../../mocks/catalog";
 import { useCartStore } from "../../stores/cart.store";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { SERVICE_MOMENTS } from "../../constants/moments";
@@ -266,9 +266,33 @@ export default function BookingScreen() {
     return cartItems.reduce((acc, item) => acc + item.zzz_quantity, 0);
   }, [cartItems]);
 
-  // Group services by category: 1 = Gastronomy, 2 = Excursions
-  const gastronomyServices = services.filter((s) => s.zzz_catalog_category_id === 1);
-  const excursionServices = services.filter((s) => s.zzz_catalog_category_id === 2);
+  // Filter services by moment - use useMemo for performance
+  // Gastronomy (category_id=1): filter by selectedMoment
+  // Excursions (category_id=2): always visible (moment-agnostic)
+  const filteredServices = useMemo(() => {
+    if (!selectedMoment) return services;
+
+    return services.filter((service) => {
+      // Excursions are always visible
+      if (service.zzz_catalog_category_id === SERVICE_CATEGORY_IDS.EXCURSION) {
+        return true;
+      }
+
+      // Gastronomy items: filter based on zzz_service_moments array
+      const serviceMoments = (service as { zzz_service_moments?: ServiceMoment[] })
+        .zzz_service_moments;
+      if (!serviceMoments || serviceMoments.length === 0) {
+        // Items with no moments array are filtered out
+        return false;
+      }
+
+      return serviceMoments.includes(selectedMoment);
+    });
+  }, [services, selectedMoment]);
+
+  // Group filtered services by category: 1 = Gastronomy, 2 = Excursions
+  const gastronomyServices = filteredServices.filter((s) => s.zzz_catalog_category_id === 1);
+  const excursionServices = filteredServices.filter((s) => s.zzz_catalog_category_id === 2);
 
   return (
     <Screen>
