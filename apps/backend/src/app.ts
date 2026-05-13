@@ -18,7 +18,7 @@ app.use("*", async (c, next) => {
       "SECURITY ALERT: ALLOWED_ORIGINS is not defined in production!",
       new Error("Missing CORS configuration"),
     );
-    return c.json({ error: "errors.common.security_cors_required" }, 500);
+    return c.json({ message: "errors.common.security_cors_required" }, 500);
   }
 
   const corsMiddleware = cors({

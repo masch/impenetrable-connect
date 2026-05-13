@@ -51,7 +51,7 @@ describe("CORS Security Guard", () => {
 
     expect(res.status).toBe(500);
     const body = await res.json();
-    expect(body.error).toBe("errors.common.security_cors_required");
+    expect(body.message).toBe("errors.common.security_cors_required");
   });
 
   it("should allow access if ALLOWED_ORIGINS is defined in production", async () => {
