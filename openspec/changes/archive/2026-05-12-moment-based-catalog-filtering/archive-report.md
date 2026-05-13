@@ -31,8 +31,8 @@
 
 ## Specs Synced
 
-| Domain | Action | Details |
-|--------|--------|---------|
+| Domain      | Action  | Details                                                                                                                                                                           |
+| ----------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | reservation | Updated | Added 3 new requirements: Catalog Item Moment Binding, Moment-Based Gastronomy Filtering, Excursion Moment-Agnostic Display. Modified existing Reservation Db Schema requirement. |
 
 ## Archive Contents
@@ -45,6 +45,7 @@
 ## Source of Truth Updated
 
 The following specs now reflect the new behavior:
+
 - `openspec/specs/reservation/spec.md`
 
 ## Project Config

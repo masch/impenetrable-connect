@@ -13,18 +13,18 @@ const app = new Hono<AppEnv>();
 app.use("*", async (c, next) => {
   const config = getAppConfig(c);
 
-  if (!config.allowedOrigins && config.isProduction) {
+  if (config.allowedOrigins.length === 0 && config.isProduction) {
     logger.error(
       "SECURITY ALERT: ALLOWED_ORIGINS is not defined in production!",
       new Error("Missing CORS configuration"),
     );
-    return c.json({ error: "Secure CORS configuration required" }, 500);
+    return c.json({ message: "errors.common.security_cors_required" }, 500);
   }
 
   const corsMiddleware = cors({
-    origin: config.allowedOrigins || ["*"],
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
+    origin: config.allowedOrigins,
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization", "X-Health-Key"],
     maxAge: 600,
   });
 

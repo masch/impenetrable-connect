@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { Project } from "@repo/shared";
 import { ProjectService } from "../services/project.service";
 import { logger } from "../services/logger.service";
+import { mapNetworkError } from "../services/api-utils";
 
 interface ProjectState {
   projects: Project[];
@@ -38,7 +39,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       set({ projects, isLoading: false });
     } catch (err: unknown) {
       logger.error("Error fetching projects", err);
-      set({ error: "Failed to fetch projects", isLoading: false });
+      set({ error: mapNetworkError(err).message, isLoading: false });
     }
   },
 

@@ -43,6 +43,7 @@ describe("CORS Security Guard", () => {
       {},
       {
         ENVIRONMENT: "production",
+        ALLOWED_ORIGINS: "",
         DATABASE_URL: "postgres://localhost:5432/db",
         JWT_SECRET: "test-secret",
       },
@@ -50,7 +51,7 @@ describe("CORS Security Guard", () => {
 
     expect(res.status).toBe(500);
     const body = await res.json();
-    expect(body.error).toBe("Secure CORS configuration required");
+    expect(body.message).toBe("errors.common.security_cors_required");
   });
 
   it("should allow access if ALLOWED_ORIGINS is defined in production", async () => {

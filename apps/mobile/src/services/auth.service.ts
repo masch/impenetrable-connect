@@ -12,6 +12,7 @@ import {
 import env from "../config/env";
 import { findUserByAlias, findUserByEmail } from "../mocks/users";
 import { getAuthState } from "./auth-state";
+import { mapNetworkError, handleResponse } from "./api-utils";
 
 /**
  * Validate data using Zod schemas
@@ -110,34 +111,23 @@ const RestAuthService: AuthServiceInterface = {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
       });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const message =
-          errorData.message === "Invalid credentials"
-            ? "errors.auth.invalid_credentials"
-            : errorData.message || "errors.auth.invalid_credentials";
-        throw new Error(message);
-      }
-      return response.json();
+      return handleResponse<AuthResponse>(response, "errors.auth.invalid_credentials");
     } catch (error) {
-      if (error instanceof TypeError && error.message === "Network request failed") {
-        throw new Error("errors.auth.connection_failed");
-      }
-      throw error;
+      throw mapNetworkError(error);
     }
   },
 
   createTourist: async (input: CreateUserInput) => {
-    const response = await fetch(`${env.API_URL}/auth/tourist/create`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(input),
-    });
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || "Registration failed");
+    try {
+      const response = await fetch(`${env.API_URL}/auth/tourist/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+      return handleResponse<AuthResponse>(response, "errors.reservation_failed");
+    } catch (error) {
+      throw mapNetworkError(error);
     }
-    return response.json();
   },
 
   getCurrentUser: async () => {
