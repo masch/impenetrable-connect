@@ -1,10 +1,6 @@
 import { ProjectService } from "../project.service";
 import { useAuthStore } from "../../stores/auth.store";
 
-// We need to access the underlying RestProjectService for testing
-// since ProjectService might be the Mock version depending on env.USE_MOCKS
-const RestProjectService = (ProjectService as any);
-
 jest.mock("../../stores/auth.store", () => ({
   useAuthStore: {
     getState: jest.fn(),
@@ -35,7 +31,7 @@ describe("ProjectService (REST)", () => {
       json: async () => [{ zzz_id: 1, zzz_name: "Test Project" }],
     });
 
-    await RestProjectService.getProjects();
+    await ProjectService.getProjects();
 
     expect(globalThis.fetch).toHaveBeenCalledWith(
       "http://localhost:3000/v1/projects",
@@ -43,7 +39,7 @@ describe("ProjectService (REST)", () => {
         headers: {
           Authorization: `Bearer ${mockToken}`,
         },
-      })
+      }),
     );
   });
 
@@ -57,6 +53,6 @@ describe("ProjectService (REST)", () => {
     });
 
     // We expect it to throw because handleResponse throws on !ok
-    await expect(RestProjectService.getProjects()).rejects.toThrow();
+    await expect(ProjectService.getProjects()).rejects.toThrow();
   });
 });

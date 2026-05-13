@@ -1,6 +1,6 @@
 import { useAuthStore } from "../auth.store";
 import { authService } from "../../services/auth.service";
-import { UserRole } from "@repo/shared";
+import { User, UserRole } from "@repo/shared";
 
 jest.mock("../../services/auth.service", () => ({
   authService: {
@@ -46,7 +46,7 @@ describe("Auth Store", () => {
   it("should clear everything on logout", async () => {
     useAuthStore.setState({
       accessToken: "token",
-      currentUser: { id: "1" } as any,
+      currentUser: { id: "1" } as unknown as User,
       isAuthenticated: true,
     });
 
@@ -61,12 +61,14 @@ describe("Auth Store", () => {
   });
 
   it("should set i18n error key on login failure", async () => {
-    (authService.login as jest.Mock).mockRejectedValue(new Error("errors.auth.invalid_credentials"));
+    (authService.login as jest.Mock).mockRejectedValue(
+      new Error("errors.auth.invalid_credentials"),
+    );
 
     // login() re-throws, so we must catch it
     try {
       await useAuthStore.getState().login({ email: "test@test.com", password: "wrong" });
-    } catch (e) {
+    } catch {
       // Expected
     }
 
