@@ -36,6 +36,7 @@ describe("OrderScreen (Tourist)", () => {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        accessToken: "mock-token",
         isAuthenticated: true,
         isLoading: false,
         error: null,

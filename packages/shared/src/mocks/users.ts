@@ -94,7 +94,7 @@ export const MOCK_USER_ENTREPRENEUR_LUCIA: User = {
 export const MOCK_USER_ENTREPRENEUR_CARLOS: User = {
   id: "entrepreneur_004",
   alias: null,
-  email: "carlos@chaqueño-outdoor.com",
+  email: "carlos@chaqueno-outdoor.com",
   firstName: "Carlos",
   lastName: "Sosa",
   phoneNumber: "+5493624444444",

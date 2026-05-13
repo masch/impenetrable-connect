@@ -6,6 +6,7 @@ import { useAgendaStore } from "./agenda.store";
 
 export interface AuthState {
   currentUser: User | null;
+  accessToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -24,6 +25,7 @@ export interface AuthState {
 
 export const useAuthStore = create<AuthState>((set) => ({
   currentUser: null,
+  accessToken: null,
   isAuthenticated: false,
   isLoading: false,
   error: null,
@@ -37,6 +39,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const response = await authService.login(input);
       set({
         currentUser: response.user,
+        accessToken: response.accessToken,
         isAuthenticated: true,
         isLoading: false,
         userRole: response.user.role,
@@ -44,7 +47,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       // Note: In a production app, we would persist tokens to SecureStore here
     } catch (error: unknown) {
       set({
-        error: error instanceof Error ? error.message : "Login failed",
+        error: error instanceof Error ? error.message : "errors.auth.invalid_credentials",
         isLoading: false,
         isAuthenticated: false,
       });
@@ -58,6 +61,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const response = await authService.createTourist(input);
       set({
         currentUser: response.user,
+        accessToken: response.accessToken,
         isAuthenticated: true,
         isLoading: false,
         userRole: response.user.role,
@@ -81,6 +85,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       set({
         currentUser: null,
+        accessToken: null,
         isAuthenticated: false,
         isLoading: false,
         userRole: UserRole.TOURIST,

@@ -61,7 +61,7 @@ export interface AppConfig {
   /** Resolved health check authorization token */
   healthToken: string;
   /** Parsed list of allowed CORS origins */
-  allowedOrigins?: string[];
+  allowedOrigins: string[];
   /** GitHub repository path for health check tracking */
   githubRepo?: string;
   /** GitHub API token for health check tracking */
@@ -117,7 +117,8 @@ export function getAppConfig(c?: Context<AppEnv>): AppConfig {
     );
   }
 
-  const origins = bindings.ALLOWED_ORIGINS || processEnv.ALLOWED_ORIGINS;
+  const origins =
+    "ALLOWED_ORIGINS" in bindings ? bindings.ALLOWED_ORIGINS : processEnv.ALLOWED_ORIGINS;
   const environment = (bindings.ENVIRONMENT ||
     processEnv.ENVIRONMENT ||
     processEnv.NODE_ENV ||
@@ -129,7 +130,7 @@ export function getAppConfig(c?: Context<AppEnv>): AppConfig {
     directUrl: bindings.DIRECT_URL || processEnv.DIRECT_URL || databaseUrl,
     environment,
     healthToken: bindings.HEALTH_TOKEN || processEnv.HEALTH_TOKEN || "",
-    allowedOrigins: origins ? origins.split(",") : undefined,
+    allowedOrigins: origins ? origins.split(",") : [],
     githubRepo: bindings.GITHUB_REPO || processEnv.GITHUB_REPO,
     githubToken: bindings.GITHUB_TOKEN || processEnv.GITHUB_TOKEN,
     logLevel: (bindings.LOG_LEVEL || processEnv.LOG_LEVEL || "info") as LogLevel,

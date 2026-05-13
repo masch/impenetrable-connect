@@ -1,6 +1,7 @@
 import { Venture, MOCK_VENTURES, MOCK_VENTURE_MEMBERS } from "@repo/shared";
 import env from "../config/env";
 import { logger } from "./logger.service";
+import { mapNetworkError, handleResponse } from "./api-utils";
 
 /**
  * Venture Service Interface
@@ -52,22 +53,26 @@ export const MockVentureService: VentureServiceInterface = {
  */
 export const RestVentureService: VentureServiceInterface = {
   getVentureByUserId: async (userId: string) => {
-    const response = await fetch(`${env.API_URL}/ventures/user/${userId}`);
-    if (!response.ok) {
+    try {
+      const response = await fetch(`${env.API_URL}/ventures/user/${userId}`);
       if (response.status === 404) return null;
-      throw new Error("API error fetching venture by user ID");
+      return handleResponse<Venture | null>(response, "errors.no_venture_found");
+    } catch (error) {
+      throw mapNetworkError(error);
     }
-    return response.json();
   },
 
   updateVenture: async (id: number, data: Partial<Venture>) => {
-    const response = await fetch(`${env.API_URL}/ventures/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) throw new Error("API error updating venture");
-    return response.json();
+    try {
+      const response = await fetch(`${env.API_URL}/ventures/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      return handleResponse<Venture>(response, "errors.venture.save_error");
+    } catch (error) {
+      throw mapNetworkError(error);
+    }
   },
 };
 

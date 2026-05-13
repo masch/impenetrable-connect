@@ -11,7 +11,7 @@ import { logger } from "../services/logger.service";
 export const authMiddleware = async (c: Context<AppEnv>, next: Next) => {
   const authHeader = c.req.header("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return c.json({ message: "Unauthorized: Missing or invalid token format" }, 401);
+    return c.json({ message: "errors.auth.unauthorized" }, 401);
   }
 
   const token = authHeader.split(" ")[1];
@@ -25,7 +25,7 @@ export const authMiddleware = async (c: Context<AppEnv>, next: Next) => {
     logger.warn(
       `JWT Verification failed: ${error instanceof Error ? error.message : "Unknown error"}`,
     );
-    return c.json({ message: "Unauthorized: Invalid or expired token" }, 401);
+    return c.json({ message: "errors.auth.token_expired_or_invalid" }, 401);
   }
 };
 
@@ -38,14 +38,14 @@ export const roleGuard = (allowedRoles: UserRole[]) => {
 
     if (!payload || !payload.role) {
       logger.warn(`Unauthorized access attempt: No role found in token`);
-      return c.json({ message: "Unauthorized" }, 401);
+      return c.json({ message: "errors.auth.forbidden" }, 401);
     }
 
     if (!allowedRoles.includes(payload.role)) {
       logger.warn(
         `Forbidden access attempt: Role ${payload.role} not in allowed list [${allowedRoles.join(", ")}]`,
       );
-      return c.json({ message: "Forbidden" }, 403);
+      return c.json({ message: "errors.auth.forbidden" }, 403);
     }
 
     await next();

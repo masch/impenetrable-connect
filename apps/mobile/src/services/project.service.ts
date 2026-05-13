@@ -10,6 +10,7 @@ import {
 } from "@repo/shared";
 import env from "../config/env";
 import { logger } from "./logger.service";
+import { handleResponse } from "./api-utils";
 
 /**
  * Validate data using Zod schemas
@@ -101,45 +102,69 @@ const MockProjectService: ProjectServiceInterface = {
   },
 };
 
+import { useAuthStore } from "../stores/auth.store";
+
 /**
- * 📡 REST API Implementation (Future)
+ * 📡 REST API Implementation
  */
 const RestProjectService: ProjectServiceInterface = {
   getProjects: async () => {
-    const response = await fetch(`${env.API_URL}/v1/projects`);
-    if (!response.ok) throw new Error("API error fetching projects");
+    const token = useAuthStore.getState().accessToken;
+    const response = await fetch(`${env.API_URL}/projects`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) return handleResponse(response, "errors.project.fetch_failed");
     return response.json();
   },
 
   getProjectById: async (id: number) => {
-    const response = await fetch(`${env.API_URL}/v1/projects/${id}`);
-    if (!response.ok) throw new Error("API error fetching project by ID");
+    const token = useAuthStore.getState().accessToken;
+    const response = await fetch(`${env.API_URL}/projects/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) return handleResponse(response, "errors.project.fetch_failed");
     return response.json();
   },
 
   createProject: async (project: CreateProjectInput) => {
-    const response = await fetch(`${env.API_URL}/v1/projects`, {
+    const token = useAuthStore.getState().accessToken;
+    const response = await fetch(`${env.API_URL}/projects`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(project),
     });
-    if (!response.ok) throw new Error("API error creating project");
+    if (!response.ok) return handleResponse(response, "errors.project.create_failed");
     return response.json();
   },
 
   updateProject: async (id: number, project: UpdateProjectInput) => {
-    const response = await fetch(`${env.API_URL}/v1/projects/${id}`, {
+    const token = useAuthStore.getState().accessToken;
+    const response = await fetch(`${env.API_URL}/projects/${id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(project),
     });
-    if (!response.ok) throw new Error("API error updating project");
+    if (!response.ok) return handleResponse(response, "errors.project.update_failed");
     return response.json();
   },
 
   deleteProject: async (id: number) => {
-    const response = await fetch(`${env.API_URL}/v1/projects/${id}`, {
+    const token = useAuthStore.getState().accessToken;
+    const response = await fetch(`${env.API_URL}/projects/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
     return response.ok;
   },

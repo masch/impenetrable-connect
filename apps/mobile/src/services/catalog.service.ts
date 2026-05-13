@@ -22,6 +22,7 @@ import {
 import { isMockUserLoggedIn, getMockUserId } from "../mocks/users";
 import { logger } from "./logger.service";
 import env from "../config/env";
+import { mapNetworkError, handleResponse } from "./api-utils";
 
 // Re-export for convenience
 export type { CatalogServiceItem };
@@ -211,68 +212,89 @@ const MockCatalogService: CatalogServiceInterface = {
  */
 const RestCatalogService: CatalogServiceInterface = {
   getServices: async () => {
-    const response = await fetch(`${env.API_URL}/services`);
-    if (!response.ok) throw new Error("API error fetching services");
-    return response.json();
+    try {
+      const response = await fetch(`${env.API_URL}/services`);
+      return handleResponse<CatalogServiceItem[]>(response, "errors.catalog_failed");
+    } catch (error) {
+      throw mapNetworkError(error);
+    }
   },
 
   getServiceById: async (id: number) => {
-    const response = await fetch(`${env.API_URL}/services/${id}`);
-    if (!response.ok) throw new Error("API error fetching service by ID");
-    return response.json();
+    try {
+      const response = await fetch(`${env.API_URL}/services/${id}`);
+      return handleResponse<CatalogServiceItem | null>(response, "errors.no_venture_found");
+    } catch (error) {
+      throw mapNetworkError(error);
+    }
   },
 
   getServicesByCategory: async (categoryId: number) => {
-    const response = await fetch(`${env.API_URL}/services?category_id=${categoryId}`);
-    if (!response.ok) throw new Error("API error fetching services by category");
-    return response.json();
+    try {
+      const response = await fetch(`${env.API_URL}/services?category_id=${categoryId}`);
+      return handleResponse<CatalogServiceItem[]>(response, "errors.catalog_failed");
+    } catch (error) {
+      throw mapNetworkError(error);
+    }
   },
 
   placeOrder: async (date, moment, items, guestCount, notes, time) => {
-    const serviceAt = time ? combineDateAndTime(date, time) : date.toISOString();
-    const response = await fetch(`${env.API_URL}/orders`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        zzz_reservation_id: 0,
-        zzz_guest_count: guestCount,
-        zzz_time_of_day: moment,
-        zzz_service_at: serviceAt,
-        zzz_notes: notes ?? null,
-        zzz_items: items,
-      }),
-    });
-    if (!response.ok) throw new Error("API error placing order");
-    return response.json();
+    try {
+      const serviceAt = time ? combineDateAndTime(date, time) : date.toISOString();
+      const response = await fetch(`${env.API_URL}/orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          zzz_reservation_id: 0,
+          zzz_guest_count: guestCount,
+          zzz_time_of_day: moment,
+          zzz_service_at: serviceAt,
+          zzz_notes: notes ?? null,
+          zzz_items: items,
+        }),
+      });
+      return handleResponse<Order>(response, "errors.reservation_failed");
+    } catch (error) {
+      throw mapNetworkError(error);
+    }
   },
 
   updateOrder: async (id: number, input: Partial<BookingInput>) => {
-    const response = await fetch(`${env.API_URL}/orders/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        zzz_notes: input.zzz_notes,
-      }),
-    });
-    if (!response.ok) throw new Error("API error updating order");
-    return response.json();
+    try {
+      const response = await fetch(`${env.API_URL}/orders/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          zzz_notes: input.zzz_notes,
+        }),
+      });
+      return handleResponse<Order>(response, "errors.reservation_failed");
+    } catch (error) {
+      throw mapNetworkError(error);
+    }
   },
 
   updateOrderStatus: async (id: number, status: string) => {
-    const response = await fetch(`${env.API_URL}/orders/${id}/status`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    if (!response.ok) throw new Error("API error updating status");
-    return response.json();
+    try {
+      const response = await fetch(`${env.API_URL}/orders/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      return handleResponse<Order>(response, "errors.reservation_failed");
+    } catch (error) {
+      throw mapNetworkError(error);
+    }
   },
 
   getOrders: async (userId?: string) => {
-    const url = userId ? `${env.API_URL}/orders?userId=${userId}` : `${env.API_URL}/orders`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("API error fetching orders");
-    return response.json();
+    try {
+      const url = userId ? `${env.API_URL}/orders?userId=${userId}` : `${env.API_URL}/orders`;
+      const response = await fetch(url);
+      return handleResponse<Order[]>(response, "errors.catalog_failed");
+    } catch (error) {
+      throw mapNetworkError(error);
+    }
   },
 };
 

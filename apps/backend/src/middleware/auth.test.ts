@@ -47,7 +47,7 @@ describe("Auth Middleware & Role Guard", () => {
 
       expect(res.status).toBe(401);
       const body = await res.json();
-      expect(body.message).toBe("Unauthorized: Invalid or expired token");
+      expect(body.message).toBe("errors.auth.token_expired_or_invalid");
     });
   });
 
@@ -89,7 +89,7 @@ describe("Auth Middleware & Role Guard", () => {
 
       expect(res.status).toBe(401);
       const body = await res.json();
-      expect(body.message).toBe("Unauthorized");
+      expect(body.message).toBe("errors.auth.forbidden");
     });
 
     it("should return 403 for unauthorized roles", async () => {
@@ -109,7 +109,7 @@ describe("Auth Middleware & Role Guard", () => {
 
       expect(res.status).toBe(403);
       const body = await res.json();
-      expect(body.message).toBe("Forbidden");
+      expect(body.message).toBe("errors.auth.forbidden");
     });
   });
 });

@@ -14,7 +14,7 @@ authRouter.post("/login", zValidator("json", LoginInputSchema), async (c) => {
   const result = await AuthService.login(input, db, jwtSecret);
 
   if (!result) {
-    return c.json({ message: "Invalid credentials" }, 401);
+    return c.json({ message: "errors.auth.invalid_credentials" }, 401);
   }
 
   return c.json(result);
