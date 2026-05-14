@@ -1,4 +1,24 @@
-.PHONY: help setup install dev dev-api dev-web-api clean lint gga format check check-static typecheck test test-shared test-coverage mobile mobile-mock mobile-api mobile-native mobile-clean mobile-web mobile-web-api mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev mobile-expo-fix-deps mobile-expo-doctor backend seed db-up db-down db-push db-generate db-migrate db-push-neon db-generate-neon db-migrate-neon db-reset eas-login eas-whoami eas-init eas-build-configure eas-build-dev eas-build-android-dev eas-build-android-preview eas-build-android-production eas-build-ios-simulator eas-export-web eas-deploy-web eas-deploy-web-prod android-app-stop android-app-restart android-reset android-stop android-kill android-restart check-backend-alive backend-login backend-deploy backend-deploy-dev backend-logs backend-secret-set
+.PHONY: help setup install clean lint gga format check test test-shared test-coverage \
+	dev dev-api dev-mock dev-web-api \
+	mobile mobile-mock mobile-api mobile-native mobile-clean mobile-web mobile-web-api \
+	mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev \
+	mobile-expo-fix-deps mobile-expo-doctor \
+	test-mobile test-mobile-api test-backend test-shared \
+	lint-mobile lint-backend \
+	typecheck typecheck-mobile typecheck-backend \
+	check-static check-static-mobile check-static-backend \
+	check-mobile check-backend check-backend-alive \
+	backend backend-login backend-deploy backend-deploy-dev backend-logs \
+	backend-secret-set backend-secret-delete \
+	backend-health backend-health-dev backend-health-internal \
+	backend-check-runs backend-check-runs-dev backend-check-runs-internal \
+	seed db-up db-down db-push db-generate db-migrate db-reset db-shell db-wait \
+	db-push-neon db-generate-neon db-migrate-neon \
+	eas-login eas-whoami eas-init eas-build-configure eas-build-dev \
+	eas-build-android-dev eas-build-android-preview eas-build-android-production \
+	eas-build-ios-simulator eas-export-web-mock eas-export-web-api \
+	eas-deploy-web-mock eas-deploy-web-api \
+	android-app-stop android-app-restart android-reset android-stop android-kill android-restart
 
 # ==========================================
 # 📋 HELP
@@ -14,11 +34,11 @@ help:
 	@echo "    make dev-web-api                  - Start all services (Backend + Mobile Web API)"
 	@echo ""
 	@echo "  🧪 TESTS"
-	@echo "    make test                          - Run all tests (mobile + backend + shared)"
-	@echo "    make test-mobile                   - Run mobile tests"
-	@echo "    make test-backend                  - Run backend tests"
-	@echo "    make test-shared                   - Run shared package tests"
-	@echo "    make test-coverage                 - Run mobile tests with coverage report"
+	@echo "    make test                         - Run all tests (mobile + backend + shared)"
+	@echo "    make test-mobile                  - Run mobile tests"
+	@echo "    make test-backend                 - Run backend tests"
+	@echo "    make test-shared                  - Run shared package tests"
+	@echo "    make test-coverage                - Run mobile tests with coverage report"
 	@echo ""
 	@echo "  📱 MOBILE"
 	@echo "    make mobile                       - Start mobile with Expo (Mocks by default)"
@@ -28,7 +48,7 @@ help:
 	@echo "    make mobile-clean                 - Start mobile clean"
 	@echo "    make mobile-web                   - Start mobile web"
 	@echo "    make mobile-web-api               - Start mobile web connected to Backend API"
-	@echo "    make mobile-android 	             - Start mobile Android"
+	@echo "    make mobile-android               - Start mobile Android"
 	@echo "    make mobile-android-native        - Start mobile Android native"
 	@echo "    make mobile-ios                   - Start mobile iOS"
 	@echo "    make mobile-ios-native            - Start mobile iOS native"
@@ -83,9 +103,10 @@ help:
 	@echo "    make eas-build-android-preview    - Build Android preview"
 	@echo "    make eas-build-android-production - Build Android production"
 	@echo "    make eas-build-ios-simulator      - Build iOS simulator"
-	@echo "    make eas-export-web               - Export web build"
-	@echo "    make eas-deploy-web               - Deploy web (preview)"
-	@echo "    make eas-deploy-web-prod          - Deploy web (production)"
+	@echo "    make eas-export-web-mock          - Export web build with mocks"
+	@echo "    make eas-deploy-web-mock          - Deploy web with mocks (production)"
+	@echo "    make eas-export-web-api           - Export web build with production API"
+	@echo "    make eas-deploy-web-api           - Deploy web with API (--api alias)"
 	@echo ""
 
 # ==========================================
@@ -425,14 +446,21 @@ eas-build-android-production:
 eas-build-ios-simulator:
 	cd $(MOBILE_DIR) && bunx eas-cli@$(EAS_CLI_VERSION) build --profile development --platform ios --simulator
 
-eas-export-web:
-	cd $(MOBILE_DIR) && bunx expo export -p web
+eas-export-web-mock:
+	cp $(MOBILE_DIR)/.env.mock $(MOBILE_DIR)/.env.local
+	cd $(MOBILE_DIR) && bunx expo export -p web --clear
 
-eas-deploy-web: eas-export-web
-	cd $(MOBILE_DIR) && bunx eas-cli@$(EAS_CLI_VERSION) deploy
+eas-export-web-api:
+	echo "# Environment: API (production)" > $(MOBILE_DIR)/.env.local
+	echo "EXPO_PUBLIC_USE_MOCKS=false" >> $(MOBILE_DIR)/.env.local
+	echo "EXPO_PUBLIC_API_URL=$(BACKEND_PROD_URL)/v1" >> $(MOBILE_DIR)/.env.local
+	cd $(MOBILE_DIR) && bunx expo export -p web --clear
 
-eas-deploy-web-prod: eas-export-web
-		cd $(MOBILE_DIR) && bunx eas-cli@$(EAS_CLI_VERSION) deploy --prod
+eas-deploy-web-mock: eas-export-web-mock
+	cd $(MOBILE_DIR) && bunx eas-cli@$(EAS_CLI_VERSION) deploy --alias mock --prod
+
+eas-deploy-web-api: eas-export-web-api
+	cd $(MOBILE_DIR) && bunx eas-cli@$(EAS_CLI_VERSION) deploy --alias api
 
 # ==========================================
 # 🤖 ANDROID EMULATOR
