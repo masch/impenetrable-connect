@@ -23,7 +23,7 @@ on:
           - api
 
 jobs:
-  deploy-mock:
+  deploy-web-mock:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' && (github.event.inputs.mode == 'mock' || github.event.inputs.mode == 'both') || github.event_name == 'push'
     steps:
@@ -37,12 +37,12 @@ jobs:
       - name: Install Dependencies
         run: make setup
 
-      - name: Deploy Web (Mock)
+      - name: Deploy Web (Mock Mode)
         run: make eas-deploy-web-mock
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-  deploy-api:
+  deploy-web-api:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' && (github.event.inputs.mode == 'api' || github.event.inputs.mode == 'both') || github.event_name == 'push'
     steps:
@@ -56,7 +56,7 @@ jobs:
       - name: Install Dependencies
         run: make setup
 
-      - name: Deploy Web (API)
+      - name: Deploy Web (API Mode)
         run: make eas-deploy-web-api
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
