@@ -11,10 +11,21 @@ on:
       - "!openspec/**"
       - "!apps/mobile/assets/**"
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "Deployment mode"
+        required: true
+        default: "mock"
+        type: choice
+        options:
+          - mock
+          - api
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      DEPLOY_MODE: ${{ github.event.inputs.mode || 'mock' }}
     steps:
       - uses: actions/checkout@v6
 
@@ -27,9 +38,19 @@ jobs:
         run: make setup
 
       - name: Export Web Build
-        run: make eas-export-web
+        run: |
+          if [ "$DEPLOY_MODE" = "api" ]; then
+            make eas-export-web-api
+          else
+            make eas-export-web-mock
+          fi
 
       - name: Deploy to EAS Hosting
-        run: make eas-deploy-web-prod
+        run: |
+          if [ "$DEPLOY_MODE" = "api" ]; then
+            make eas-deploy-web-api
+          else
+            make eas-deploy-web-mock
+          fi
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
