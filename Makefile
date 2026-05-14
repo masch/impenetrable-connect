@@ -13,7 +13,7 @@
 	backend-health backend-health-dev backend-health-internal \
 	backend-check-runs backend-check-runs-dev backend-check-runs-internal \
 	seed db-up db-down db-push db-generate db-migrate db-reset db-shell db-wait \
-	db-push-neon db-generate-neon db-migrate-neon \
+	db-push-neon db-generate-neon db-migrate-neon db-seed-neon \
 	eas-login eas-whoami eas-init eas-build-configure eas-build-dev \
 	eas-build-android-dev eas-build-android-preview eas-build-android-production \
 	eas-build-ios-simulator eas-export-web-mock eas-export-web-api \
@@ -75,6 +75,7 @@ help:
 	@echo "    make db-generate                  - Generate SQL migrations"
 	@echo "    make db-migrate                   - Apply SQL migrations and expert patterns"
 	@echo "    make db-migrate-neon              - Deploy to Neon using .env.neon"
+	@echo "    make db-seed-neon                 - Seed Neon database"
 	@echo ""
 	@echo "  🔧 UTILS"
 	@echo "    make clean                        - Clean node_modules"
@@ -231,6 +232,9 @@ db-generate-neon:
 
 db-migrate-neon:
 	$(MAKE) db-migrate ENV_FILE=.env.neon
+
+db-seed-neon:
+	cd $(BACKEND_DIR) && bun --env-file=../../.env.neon run db:seed
 	
 backend-login:
 	cd $(BACKEND_DIR) && bunx wrangler login
@@ -445,22 +449,6 @@ eas-build-android-production:
 
 eas-build-ios-simulator:
 	cd $(MOBILE_DIR) && bunx eas-cli@$(EAS_CLI_VERSION) build --profile development --platform ios --simulator
-
-eas-export-web-mock:
-	cp $(MOBILE_DIR)/.env.mock $(MOBILE_DIR)/.env.local
-	cd $(MOBILE_DIR) && bunx expo export -p web --clear
-
-eas-export-web-api:
-	echo "# Environment: API (production)" > $(MOBILE_DIR)/.env.local
-	echo "EXPO_PUBLIC_USE_MOCKS=false" >> $(MOBILE_DIR)/.env.local
-	echo "EXPO_PUBLIC_API_URL=$(BACKEND_PROD_URL)/v1" >> $(MOBILE_DIR)/.env.local
-	cd $(MOBILE_DIR) && bunx expo export -p web --clear
-
-eas-deploy-web-mock: eas-export-web-mock
-	cd $(MOBILE_DIR) && bunx eas-cli@$(EAS_CLI_VERSION) deploy --alias mock --prod
-
-eas-deploy-web-api: eas-export-web-api
-	cd $(MOBILE_DIR) && bunx eas-cli@$(EAS_CLI_VERSION) deploy --alias api
 
 # ==========================================
 # 🤖 ANDROID EMULATOR
