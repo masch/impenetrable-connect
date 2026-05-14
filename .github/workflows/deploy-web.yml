@@ -15,17 +15,17 @@ on:
       mode:
         description: "Deployment mode"
         required: true
-        default: "mock"
+        default: "both"
         type: choice
         options:
+          - both
           - mock
           - api
 
 jobs:
-  build-and-deploy:
+  deploy-mock:
     runs-on: ubuntu-latest
-    env:
-      DEPLOY_MODE: ${{ github.event.inputs.mode || 'mock' }}
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.mode == 'mock' || github.event.inputs.mode == 'both') || github.event_name == 'push'
     steps:
       - uses: actions/checkout@v6
 
@@ -37,20 +37,30 @@ jobs:
       - name: Install Dependencies
         run: make setup
 
-      - name: Export Web Build
+      - name: Export and Deploy Web (Mock)
         run: |
-          if [ "$DEPLOY_MODE" = "api" ]; then
-            make eas-export-web-api
-          else
-            make eas-export-web-mock
-          fi
+          make eas-export-web-mock
+          make eas-deploy-web-mock
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Deploy to EAS Hosting
+  deploy-api:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.mode == 'api' || github.event.inputs.mode == 'both') || github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: make setup
+
+      - name: Export and Deploy Web (API)
         run: |
-          if [ "$DEPLOY_MODE" = "api" ]; then
-            make eas-deploy-web-api
-          else
-            make eas-deploy-web-mock
-          fi
+          make eas-export-web-api
+          make eas-deploy-web-api
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
