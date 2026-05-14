@@ -46,3 +46,9 @@ rules:
     - Compare implementation against every spec scenario
   archive:
     - Warn before merging destructive deltas (large removals)
+
+archived_changes:
+  - name: web-deployment-modes
+    archived_date: "2026-05-13"
+    status: completed
+    summary: "Enabled dual web deployment modes (mock/API) via Makefile targets and GitHub Actions workflow_dispatch"

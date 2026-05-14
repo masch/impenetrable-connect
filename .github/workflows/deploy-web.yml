@@ -11,10 +11,21 @@ on:
       - "!openspec/**"
       - "!apps/mobile/assets/**"
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "Deployment mode"
+        required: true
+        default: "both"
+        type: choice
+        options:
+          - both
+          - mock
+          - api
 
 jobs:
-  build-and-deploy:
+  deploy-web-mock:
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.mode == 'mock' || github.event.inputs.mode == 'both') || github.event_name == 'push'
     steps:
       - uses: actions/checkout@v6
 
@@ -26,10 +37,26 @@ jobs:
       - name: Install Dependencies
         run: make setup
 
-      - name: Export Web Build
-        run: make eas-export-web
+      - name: Deploy Web (Mock Mode)
+        run: make eas-deploy-web-mock
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Deploy to EAS Hosting
-        run: make eas-deploy-web-prod
+  deploy-web-api:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.mode == 'api' || github.event.inputs.mode == 'both') || github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: make setup
+
+      - name: Deploy Web (API Mode)
+        run: make eas-deploy-web-api
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
