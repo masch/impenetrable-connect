@@ -37,10 +37,8 @@ jobs:
       - name: Install Dependencies
         run: make setup
 
-      - name: Export and Deploy Web (Mock)
-        run: |
-          make eas-export-web-mock
-          make eas-deploy-web-mock
+      - name: Deploy Web (Mock)
+        run: make eas-deploy-web-mock
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
@@ -58,9 +56,7 @@ jobs:
       - name: Install Dependencies
         run: make setup
 
-      - name: Export and Deploy Web (API)
-        run: |
-          make eas-export-web-api
-          make eas-deploy-web-api
+      - name: Deploy Web (API)
+        run: make eas-deploy-web-api
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
