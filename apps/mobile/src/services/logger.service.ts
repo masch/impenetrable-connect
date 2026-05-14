@@ -3,7 +3,7 @@
  * Centralized logging for the mobile application.
  * Handles formatting, environment-specific transports, and error destructuring.
  */
-export type LogLevel = "DEBUG" | "INFO" | "WARN" | "ERROR";
+type LogLevel = "DEBUG" | "INFO" | "WARN" | "ERROR";
 
 interface LogEntry {
   level: LogLevel;

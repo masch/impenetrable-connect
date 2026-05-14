@@ -101,13 +101,6 @@ export function getMomentConfig(moment: ServiceMoment) {
 }
 
 /**
- * Get icon for a service moment
- */
-export function getMomentIcon(moment: ServiceMoment): string {
-  return getMomentConfig(moment).icon;
-}
-
-/**
  * Get hex color for a service moment
  */
 export function getMomentColor(moment: ServiceMoment): string {
