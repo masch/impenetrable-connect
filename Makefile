@@ -464,3 +464,25 @@ android-restart: android-stop
 	@echo "🔄 Restarting the emulator: $(ANDROID_FIRST_AVD)..."
 	@sleep 1
 	$(ANDROID_EMULATOR) @$(ANDROID_FIRST_AVD) &
+
+# ==========================================
+# 🌐 WEB DUAL DEPLOYMENT
+# ==========================================
+
+eas-export-web-mock:
+	echo "# Environment: MOCK" > $(MOBILE_DIR)/.env.local
+	echo "EXPO_PUBLIC_USE_MOCKS=true" >> $(MOBILE_DIR)/.env.local
+	echo "EXPO_PUBLIC_API_URL=http://localhost:3000/v1" >> $(MOBILE_DIR)/.env.local
+	cd $(MOBILE_DIR) && bunx expo export -p web --clear
+
+eas-export-web-api:
+	echo "# Environment: API (production)" > $(MOBILE_DIR)/.env.local
+	echo "EXPO_PUBLIC_USE_MOCKS=false" >> $(MOBILE_DIR)/.env.local
+	echo "EXPO_PUBLIC_API_URL=$(BACKEND_PROD_URL)/v1" >> $(MOBILE_DIR)/.env.local
+	cd $(MOBILE_DIR) && bunx expo export -p web --clear
+
+eas-deploy-web-mock: eas-export-web-mock
+	cd $(MOBILE_DIR) && bunx eas-cli@$(EAS_CLI_VERSION) deploy --alias mock --prod
+
+eas-deploy-web-api: eas-export-web-api
+	cd $(MOBILE_DIR) && bunx eas-cli@$(EAS_CLI_VERSION) deploy --alias api
