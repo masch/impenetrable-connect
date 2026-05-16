@@ -15,6 +15,8 @@
   2. ALL CI checks passed (status: success)
   3. Issue linked with `status:approved` label
   4. PR has exactly one `type:*` label
+  5. User has commented 🥦 emoji on the PR (green light signal)
+  6. SDD Archive has been run for this change (verify openspec/changes/archive/ exists)
   NEVER merge if any condition is not met.
 - **Code Quality & Formatting (Prettier-First Policy)**: ALL code files MUST strictly adhere to the project's `.prettierrc` configuration.
   - **Tab Width**: 2 spaces.
