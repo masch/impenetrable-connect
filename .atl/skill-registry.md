@@ -9,6 +9,7 @@
 
 - **Language Policy**: ALL technical metadata, including code comments, docstrings, and Git metadata (Commit messages, PR descriptions), MUST be written in **English**. The project's "Technical Esperanto" is English, regardless of the conversation language.
 - **Command Policy: Make-First**: ALWAYS use `make <command>` for ANY development execution. Direct use of `bun`, `npm`, or `yarn` is STRICTLY PROHIBITED. If a required command is missing from the `Makefile`, ASK the user to add it first.
+- **GPG Commit Signing (MANDATORY)**: ALL commits MUST be GPG-signed. NEVER use plain `git commit`. ALWAYS use `git commit -S` (short for `--gpg-sign`). If commit.gpgsign is set to true in git config, this is enforced automatically, but always explicitly use `-S` to ensure signing occurs.
 - **Code Quality & Formatting (Prettier-First Policy)**: ALL code files MUST strictly adhere to the project's `.prettierrc` configuration.
   - **Tab Width**: 2 spaces.
   - **Quotes**: Double quotes (`"`) for strings.
