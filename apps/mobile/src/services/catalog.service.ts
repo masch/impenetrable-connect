@@ -36,7 +36,7 @@ export const BookingInputSchema = z.object({
   zzz_notes: z.string().optional(),
 });
 
-export type BookingInput = z.infer<typeof BookingInputSchema>;
+type BookingInput = z.infer<typeof BookingInputSchema>;
 
 /**
  * Common interface for catalog service implementations
