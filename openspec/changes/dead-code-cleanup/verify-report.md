@@ -6,31 +6,31 @@
 
 ## Completeness
 
-| Phase | Tasks | Complete |
-|-------|-------|----------|
-| Phase 1: Verification pre-cleanup | 2 | 2/2 |
-| Phase 2: Delete unused files | 4 | 4/4 |
-| Phase 3: Remove unused exports | 2 | 2/2 |
-| Phase 4: Knip config | 1 | 1/1 |
-| Phase 5: Post-cleanup verification | 3 | 3/3 |
-| Phase 6: Commit | 2 | 0/2 (skipped - user commit) |
+| Phase                              | Tasks | Complete                    |
+| ---------------------------------- | ----- | --------------------------- |
+| Phase 1: Verification pre-cleanup  | 2     | 2/2                         |
+| Phase 2: Delete unused files       | 4     | 4/4                         |
+| Phase 3: Remove unused exports     | 2     | 2/2                         |
+| Phase 4: Knip config               | 1     | 1/1                         |
+| Phase 5: Post-cleanup verification | 3     | 3/3                         |
+| Phase 6: Commit                    | 2     | 0/2 (skipped - user commit) |
 
 ## Build & Tests Evidence
 
-| Command | Result |
-|---------|--------|
-| `cd apps/mobile && npm test` | PASS (167/167 tests) |
-| `npx react-doctor@latest .` | 39 dead code issues (down from 73 - 47% reduction) |
+| Command                      | Result                                             |
+| ---------------------------- | -------------------------------------------------- |
+| `cd apps/mobile && npm test` | PASS (167/167 tests)                               |
+| `npx react-doctor@latest .`  | 39 dead code issues (down from 73 - 47% reduction) |
 
 ## Spec Compliance
 
-| Requirement | Status | Evidence |
-|-------------|--------|----------|
-| 4 archivos eliminados | PASS | git status confirms: CatalogImage.tsx, ConfirmModal.tsx, SectionHeader.tsx, roles.ts deleted |
-| 1 export eliminado (getMomentIcon) | PASS | git diff shows function removed from moments.ts |
-| 1 type eliminado (LogLevel) | PASS | git diff shows `export type LogLevel` → `type LogLevel` (unexported, internal-only) |
-| knip config actualizado | PASS | knip.config.js created with test ignore patterns |
-| tests pasando | PASS | 167/167 tests passing |
+| Requirement                        | Status | Evidence                                                                                     |
+| ---------------------------------- | ------ | -------------------------------------------------------------------------------------------- |
+| 4 archivos eliminados              | PASS   | git status confirms: CatalogImage.tsx, ConfirmModal.tsx, SectionHeader.tsx, roles.ts deleted |
+| 1 export eliminado (getMomentIcon) | PASS   | git diff shows function removed from moments.ts                                              |
+| 1 type eliminado (LogLevel)        | PASS   | git diff shows `export type LogLevel` → `type LogLevel` (unexported, internal-only)          |
+| knip config actualizado            | PASS   | knip.config.js created with test ignore patterns                                             |
+| tests pasando                      | PASS   | 167/167 tests passing                                                                        |
 
 ## Design Coherence
 
@@ -47,6 +47,7 @@ No design document existed for this cleanup change. All modifications align with
 **PASS** ✅ (12/14 tasks - commit phase pending user action)
 
 The implementation successfully:
+
 - Removed 4 unused files (CatalogImage.tsx, ConfirmModal.tsx, SectionHeader.tsx, roles.ts)
 - Removed 1 unused export (getMomentIcon from moments.ts)
 - Unexported 1 unused type (LogLevel from logger.service.ts - now internal-only)

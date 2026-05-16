@@ -34,7 +34,3 @@ export function getMockUserId(): string {
 export function isMockUserLoggedIn(): boolean {
   return mockGetCurrentUser() !== null;
 }
-
-export function getDefaultMockUserId(): string {
-  return MOCK_USER_TOURIST_WITH_ORDERS.id;
-}

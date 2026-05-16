@@ -3,7 +3,7 @@
 // - Mock: for frontend development without API
 // - API: for connecting to the Backend API
 
-export const env = {
+const env = {
   // Set to 'false' to use the Backend API (defaults to 'true' if not set)
   USE_MOCKS: process.env.EXPO_PUBLIC_USE_MOCKS !== "false",
 

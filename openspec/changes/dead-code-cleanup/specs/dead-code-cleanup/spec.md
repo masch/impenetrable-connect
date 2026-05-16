@@ -70,7 +70,7 @@ Agregar configuración para que knip ignore archivos de test y no los marque com
 
 - GIVEN el proyecto usa knip para análisis de código
 - WHEN se agrega configuración para ignorar test files
-- THEN los archivos de test (*.test.ts, *.test.tsx) no son reportados como dead code
+- THEN los archivos de test (_.test.ts, _.test.tsx) no son reportados como dead code
 - AND react-doctor muestra reducción significativa de warnings
 
 ## ADDED Requirements

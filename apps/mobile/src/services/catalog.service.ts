@@ -26,7 +26,6 @@ import { mapNetworkError, handleResponse } from "./api-utils";
 
 // Re-export for convenience
 export type { CatalogServiceItem };
-export type { Order };
 
 // Validation schemas for booking operations
 export const BookingInputSchema = z.object({
