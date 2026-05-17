@@ -36,14 +36,44 @@ jest.mock("@expo/vector-icons", () => ({
 }));
 
 // 4. Project-specific component/hook mocks that should be global
-jest.mock("./src/components/LanguageSwitcher", () => ({
-  LanguageSwitcher: () => null,
-}));
+// LanguageSwitcher is now tested with real component
 
 // Global mock for translations since every screen uses it
+// Enhanced to return useful values for accessibility testing while maintaining compatibility
 jest.mock("./src/hooks/useI18n", () => ({
   useTranslations: () => ({
-    t: (key: string) => key,
+    // Return human-readable strings for common accessibility keys
+    // but pass through most keys unchanged for existing tests
+    t: (key: string) => {
+      // Only translate specific accessibility-related keys
+      const accessibilityKeys: Record<string, string> = {
+        "common.select": "Select",
+        "common.selected": "Selected",
+        "common.language_selected": "Selected language",
+        "common.switch_language": "Switch language",
+        "common.switch_language_hint": "Tap to switch language",
+        "common.language_active": "Currently active language",
+        "form.supported_languages": "Supported Languages",
+        "form.language.es": "ES language",
+        "form.language.en": "EN language",
+        "orders.today": "Today",
+        "orders.tomorrow": "Tomorrow",
+        "orders.choose": "Choose date",
+        "orders.today_hint": "Select today's date",
+        "orders.tomorrow_hint": "Select tomorrow's date",
+        "orders.choose_hint": "Open date picker",
+        "common.edit": "Edit",
+        "common.delete": "Delete",
+        "common.cancel": "Cancel",
+        "common.confirm": "Confirm",
+      };
+
+      // Return translated value if exact match, otherwise return key as-is
+      if (accessibilityKeys[key]) {
+        return accessibilityKeys[key];
+      }
+      return key; // Return original key for backward compatibility
+    },
     locale: "en",
     getLocalizedName: (obj: Record<string, unknown> | undefined) => (obj?.en as string) || "",
   }),
