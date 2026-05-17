@@ -11,7 +11,7 @@
 
 ### Global Context
 
-- **Project Name**: ALWAYS use `impenetrable-connect`. NEVER use "Rewilding Connect".
+- **Project Name**: ALWAYS use `impenetrable-connect`.
 - **AI Review**: START every review with `STATUS: PASSED` or `STATUS: FAILED` on the first line.
 - **Language**: ALL code comments, docstrings, commits, and PR descriptions in **English**.
 - **Commands**: USE `make <command>` for ANY development. NEVER use `bun`, `npm`, or `yarn` directly.
