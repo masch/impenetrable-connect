@@ -4,10 +4,10 @@
 
 Running `npx react-doctor@latest` found **14 dead code issues**:
 
-| Issue | Count | Description |
-|-------|-------|-------------|
-| Unused export: `isDev` | ×11 | Exported but never imported |
-| Unused type: `BookingInput` | ×3 | Exported but never imported elsewhere |
+| Issue                       | Count | Description                           |
+| --------------------------- | ----- | ------------------------------------- |
+| Unused export: `isDev`      | ×11   | Exported but never imported           |
+| Unused type: `BookingInput` | ×3    | Exported but never imported elsewhere |
 
 ## Current State
 
@@ -22,6 +22,7 @@ export const isDev = process.env.NODE_ENV !== "production";
 **Why it's dead:** The `isDev` constant is exported but never imported anywhere in the codebase. All service files import `env` as default, not `isDev`.
 
 **Likely cause:** In commit `157b491` ("chore(mobile): remove dead code (4 items)"), the `env` export was converted from a named export to a default export:
+
 - `export const env` → `const env` + `export default env`
 
 During this refactor, `isDev` was left behind as a leftover. It was probably added for debugging or conditional behavior that was later refactored away.
@@ -50,9 +51,9 @@ export type BookingInput = z.infer<typeof BookingInputSchema>;
 
 ## Files Affected
 
-| File | Issue | Action |
-|------|-------|--------|
-| `apps/mobile/src/config/env.ts` | `isDev` unused | Remove export |
+| File                                          | Issue                            | Action                              |
+| --------------------------------------------- | -------------------------------- | ----------------------------------- |
+| `apps/mobile/src/config/env.ts`               | `isDev` unused                   | Remove export                       |
 | `apps/mobile/src/services/catalog.service.ts` | `BookingInput` unused externally | Remove export (keep internal usage) |
 
 ## Recommendation
