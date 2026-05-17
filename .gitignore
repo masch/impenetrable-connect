@@ -23,6 +23,10 @@
 **/.agent/
 **/.gemini/
 
+# Agent tooling metadata (generated per-user, not product code)
+**/.atl/
+**/.pi/
+
 # Logs and cache
 **/*.log
 **/npm-debug.*
