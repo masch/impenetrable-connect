@@ -25,8 +25,8 @@ describe("DatePicker", () => {
   it("should render quick select buttons", () => {
     render(<DatePicker value={new Date()} onChange={() => {}} />);
 
-    // Quick select buttons should be present (via translation key in mock)
-    const todayButton = screen.getByLabelText("orders.today");
+    // Quick select buttons now use translated text "Today"
+    const todayButton = screen.getByLabelText("Today");
     expect(todayButton).toBeTruthy();
   });
 
@@ -34,7 +34,7 @@ describe("DatePicker", () => {
     const mockOnChange = jest.fn();
     render(<DatePicker value={new Date()} onChange={mockOnChange} />);
 
-    const todayButton = screen.getByLabelText("orders.today");
+    const todayButton = screen.getByLabelText("Today");
     fireEvent.press(todayButton);
 
     expect(mockOnChange).toHaveBeenCalled();
@@ -43,7 +43,7 @@ describe("DatePicker", () => {
   it("should render tomorrow button", () => {
     render(<DatePicker value={new Date()} onChange={() => {}} />);
 
-    const tomorrowButton = screen.getByLabelText("orders.tomorrow");
+    const tomorrowButton = screen.getByLabelText("Tomorrow");
     expect(tomorrowButton).toBeTruthy();
   });
 
@@ -51,7 +51,7 @@ describe("DatePicker", () => {
     const mockOnChange = jest.fn();
     render(<DatePicker value={new Date()} onChange={mockOnChange} />);
 
-    const tomorrowButton = screen.getByLabelText("orders.tomorrow");
+    const tomorrowButton = screen.getByLabelText("Tomorrow");
     fireEvent.press(tomorrowButton);
 
     expect(mockOnChange).toHaveBeenCalledWith(expect.any(Date));
@@ -70,16 +70,16 @@ describe("DatePicker", () => {
       />,
     );
 
-    // Should render without errors
-    expect(screen.getByLabelText("orders.today")).toBeTruthy();
+    // Should render without errors - now uses translated "Today"
+    expect(screen.getByLabelText("Today")).toBeTruthy();
   });
 
   it("should render with null value (defaults to today)", () => {
     const mockOnChange = jest.fn();
     render(<DatePicker value={null} onChange={mockOnChange} />);
 
-    // Should still show today button
-    const todayButton = screen.getByLabelText("orders.today");
+    // Should still show today button - now uses translated "Today"
+    const todayButton = screen.getByLabelText("Today");
     expect(todayButton).toBeTruthy();
   });
 
