@@ -37,7 +37,7 @@
 - **Functional Components**: ONLY functional components with hooks. NO class components.
 - **Imports**: NEVER use `import * as`. ALWAYS use named imports.
 - **Buttons**:
-  - EXCEPTION: `src/components/FormSwitch.tsx` may use `Pressable`.
+  - EXCEPTION: `apps/mobile/src/components/FormSwitch.tsx` may use `Pressable`.
   - ALL other interactive elements MUST use the centralized `Button` component.
 - **Accessibility**:
   - Images: `alt` (web) or `accessibilityLabel` (native).
@@ -78,7 +78,7 @@
   - NEVER use `console.log`, `console.warn`, `console.error`.
   - Backend: Use `apps/backend/src/services/logger.service.ts`.
   - Mobile: Use `apps/mobile/src/services/logger.service.ts`.
-- **Mock Data**: NEVER duplicate. Centralize in `src/mocks/*.data.ts`.
+- **Mock Data**: NEVER duplicate. Centralize in `apps/mobile/src/mocks/*.data.ts`.
 
 ### Backend Security
 
