@@ -53,3 +53,9 @@ There's already a documented convention from a previous change (ag-standards-int
 ### Ready for Proposal
 
 **No** — This is already the established convention. No change needed unless the user wants to clean up the cache file for aesthetic reasons.
+
+---
+
+## Result
+
+**COMPLETED** — Follow-up action: Added `.atl/` and `.pi/` to `.gitignore` following official Gentle AI conventions (see issue #189, PR #190).
