@@ -162,4 +162,81 @@ describe("OrderScreen (Tourist)", () => {
     expect(mockOrder.zzz_notes).toBe(mockNotes);
     expect(mockOrder.zzz_reservation?.zzz_service_at).toBe("2099-06-15T13:30:00-03:00");
   });
+
+  describe("Accessibility labels", () => {
+    it("should render accessibility label for today", () => {
+      mockedUseReservationStore.mockImplementation((selector) => {
+        const state: ReservationState = {
+          activeOrders: [],
+          historyOrders: [],
+          isLoading: false,
+          error: null,
+          selectedTab: "active",
+          fetchOrders: jest.fn(),
+          cancelOrder: jest.fn(),
+          addOrder: jest.fn(),
+          updateOrder: jest.fn(),
+          moveOrders: jest.fn(),
+          setTab: jest.fn(),
+        };
+        return typeof selector === "function" ? selector(state) : state;
+      });
+
+      const { getByLabelText } = render(<OrderScreen />);
+
+      // Today uses translation key "accessibility.select_today" in mock
+      const todayButton = getByLabelText("accessibility.select_today");
+      expect(todayButton).toBeTruthy();
+    });
+
+    it("should render accessibility label for tomorrow", () => {
+      mockedUseReservationStore.mockImplementation((selector) => {
+        const state: ReservationState = {
+          activeOrders: [],
+          historyOrders: [],
+          isLoading: false,
+          error: null,
+          selectedTab: "active",
+          fetchOrders: jest.fn(),
+          cancelOrder: jest.fn(),
+          addOrder: jest.fn(),
+          updateOrder: jest.fn(),
+          moveOrders: jest.fn(),
+          setTab: jest.fn(),
+        };
+        return typeof selector === "function" ? selector(state) : state;
+      });
+
+      const { getByLabelText } = render(<OrderScreen />);
+
+      // Tomorrow uses translation key "accessibility.select_tomorrow" in mock
+      const tomorrowButton = getByLabelText("accessibility.select_tomorrow");
+      expect(tomorrowButton).toBeTruthy();
+    });
+
+    it("should render accessibility label for future dates", () => {
+      mockedUseReservationStore.mockImplementation((selector) => {
+        const state: ReservationState = {
+          activeOrders: [],
+          historyOrders: [],
+          isLoading: false,
+          error: null,
+          selectedTab: "active",
+          fetchOrders: jest.fn(),
+          cancelOrder: jest.fn(),
+          addOrder: jest.fn(),
+          updateOrder: jest.fn(),
+          moveOrders: jest.fn(),
+          setTab: jest.fn(),
+        };
+        return typeof selector === "function" ? selector(state) : state;
+      });
+
+      const { getAllByLabelText } = render(<OrderScreen />);
+
+      // Future dates all use "accessibility.select_date" (mock returns key only)
+      const futureDateButtons = getAllByLabelText("accessibility.select_date");
+      expect(futureDateButtons.length).toBeGreaterThan(0);
+    });
+  });
 });

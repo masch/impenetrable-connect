@@ -21,6 +21,7 @@ interface DatePickerProps {
   minimumDate?: Date;
   maximumDate?: Date;
   accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 export function DatePicker({
@@ -29,6 +30,7 @@ export function DatePicker({
   minimumDate,
   maximumDate,
   accessibilityLabel,
+  accessibilityHint,
 }: DatePickerProps) {
   const { t } = useTranslations();
   const [showPicker, setShowPicker] = useState(false);
@@ -105,7 +107,7 @@ export function DatePicker({
 
   if (isWeb) {
     return (
-      <View accessibilityLabel={accessibilityLabel}>
+      <View accessibilityLabel={accessibilityLabel} accessibilityHint={accessibilityHint}>
         {/* Quick select in single line */}
         <View className="flex-row gap-2">
           <Button
@@ -114,6 +116,7 @@ export function DatePicker({
             title={t("orders.today")}
             onPress={() => handleWebQuickSelect(0)}
             accessibilityLabel={t("orders.today")}
+            accessibilityHint={t("orders.today_hint")}
           />
           <Button
             className="flex-1 rounded-2xl px-1"
@@ -121,6 +124,7 @@ export function DatePicker({
             title={t("orders.tomorrow")}
             onPress={() => handleWebQuickSelect(1)}
             accessibilityLabel={t("orders.tomorrow")}
+            accessibilityHint={t("orders.tomorrow_hint")}
           />
           <Button
             className="flex-1 rounded-2xl px-1"
@@ -132,6 +136,8 @@ export function DatePicker({
               setWebPickerOpen(!webPickerOpen);
             }}
             accessibilityLabel={isCustomDate() ? formatDate(currentValue) : t("orders.choose")}
+            accessibilityHint={t("orders.choose_hint")}
+            testID="web-picker-toggle"
           />
         </View>
 
@@ -142,7 +148,7 @@ export function DatePicker({
                 size="sm"
                 variant="outline"
                 leftIcon="chevron-left"
-                className="border-0 bg-surface-container-highest w-10 h-10"
+                className="border-0 bg-surface-container-highest size-10"
                 onPress={() => adjustDate(-1)}
                 accessibilityLabel={t("common.previous")}
               />
@@ -153,7 +159,7 @@ export function DatePicker({
                 size="sm"
                 variant="outline"
                 leftIcon="chevron-right"
-                className="border-0 bg-surface-container-highest w-10 h-10"
+                className="border-0 bg-surface-container-highest size-10"
                 onPress={() => adjustDate(1)}
                 accessibilityLabel={t("common.next")}
               />
@@ -176,7 +182,7 @@ export function DatePicker({
   }
 
   return (
-    <View accessibilityLabel={accessibilityLabel}>
+    <View accessibilityLabel={accessibilityLabel} accessibilityHint={accessibilityHint}>
       {/* Quick select in single line */}
       <View className="flex-row gap-3">
         <Button
@@ -188,6 +194,7 @@ export function DatePicker({
           variant="ghost"
           onPress={() => handleQuickSelect(0)}
           accessibilityLabel={t("orders.today")}
+          accessibilityHint={t("orders.today_hint")}
         >
           <Text
             className={`text-base font-display ${
@@ -208,6 +215,7 @@ export function DatePicker({
           variant="ghost"
           onPress={() => handleQuickSelect(1)}
           accessibilityLabel={t("orders.tomorrow")}
+          accessibilityHint={t("orders.tomorrow_hint")}
         >
           <Text
             className={`text-base font-display ${
@@ -228,6 +236,7 @@ export function DatePicker({
           variant="ghost"
           onPress={() => setShowPicker(!showPicker)}
           accessibilityLabel={isCustomDate() ? formatDate(currentValue) : t("orders.choose")}
+          accessibilityHint={t("orders.choose_hint")}
         >
           <View className="flex-row items-center gap-2">
             {!isCustomDate() && (

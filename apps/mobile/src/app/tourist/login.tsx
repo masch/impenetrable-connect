@@ -24,7 +24,7 @@ interface FormErrors {
 
 export default function LoginScreen() {
   const { t } = useTranslations();
-  const router = useRouter();
+  const { replace } = useRouter();
   const [formData, setFormData] = useState<LoginFormData>({
     alias: "",
     phoneNumber: "",
@@ -58,7 +58,7 @@ export default function LoginScreen() {
     const register = useAuthStore.getState().register;
     register(userData)
       .then(() => {
-        router.replace("/tourist");
+        replace("/tourist");
       })
       .catch((error) => {
         logger.error("Registration failed", error);
@@ -151,7 +151,13 @@ export default function LoginScreen() {
         </ScrollView>
 
         <View className="p-5 bg-surface/85 backdrop-blur-sm max-w-md mx-auto w-full">
-          <Button title={t("login.submit_button")} onPress={handleSubmit} icon="→" />
+          <Button
+            title={t("login.submit_button")}
+            onPress={handleSubmit}
+            icon="→"
+            accessibilityLabel={t("login.submit_button")}
+            accessibilityHint={t("accessibility.login_submit_hint")}
+          />
         </View>
       </KeyboardAvoidingView>
     </Screen>

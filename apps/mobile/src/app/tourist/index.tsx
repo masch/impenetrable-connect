@@ -18,7 +18,7 @@ import { isTimeInRange } from "../../hooks/useTimeValidation";
 import Screen, { ScreenContent } from "../../components/Screen";
 
 export default function OrderSetupScreen() {
-  const router = useRouter();
+  const { push, back } = useRouter();
   const { t } = useTranslations();
   const { projects, selectedProject, isLoading, error, fetchProjects, selectProject } =
     useProjectStore();
@@ -78,7 +78,7 @@ export default function OrderSetupScreen() {
           )}
           <Button
             title={error ? t("common.retry") : t("common.back")}
-            onPress={() => (error ? fetchProjects() : router.back())}
+            onPress={() => (error ? fetchProjects() : back())}
             variant={error ? "primary" : "ghost"}
             className="mt-6 w-full"
           />
@@ -162,7 +162,7 @@ export default function OrderSetupScreen() {
     }
 
     setContext(date, moment, selectedTime);
-    router.push("/tourist/booking");
+    push("/tourist/booking");
   };
 
   return (
@@ -191,6 +191,7 @@ export default function OrderSetupScreen() {
               value={date}
               onChange={setDate}
               accessibilityLabel={t("order_setup.date_label")}
+              accessibilityHint={t("accessibility.date_picker_hint")}
             />
           </View>
 
@@ -211,7 +212,9 @@ export default function OrderSetupScreen() {
               <Button
                 variant="ghost"
                 onPress={() => setGuestCount(Math.max(1, guestCount - 1))}
-                className="w-14 h-14 rounded-2xl bg-surface-container-high items-center justify-center border border-outline-variant/10"
+                className="size-14 rounded-2xl bg-surface-container-high items-center justify-center border border-outline-variant/10"
+                accessibilityLabel={t("accessibility.decrement_guests")}
+                accessibilityHint={t("accessibility.decrement_guests_hint")}
               >
                 <MaterialCommunityIcons name="minus" size={24} color={COLORS.primary} />
               </Button>
@@ -229,7 +232,9 @@ export default function OrderSetupScreen() {
                 variant="ghost"
                 testID="guest-plus-button"
                 onPress={() => setGuestCount(guestCount + 1)}
-                className="w-14 h-14 rounded-2xl bg-surface-container-high items-center justify-center border border-outline-variant/10"
+                className="size-14 rounded-2xl bg-surface-container-high items-center justify-center border border-outline-variant/10"
+                accessibilityLabel={t("accessibility.increment_guests")}
+                accessibilityHint={t("accessibility.increment_guests_hint")}
               >
                 <MaterialCommunityIcons name="plus" size={24} color={COLORS.primary} />
               </Button>
@@ -255,6 +260,7 @@ export default function OrderSetupScreen() {
                     variant="ghost"
                     onPress={() => handleMomentChange(m.zzz_id)}
                     accessibilityLabel={`${label}${isSelected ? `, ${t("common.selected")}` : ""}`}
+                    accessibilityHint={t("accessibility.moment_selection_hint")}
                     accessibilityRole="radio"
                     accessibilityState={{ selected: isSelected }}
                     className={`w-[48%] items-center justify-center p-5 border rounded-3xl transition-all ${
@@ -283,7 +289,7 @@ export default function OrderSetupScreen() {
 
                     {isSelected && (
                       <View
-                        className={`absolute top-3 right-3 w-5 h-5 rounded-full items-center justify-center ${m.bgClass}`}
+                        className={`absolute top-3 right-3 size-5 rounded-full items-center justify-center ${m.bgClass}`}
                       >
                         <MaterialCommunityIcons
                           name="check"
@@ -419,6 +425,7 @@ export default function OrderSetupScreen() {
               rightIcon="arrow-right"
               className="py-5 rounded-2xl shadow-lg"
               accessibilityLabel={t("order_setup.submit")}
+              accessibilityHint={t("accessibility.submit_order_hint")}
             />
           </View>
         </ScrollView>
