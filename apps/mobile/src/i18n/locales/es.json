@@ -183,7 +183,9 @@
     "current_value": "Valor actual",
     "capacity_legend": "Este es el límite máximo de personas que podés recibir simultáneamente.",
     "minus": "Disminuir capacidad",
+    "minus_hint": "Reducir capacidad en 1",
     "plus": "Aumentar capacidad",
+    "plus_hint": "Aumentar capacidad en 1",
     "management": "Gestión de Disponibilidad",
     "is_paused": "Emprendimiento Activo",
     "is_paused_help": "Si desactivás esta opción, tu emprendimiento dejará de ser visible en el catálogo y no recibirás nuevas solicitudes temporalmente.",
@@ -191,7 +193,9 @@
     "pause_confirm_message": "Al desactivarlo, tu emprendimiento no será visible en el catálogo y no recibirás nuevas solicitudes de reserva.",
     "resume_confirm_title": "¿Activar emprendimiento?",
     "resume_confirm_message": "¡Genial! Tu emprendimiento volverá a estar visible para todos los turistas y podrás recibir nuevos pedidos de inmediato.",
-    "deactivate_warning": "ADVERTENCIA: Desactivar este emprendimiento cancelará su visibilidad en el catálogo de forma inmediata."
+    "deactivate_warning": "ADVERTENCIA: Desactivar este emprendimiento cancelará su visibilidad en el catálogo de forma inmediata.",
+    "status_toggle_label": "Interruptor de estado del emprendimiento",
+    "status_toggle_hint": "Doble tocada para activar o desactivar el emprendimiento"
   },
   "orders": {
     "title": "Mis Pedidos",
@@ -200,9 +204,12 @@
     "noActive": "No tenés pedidos activos",
     "noHistory": "No hay historial de pedidos",
     "today": "Hoy",
+    "today_hint": "Seleccionar la fecha de hoy",
     "tomorrow": "Mañana",
+    "tomorrow_hint": "Seleccionar la fecha de mañana",
     "yesterday": "Ayer",
     "choose": "Elegir",
+    "choose_hint": "Abrir selector de fecha para elegir una fecha personalizada",
     "confirm": "Confirmar",
     "reject": "Rechazar pedido",
     "rejectConfirm": "¿Rechazar este pedido?",
@@ -293,6 +300,24 @@
     "selected": "Seleccionado",
     "previous": "Anterior",
     "next": "Siguiente",
+    "decrease": "Disminuir",
+    "decrease_hint": "Reducir cantidad en 1",
+    "increase": "Aumentar",
+    "increase_hint": "Aumentar cantidad en 1",
+    "close": "Cerrar",
+    "close_hint": "Cerrar este modal",
+    "cancel_hint": "Descartar y cerrar este diálogo",
+    "language_selected": "Seleccionado. Tocá para deseleccionar",
+    "language_tap_to_select": "Tocá para seleccionar",
+    "project_view_details": "Doble tocada para ver detalles del proyecto",
+    "switch_language": "Cambiar a idioma {{lang}}",
+    "language_active": "Idioma actualmente activo",
+    "switch_language_hint": "Tocá para cambiar idioma",
+    "set_default_language": "Establecer {{lang}} como idioma predeterminado",
+    "default_language_selected": "Actualmente seleccionado como predeterminado",
+    "tap_set_default": "Tocá para establecer como predeterminado",
+    "save_project_changes": "Guardar cambios del proyecto",
+    "create_new_project": "Crear nuevo proyecto",
     "accept": "Aceptar",
     "decline": "Rechazar",
     "dishes_one": "Plato",
@@ -345,7 +370,8 @@
     "time_label": "Hora del servicio",
     "select_time": "Seleccionar hora",
     "time_error_invalid": "Hora inválida",
-    "time_error_outside_range": "Hora fuera del rango permitido ({{start}} - {{end}})"
+    "time_error_outside_range": "Hora fuera del rango permitido ({{start}} - {{end}})",
+    "select_time_option": "Seleccionar hora {{time}}"
   },
   "status": {
     "title": "Estado del Sistema",
@@ -386,5 +412,21 @@
   },
   "admin": {
     "system": "Gestión del Sistema"
+  },
+  "accessibility": {
+    "toggle_order_summary_hint": "Alternar para mostrar u ocultar el resumen del pedido",
+    "confirm_order_hint": "Confirmar y realizar tu pedido",
+    "login_submit_hint": "Toca para enviar y continuar",
+    "select_today": "Seleccionar hoy",
+    "select_tomorrow": "Seleccionar mañana",
+    "select_date": "Seleccionar {{date}}",
+    "date_picker_hint": "Doble toque para seleccionar una fecha",
+    "moment_selection_hint": "Doble toque para seleccionar el horario de comida",
+    "submit_order_hint": "Doble toque para ver el menú",
+    "date_selection_hint": "Doble toque para ver pedidos de este día",
+    "decrement_guests": "Reducir cantidad de comensales",
+    "decrement_guests_hint": "Toca para reducir la cantidad de comensales en 1",
+    "increment_guests": "Aumentar cantidad de comensales",
+    "increment_guests_hint": "Toca para aumentar la cantidad de comensales en 1"
   }
 }

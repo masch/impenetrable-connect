@@ -183,7 +183,9 @@
     "current_value": "Current value",
     "capacity_legend": "This is the maximum number of people you can receive simultaneously.",
     "minus": "Decrease capacity",
+    "minus_hint": "Decrease capacity by 1",
     "plus": "Increase capacity",
+    "plus_hint": "Increase capacity by 1",
     "management": "Availability Management",
     "is_paused": "Venture Active",
     "is_paused_help": "If you deactivate this option, your venture will no longer be visible in the catalog and you will not receive new requests temporarily.",
@@ -191,7 +193,9 @@
     "pause_confirm_message": "By deactivating it, your venture will not be visible in the catalog and you will not receive new booking requests.",
     "resume_confirm_title": "Activate venture?",
     "resume_confirm_message": "Great! Your venture will be visible to all tourists again and you will be able to receive new orders immediately.",
-    "deactivate_warning": "WARNING: Deactivating this venture will immediately cancel its visibility in the catalog."
+    "deactivate_warning": "WARNING: Deactivating this venture will immediately cancel its visibility in the catalog.",
+    "status_toggle_label": "Venture status toggle",
+    "status_toggle_hint": "Double tap to toggle venture active status"
   },
   "orders": {
     "title": "My Orders",
@@ -200,9 +204,12 @@
     "noActive": "You have no active orders",
     "noHistory": "No order history",
     "today": "Today",
+    "today_hint": "Select today's date",
     "tomorrow": "Tomorrow",
+    "tomorrow_hint": "Select tomorrow's date",
     "yesterday": "Yesterday",
     "choose": "Choose",
+    "choose_hint": "Open date picker to choose a custom date",
     "confirm": "Confirm",
     "reject": "Reject order",
     "rejectConfirm": "Reject this order?",
@@ -293,6 +300,24 @@
     "selected": "Selected",
     "previous": "Previous",
     "next": "Next",
+    "decrease": "Decrease",
+    "decrease_hint": "Decrease quantity by 1",
+    "increase": "Increase",
+    "increase_hint": "Increase quantity by 1",
+    "close": "Close",
+    "close_hint": "Close this modal",
+    "cancel_hint": "Dismiss and close this dialog",
+    "language_selected": "Selected. Tap to deselect",
+    "language_tap_to_select": "Tap to select",
+    "project_view_details": "Double tap to view project details",
+    "switch_language": "Switch to {{lang}} language",
+    "language_active": "Currently active language",
+    "switch_language_hint": "Tap to switch language",
+    "set_default_language": "Set {{lang}} as default language",
+    "default_language_selected": "Currently selected as default",
+    "tap_set_default": "Tap to set as default language",
+    "save_project_changes": "Save project changes",
+    "create_new_project": "Create new project",
     "accept": "Accept",
     "decline": "Decline",
     "dishes_one": "Dish",
@@ -345,7 +370,8 @@
     "time_label": "Service time",
     "select_time": "Select time",
     "time_error_invalid": "Invalid time",
-    "time_error_outside_range": "Time outside allowed range ({{start}} - {{end}})"
+    "time_error_outside_range": "Time outside allowed range ({{start}} - {{end}})",
+    "select_time_option": "Select time {{time}}"
   },
   "status": {
     "title": "System Status",
@@ -386,5 +412,21 @@
   },
   "admin": {
     "system": "System Management"
+  },
+  "accessibility": {
+    "toggle_order_summary_hint": "Toggle to show or hide order summary",
+    "confirm_order_hint": "Confirm and place your order",
+    "login_submit_hint": "Tap to submit and continue",
+    "select_today": "Select today",
+    "select_tomorrow": "Select tomorrow",
+    "select_date": "Select {{date}}",
+    "date_picker_hint": "Double tap to select a date",
+    "moment_selection_hint": "Double tap to select meal time",
+    "submit_order_hint": "Double tap to proceed to menu",
+    "date_selection_hint": "Double tap to view orders for this day",
+    "decrement_guests": "Decrease guest count",
+    "decrement_guests_hint": "Tap to reduce number of guests by 1",
+    "increment_guests": "Increase guest count",
+    "increment_guests_hint": "Tap to increase number of guests by 1"
   }
 }

@@ -34,7 +34,7 @@ import { SERVICE_MOMENTS } from "../../constants/moments";
 import { Button } from "../../components/Button";
 
 export default function BookingScreen() {
-  const router = useRouter();
+  const { push, replace } = useRouter();
   const { t, getLocalizedName } = useTranslations();
   const services = useCatalogStore((state) => state.services);
   const isLoading = useCatalogStore((state) => state.isLoading);
@@ -68,14 +68,14 @@ export default function BookingScreen() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.replace("/tourist");
+      replace("/tourist");
       return;
     }
 
     if (!isValidContext()) {
-      router.replace("/tourist");
+      replace("/tourist");
     }
-  }, [isAuthenticated, isValidContext, router]);
+  }, [isAuthenticated, isValidContext, replace]);
 
   const relativeDateLabel = getRelativeDateLabel(selectedDate, t);
 
@@ -200,7 +200,7 @@ export default function BookingScreen() {
             {
               text: t("common.login"),
               variant: "primary",
-              onPress: () => router.push("/tourist/login"),
+              onPress: () => push("/tourist/login"),
             },
           ],
         });
@@ -251,7 +251,7 @@ export default function BookingScreen() {
       fetchOrders,
       handleCloseModal,
       t,
-      router,
+      push,
       addItem,
       updateOrderInStore,
       editingOrder,
@@ -307,11 +307,11 @@ export default function BookingScreen() {
             </View>
 
             <Button
-              onPress={() => router.push("/tourist/profile")}
+              onPress={() => push("/tourist/profile")}
               variant="secondary"
               leftIcon="cog-outline"
               iconColor={COLORS.primary}
-              className="w-12 h-12 rounded-2xl border border-outline-variant/30 shadow-sm p-0 px-0"
+              className="size-12 rounded-2xl border border-outline-variant/30 shadow-sm p-0 px-0"
               testID="profile-button"
             />
           </View>
@@ -471,7 +471,7 @@ export default function BookingScreen() {
                               <Text className="text-sm font-display font-bold text-on-surface mr-3">
                                 {formatCurrency(item.zzz_price * item.zzz_quantity)}
                               </Text>
-                              <View className="w-7 h-7 bg-surface-container-high rounded-full items-center justify-center border border-outline-variant/20">
+                              <View className="size-7 bg-surface-container-high rounded-full items-center justify-center border border-outline-variant/20">
                                 <MaterialCommunityIcons
                                   name="pencil"
                                   size={14}
@@ -529,6 +529,10 @@ export default function BookingScreen() {
                     onPress={() => setShowOrderSummary(!showOrderSummary)}
                     className="flex-row items-center min-w-0 p-0"
                     testID="toggle-order-summary-button"
+                    accessibilityLabel={
+                      showOrderSummary ? t("common.hide_summary") : t("common.show_summary")
+                    }
+                    accessibilityHint={t("accessibility.toggle_order_summary_hint")}
                   >
                     <View>
                       <View className="flex-row items-center gap-1">
@@ -553,11 +557,11 @@ export default function BookingScreen() {
                   <View className="flex-row items-center gap-2">
                     <Button
                       variant="secondary"
-                      className="flex-row items-center p-0 px-2.5 h-10 rounded-xl border border-outline-variant/30 bg-surface-container-solid"
+                      className="flex-row items-center p-0 px-2.5 h-11 rounded-xl border border-outline-variant/30 bg-surface-container-solid"
                       testID="change-date-time-button"
                       onPress={() => {
                         impactAsync(ImpactFeedbackStyle.Light);
-                        router.replace("/tourist");
+                        replace("/tourist");
                       }}
                     >
                       <MaterialCommunityIcons
@@ -599,9 +603,11 @@ export default function BookingScreen() {
                     <Button
                       title={t("orders.confirm")}
                       variant="primary"
-                      className="px-4 h-10 rounded-xl"
+                      className="px-4 h-11 rounded-xl"
                       testID="confirm-order-button"
                       size="sm"
+                      accessibilityLabel={t("orders.confirm")}
+                      accessibilityHint={t("accessibility.confirm_order_hint")}
                       onPress={() => {
                         setAlertConfig({
                           visible: true,
@@ -634,7 +640,7 @@ export default function BookingScreen() {
                                     addOrderToStore(newOrder);
                                     clearCart();
                                     notificationAsync(NotificationFeedbackType.Success);
-                                    router.push("/tourist/orders");
+                                    push("/tourist/orders");
                                   }
                                 } catch (err) {
                                   logger.error("Final confirmation failed", err);

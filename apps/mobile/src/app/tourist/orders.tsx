@@ -62,7 +62,7 @@ function EmptyState({ type }: EmptyStateProps) {
 }
 
 export default function OrderScreen() {
-  const router = useRouter();
+  const { replace } = useRouter();
   const { t } = useTranslations();
   const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -86,9 +86,9 @@ export default function OrderScreen() {
   // Redirect to home if not authenticated
   useEffect(() => {
     if (!currentUser) {
-      router.replace("/tourist");
+      replace("/tourist");
     }
-  }, [currentUser, router]);
+  }, [currentUser, replace]);
 
   // Fetch orders and services when user changes
   useEffect(() => {
@@ -184,6 +184,16 @@ export default function OrderScreen() {
                   onPress={() => setSelectedDate(date)}
                   variant="ghost"
                   className="mr-3"
+                  accessibilityLabel={
+                    isToday
+                      ? t("accessibility.select_today")
+                      : isTomorrow
+                        ? t("accessibility.select_tomorrow")
+                        : t("accessibility.select_date", {
+                            date: formatDate(date, { day: "numeric", month: "short" }),
+                          })
+                  }
+                  accessibilityHint={t("accessibility.date_selection_hint")}
                 >
                   <View
                     className={`w-[58px] h-[82px] rounded-3xl border items-center justify-center overflow-hidden ${
