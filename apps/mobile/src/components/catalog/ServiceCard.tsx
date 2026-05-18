@@ -42,8 +42,7 @@ export const ServiceCard = ({ item, onPress, categoryName, className = "" }: Ser
                   ? { uri: item.zzz_image_url }
                   : item.zzz_image_url
               }
-              className="absolute w-full h-full"
-              resizeMode="cover"
+              style={{ width: "100%", height: "100%" }}
             />
           ) : (
             <View className="w-full h-full items-center justify-center">
