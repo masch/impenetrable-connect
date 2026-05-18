@@ -1,8 +1,8 @@
 import { View, Text } from "react-native";
 import { Button } from "../../components/Button";
+import { Icon } from "../Icon";
 import { type Order, type OrderStatus, COLORS } from "@repo/shared";
 import { useTranslations } from "../../hooks/useI18n";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { getOrderActions } from "../../logic/order-actions";
 import { formatCurrency, extractTimeFromISO } from "../../logic/formatters";
 import { getMomentColor } from "../../constants/moments";
@@ -148,8 +148,7 @@ export default function ReservationCard({
   return (
     <View
       testID={`reservation-card-${order.zzz_id}`}
-      className={containerClass}
-      style={hideShadow ? {} : { elevation: 3 }}
+      className={`${containerClass} ${!hideShadow ? "shadow-md" : ""}`}
     >
       {/* Status Color Bar with moment color */}
       <View className="h-1.5 w-full" style={{ backgroundColor: momentColor }} />
@@ -161,8 +160,8 @@ export default function ReservationCard({
         >
           {!hideStatus && (
             <View className={`flex-row items-center px-3 py-1.5 rounded-full ${status.bgClass}/15`}>
-              <MaterialCommunityIcons
-                name={status.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+              <Icon
+                name={status.icon}
                 size={14}
                 color={status.color}
                 accessibilityLabel={status.label}
@@ -180,8 +179,8 @@ export default function ReservationCard({
               hideStatus ? "bg-primary/10 border border-primary/20" : "bg-surface-container-low"
             }`}
           >
-            <MaterialCommunityIcons
-              name={headerIcon as keyof typeof MaterialCommunityIcons.glyphMap}
+            <Icon
+              name={headerIcon}
               size={hideStatus ? 18 : 14}
               color={hideStatus ? COLORS.primary : COLORS["on-surface-variant"]}
               accessibilityLabel={headerTitle}
@@ -199,7 +198,7 @@ export default function ReservationCard({
                 className="ml-2 px-2.5 py-1 rounded-lg flex-row items-center gap-1"
                 style={{ backgroundColor: momentColor + "20" }}
               >
-                <MaterialCommunityIcons name="clock-outline" size={12} color={momentColor} />
+                <Icon name="clock-outline" size={12} color={momentColor} />
                 <Text className="font-display-bold text-[11px]" style={{ color: momentColor }}>
                   {orderTime}
                 </Text>
@@ -244,7 +243,7 @@ export default function ReservationCard({
         {order.zzz_notes && (
           <View className="bg-surface-container-low/50 p-3 rounded-2xl mb-4 border border-outline-variant/20">
             <View className="flex-row items-center mb-1">
-              <MaterialCommunityIcons
+              <Icon
                 name="comment-text-outline"
                 size={12}
                 color={COLORS["on-surface-variant"]}
@@ -265,7 +264,7 @@ export default function ReservationCard({
           <View className="flex-row items-center justify-between mb-3">
             <View className="flex-row items-center gap-2">
               <View className="flex-row items-center bg-surface-container-low px-3 py-1.5 rounded-xl">
-                <MaterialCommunityIcons
+                <Icon
                   name="silverware-variant"
                   size={14}
                   color={COLORS["on-surface-variant"]}
@@ -278,7 +277,7 @@ export default function ReservationCard({
               </View>
 
               <View className="flex-row items-center bg-surface-container-low px-3 py-1.5 rounded-xl border border-primary/10">
-                <MaterialCommunityIcons
+                <Icon
                   name="account-group-outline"
                   size={14}
                   color={COLORS.primary}

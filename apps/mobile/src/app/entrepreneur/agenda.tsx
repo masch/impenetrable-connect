@@ -7,7 +7,7 @@ import { useTranslations } from "../../hooks/useI18n";
 import { useAgendaStore } from "../../stores/agenda.store";
 import { type DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import ReservationCard from "../../components/entrepreneur/ReservationCard";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "../../components/Icon";
 import { getMomentConfig, MOMENTS } from "../../constants/moments";
 import { COLORS } from "@repo/shared";
 import {
@@ -72,6 +72,7 @@ export default function AgendaScreen() {
                 <View key={toISODate(date)} className="relative mr-3">
                   <Button
                     onPress={() => setSelectedDate(date)}
+                    testID={`date-selector-${toISODate(date)}`}
                     className={`w-[58px] h-[82px] rounded-3xl border items-center justify-center ${
                       isSelected
                         ? "bg-primary border-primary shadow-lg shadow-primary/30"
@@ -86,7 +87,7 @@ export default function AgendaScreen() {
                           <View
                             className={`p-1.5 rounded-full mb-1 ${isSelected ? "bg-white/20" : isToday ? "bg-secondary/20" : "bg-primary/10"}`}
                           >
-                            <MaterialCommunityIcons
+                            <Icon
                               name={isToday ? "star" : "calendar-arrow-right"}
                               size={22}
                               color={
@@ -192,6 +193,7 @@ export default function AgendaScreen() {
               <Button
                 onPress={() => setShowDatePicker(true)}
                 variant="outline"
+                testID="open-date-picker"
                 className="bg-surface-container-high p-2.5 rounded-xl border border-outline-variant/30"
                 rightIcon="calendar-month-outline"
                 iconColor={COLORS.primary}
@@ -227,11 +229,7 @@ export default function AgendaScreen() {
                   {/* Moment Header */}
                   <View className="flex-row items-center mb-3.5 px-1">
                     <View className={`p-2 rounded-xl mr-3 ${config.bgClass}/15`}>
-                      <MaterialCommunityIcons
-                        name={config.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-                        size={18}
-                        color={config.hex}
-                      />
+                      <Icon name={config.icon} size={18} color={config.hex} />
                     </View>
                     <Text
                       className={`font-display-black text-[14px] uppercase tracking-[1.5px] ${config.textClass}`}
@@ -256,11 +254,7 @@ export default function AgendaScreen() {
                                 className="flex-row items-center px-3 py-1 rounded-full gap-1.5"
                                 style={{ backgroundColor: config.hex }}
                               >
-                                <MaterialCommunityIcons
-                                  name="clock-outline"
-                                  size={14}
-                                  color="#FFFFFF"
-                                />
+                                <Icon name="clock-outline" size={14} color="#FFFFFF" />
                                 <Text className="font-display-bold text-sm text-white">
                                   {displayTime}
                                 </Text>

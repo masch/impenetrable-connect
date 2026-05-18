@@ -9,7 +9,7 @@ import { type DateTimePickerEvent } from "@react-native-community/datetimepicker
 import { AppDateTimePicker } from "./AppDateTimePicker";
 import { useTranslations } from "../hooks/useI18n";
 import { Button } from "./Button";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "./Icon";
 import { COLORS } from "@repo/shared";
 import { formatDate as formatDisplayDate } from "../logic/formatters";
 
@@ -240,7 +240,7 @@ export function DatePicker({
         >
           <View className="flex-row items-center gap-2">
             {!isCustomDate() && (
-              <MaterialCommunityIcons
+              <Icon
                 name="calendar-month-outline"
                 size={18}
                 color={COLORS["on-surface-variant"]}
@@ -256,9 +256,7 @@ export function DatePicker({
             >
               {isCustomDate() ? formatDate(currentValue) : t("orders.choose")}
             </Text>
-            {isCustomDate() && (
-              <MaterialCommunityIcons name="pencil" size={14} color={COLORS.secondary} />
-            )}
+            {isCustomDate() && <Icon name="pencil" size={14} color={COLORS.secondary} />}
           </View>
         </Button>
       </View>

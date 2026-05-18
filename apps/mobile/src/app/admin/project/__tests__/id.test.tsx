@@ -38,8 +38,10 @@ jest.mock("../../../../stores/project.store", () => ({
   }),
 }));
 
-// Mock MaterialCommunityIcons to avoid native issues in tests
-jest.mock("@expo/vector-icons/MaterialCommunityIcons", () => "MaterialCommunityIcons");
+// Mock expo-symbols to avoid native issues in tests
+jest.mock("expo-symbols", () => ({
+  Symbol: "Symbol",
+}));
 
 describe("ProjectFormScreen - Guardrail Pattern", () => {
   beforeEach(() => {

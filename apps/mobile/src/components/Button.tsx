@@ -8,7 +8,7 @@ import {
   ViewStyle,
   ActivityIndicator,
 } from "react-native";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "./Icon";
 import { COLORS } from "@repo/shared";
 
 interface ButtonVariantStyle {
@@ -24,8 +24,8 @@ interface ButtonProps {
   onPress: () => void;
   disabled?: boolean;
   icon?: string;
-  leftIcon?: keyof typeof MaterialCommunityIcons.glyphMap;
-  rightIcon?: keyof typeof MaterialCommunityIcons.glyphMap;
+  leftIcon?: string;
+  rightIcon?: string;
   iconColor?: string;
   className?: string;
   textClassName?: string;
@@ -122,7 +122,7 @@ export function Button({
           ) : (
             <>
               {leftIcon && (
-                <MaterialCommunityIcons
+                <Icon
                   name={leftIcon}
                   size={20}
                   color={pressed ? COLORS["on-surface-variant"] : resolvedIconColor}
@@ -154,7 +154,7 @@ export function Button({
               )}
 
               {rightIcon && (
-                <MaterialCommunityIcons
+                <Icon
                   name={rightIcon}
                   size={20}
                   color={pressed ? COLORS["on-surface-variant"] : resolvedIconColor}

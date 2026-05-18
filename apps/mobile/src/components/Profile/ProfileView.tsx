@@ -1,7 +1,7 @@
 import { UserRole, COLORS, User } from "@repo/shared";
 import { Text, View } from "react-native";
 import { useRouter, Router } from "expo-router";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "../Icon";
 import Screen, { ScreenContent } from "../Screen";
 import { Button } from "../Button";
 import { useTranslations } from "../../hooks/useI18n";
@@ -15,7 +15,7 @@ interface ProfileAction {
   id: string;
   title: string;
   description: string;
-  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  icon: string;
   onPress: () => void;
 }
 
@@ -101,13 +101,13 @@ function ProfileActionButton({ title, description, icon, onPress }: ProfileActio
       className="flex-row items-center p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30"
     >
       <View className="w-12 h-12 rounded-2xl bg-primary/10 items-center justify-center mr-4">
-        <MaterialCommunityIcons name={icon} size={24} color={COLORS.primary} />
+        <Icon name={icon} size={24} color={COLORS.primary} />
       </View>
       <View className="flex-1">
         <Text className="text-lg font-display font-bold text-on-surface">{title}</Text>
         <Text className="text-sm font-body text-on-surface-variant/70">{description}</Text>
       </View>
-      <MaterialCommunityIcons name="chevron-right" size={24} color={COLORS["on-surface-variant"]} />
+      <Icon name="chevron-right" size={24} color={COLORS["on-surface-variant"]} />
     </Button>
   );
 }

@@ -9,7 +9,7 @@ import {
   Platform,
 } from "react-native";
 import { CatalogItem, COLORS } from "@repo/shared";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "../Icon";
 import { useTranslations } from "../../hooks/useI18n";
 import { Button } from "../Button";
 import { useCartStore } from "../../stores/cart.store";
@@ -81,7 +81,7 @@ export const ReservationModal = ({
                 </Text>
               </View>
               <Button variant="ghost" onPress={onClose} className="p-2" testID="close-modal-button">
-                <MaterialCommunityIcons
+                <Icon
                   name="close"
                   size={24}
                   color={COLORS["on-surface"]}
@@ -92,7 +92,7 @@ export const ReservationModal = ({
 
             {/* Context Header (Read-only Pill) */}
             <View className="flex-row items-center bg-primary/5 p-4 rounded-2xl border border-primary/10 mb-6">
-              <MaterialCommunityIcons name="calendar-clock" size={24} color={COLORS.primary} />
+              <Icon name="calendar-clock" size={24} color={COLORS.primary} />
               <View className="ml-3">
                 <Text className="text-[10px] font-display font-bold text-primary uppercase tracking-widest">
                   {t("catalog.reservation.active_context")}
@@ -116,7 +116,7 @@ export const ReservationModal = ({
                   className="w-12 h-12"
                   disabled={quantity <= 1}
                 >
-                  <MaterialCommunityIcons
+                  <Icon
                     name="minus"
                     size={24}
                     color={COLORS.primary}
@@ -142,7 +142,7 @@ export const ReservationModal = ({
                   disabled={quantity >= item.zzz_max_participants}
                   testID="quantity-plus-button"
                 >
-                  <MaterialCommunityIcons
+                  <Icon
                     name="plus"
                     size={24}
                     color={COLORS.primary}

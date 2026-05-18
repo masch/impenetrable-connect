@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Image } from "react-native";
 import { Button } from "../Button";
 import { CatalogItem, COLORS } from "@repo/shared";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "../Icon";
 import { useTranslations } from "../../hooks/useI18n";
 import { formatCurrency } from "../../logic/formatters";
 
@@ -43,16 +43,11 @@ export const ServiceCard = ({ item, onPress, categoryName, className = "" }: Ser
                   : item.zzz_image_url
               }
               className="absolute w-full h-full"
-              style={{ width: "100%", height: "100%" }}
               resizeMode="cover"
             />
           ) : (
             <View className="w-full h-full items-center justify-center">
-              <MaterialCommunityIcons
-                name="image-off-outline"
-                size={48}
-                color={COLORS["outline-variant"]}
-              />
+              <Icon name="image-off-outline" size={48} color={COLORS["outline-variant"]} />
             </View>
           )}
 
@@ -84,7 +79,7 @@ export const ServiceCard = ({ item, onPress, categoryName, className = "" }: Ser
             </Text>
             {item.zzz_max_participants && (
               <View className="flex-row items-center bg-secondary/10 px-2 py-1 rounded-lg">
-                <MaterialCommunityIcons name="account-group" size={14} color={COLORS.secondary} />
+                <Icon name="account-group" size={14} color={COLORS.secondary} />
                 <Text className="text-[10px] font-bold text-secondary ml-1">
                   {item.zzz_max_participants}
                 </Text>
@@ -103,7 +98,7 @@ export const ServiceCard = ({ item, onPress, categoryName, className = "" }: Ser
             <Text className="text-[10px] font-display font-bold text-primary uppercase tracking-tighter">
               {t("catalog.book_now")}
             </Text>
-            <MaterialCommunityIcons name="chevron-right" size={16} color={COLORS.primary} />
+            <Icon name="chevron-right" size={16} color={COLORS.primary} />
           </View>
         </View>
       </View>

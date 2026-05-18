@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "../../components/Icon";
 import { useTranslations } from "../../hooks/useI18n";
 import { SHARED_SCREEN_OPTIONS } from "../../constants/theme";
 import { useCartStore } from "../../stores/cart.store";
@@ -18,7 +18,7 @@ export default function TouristTabsLayout() {
           tabBarLabel: t("tabs.roles"),
           tabBarAccessibilityLabel: t("tabs.roles"),
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="swap-horizontal" size={size} color={color} />
+            <Icon name="swap-horizontal" size={size} color={color} />
           ),
         }}
         listeners={{
@@ -39,9 +39,7 @@ export default function TouristTabsLayout() {
           title: t("tabs.login"),
           tabBarLabel: t("tabs.login"),
           tabBarAccessibilityLabel: t("tabs.login"),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="login" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Icon name="login" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -52,7 +50,7 @@ export default function TouristTabsLayout() {
           tabBarLabel: t("tabs.catalog"),
           tabBarAccessibilityLabel: t("tabs.catalog"),
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="compass-outline" size={size} color={color} />
+            <Icon name="compass-outline" size={size} color={color} />
           ),
         }}
       />
@@ -63,9 +61,7 @@ export default function TouristTabsLayout() {
           title: t("tabs.orders"),
           tabBarLabel: t("tabs.orders"),
           tabBarAccessibilityLabel: t("tabs.orders"),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="cart" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Icon name="cart" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -75,9 +71,7 @@ export default function TouristTabsLayout() {
           title: t("tabs.profile"),
           tabBarLabel: t("tabs.profile"),
           tabBarAccessibilityLabel: t("tabs.profile"),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account-circle" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Icon name="account-circle" size={size} color={color} />,
         }}
       />
     </Tabs>

@@ -7,7 +7,7 @@ import { useEffect, useCallback, useState, useMemo, type ComponentProps } from "
 import { useRouter } from "expo-router";
 import { View, Text, ScrollView, RefreshControl } from "react-native";
 import { Button } from "../../components/Button";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "../../components/Icon";
 import { useTranslations } from "../../hooks/useI18n";
 import Screen, { ScreenContent } from "../../components/Screen";
 import LoadingView from "../../components/LoadingView";
@@ -48,7 +48,7 @@ function EmptyState({ type }: EmptyStateProps) {
 
   return (
     <View className="flex-1 items-center justify-center py-20">
-      <MaterialCommunityIcons
+      <Icon
         name={type === "active" ? "package-variant-closed" : "history"}
         size={48}
         color={COLORS["on-surface"]}
@@ -183,6 +183,7 @@ export default function OrderScreen() {
                   key={toISODate(date)}
                   onPress={() => setSelectedDate(date)}
                   variant="ghost"
+                  testID={`date-selector-${toISODate(date)}`}
                   className="mr-3"
                   accessibilityLabel={
                     isToday
@@ -210,7 +211,7 @@ export default function OrderScreen() {
                           <View
                             className={`p-1.5 rounded-full mb-1 ${isSelected ? "bg-white/20" : isToday ? "bg-secondary/20" : "bg-primary/10"}`}
                           >
-                            <MaterialCommunityIcons
+                            <Icon
                               name={isToday ? "star" : "calendar-arrow-right"}
                               size={22}
                               color={
@@ -312,11 +313,7 @@ export default function OrderScreen() {
                           {/* Moment Header */}
                           <View className="flex-row items-center mb-4 px-2">
                             <View className={`p-1.5 rounded-lg mr-3 ${config.bgClass}/15`}>
-                              <MaterialCommunityIcons
-                                name={config.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-                                size={18}
-                                color={config.hex}
-                              />
+                              <Icon name={config.icon} size={18} color={config.hex} />
                             </View>
                             <Text className="font-display-bold text-lg text-on-surface">
                               {formatMoment(moment as ServiceMoment, t)}
@@ -341,11 +338,7 @@ export default function OrderScreen() {
                                           className="flex-row items-center px-3 py-1.5 rounded-full gap-1.5"
                                           style={{ backgroundColor: momentColor }}
                                         >
-                                          <MaterialCommunityIcons
-                                            name="clock-outline"
-                                            size={16}
-                                            color="#FFFFFF"
-                                          />
+                                          <Icon name="clock-outline" size={16} color="#FFFFFF" />
                                           <Text className="font-display-bold text-base text-white">
                                             {displayTime}
                                           </Text>

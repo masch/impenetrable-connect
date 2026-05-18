@@ -1,6 +1,6 @@
 .PHONY: help setup install clean lint gga format check test test-shared test-coverage \
 	dev dev-api dev-mock dev-web-api \
-	mobile mobile-mock mobile-api mobile-native mobile-clean mobile-web mobile-web-api \
+	mobile mobile-mock mobile-mock-web mobile-api mobile-native mobile-clean mobile-web-mock mobile-web-api \
 	mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev \
 	mobile-expo-fix-deps mobile-expo-doctor \
 	test-mobile test-mobile-api test-backend test-shared \
@@ -43,10 +43,11 @@ help:
 	@echo "  📱 MOBILE"
 	@echo "    make mobile                       - Start mobile with Expo (Mocks by default)"
 	@echo "    make mobile-mock                  - Start mobile with Mocks"
+	@echo "    make mobile-mock-web              - Start mobile web with Mocks"
 	@echo "    make mobile-api                   - Start mobile connected to Backend API"
 	@echo "    make mobile-native                - Start mobile native"
 	@echo "    make mobile-clean                 - Start mobile clean"
-	@echo "    make mobile-web                   - Start mobile web"
+	@echo "    make mobile-web-mock              - Start mobile web with mocks"
 	@echo "    make mobile-web-api               - Start mobile web connected to Backend API"
 	@echo "    make mobile-android               - Start mobile Android"
 	@echo "    make mobile-android-native        - Start mobile Android native"
@@ -143,6 +144,10 @@ mobile-mock:
 	cp $(MOBILE_DIR)/.env.mock $(MOBILE_DIR)/.env.local
 	cd $(MOBILE_DIR) && bun run start
 
+mobile-mock-web:
+	cp $(MOBILE_DIR)/.env.mock $(MOBILE_DIR)/.env.local
+	cd $(MOBILE_DIR) && bun run web
+
 mobile-api: check-backend-alive
 	cp $(MOBILE_DIR)/.env.api $(MOBILE_DIR)/.env.local
 	cd $(MOBILE_DIR) && bun run start
@@ -156,7 +161,7 @@ mobile-dev:
 mobile-clean:
 	cd $(MOBILE_DIR) && bun run start:clean
 
-mobile-web:
+mobile-web-mock:
 	cp $(MOBILE_DIR)/.env.mock $(MOBILE_DIR)/.env.local
 	cd $(MOBILE_DIR) && bun run web
 
@@ -346,6 +351,8 @@ dev-web-api: db-up db-wait
 		--prefix-colors "blue,magenta" \
 		"make backend" \
 		"make mobile-web-api"
+
+dev-web-mock: mobile-mock-web
 
 # Determine if we are in CI to skip podman/provisioning steps.
 # In GitHub Actions, $(CI) is usually set to 'true'.

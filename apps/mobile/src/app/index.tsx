@@ -4,7 +4,7 @@ import Screen, { ScreenContent } from "../components/Screen";
 import { router } from "expo-router";
 import { MOCK_VENTURES, MOCK_VENTURE_MEMBERS, UserRole, type User, COLORS } from "@repo/shared";
 import { getDemoUsersByRole, findUserById } from "../mocks/users";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "../components/Icon";
 import { useTranslations } from "../hooks/useI18n";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 
@@ -15,7 +15,7 @@ import { logger } from "../services/logger.service";
 import { getMockOrders } from "../mocks/orders";
 
 interface RoleConfig {
-  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  icon: string;
   bgClass: string;
   accentClass: string;
   borderClass: string;
@@ -23,10 +23,10 @@ interface RoleConfig {
   color: string;
   titleKey: string;
   descriptionKey: string;
-  userIcon?: keyof typeof MaterialCommunityIcons.glyphMap;
+  userIcon?: string;
   actionTitleKey?: string;
   actionDescriptionKey?: string;
-  actionIcon?: keyof typeof MaterialCommunityIcons.glyphMap;
+  actionIcon?: string;
 }
 
 // Role configuration from design system - mapped for icons and backgrounds
@@ -162,11 +162,7 @@ export default function RoleSelectorScreen() {
                   <View
                     className={`w-12 h-12 rounded-full items-center justify-center ${config.bgClass}`}
                   >
-                    <MaterialCommunityIcons
-                      name={config.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-                      size={24}
-                      color={COLORS["on-primary"]}
-                    />
+                    <Icon name={config.icon} size={24} color={COLORS["on-primary"]} />
                   </View>
                   <View className="flex-1">
                     <Text className="text-lg font-display font-bold text-on-surface">
@@ -225,11 +221,7 @@ export default function RoleSelectorScreen() {
                             >
                               <View className="flex-row items-center mb-3">
                                 <View className="bg-primary/10 p-1.5 rounded-lg">
-                                  <MaterialCommunityIcons
-                                    name="storefront"
-                                    size={16}
-                                    color={COLORS.primary}
-                                  />
+                                  <Icon name="storefront" size={16} color={COLORS.primary} />
                                 </View>
                                 <Text className="text-sm font-bold text-primary ml-2 tracking-tight">
                                   {venture.name}
@@ -246,6 +238,7 @@ export default function RoleSelectorScreen() {
                                       key={user.id}
                                       variant="ghost"
                                       onPress={() => handleDemoLogin(user)}
+                                      testID={`demo-login-${user.alias || user.email}`}
                                       leftIcon={config.userIcon}
                                       title={formatUserDisplayName(
                                         user.firstName || user.email || "",
@@ -272,6 +265,7 @@ export default function RoleSelectorScreen() {
                               key={user.id}
                               variant="ghost"
                               onPress={() => handleDemoLogin(user)}
+                              testID={`demo-login-${user.alias || user.email}`}
                               leftIcon={config.userIcon}
                               title={displayName}
                               className={`flex-1 min-w-[45%] border ${config.borderClass} ${config.accentClass} px-3 py-2.5 rounded-lg`}
