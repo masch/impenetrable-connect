@@ -5,7 +5,7 @@ import LoadingView from "../../components/LoadingView";
 import { useTranslations } from "../../hooks/useI18n";
 import { useAgendaStore } from "../../stores/agenda.store";
 import ReservationCard from "../../components/entrepreneur/ReservationCard";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "../../components/Icon";
 import { COLORS } from "@repo/shared";
 import {
   formatDate,
@@ -101,11 +101,7 @@ export default function RequestScreen() {
                       className="w-12 h-12 rounded-2xl items-center justify-center mr-5 shadow-lg shadow-primary/20"
                       style={{ backgroundColor: COLORS.primary }}
                     >
-                      <MaterialCommunityIcons
-                        name="calendar-multiselect"
-                        size={24}
-                        color={COLORS["on-primary"]}
-                      />
+                      <Icon name="calendar-multiselect" size={24} color={COLORS["on-primary"]} />
                     </View>
                     <View className="flex-1">
                       <Text className="text-on-surface font-display-black text-2xl uppercase tracking-tighter leading-none mb-1">
@@ -137,11 +133,7 @@ export default function RequestScreen() {
                       <View key={moment} className="mb-6 px-4">
                         <View className="flex-row items-center mb-3">
                           <View className={`p-1.5 rounded-lg mr-2.5 ${config.bgClass}/10`}>
-                            <MaterialCommunityIcons
-                              name={config.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-                              size={16}
-                              color={config.hex}
-                            />
+                            <Icon name={config.icon} size={16} color={config.hex} />
                           </View>
                           <Text
                             className={`font-display-bold text-xs uppercase tracking-widest ${config.textClass}`}
@@ -165,11 +157,7 @@ export default function RequestScreen() {
                                       className="flex-row items-center px-3 py-1 rounded-full gap-1.5"
                                       style={{ backgroundColor: config.hex }}
                                     >
-                                      <MaterialCommunityIcons
-                                        name="clock-outline"
-                                        size={14}
-                                        color="#FFFFFF"
-                                      />
+                                      <Icon name="clock-outline" size={14} color="#FFFFFF" />
                                       <Text className="font-display-bold text-sm text-white">
                                         {displayTime}
                                       </Text>
@@ -211,7 +199,7 @@ export default function RequestScreen() {
             ) : (
               <View className="items-center justify-center py-20 px-10">
                 <View className="w-20 h-20 rounded-full bg-secondary/10 items-center justify-center mb-6">
-                  <MaterialCommunityIcons
+                  <Icon
                     name="tray-full"
                     size={40}
                     color={COLORS.secondary}

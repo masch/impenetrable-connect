@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "../../components/Icon";
 import { useTranslations } from "../../hooks/useI18n";
 import { SHARED_SCREEN_OPTIONS } from "../../constants/theme";
 
@@ -16,7 +16,7 @@ export default function AdminTabsLayout() {
           tabBarLabel: t("tabs.roles"),
           tabBarAccessibilityLabel: t("tabs.roles"),
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="swap-horizontal" size={size} color={color} />
+            <Icon name="swap-horizontal" size={size} color={color} />
           ),
         }}
       />
@@ -27,9 +27,7 @@ export default function AdminTabsLayout() {
           title: t("tabs.projects"),
           tabBarLabel: t("tabs.projects"),
           tabBarAccessibilityLabel: t("tabs.projects"),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="folder" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Icon name="folder" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -39,9 +37,7 @@ export default function AdminTabsLayout() {
           title: t("tabs.profile"),
           tabBarLabel: t("tabs.profile"),
           tabBarAccessibilityLabel: t("tabs.profile"),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account-circle" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Icon name="account-circle" size={size} color={color} />,
         }}
       />
     </Tabs>

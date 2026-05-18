@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text } from "react-native";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "./Icon";
 import { useTranslations } from "../hooks/useI18n";
 import { COLORS } from "@repo/shared";
 import { FormSwitch } from "./FormSwitch";
@@ -48,7 +48,7 @@ export default function VentureStatusSection({
     <View className="bg-surface-container-low rounded-3xl border border-outline-variant/30 p-5 shadow-sm mb-4">
       <View className="flex-row items-center mb-4">
         <View className="w-10 h-10 rounded-xl bg-primary/10 items-center justify-center mr-3">
-          <MaterialCommunityIcons
+          <Icon
             name="power-settings"
             size={24}
             color={COLORS.primary}

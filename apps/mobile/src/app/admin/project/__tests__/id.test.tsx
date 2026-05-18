@@ -38,9 +38,6 @@ jest.mock("../../../../stores/project.store", () => ({
   }),
 }));
 
-// Mock MaterialCommunityIcons to avoid native issues in tests
-jest.mock("@expo/vector-icons/MaterialCommunityIcons", () => "MaterialCommunityIcons");
-
 describe("ProjectFormScreen - Guardrail Pattern", () => {
   beforeEach(() => {
     jest.clearAllMocks();

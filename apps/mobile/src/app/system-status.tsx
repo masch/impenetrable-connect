@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, ScrollView, RefreshControl } from "react-native";
 import { openURL } from "expo-linking";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Icon } from "../components/Icon";
 import { useTranslations } from "../hooks/useI18n";
 import { StatusService, BackendHealthWithLatency } from "../services/status.service";
 import { logger } from "../services/logger.service";
@@ -21,7 +21,7 @@ interface StatusCardProps {
   url?: string;
   messages?: string[];
   isDetailed?: boolean;
-  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  icon: string;
 }
 
 function StatusIndicator({ status }: { status: StatusCardProps["status"] }) {
@@ -74,12 +74,7 @@ function StatusCard({
   const content = (
     <View className="p-4 flex-row items-start gap-4 w-full">
       <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center mt-1">
-        <MaterialCommunityIcons
-          name={icon}
-          size={24}
-          color={COLORS.primary}
-          accessibilityLabel={title}
-        />
+        <Icon name={icon} size={24} color={COLORS.primary} accessibilityLabel={title} />
       </View>
       <View className="flex-1 items-start">
         <View className="flex-row items-center justify-between w-full pr-2">
@@ -92,7 +87,7 @@ function StatusCard({
               {title}
             </Text>
             {url && (
-              <MaterialCommunityIcons
+              <Icon
                 name="open-in-new"
                 size={14}
                 color="gray"
@@ -424,6 +419,7 @@ export default function StatusScreen() {
               title={t("status.refresh")}
               leftIcon="refresh"
               onPress={onRefresh}
+              testID="refresh-status"
               className="px-8"
             />
           </View>

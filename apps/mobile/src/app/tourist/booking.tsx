@@ -3,7 +3,7 @@
  * Displays available tourist services grouped by categories with booking capability.
  */
 
-import { useEffect, useState, useCallback, useMemo, type ComponentProps } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { Text, View, ScrollView, RefreshControl, Platform } from "react-native";
 import {
   impactAsync,
@@ -29,7 +29,7 @@ import { logger } from "../../services/logger.service";
 import { COLORS, type Order, type ServiceMoment } from "@repo/shared";
 import { SERVICE_CATEGORY_IDS, type CatalogServiceItem } from "../../mocks/catalog";
 import { useCartStore } from "../../stores/cart.store";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "../../components/Icon";
 import { SERVICE_MOMENTS } from "../../constants/moments";
 import { Button } from "../../components/Button";
 
@@ -472,7 +472,7 @@ export default function BookingScreen() {
                                 {formatCurrency(item.zzz_price * item.zzz_quantity)}
                               </Text>
                               <View className="size-7 bg-surface-container-high rounded-full items-center justify-center border border-outline-variant/20">
-                                <MaterialCommunityIcons
+                                <Icon
                                   name="pencil"
                                   size={14}
                                   color={COLORS.primary}
@@ -510,7 +510,7 @@ export default function BookingScreen() {
                             }}
                             className="p-2 ml-1 min-w-0"
                           >
-                            <MaterialCommunityIcons
+                            <Icon
                               name="trash-can-outline"
                               size={18}
                               color={COLORS.error}
@@ -539,7 +539,7 @@ export default function BookingScreen() {
                         <Text className="text-[9px] font-display font-bold text-primary uppercase tracking-tighter opacity-80">
                           {t("catalog.reservation.total_items", { count: totalQuantity })}
                         </Text>
-                        <MaterialCommunityIcons
+                        <Icon
                           name={showOrderSummary ? "chevron-down" : "chevron-up"}
                           size={10}
                           color={COLORS.primary}
@@ -564,7 +564,7 @@ export default function BookingScreen() {
                         replace("/tourist");
                       }}
                     >
-                      <MaterialCommunityIcons
+                      <Icon
                         name="calendar-month-outline"
                         size={12}
                         color={COLORS.primary}
@@ -579,12 +579,8 @@ export default function BookingScreen() {
 
                       {currentMoment && (
                         <View className="flex-row items-center">
-                          <MaterialCommunityIcons
-                            name={
-                              currentMoment.icon as ComponentProps<
-                                typeof MaterialCommunityIcons
-                              >["name"]
-                            }
+                          <Icon
+                            name={currentMoment.icon}
                             size={12}
                             color={currentMoment.hex}
                             accessibilityLabel={t("catalog.reservation.change_time")}

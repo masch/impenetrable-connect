@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Tabs } from "expo-router";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "../../components/Icon";
 import { useTranslations } from "../../hooks/useI18n";
 import { SHARED_SCREEN_OPTIONS } from "../../constants/theme";
 import { useAgendaStore } from "../../stores/agenda.store";
@@ -24,7 +24,7 @@ export default function EntrepreneurTabsLayout() {
           tabBarLabel: t("tabs.roles"),
           tabBarAccessibilityLabel: t("tabs.roles"),
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="swap-horizontal" size={size} color={color} />
+            <Icon name="swap-horizontal" size={size} color={color} />
           ),
         }}
       />
@@ -35,9 +35,7 @@ export default function EntrepreneurTabsLayout() {
           title: t("tabs.request"),
           tabBarLabel: t("tabs.request"),
           tabBarAccessibilityLabel: t("tabs.request"),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="file-document" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Icon name="file-document" size={size} color={color} />,
           tabBarBadge: pendingCount > 0 ? pendingCount : undefined,
         }}
       />
@@ -48,9 +46,7 @@ export default function EntrepreneurTabsLayout() {
           title: t("tabs.agenda"),
           tabBarLabel: t("tabs.agenda"),
           tabBarAccessibilityLabel: t("tabs.agenda"),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="calendar" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Icon name="calendar" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -60,9 +56,7 @@ export default function EntrepreneurTabsLayout() {
           title: t("tabs.profile"),
           tabBarLabel: t("tabs.profile"),
           tabBarAccessibilityLabel: t("tabs.profile"),
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account-circle" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Icon name="account-circle" size={size} color={color} />,
         }}
       />
       <Tabs.Screen

@@ -76,8 +76,6 @@ jest.mock("../../../components/Button", () => ({
   }) => <>{children}</>,
 }));
 
-jest.mock("@expo/vector-icons/MaterialCommunityIcons", () => "MaterialCommunityIcons");
-
 /**
  * Filter function that mimics the logic in booking.tsx
  * This is the actual filtering logic being tested

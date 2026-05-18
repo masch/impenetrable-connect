@@ -1,6 +1,6 @@
 import { Modal, Text, View, ScrollView } from "react-native";
 import { Button } from "./Button";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "./Icon";
 import { useTranslations } from "../hooks/useI18n";
 import { COLORS } from "@repo/shared";
 
@@ -80,7 +80,7 @@ export function AppAlert({
               accessibilityLabel={t(`common.${type}`)}
               accessibilityRole="image"
             >
-              <MaterialCommunityIcons name={name} size={32} color={color} />
+              <Icon name={name} size={32} color={color} />
             </View>
           </View>
 

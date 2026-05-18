@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Text, View, Animated, Pressable } from "react-native";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Icon } from "./Icon";
 import { COLORS } from "@repo/shared";
 import { useTranslations } from "../hooks/useI18n";
 
@@ -61,15 +61,7 @@ export function FormSwitch({
           minHeight: 48,
         }}
       >
-        <Text
-          style={{
-            flex: 1,
-            marginRight: 16,
-            fontSize: 16,
-            color: COLORS["on-surface"],
-            includeFontPadding: false,
-          }}
-        >
+        <Text style={{ flex: 1, marginRight: 16, fontSize: 16, color: COLORS["on-surface"] }}>
           {label}
         </Text>
 
@@ -100,7 +92,6 @@ export function FormSwitch({
                 borderRadius: 11,
                 backgroundColor: COLORS["surface-container-lowest"],
               }}
-              className="shadow-sm elevation-5"
             />
           </Animated.View>
         </Pressable>
@@ -109,7 +100,7 @@ export function FormSwitch({
       {/* Integrated Guardrail Pattern */}
       {value && warning ? (
         <View className="bg-error/5 border border-error/10 rounded-2xl p-4 mt-2 flex-row items-start">
-          <MaterialCommunityIcons
+          <Icon
             name="alert-circle-outline"
             size={20}
             color={COLORS.error}
@@ -120,7 +111,7 @@ export function FormSwitch({
         </View>
       ) : !value && helperText ? (
         <View className="bg-primary/5 border border-primary/10 rounded-2xl p-4 mt-2 flex-row items-start">
-          <MaterialCommunityIcons
+          <Icon
             name="information-outline"
             size={20}
             color={COLORS.primary}
