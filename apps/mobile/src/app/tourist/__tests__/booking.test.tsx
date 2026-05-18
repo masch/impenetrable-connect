@@ -76,10 +76,6 @@ jest.mock("../../../components/Button", () => ({
   }) => <>{children}</>,
 }));
 
-jest.mock("expo-symbols", () => ({
-  Symbol: "Symbol",
-}));
-
 /**
  * Filter function that mimics the logic in booking.tsx
  * This is the actual filtering logic being tested

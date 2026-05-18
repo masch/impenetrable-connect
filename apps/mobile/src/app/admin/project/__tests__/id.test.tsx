@@ -38,11 +38,6 @@ jest.mock("../../../../stores/project.store", () => ({
   }),
 }));
 
-// Mock expo-symbols to avoid native issues in tests
-jest.mock("expo-symbols", () => ({
-  Symbol: "Symbol",
-}));
-
 describe("ProjectFormScreen - Guardrail Pattern", () => {
   beforeEach(() => {
     jest.clearAllMocks();
