@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { View, Text, ScrollView, RefreshControl } from "react-native";
 import { Button } from "../../components/Button";
 import Screen, { ScreenContent } from "../../components/Screen";
@@ -22,8 +22,16 @@ import { AppDateTimePicker } from "../../components/AppDateTimePicker";
 
 export default function AgendaScreen() {
   const { t } = useTranslations();
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Memoized dates to avoid hydration mismatch (computed once)
+  const today = useMemo(() => new Date(), []);
+  const tomorrow = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d;
+  }, []);
 
   const { orders, isLoading, fetchAgenda, acceptOrder, declineOrder, getDayCount } =
     useAgendaStore();
@@ -53,10 +61,6 @@ export default function AgendaScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View className="flex-row pb-2 px-1">
             {days.map((date) => {
-              const today = new Date();
-              const tomorrow = new Date();
-              tomorrow.setDate(today.getDate() + 1);
-
               const isToday = isSameDay(date, today);
               const isTomorrow = isSameDay(date, tomorrow);
               const isSelected = isSameDay(date, selectedDate);
@@ -90,6 +94,9 @@ export default function AgendaScreen() {
                             <Icon
                               name={isToday ? "star" : "calendar-arrow-right"}
                               size={22}
+                              accessibilityLabel={
+                                isToday ? t("orders.today") : t("orders.tomorrow")
+                              }
                               color={
                                 isSelected
                                   ? COLORS["on-primary"]
@@ -144,10 +151,9 @@ export default function AgendaScreen() {
                       }`}
                     >
                       <Text
-                        className={`text-[10px] font-display-black leading-none ${
+                        className={`text-[10px] font-display-black leading-none mt-[-1px] ${
                           isSelected ? "text-primary" : "text-white"
                         }`}
-                        style={{ marginTop: -1 }}
                       >
                         {count}
                       </Text>
@@ -229,7 +235,12 @@ export default function AgendaScreen() {
                   {/* Moment Header */}
                   <View className="flex-row items-center mb-3.5 px-1">
                     <View className={`p-2 rounded-xl mr-3 ${config.bgClass}/15`}>
-                      <Icon name={config.icon} size={18} color={config.hex} />
+                      <Icon
+                        name={config.icon}
+                        size={18}
+                        color={config.hex}
+                        accessibilityLabel={formatMoment(moment, t)}
+                      />
                     </View>
                     <Text
                       className={`font-display-black text-[14px] uppercase tracking-[1.5px] ${config.textClass}`}
@@ -251,10 +262,14 @@ export default function AgendaScreen() {
                           {time ? (
                             <View className="flex-row justify-center items-center py-2 bg-surface-container-low/50">
                               <View
-                                className="flex-row items-center px-3 py-1 rounded-full gap-1.5"
-                                style={{ backgroundColor: config.hex }}
+                                className={`flex-row items-center px-3 py-1 rounded-full gap-1.5 ${config.bgClass}`}
                               >
-                                <Icon name="clock-outline" size={14} color="#FFFFFF" />
+                                <Icon
+                                  name="clock-outline"
+                                  size={14}
+                                  color={COLORS["on-primary"]}
+                                  accessibilityLabel="Time"
+                                />
                                 <Text className="font-display-bold text-sm text-white">
                                   {displayTime}
                                 </Text>
