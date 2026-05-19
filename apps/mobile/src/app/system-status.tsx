@@ -120,8 +120,8 @@ function StatusCard({
 
         {isDetailed && messages && messages.length > 0 && (
           <View className="mt-3 w-full border-t border-on-surface/5 pt-2">
-            {messages.map((msg, idx) => (
-              <View key={idx} className="flex-row items-start gap-2 mb-1">
+            {messages.map((msg) => (
+              <View key={msg} className="flex-row items-start gap-2 mb-1">
                 <Text className="text-[11px] text-on-surface/50 font-medium leading-tight flex-1">
                   • {msg}
                 </Text>

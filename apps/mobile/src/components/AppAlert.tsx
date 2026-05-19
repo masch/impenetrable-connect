@@ -101,9 +101,9 @@ export function AppAlert({
           </ScrollView>
 
           <View className="flex-col gap-3">
-            {actions.map((action, index) => (
+            {actions.map((action) => (
               <Button
-                key={index}
+                key={action.text}
                 title={action.text}
                 variant={
                   action.variant || (action.style === "destructive" ? "danger" : "secondary")
@@ -113,7 +113,7 @@ export function AppAlert({
                   action.onPress();
                 }}
                 className={action.style === "cancel" ? "opacity-70" : ""}
-                testID={`alert-action-${index}`}
+                testID={`alert-action-${action.text.toLowerCase().replace(/\s+/g, "-")}`}
               />
             ))}
           </View>
