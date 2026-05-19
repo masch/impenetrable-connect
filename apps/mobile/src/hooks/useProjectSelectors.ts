@@ -11,7 +11,7 @@ import { Project } from "@repo/shared";
  * Sort projects by active status (active first) then by name (ascending)
  */
 export const sortProjectsByActiveFirst: (projects: Project[]) => Project[] = (projects) => {
-  return [...projects].sort((a, b) => {
+  return projects.toSorted((a, b) => {
     if (a.zzz_is_active !== b.zzz_is_active) {
       return a.zzz_is_active ? -1 : 1;
     }
@@ -23,7 +23,7 @@ export const sortProjectsByActiveFirst: (projects: Project[]) => Project[] = (pr
  * Sort projects by name (ascending)
  */
 export const sortProjectsByName: (projects: Project[]) => Project[] = (projects) => {
-  return [...projects].sort((a, b) => a.zzz_name.localeCompare(b.zzz_name));
+  return projects.toSorted((a, b) => a.zzz_name.localeCompare(b.zzz_name));
 };
 
 /**
