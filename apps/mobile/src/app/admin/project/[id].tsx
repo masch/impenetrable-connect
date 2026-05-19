@@ -4,7 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { Text, View, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { useProjectStore } from "../../../stores/project.store";
 import { useTranslations } from "../../../hooks/useI18n";
-import { Language, SUPPORTED_LANGUAGES } from "@repo/shared";
+import { Language, SUPPORTED_LANGUAGES, PROJECT_CONSTRAINTS } from "@repo/shared";
 import { logger } from "../../../services/logger.service";
 import { FormInput } from "../../../components/FormInput";
 import { FormLanguageSelector } from "../../../components/FormLanguageSelector";
@@ -43,7 +43,7 @@ const initialFormData: FormData = {
 };
 
 export default function ProjectFormScreen() {
-  const router = useRouter();
+  const { replace, back } = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const isEditMode = id !== undefined && id !== "new";
 
@@ -99,7 +99,7 @@ export default function ProjectFormScreen() {
 
     if (!formData.zzz_name.trim()) {
       newErrors.zzz_name = t("validation.name_required");
-    } else if (formData.zzz_name.trim().length < 2) {
+    } else if (formData.zzz_name.trim().length < PROJECT_CONSTRAINTS.NAME_MIN_LENGTH) {
       newErrors.zzz_name = t("validation.name_min_length");
     }
 
@@ -108,12 +108,20 @@ export default function ProjectFormScreen() {
     }
 
     const timeout = parseInt(formData.zzz_cascade_timeout_minutes, 10);
-    if (isNaN(timeout) || timeout < 1 || timeout > 120) {
+    if (
+      isNaN(timeout) ||
+      timeout < PROJECT_CONSTRAINTS.CASCADE_TIMEOUT_MINUTES_MIN ||
+      timeout > PROJECT_CONSTRAINTS.CASCADE_TIMEOUT_MINUTES_MAX
+    ) {
       newErrors.zzz_cascade_timeout_minutes = t("validation.timeout_range");
     }
 
     const attempts = parseInt(formData.zzz_max_cascade_attempts, 10);
-    if (isNaN(attempts) || attempts < 1 || attempts > 10) {
+    if (
+      isNaN(attempts) ||
+      attempts < PROJECT_CONSTRAINTS.MAX_CASCADE_ATTEMPTS_MIN ||
+      attempts > PROJECT_CONSTRAINTS.MAX_CASCADE_ATTEMPTS_MAX
+    ) {
       newErrors.zzz_max_cascade_attempts = t("validation.attempts_range");
     }
 
@@ -143,7 +151,7 @@ export default function ProjectFormScreen() {
         await createProject(projectData);
       }
       // Navigate to project list after save
-      router.replace("/admin/project");
+      replace("/admin/project");
     } catch (e: unknown) {
       logger.error("Failed to save project", e, { isEditMode, formData });
       setAlertConfig({
@@ -289,6 +297,8 @@ export default function ProjectFormScreen() {
                       <Button
                         key={lang}
                         variant="ghost"
+                        testID={`default-language-${lang}`}
+                        accessibilityLabel={`Select ${lang} as default language`}
                         className={`
                           px-5 py-3 min-h-touch rounded-none
                           ${formData.zzz_default_language === lang ? "bg-primary-container" : "bg-surface-container-highest"}
@@ -344,7 +354,7 @@ export default function ProjectFormScreen() {
               {/* Action Buttons */}
               <View className="pt-6 flex-row gap-4">
                 <View className="flex-1">
-                  <Button title={t("cancel")} variant="secondary" onPress={() => router.back()} />
+                  <Button title={t("cancel")} variant="secondary" onPress={() => back()} />
                 </View>
                 <View className="flex-1">
                   <Button

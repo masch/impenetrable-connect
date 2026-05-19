@@ -21,8 +21,10 @@ export function LanguageSwitcher() {
         const isActive = locale === lang.code;
         return (
           <Button
+            testID={`language-switcher-${lang.code}`}
             key={lang.code}
             variant="ghost"
+            accessibilityLabel={`Switch to ${lang.label}`}
             className={`
               px-4 py-2 min-h-touch rounded-none
               ${isActive ? "bg-primary-container" : "bg-surface-container-highest"}

@@ -15,7 +15,7 @@ import jaguarHero from "../../../assets/jaguar-hero.png";
 
 export default function LoginScreen() {
   const { t } = useTranslations();
-  const router = useRouter();
+  const { replace, back } = useRouter();
   const login = useAuthStore((state) => state.login);
   const userRole = useAuthStore((state) => state.userRole);
   const isLoading = useAuthStore((state) => state.isLoading);
@@ -31,11 +31,11 @@ export default function LoginScreen() {
 
       // Redirect based on role
       if (userRole === UserRole.ENTREPRENEUR) {
-        router.replace("/entrepreneur/agenda");
+        replace("/entrepreneur/agenda");
       } else if (userRole === UserRole.ADMIN) {
-        router.replace("/admin/project");
+        replace("/admin/project");
       } else {
-        router.replace("/tourist");
+        replace("/tourist");
       }
     } catch (e) {
       logger.error("Login failed", e);
@@ -111,9 +111,15 @@ export default function LoginScreen() {
                     onPress={handleLogin}
                     disabled={isLoading}
                     className="mt-4"
+                    testID="login-button"
                   />
 
-                  <Button title={t("common.back")} variant="ghost" onPress={() => router.back()} />
+                  <Button
+                    title={t("common.back")}
+                    variant="ghost"
+                    onPress={() => back()}
+                    testID="back-button"
+                  />
                 </View>
               </View>
             </View>
