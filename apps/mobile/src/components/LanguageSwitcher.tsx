@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Text, View } from "react-native";
 import { Button } from "./Button";
-import { useLocale } from "../hooks/useI18n";
+import { useLocale, useTranslations } from "../hooks/useI18n";
 
 const AVAILABLE_LOCALES = [
   { code: "en", label: "EN" },
@@ -10,6 +10,7 @@ const AVAILABLE_LOCALES = [
 
 export function LanguageSwitcher() {
   const { locale, setLocale, initializeLocale } = useLocale();
+  const { t } = useTranslations();
 
   useEffect(() => {
     initializeLocale();
@@ -24,7 +25,7 @@ export function LanguageSwitcher() {
             testID={`language-switcher-${lang.code}`}
             key={lang.code}
             variant="ghost"
-            accessibilityLabel={`Switch to ${lang.label}`}
+            accessibilityLabel={t("common.switch_language", { lang: lang.label })}
             className={`
               px-4 py-2 min-h-touch rounded-none
               ${isActive ? "bg-primary-container" : "bg-surface-container-highest"}
