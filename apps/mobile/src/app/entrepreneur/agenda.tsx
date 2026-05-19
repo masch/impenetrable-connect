@@ -49,125 +49,6 @@ export default function AgendaScreen() {
     }
   };
 
-  const renderDateSelector = () => {
-    const days = [0, 1, 2, 3, 4, 5, 6].map((offset) => {
-      const date = new Date();
-      date.setDate(date.getDate() + offset);
-      return date;
-    });
-
-    return (
-      <View className="mb-4">
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View className="flex-row pb-2 px-1">
-            {days.map((date) => {
-              const isToday = isSameDay(date, today);
-              const isTomorrow = isSameDay(date, tomorrow);
-              const isSelected = isSameDay(date, selectedDate);
-              const count = getDayCount(date);
-
-              const weekdayLabel = isToday
-                ? t("orders.today")
-                : isTomorrow
-                  ? t("orders.tomorrow")
-                  : formatDate(date, { weekday: "short" });
-
-              return (
-                <View key={toISODate(date)} className="relative mr-3">
-                  <Button
-                    onPress={() => setSelectedDate(date)}
-                    testID={`date-selector-${toISODate(date)}`}
-                    className={`w-[58px] h-[82px] rounded-3xl border items-center justify-center ${
-                      isSelected
-                        ? "bg-primary border-primary shadow-lg shadow-primary/30"
-                        : isToday
-                          ? "bg-secondary/10 border-secondary/40"
-                          : "bg-surface-container-lowest border-outline-variant/30"
-                    }`}
-                  >
-                    <View className="items-center justify-center flex-1">
-                      {isToday || isTomorrow ? (
-                        <>
-                          <View
-                            className={`p-1.5 rounded-full mb-1 ${isSelected ? "bg-white/20" : isToday ? "bg-secondary/20" : "bg-primary/10"}`}
-                          >
-                            <Icon
-                              name={isToday ? "star" : "calendar-arrow-right"}
-                              size={22}
-                              accessibilityLabel={
-                                isToday ? t("orders.today") : t("orders.tomorrow")
-                              }
-                              color={
-                                isSelected
-                                  ? COLORS["on-primary"]
-                                  : isToday
-                                    ? COLORS.secondary
-                                    : COLORS.primary
-                              }
-                            />
-                          </View>
-                          <Text
-                            className={`font-display-black text-[9px] uppercase tracking-[0.5px] ${
-                              isSelected
-                                ? "text-white"
-                                : isToday
-                                  ? "text-secondary"
-                                  : "text-on-surface-variant"
-                            }`}
-                          >
-                            {isToday ? t("common.today_short") : t("common.tomorrow_short")}
-                          </Text>
-                        </>
-                      ) : (
-                        <>
-                          <Text
-                            className={`font-display-bold text-[9px] uppercase tracking-tighter mb-1.5 ${
-                              isSelected ? "text-white/70" : "text-on-surface-variant"
-                            }`}
-                          >
-                            {weekdayLabel}
-                          </Text>
-
-                          <Text
-                            className={`font-display-black text-xl ${
-                              isSelected ? "text-white" : "text-on-surface"
-                            }`}
-                          >
-                            {formatDate(date, { day: "numeric" })}
-                          </Text>
-                        </>
-                      )}
-                    </View>
-
-                    {isToday && !isSelected && (
-                      <View className="absolute bottom-2 w-1.5 h-1.5 rounded-full bg-secondary" />
-                    )}
-                  </Button>
-
-                  {count > 0 && (
-                    <View
-                      className={`absolute top-1 right-1 min-w-[18px] h-4 px-1 rounded-md items-center justify-center border ${
-                        isSelected ? "bg-white border-primary/20" : "bg-primary border-primary"
-                      }`}
-                    >
-                      <Text
-                        className={`text-[10px] font-display-black leading-none mt-[-1px] ${
-                          isSelected ? "text-primary" : "text-white"
-                        }`}
-                      >
-                        {count}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              );
-            })}
-          </View>
-        </ScrollView>
-      </View>
-    );
-  };
-
   return (
     <Screen>
       <ScreenContent>
@@ -206,7 +87,14 @@ export default function AgendaScreen() {
               />
             </View>
 
-            {renderDateSelector()}
+            <DateSelector
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+              t={t}
+              today={today}
+              tomorrow={tomorrow}
+              getDayCount={getDayCount}
+            />
 
             {/* Group by moment -> time */}
             {MOMENTS.map((moment) => {
@@ -310,5 +198,137 @@ export default function AgendaScreen() {
         )}
       </ScreenContent>
     </Screen>
+  );
+}
+
+// Separate component to fix react-doctor/no-render-in-render warning
+function DateSelector({
+  selectedDate,
+  onSelectDate,
+  t,
+  today,
+  tomorrow,
+  getDayCount,
+}: {
+  selectedDate: Date;
+  onSelectDate: (date: Date) => void;
+  t: (key: string) => string;
+  today: Date;
+  tomorrow: Date;
+  getDayCount: (date: Date) => number;
+}) {
+  const days = [0, 1, 2, 3, 4, 5, 6].map((offset) => {
+    const date = new Date();
+    date.setDate(date.getDate() + offset);
+    return date;
+  });
+
+  return (
+    <View className="mb-4">
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <View className="flex-row pb-2 px-1">
+          {days.map((date) => {
+            const isToday = isSameDay(date, today);
+            const isTomorrow = isSameDay(date, tomorrow);
+            const isSelected = isSameDay(date, selectedDate);
+            const count = getDayCount(date);
+
+            const weekdayLabel = isToday
+              ? t("orders.today")
+              : isTomorrow
+                ? t("orders.tomorrow")
+                : formatDate(date, { weekday: "short" });
+
+            return (
+              <View key={toISODate(date)} className="relative mr-3">
+                <Button
+                  onPress={() => onSelectDate(date)}
+                  testID={`date-selector-${toISODate(date)}`}
+                  className={`w-[58px] h-[82px] rounded-3xl border items-center justify-center ${
+                    isSelected
+                      ? "bg-primary border-primary shadow-lg shadow-primary/30"
+                      : isToday
+                        ? "bg-secondary/10 border-secondary/40"
+                        : "bg-surface-container-lowest border-outline-variant/30"
+                  }`}
+                >
+                  <View className="items-center justify-center flex-1">
+                    {isToday || isTomorrow ? (
+                      <>
+                        <View
+                          className={`p-1.5 rounded-full mb-1 ${isSelected ? "bg-white/20" : isToday ? "bg-secondary/20" : "bg-primary/10"}`}
+                        >
+                          <Icon
+                            name={isToday ? "star" : "calendar-arrow-right"}
+                            size={22}
+                            accessibilityLabel={isToday ? t("orders.today") : t("orders.tomorrow")}
+                            color={
+                              isSelected
+                                ? COLORS["on-primary"]
+                                : isToday
+                                  ? COLORS.secondary
+                                  : COLORS.primary
+                            }
+                          />
+                        </View>
+                        <Text
+                          className={`font-display-black text-[9px] uppercase tracking-[0.5px] ${
+                            isSelected
+                              ? "text-white"
+                              : isToday
+                                ? "text-secondary"
+                                : "text-on-surface-variant"
+                          }`}
+                        >
+                          {isToday ? t("common.today_short") : t("common.tomorrow_short")}
+                        </Text>
+                      </>
+                    ) : (
+                      <>
+                        <Text
+                          className={`font-display-bold text-[9px] uppercase tracking-tighter mb-1.5 ${
+                            isSelected ? "text-white/70" : "text-on-surface-variant"
+                          }`}
+                        >
+                          {weekdayLabel}
+                        </Text>
+
+                        <Text
+                          className={`font-display-black text-xl ${
+                            isSelected ? "text-white" : "text-on-surface"
+                          }`}
+                        >
+                          {formatDate(date, { day: "numeric" })}
+                        </Text>
+                      </>
+                    )}
+                  </View>
+
+                  {isToday && !isSelected && (
+                    <View className="absolute bottom-2 w-1.5 h-1.5 rounded-full bg-secondary" />
+                  )}
+                </Button>
+
+                {count > 0 && (
+                  <View
+                    className={`absolute top-1 right-1 min-w-[18px] h-4 px-1 rounded-md items-center justify-center border ${
+                      isSelected ? "bg-white border-primary/20" : "bg-primary border-primary"
+                    }`}
+                  >
+                    <Text
+                      className={`text-[10px] font-display-black leading-none mt-[-1px] ${
+                        isSelected ? "text-primary" : "text-white"
+                      }`}
+                    >
+                      {count}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            );
+          })}
+        </View>
+      </ScrollView>
+    </View>
   );
 }
