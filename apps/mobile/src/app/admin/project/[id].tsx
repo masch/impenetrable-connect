@@ -4,7 +4,13 @@ import { StatusBar } from "expo-status-bar";
 import { Text, View, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { useProjectStore } from "../../../stores/project.store";
 import { useTranslations } from "../../../hooks/useI18n";
-import { Language, SUPPORTED_LANGUAGES, PROJECT_CONSTRAINTS } from "@repo/shared";
+import {
+  Language,
+  SUPPORTED_LANGUAGES,
+  CreateProjectSchema,
+  UpdateProjectSchema,
+  PROJECT_CONSTRAINTS,
+} from "@repo/shared";
 import { logger } from "../../../services/logger.service";
 import { FormInput } from "../../../components/FormInput";
 import { FormLanguageSelector } from "../../../components/FormLanguageSelector";
@@ -37,8 +43,8 @@ const initialFormData: FormData = {
   zzz_name: "",
   zzz_default_language: "es",
   zzz_supported_languages: ["es"],
-  zzz_cascade_timeout_minutes: "30",
-  zzz_max_cascade_attempts: "10",
+  zzz_cascade_timeout_minutes: String(PROJECT_CONSTRAINTS.CASCADE_TIMEOUT_MINUTES_MAX),
+  zzz_max_cascade_attempts: String(PROJECT_CONSTRAINTS.MAX_CASCADE_ATTEMPTS_MAX),
   zzz_is_active: true,
 };
 
@@ -94,39 +100,40 @@ export default function ProjectFormScreen() {
     }
   }, [isEditMode, selectedProject]);
 
+  // Map Zod field names to translation keys
+  const fieldToTranslationKey: Record<string, string> = {
+    zzz_name: "validation.name_required",
+    zzz_supported_languages: "validation.supported_languages_required",
+    zzz_cascade_timeout_minutes: "validation.timeout_range",
+    zzz_max_cascade_attempts: "validation.attempts_range",
+  };
+
   const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
+    const parsedData = {
+      zzz_name: formData.zzz_name.trim(),
+      zzz_default_language: formData.zzz_default_language,
+      zzz_supported_languages: formData.zzz_supported_languages,
+      zzz_cascade_timeout_minutes: Number(formData.zzz_cascade_timeout_minutes),
+      zzz_max_cascade_attempts: Number(formData.zzz_max_cascade_attempts),
+      zzz_is_active: formData.zzz_is_active,
+    };
 
-    if (!formData.zzz_name.trim()) {
-      newErrors.zzz_name = t("validation.name_required");
-    } else if (formData.zzz_name.trim().length < PROJECT_CONSTRAINTS.NAME_MIN_LENGTH) {
-      newErrors.zzz_name = t("validation.name_min_length");
+    const schema = isEditMode ? UpdateProjectSchema : CreateProjectSchema;
+    const result = schema.safeParse(parsedData);
+
+    if (!result.success) {
+      const newErrors: FormErrors = {};
+      for (const issue of result.error.issues) {
+        const key = issue.path[0] as keyof FormErrors;
+        const translationKey = fieldToTranslationKey[key];
+        newErrors[key] = translationKey ? t(translationKey) : issue.message;
+      }
+      setErrors(newErrors);
+      return false;
     }
 
-    if (formData.zzz_supported_languages.length === 0) {
-      newErrors.zzz_supported_languages = t("validation.supported_languages_required");
-    }
-
-    const timeout = parseInt(formData.zzz_cascade_timeout_minutes, 10);
-    if (
-      isNaN(timeout) ||
-      timeout < PROJECT_CONSTRAINTS.CASCADE_TIMEOUT_MINUTES_MIN ||
-      timeout > PROJECT_CONSTRAINTS.CASCADE_TIMEOUT_MINUTES_MAX
-    ) {
-      newErrors.zzz_cascade_timeout_minutes = t("validation.timeout_range");
-    }
-
-    const attempts = parseInt(formData.zzz_max_cascade_attempts, 10);
-    if (
-      isNaN(attempts) ||
-      attempts < PROJECT_CONSTRAINTS.MAX_CASCADE_ATTEMPTS_MIN ||
-      attempts > PROJECT_CONSTRAINTS.MAX_CASCADE_ATTEMPTS_MAX
-    ) {
-      newErrors.zzz_max_cascade_attempts = t("validation.attempts_range");
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors({});
+    return true;
   };
 
   const handleSubmit = async () => {
@@ -269,6 +276,7 @@ export default function ProjectFormScreen() {
             <View className="gap-4">
               {/* Name */}
               <FormInput
+                testID="project-name-input"
                 label={t("project_name")}
                 value={formData.zzz_name}
                 onChangeText={(value) => updateField("zzz_name", value)}
@@ -321,6 +329,7 @@ export default function ProjectFormScreen() {
 
               {/* Cascade Timeout */}
               <FormInput
+                testID="cascade-timeout-input"
                 label={t("cascade_timeout")}
                 value={formData.zzz_cascade_timeout_minutes}
                 onChangeText={(value) => updateField("zzz_cascade_timeout_minutes", value)}
@@ -332,6 +341,7 @@ export default function ProjectFormScreen() {
 
               {/* Max Cascade Attempts */}
               <FormInput
+                testID="max-attempts-input"
                 label={t("max_attempts")}
                 value={formData.zzz_max_cascade_attempts}
                 onChangeText={(value) => updateField("zzz_max_cascade_attempts", value)}
