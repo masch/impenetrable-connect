@@ -111,6 +111,7 @@
   2. `git pull origin main`
   3. Create feature branch (`issue-#/short-description`)
 - **Commits**: Use conventional commits. NO AI attribution.
+- **NO --amend**: NEVER use `--amend`. Always create new commits to preserve audit trail.
 - **GPG Signing**: ALWAYS use `git commit -S`. NEVER commit without signing.
   1. Complete work + run `make check`
   2. `git add` files
