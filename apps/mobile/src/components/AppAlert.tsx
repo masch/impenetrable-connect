@@ -67,6 +67,7 @@ export function AppAlert({
           onPress={onClose}
           accessibilityLabel={t("common.cancel")}
           accessibilityHint={t("common.cancel")}
+          testID="alert-backdrop"
         >
           <View className="absolute inset-0 bg-black/60" />
         </Button>
@@ -76,11 +77,16 @@ export function AppAlert({
           {/* Icon / Brand mark */}
           <View className="items-center mb-4">
             <View
-              className={`w-14 h-14 ${bg} rounded-full items-center justify-center`}
+              className={`size-14 ${bg} rounded-full items-center justify-center`}
               accessibilityLabel={t(`common.${type}`)}
               accessibilityRole="image"
             >
-              <Icon name={name} size={32} color={color} />
+              <Icon
+                name={name}
+                size={32}
+                color={color}
+                accessibilityLabel={t("common.alert_icon")}
+              />
             </View>
           </View>
 
@@ -107,6 +113,7 @@ export function AppAlert({
                   action.onPress();
                 }}
                 className={action.style === "cancel" ? "opacity-70" : ""}
+                testID={`alert-action-${index}`}
               />
             ))}
           </View>

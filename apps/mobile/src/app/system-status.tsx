@@ -33,7 +33,12 @@ function StatusIndicator({ status }: { status: StatusCardProps["status"] }) {
     loading: "bg-outline-variant",
   };
 
-  return <View className={`w-3 h-3 rounded-full ${colors[status]}`} />;
+  return (
+    <View
+      className={`size-3 rounded-full ${colors[status]}`}
+      accessibilityLabel={`status: ${status}`}
+    />
+  );
 }
 
 function StatusCard({
@@ -73,7 +78,7 @@ function StatusCard({
 
   const content = (
     <View className="p-4 flex-row items-start gap-4 w-full">
-      <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center mt-1">
+      <View className="size-10 rounded-full bg-primary/10 items-center justify-center mt-1">
         <Icon name={icon} size={24} color={COLORS.primary} accessibilityLabel={title} />
       </View>
       <View className="flex-1 items-start">
@@ -90,7 +95,7 @@ function StatusCard({
               <Icon
                 name="open-in-new"
                 size={14}
-                color="gray"
+                color={COLORS["on-surface-variant"]}
                 accessibilityLabel={t("common.open_external_link")}
               />
             )}
@@ -389,7 +394,7 @@ export default function StatusScreen() {
                     ? envColors.staging
                     : undefined
               }
-              detail={ciStatus.detail || "GitHub Actions"}
+              detail={ciStatus.detail || t("common.ci_name")}
               url={ciStatus.url}
               messages={ciStatus.messages}
               isDetailed={isDetailed}
@@ -406,7 +411,7 @@ export default function StatusScreen() {
                     ? envColors.staging
                     : undefined
               }
-              detail={deployStatus.detail || "EAS Hosting"}
+              detail={deployStatus.detail || t("common.deploy_name")}
               url={deployStatus.url}
               messages={deployStatus.messages}
               isDetailed={isDetailed}

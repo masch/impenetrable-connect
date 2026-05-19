@@ -92,7 +92,12 @@ export const ReservationModal = ({
 
             {/* Context Header (Read-only Pill) */}
             <View className="flex-row items-center bg-primary/5 p-4 rounded-2xl border border-primary/10 mb-6">
-              <Icon name="calendar-clock" size={24} color={COLORS.primary} />
+              <Icon
+                name="calendar-clock"
+                size={24}
+                color={COLORS.primary}
+                accessibilityLabel={t("common.scheduled")}
+              />
               <View className="ml-3">
                 <Text className="text-[10px] font-display font-bold text-primary uppercase tracking-widest">
                   {t("catalog.reservation.active_context")}
@@ -113,7 +118,7 @@ export const ReservationModal = ({
                 <Button
                   variant="ghost"
                   onPress={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                  className="w-12 h-12"
+                  className="size-12"
                   disabled={quantity <= 1}
                 >
                   <Icon
@@ -138,7 +143,7 @@ export const ReservationModal = ({
                   onPress={() =>
                     setQuantity((prev) => Math.min(item.zzz_max_participants, prev + 1))
                   }
-                  className="w-12 h-12"
+                  className="size-12"
                   disabled={quantity >= item.zzz_max_participants}
                   testID="quantity-plus-button"
                 >

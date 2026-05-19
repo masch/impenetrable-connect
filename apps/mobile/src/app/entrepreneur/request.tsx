@@ -75,6 +75,7 @@ export default function RequestScreen() {
             className="flex-1"
             contentContainerClassName="pt-4 pb-10"
             showsVerticalScrollIndicator={false}
+            testID="pending-orders-list"
             refreshControl={
               <RefreshControl
                 refreshing={isLoadingPending}
@@ -87,21 +88,17 @@ export default function RequestScreen() {
               sortedDates.map((dateKey) => (
                 <View key={dateKey} className="mb-12">
                   {/* Date Header Banner - High Visibility Ribbon */}
-                  <View
-                    className="flex-row items-center py-6 px-8 mb-10 -mx-4 border-y border-primary/20 relative overflow-hidden"
-                    style={{ backgroundColor: COLORS.primary + "14" }}
-                  >
+                  <View className="flex-row items-center py-6 px-8 mb-10 -mx-4 border-y border-primary/20 relative overflow-hidden bg-primary/10">
                     {/* Vertical Accent Bar */}
-                    <View
-                      className="absolute left-0 top-0 bottom-0 w-1.5"
-                      style={{ backgroundColor: COLORS.primary }}
-                    />
+                    <View className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary" />
 
-                    <View
-                      className="w-12 h-12 rounded-2xl items-center justify-center mr-5 shadow-lg shadow-primary/20"
-                      style={{ backgroundColor: COLORS.primary }}
-                    >
-                      <Icon name="calendar-multiselect" size={24} color={COLORS["on-primary"]} />
+                    <View className="size-12 rounded-2xl items-center justify-center mr-5 shadow-lg shadow-primary/20 bg-primary">
+                      <Icon
+                        name="calendar-multiselect"
+                        size={24}
+                        color={COLORS["on-primary"]}
+                        accessibilityLabel={t("common.date")}
+                      />
                     </View>
                     <View className="flex-1">
                       <Text className="text-on-surface font-display-black text-2xl uppercase tracking-tighter leading-none mb-1">
@@ -133,7 +130,12 @@ export default function RequestScreen() {
                       <View key={moment} className="mb-6 px-4">
                         <View className="flex-row items-center mb-3">
                           <View className={`p-1.5 rounded-lg mr-2.5 ${config.bgClass}/10`}>
-                            <Icon name={config.icon} size={16} color={config.hex} />
+                            <Icon
+                              name={config.icon}
+                              size={16}
+                              color={config.hex}
+                              accessibilityLabel={config.labelKey}
+                            />
                           </View>
                           <Text
                             className={`font-display-bold text-xs uppercase tracking-widest ${config.textClass}`}
@@ -154,10 +156,15 @@ export default function RequestScreen() {
                                 {time ? (
                                   <View className="flex-row justify-center items-center py-2 bg-surface-container-low/30">
                                     <View
-                                      className="flex-row items-center px-3 py-1 rounded-full gap-1.5"
-                                      style={{ backgroundColor: config.hex }}
+                                      className={`flex-row items-center px-3 py-1 rounded-full gap-1.5 ${config.bgClass}`}
+                                      accessibilityLabel={t("common.time")}
                                     >
-                                      <Icon name="clock-outline" size={14} color="#FFFFFF" />
+                                      <Icon
+                                        name="clock-outline"
+                                        size={14}
+                                        color={COLORS["on-primary"]}
+                                        accessibilityLabel={t("common.time")}
+                                      />
                                       <Text className="font-display-bold text-sm text-white">
                                         {displayTime}
                                       </Text>
@@ -198,12 +205,13 @@ export default function RequestScreen() {
               ))
             ) : (
               <View className="items-center justify-center py-20 px-10">
-                <View className="w-20 h-20 rounded-full bg-secondary/10 items-center justify-center mb-6">
+                <View className="size-20 rounded-full bg-secondary/10 items-center justify-center mb-6">
                   <Icon
                     name="tray-full"
                     size={40}
                     color={COLORS.secondary}
-                    style={{ opacity: 0.5 }}
+                    className="opacity-50"
+                    accessibilityLabel="empty"
                   />
                 </View>
                 <Text className="text-on-surface font-display-bold text-xl text-center mb-2">
