@@ -176,6 +176,15 @@ const MOCK_RESERVATION_TODAY_DINNER_PEND_RESTRICTION: Reservation = {
   zzz_guest_count: 2,
 };
 
+const MOCK_RESERVATION_TODAY_DINNER_2_PEND_RESTRICTION: Reservation = {
+  zzz_id: 16,
+  zzz_user_id: MOCK_USER_TOURIST_WITH_ORDERS.id,
+  zzz_service_at: todayDinner2,
+  zzz_time_of_day: "DINNER",
+  zzz_status: "SEARCHING",
+  zzz_guest_count: 3,
+};
+
 /**
  * Reservations (parent entities for orders)
  */
@@ -195,6 +204,7 @@ export const MOCK_RESERVATIONS: Reservation[] = [
   MOCK_RESERVATION_TOMORROW_LUNCH_PENDING_2,
   MOCK_RESERVATION_AFTER_TOMORROW_BREAKFAST_PENDING,
   MOCK_RESERVATION_TODAY_DINNER_PEND_RESTRICTION,
+  MOCK_RESERVATION_TODAY_DINNER_2_PEND_RESTRICTION,
 ];
 
 /**
@@ -522,6 +532,44 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
         zzz_order_id: 15,
         zzz_catalog_item_id: POSTRE_REGIONAL.zzz_id,
         zzz_quantity: 2,
+        zzz_price: POSTRE_REGIONAL.zzz_price,
+      },
+    ],
+    zzz_created_at: today,
+    zzz_notify_whatsapp: true,
+  },
+  {
+    zzz_id: 16,
+    zzz_reservation_id: MOCK_RESERVATION_TODAY_DINNER_PEND_RESTRICTION.zzz_id,
+    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_global_status: "OFFER_PENDING",
+    zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
+    zzz_notes: "Con mucha sal",
+    zzz_items: [
+      {
+        zzz_id: 22,
+        zzz_order_id: 16,
+        zzz_catalog_item_id: POSTRE_REGIONAL.zzz_id,
+        zzz_quantity: 3,
+        zzz_price: POSTRE_REGIONAL.zzz_price,
+      },
+    ],
+    zzz_created_at: today,
+    zzz_notify_whatsapp: true,
+  },
+  {
+    zzz_id: 17,
+    zzz_reservation_id: MOCK_RESERVATION_TODAY_DINNER_2_PEND_RESTRICTION.zzz_id,
+    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_global_status: "OFFER_PENDING",
+    zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
+    zzz_notes: "Sin azucar",
+    zzz_items: [
+      {
+        zzz_id: 23,
+        zzz_order_id: 17,
+        zzz_catalog_item_id: POSTRE_REGIONAL.zzz_id,
+        zzz_quantity: 3,
         zzz_price: POSTRE_REGIONAL.zzz_price,
       },
     ],

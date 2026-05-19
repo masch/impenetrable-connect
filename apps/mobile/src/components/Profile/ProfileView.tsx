@@ -94,20 +94,28 @@ export default function ProfileView({ userType }: ProfileViewProps) {
 }
 
 function ProfileActionButton({ title, description, icon, onPress }: ProfileAction) {
+  const { t } = useTranslations();
+
   return (
     <Button
       onPress={onPress}
       variant="ghost"
       className="flex-row items-center p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30"
+      testID={`profile-action-${title.toLowerCase().replace(/\s+/g, "-")}`}
     >
-      <View className="w-12 h-12 rounded-2xl bg-primary/10 items-center justify-center mr-4">
-        <Icon name={icon} size={24} color={COLORS.primary} />
+      <View className="size-12 rounded-2xl bg-primary/10 items-center justify-center mr-4">
+        <Icon name={icon} size={24} color={COLORS.primary} accessibilityLabel={title} />
       </View>
       <View className="flex-1">
         <Text className="text-lg font-display font-bold text-on-surface">{title}</Text>
         <Text className="text-sm font-body text-on-surface-variant/70">{description}</Text>
       </View>
-      <Icon name="chevron-right" size={24} color={COLORS["on-surface-variant"]} />
+      <Icon
+        name="chevron-right"
+        size={24}
+        color={COLORS["on-surface-variant"]}
+        accessibilityLabel={t("common.more")}
+      />
     </Button>
   );
 }

@@ -72,8 +72,6 @@ const ROLE_CONFIG: Record<UserRole, RoleConfig> = {
 };
 
 export default function RoleSelectorScreen() {
-  logger.debug("env.USE_MOCKS", { value: env.USE_MOCKS });
-  logger.debug("EXPO_PUBLIC_USE_MOCKS", { value: process.env.EXPO_PUBLIC_USE_MOCKS });
   const { setUserRole } = useAuthStore();
   const login = useAuthStore((state) => state.login);
 
@@ -160,9 +158,14 @@ export default function RoleSelectorScreen() {
                   className={`flex-row items-center gap-3 p-3 rounded-lg ${config.accentClass} mb-3`}
                 >
                   <View
-                    className={`w-12 h-12 rounded-full items-center justify-center ${config.bgClass}`}
+                    className={`size-12 rounded-full items-center justify-center ${config.bgClass}`}
                   >
-                    <Icon name={config.icon} size={24} color={COLORS["on-primary"]} />
+                    <Icon
+                      name={config.icon}
+                      size={24}
+                      color={COLORS["on-primary"]}
+                      accessibilityLabel={config.titleKey}
+                    />
                   </View>
                   <View className="flex-1">
                     <Text className="text-lg font-display font-bold text-on-surface">
@@ -183,6 +186,7 @@ export default function RoleSelectorScreen() {
                     title={t(config.actionTitleKey || "")}
                     subtitle={t(config.actionDescriptionKey || "")}
                     className={`mb-4 border ${config.borderClass}`}
+                    testID={`role-button-${group.role.toLowerCase()}`}
                   />
                 ) : (
                   // Spacer to maintain vertical rhythm when action button is hidden (match mb-4)
@@ -221,7 +225,12 @@ export default function RoleSelectorScreen() {
                             >
                               <View className="flex-row items-center mb-3">
                                 <View className="bg-primary/10 p-1.5 rounded-lg">
-                                  <Icon name="storefront" size={16} color={COLORS.primary} />
+                                  <Icon
+                                    name="storefront"
+                                    size={16}
+                                    color={COLORS.primary}
+                                    accessibilityLabel="venture"
+                                  />
                                 </View>
                                 <Text className="text-sm font-bold text-primary ml-2 tracking-tight">
                                   {venture.name}

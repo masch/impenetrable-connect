@@ -23,7 +23,7 @@ export default function VentureCapacitySection({
   return (
     <View className="bg-surface-container-low rounded-3xl border border-outline-variant/30 p-5 shadow-sm mb-4">
       <View className="flex-row items-center mb-4">
-        <View className="w-10 h-10 rounded-xl bg-primary/10 items-center justify-center mr-3">
+        <View className="size-10 rounded-xl bg-primary/10 items-center justify-center mr-3">
           <Icon
             name="account-group-outline"
             size={24}
@@ -40,7 +40,7 @@ export default function VentureCapacitySection({
         <Button
           variant="outline"
           onPress={() => onValueChange(Math.max(1, capacity - 1))}
-          className="w-12 h-12 rounded-xl border-outline-variant/50"
+          className="size-12 rounded-xl border-outline-variant/50"
           disabled={capacity <= 1 || disabled}
           testID="minus-button"
           accessibilityLabel={t("venture.minus")}
@@ -74,7 +74,7 @@ export default function VentureCapacitySection({
         <Button
           variant="outline"
           onPress={() => onValueChange(capacity + 1)}
-          className="w-12 h-12 rounded-xl border-outline-variant/50"
+          className="size-12 rounded-xl border-outline-variant/50"
           disabled={capacity >= 999 || disabled}
           testID="plus-button"
           accessibilityLabel={t("venture.plus")}

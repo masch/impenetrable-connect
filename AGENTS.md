@@ -31,6 +31,11 @@
 - **Immutability**: ALWAYS use `const` over `let`.
 - **Interfaces**: Use `interface` for object definitions. NEVER use `type` for simple objects. `type` ONLY for Unions/Intersections/Primitives.
 - **Enums**: Use `SCREAMING_SNAKE_CASE` for members (e.g., `USER_ROLE.ADMIN`). NEVER use lowercase.
+- **No Magic Numbers**: NEVER use hardcoded numbers inline in ANY code (production, tests, utilities). Use named constants that describe behavior.
+  - **DO**: `const MAX_RETRIES = 3; const API_TIMEOUT_MS = 5000;`
+  - **DON'T**: `if (attempts > 3) fetch(url, { timeout: 5000 })`
+  - Exception: numbers 0, 1 used as identity/boolean logic (`index + 1`, `count === 0`) are allowed.
+  - Group related constants: `const PAGINATION = { PAGE_SIZE: 20, MAX_PAGES: 10 }`
 
 ### React & React Native
 
@@ -111,6 +116,7 @@
   2. `git pull origin main`
   3. Create feature branch (`issue-#/short-description`)
 - **Commits**: Use conventional commits. NO AI attribution.
+- **NO --amend**: NEVER use `--amend`. Always create new commits to preserve audit trail.
 - **GPG Signing**: ALWAYS use `git commit -S`. NEVER commit without signing.
   1. Complete work + run `make check`
   2. `git add` files

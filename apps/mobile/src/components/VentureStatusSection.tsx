@@ -47,7 +47,7 @@ export default function VentureStatusSection({
   return (
     <View className="bg-surface-container-low rounded-3xl border border-outline-variant/30 p-5 shadow-sm mb-4">
       <View className="flex-row items-center mb-4">
-        <View className="w-10 h-10 rounded-xl bg-primary/10 items-center justify-center mr-3">
+        <View className="size-10 rounded-xl bg-primary/10 items-center justify-center mr-3">
           <Icon
             name="power-settings"
             size={24}

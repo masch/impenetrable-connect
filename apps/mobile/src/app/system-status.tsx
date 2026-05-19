@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useCallback, useReducer } from "react";
 import { View, Text, ScrollView, RefreshControl } from "react-native";
 import { openURL } from "expo-linking";
 import { Stack, useLocalSearchParams } from "expo-router";
@@ -33,7 +33,12 @@ function StatusIndicator({ status }: { status: StatusCardProps["status"] }) {
     loading: "bg-outline-variant",
   };
 
-  return <View className={`w-3 h-3 rounded-full ${colors[status]}`} />;
+  return (
+    <View
+      className={`size-3 rounded-full ${colors[status]}`}
+      accessibilityLabel={`status: ${status}`}
+    />
+  );
 }
 
 function StatusCard({
@@ -73,7 +78,7 @@ function StatusCard({
 
   const content = (
     <View className="p-4 flex-row items-start gap-4 w-full">
-      <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center mt-1">
+      <View className="size-10 rounded-full bg-primary/10 items-center justify-center mt-1">
         <Icon name={icon} size={24} color={COLORS.primary} accessibilityLabel={title} />
       </View>
       <View className="flex-1 items-start">
@@ -90,7 +95,7 @@ function StatusCard({
               <Icon
                 name="open-in-new"
                 size={14}
-                color="gray"
+                color={COLORS["on-surface-variant"]}
                 accessibilityLabel={t("common.open_external_link")}
               />
             )}
@@ -115,8 +120,8 @@ function StatusCard({
 
         {isDetailed && messages && messages.length > 0 && (
           <View className="mt-3 w-full border-t border-on-surface/5 pt-2">
-            {messages.map((msg, idx) => (
-              <View key={idx} className="flex-row items-start gap-2 mb-1">
+            {messages.map((msg) => (
+              <View key={msg} className="flex-row items-start gap-2 mb-1">
                 <Text className="text-[11px] text-on-surface/50 font-medium leading-tight flex-1">
                   • {msg}
                 </Text>
@@ -156,31 +161,73 @@ interface AnnotationsMap {
   [key: string]: AnnotationData;
 }
 
+interface StatusState {
+  health: BackendHealthWithLatency | null;
+  runs: GitHubRun[] | null;
+  annotations: AnnotationsMap;
+  loading: boolean;
+  refreshing: boolean;
+  fetchError: string | null;
+  lastUpdated: Date;
+}
+
+type StatusAction =
+  | { type: "SET_HEALTH"; payload: BackendHealthWithLatency | null }
+  | { type: "SET_RUNS"; payload: GitHubRun[] | null }
+  | { type: "SET_ANNOTATIONS"; payload: AnnotationsMap }
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_REFRESHING"; payload: boolean }
+  | { type: "SET_ERROR"; payload: string | null }
+  | { type: "SET_LAST_UPDATED"; payload: Date };
+
+const statusReducer = (state: StatusState, action: StatusAction): StatusState => {
+  switch (action.type) {
+    case "SET_HEALTH":
+      return { ...state, health: action.payload };
+    case "SET_RUNS":
+      return { ...state, runs: action.payload };
+    case "SET_ANNOTATIONS":
+      return { ...state, annotations: action.payload };
+    case "SET_LOADING":
+      return { ...state, loading: action.payload };
+    case "SET_REFRESHING":
+      return { ...state, refreshing: action.payload };
+    case "SET_ERROR":
+      return { ...state, fetchError: action.payload };
+    case "SET_LAST_UPDATED":
+      return { ...state, lastUpdated: action.payload };
+    default:
+      return state;
+  }
+};
+
 export default function StatusScreen() {
   const { t } = useTranslations();
   const isDetailed = useLocalSearchParams<{ debug: string }>().debug === "true";
 
-  const [health, setHealth] = useState<BackendHealthWithLatency | null>(null);
-  const [runs, setRuns] = useState<GitHubRun[] | null>(null);
-  const [annotations, setAnnotations] = useState<AnnotationsMap>({});
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [fetchError, setFetchError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [state, dispatch] = useReducer(statusReducer, {
+    health: null,
+    runs: null,
+    annotations: {},
+    loading: true,
+    refreshing: false,
+    fetchError: null,
+    lastUpdated: new Date(),
+  });
 
   const fetchData = useCallback(async () => {
-    setFetchError(null);
+    dispatch({ type: "SET_ERROR", payload: null });
 
     // We fetch independently so GitHub failures don't block the backend status
     const [healthData, runsData] = await Promise.all([
       StatusService.fetchBackendHealth().catch((err: Error) => {
         logger.error("[ERROR] Backend health fetch failed", err);
-        setFetchError("unreachable");
+        dispatch({ type: "SET_ERROR", payload: "unreachable" });
         return null;
       }),
       StatusService.fetchGitHubRuns().catch((err: Error) => {
         logger.error("[ERROR] GitHub runs fetch failed", err);
-        return null; // Return null on failure instead of empty array
+        return null;
       }),
     ]);
 
@@ -202,15 +249,15 @@ export default function StatusScreen() {
           }
         }),
       );
-      setAnnotations(newAnnotationsMap);
+      dispatch({ type: "SET_ANNOTATIONS", payload: newAnnotationsMap });
     }
 
-    if (healthData) setHealth(healthData);
-    if (runsData) setRuns(runsData);
+    if (healthData) dispatch({ type: "SET_HEALTH", payload: healthData });
+    if (runsData) dispatch({ type: "SET_RUNS", payload: runsData });
 
-    setLastUpdated(new Date());
-    setLoading(false);
-    setRefreshing(false);
+    dispatch({ type: "SET_LAST_UPDATED", payload: new Date() });
+    dispatch({ type: "SET_LOADING", payload: false });
+    dispatch({ type: "SET_REFRESHING", payload: false });
   }, [isDetailed]);
 
   useEffect(() => {
@@ -220,11 +267,11 @@ export default function StatusScreen() {
   }, [fetchData]);
 
   const onRefresh = () => {
-    setRefreshing(true);
+    dispatch({ type: "SET_REFRESHING", payload: true });
     fetchData();
   };
 
-  if (loading) {
+  if (state.loading) {
     return <LoadingView message={t("common.loading")} />;
   }
 
@@ -234,7 +281,7 @@ export default function StatusScreen() {
     const run = runs.find((r) => r.name.toLowerCase().includes(name.toLowerCase()));
     if (!run) return { status: "loading" as const, message: t("status.loading_dots") };
 
-    const annotationData = annotations[run.head_commit.id];
+    const annotationData = state.annotations[run.head_commit.id];
     const annotationCount = annotationData?.count || 0;
     const forcedWarning = isDetailed && annotationCount > 0 && run.conclusion === "success";
 
@@ -261,15 +308,19 @@ export default function StatusScreen() {
     };
   };
 
-  const ciStatus = getStatusFromRuns(runs, "CI");
-  const deployStatus = getStatusFromRuns(runs, "Deploy Web");
+  const ciStatus = getStatusFromRuns(state.runs, "CI");
+  const deployStatus = getStatusFromRuns(state.runs, "Deploy Web");
 
-  const dbLatencyNum = health?.database.latency ? parseInt(health.database.latency) : 0;
+  const dbLatencyNum = state.health?.database.latency ? parseInt(state.health.database.latency) : 0;
   const dbStatus =
-    health?.database.status === "error" ? "error" : dbLatencyNum > 500 ? "warning" : "success";
+    state.health?.database.status === "error"
+      ? "error"
+      : dbLatencyNum > 500
+        ? "warning"
+        : "success";
 
-  const uptimeHours = Math.floor((health?.uptime || 0) / 3600);
-  const uptimeMinutes = Math.floor(((health?.uptime || 0) % 3600) / 60);
+  const uptimeHours = Math.floor((state.health?.uptime || 0) / 3600);
+  const uptimeMinutes = Math.floor(((state.health?.uptime || 0) % 3600) / 60);
   const uptimeStr = `${uptimeHours}h ${uptimeMinutes}m`;
 
   const envColors = {
@@ -306,15 +357,17 @@ export default function StatusScreen() {
   };
 
   const healthEnv =
-    health?.environment && health.environment !== "mock" ? health.environment : "default";
+    state.health?.environment && state.health.environment !== "mock"
+      ? state.health.environment
+      : "default";
   const colors = envColors[healthEnv as keyof typeof envColors] || envColors.default;
 
-  const apiDesc = health?.environment
-    ? `${t("status.env_label")}: ${t(`status.env_${health.environment}`)}`
+  const apiDesc = state.health?.environment
+    ? `${t("status.env_label")}: ${t(`status.env_${state.health.environment}`)}`
     : t("status.api_desc");
 
-  const dbDesc = health?.environment
-    ? `${t("status.env_label")}: ${t(`status.env_${health.environment}`)}`
+  const dbDesc = state.health?.environment
+    ? `${t("status.env_label")}: ${t(`status.env_${state.health.environment}`)}`
     : t("status.db_desc");
 
   return (
@@ -330,7 +383,7 @@ export default function StatusScreen() {
         className="flex-1"
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
+            refreshing={state.refreshing}
             onRefresh={onRefresh}
             tintColor={COLORS.primary}
           />
@@ -339,14 +392,16 @@ export default function StatusScreen() {
         <ScreenContent className="pt-24 px-4 items-start">
           <View className="mb-8 items-start w-full">
             <Text className="text-3xl font-bold text-on-surface mb-2">{t("status.title")}</Text>
-            {fetchError && (
+            {state.fetchError && (
               <View className="bg-error/10 p-3 rounded-lg border border-error/20 mb-4">
-                <Text className="text-error text-sm font-medium">{t(`status.${fetchError}`)}</Text>
+                <Text className="text-error text-sm font-medium">
+                  {t(`status.${state.fetchError}`)}
+                </Text>
               </View>
             )}
-            {lastUpdated && !fetchError && (
+            {state.lastUpdated && !state.fetchError && (
               <Text className="text-on-surface/50">
-                {t("status.last_updated", { time: formatTime(lastUpdated) })}
+                {t("status.last_updated", { time: formatTime(state.lastUpdated) })}
               </Text>
             )}
           </View>
@@ -358,18 +413,18 @@ export default function StatusScreen() {
             <StatusCard
               title={t("status.api")}
               icon="server"
-              status={health?.status === "ok" ? "success" : "error"}
-              description={health?.status === "ok" ? apiDesc : t("status.unreachable")}
+              status={state.health?.status === "ok" ? "success" : "error"}
+              description={state.health?.status === "ok" ? apiDesc : t("status.unreachable")}
               badgeStyle={colors}
-              detail={`${t("status.latency_label", { value: health?.apiLatency || "0ms" })} • ${t("status.uptime_label", { value: uptimeStr })}`}
+              detail={`${t("status.latency_label", { value: state.health?.apiLatency || "0ms" })} • ${t("status.uptime_label", { value: uptimeStr })}`}
             />
             <StatusCard
               title={t("status.database")}
               icon="database"
               status={dbStatus}
-              description={health?.database.status === "ok" ? dbDesc : t("status.outage")}
+              description={state.health?.database.status === "ok" ? dbDesc : t("status.outage")}
               badgeStyle={colors}
-              detail={t("status.latency_label", { value: health?.database.latency || "0ms" })}
+              detail={t("status.latency_label", { value: state.health?.database.latency || "0ms" })}
             />
           </View>
 
@@ -389,7 +444,7 @@ export default function StatusScreen() {
                     ? envColors.staging
                     : undefined
               }
-              detail={ciStatus.detail || "GitHub Actions"}
+              detail={ciStatus.detail || t("common.ci_name")}
               url={ciStatus.url}
               messages={ciStatus.messages}
               isDetailed={isDetailed}
@@ -406,7 +461,7 @@ export default function StatusScreen() {
                     ? envColors.staging
                     : undefined
               }
-              detail={deployStatus.detail || "EAS Hosting"}
+              detail={deployStatus.detail || t("common.deploy_name")}
               url={deployStatus.url}
               messages={deployStatus.messages}
               isDetailed={isDetailed}
