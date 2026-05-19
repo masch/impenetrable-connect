@@ -307,6 +307,7 @@
     "close": "Close",
     "close_hint": "Close this modal",
     "cancel_hint": "Dismiss and close this dialog",
+    "toggle_language": "Toggle {{language}} language",
     "language_selected": "Selected. Tap to deselect",
     "language_tap_to_select": "Tap to select",
     "project_view_details": "Double tap to view project details",
