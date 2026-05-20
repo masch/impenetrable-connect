@@ -1,6 +1,7 @@
 import { Text, View } from "react-native";
 import { Button } from "./Button";
 import { Language } from "@repo/shared";
+import { useTranslations } from "../hooks/useI18n";
 
 interface FormLanguageSelectorProps {
   label: string;
@@ -17,6 +18,7 @@ export function FormLanguageSelector({
   availableLanguages = ["es", "en"],
   error,
 }: FormLanguageSelectorProps) {
+  const { t } = useTranslations();
   return (
     <View className="mb-3">
       <Text className="text-sm font-medium text-on-surface mb-2">{label}</Text>
@@ -27,11 +29,13 @@ export function FormLanguageSelector({
             <Button
               key={lang}
               variant="ghost"
+              testID={`language-toggle-${lang}`}
               className={`
                 px-5 py-3 min-h-touch rounded-none
                 ${isSelected ? "bg-primary-container" : "bg-surface-container-highest"}
               `}
               onPress={() => onToggle(lang)}
+              accessibilityLabel={t("common.toggle_language", { language: lang })}
             >
               <Text
                 className={`

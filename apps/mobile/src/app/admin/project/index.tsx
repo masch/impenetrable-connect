@@ -1,7 +1,7 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useFocusEffect, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Text, View, ScrollView } from "react-native";
+import { Text, View, ScrollView, RefreshControl } from "react-native";
 import { useProjectStore } from "../../../stores/project.store";
 import { useTranslations } from "../../../hooks/useI18n";
 import { useProjectSelectors } from "../../../hooks/useProjectSelectors";
@@ -12,10 +12,17 @@ import Screen from "../../../components/Screen";
 import LoadingView from "../../../components/LoadingView";
 
 export default function ProjectsScreen() {
-  const router = useRouter();
+  const { push } = useRouter();
   const { isLoading, error, fetchProjects } = useProjectStore();
   const { t } = useTranslations();
   const { activeProjects, inactiveProjects } = useProjectSelectors();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchProjects();
+    setRefreshing(false);
+  }, [fetchProjects]);
 
   useFocusEffect(
     useCallback(() => {
@@ -28,6 +35,7 @@ export default function ProjectsScreen() {
       <ScrollView
         className="flex-1 w-full self-center max-w-sm pb-6"
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {/* Header */}
         <View className="mb-8 flex-row justify-between items-center">
@@ -82,7 +90,8 @@ export default function ProjectsScreen() {
             <Button
               title={t("add_project")}
               icon="+"
-              onPress={() => router.push("/admin/project/new")}
+              onPress={() => push("/admin/project/new")}
+              testID="add-project-button"
             />
           </View>
         )}
