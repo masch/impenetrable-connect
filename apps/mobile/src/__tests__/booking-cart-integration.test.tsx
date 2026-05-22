@@ -1,14 +1,14 @@
 import { render, screen, fireEvent } from "./utils/test-utils";
 import BookingScreen from "../app/tourist/booking";
 import { useCartStore } from "../stores/cart.store";
-import { useCatalogStore } from "../stores/catalog.store";
+import { useCatalogStore } from "../stores/product.store";
 import { useReservationStore } from "../stores/reservation.store";
 import { useAuthStore } from "../stores/auth.store";
 import { useProjectStore } from "../stores/project.store";
 
 // Mocking all involved stores
 jest.mock("../stores/cart.store");
-jest.mock("../stores/catalog.store");
+jest.mock("../stores/product.store");
 jest.mock("../stores/reservation.store");
 jest.mock("../stores/auth.store");
 jest.mock("../stores/project.store");
@@ -32,7 +32,7 @@ const mockServices = [
     zzz_name_i18n: { es: "Beef Empanadas 1/2 dozen", en: "Beef Empanadas 1/2 dozen" },
     zzz_description_i18n: { es: "De carne", en: "Meat" },
     zzz_price: 9500,
-    zzz_catalog_category_id: 1, // GASTRONOMY
+    zzz_product_category_id: 1, // GASTRONOMY
     zzz_image_url: "test.jpg",
     zzz_service_moments: ["LUNCH", "DINNER"], // Moment-based filtering enabled
   },

@@ -1,12 +1,12 @@
 import { describe, it, expect } from "bun:test";
-import { CatalogItemSchema } from "../catalog";
+import { CatalogItemSchema } from "../product";
 
-describe("CatalogItemSchema", () => {
+describe("CatalogItemSchema (Product)", () => {
   it("should validate a standard catalog item", () => {
     const validItem = {
       zzz_id: 1,
-      zzz_catalog_type_id: 10,
-      zzz_catalog_category_id: 1,
+      zzz_product_type_id: 10,
+      zzz_product_category_id: 1,
       zzz_name_i18n: { es: "Guiso" },
       zzz_description_i18n: { es: "Rico" },
       zzz_price: 15.0,
@@ -20,8 +20,8 @@ describe("CatalogItemSchema", () => {
   it("should allow catalog item without max_participants", () => {
     const masterItem = {
       zzz_id: 1,
-      zzz_catalog_type_id: 10,
-      zzz_catalog_category_id: 1,
+      zzz_product_type_id: 10,
+      zzz_product_category_id: 1,
       zzz_name_i18n: { es: "Guiso" },
       zzz_description_i18n: { es: "Rico" },
       zzz_price: 15.0,

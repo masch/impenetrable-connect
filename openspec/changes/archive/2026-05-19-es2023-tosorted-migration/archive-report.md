@@ -11,10 +11,10 @@ Replaced 2 occurrences of `[...projects].sort()` with ES2023's native `toSorted(
 
 ## Changes
 
-| File | Change |
-|------|--------|
+| File                                           | Change                                          |
+| ---------------------------------------------- | ----------------------------------------------- |
 | `apps/mobile/src/hooks/useProjectSelectors.ts` | Line 14: `sortProjectsByActiveFirst` → toSorted |
-| `apps/mobile/src/hooks/useProjectSelectors.ts` | Line 26: `sortProjectsByName` → toSorted |
+| `apps/mobile/src/hooks/useProjectSelectors.ts` | Line 26: `sortProjectsByName` → toSorted        |
 
 ## Verification
 

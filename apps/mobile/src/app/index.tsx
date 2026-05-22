@@ -71,6 +71,11 @@ const ROLE_CONFIG: Record<UserRole, RoleConfig> = {
   },
 };
 
+const DEMO_BUTTON_MIN_WIDTH = "min-w-[45%]";
+const DEMO_BUTTON_BG = "bg-white/60";
+const ICON_SIZE_ROLE_HEADER = 24;
+const ICON_SIZE_VENTURE = 16;
+
 export default function RoleSelectorScreen() {
   const { setUserRole } = useAuthStore();
   const login = useAuthStore((state) => state.login);
@@ -84,7 +89,7 @@ export default function RoleSelectorScreen() {
 
   const handleDemoLogin = async (user: User) => {
     const role = user.role;
-    const isTourist = role === "TOURIST";
+    const isTourist = role === UserRole.TOURIST;
 
     try {
       // Clear previous session state before new demo login
@@ -162,9 +167,9 @@ export default function RoleSelectorScreen() {
                   >
                     <Icon
                       name={config.icon}
-                      size={24}
+                      size={ICON_SIZE_ROLE_HEADER}
                       color={COLORS["on-primary"]}
-                      accessibilityLabel={config.titleKey}
+                      accessibilityLabel={t(config.titleKey)}
                     />
                   </View>
                   <View className="flex-1">
@@ -193,7 +198,18 @@ export default function RoleSelectorScreen() {
                   <View className="h-4" />
                 )}
 
-                {/* Real Login Button - For Entrepreneur and Admin in Real Mode */}
+                {/* Real Login Button - For all roles in Real Mode */}
+                {!env.USE_MOCKS && group.role === UserRole.TOURIST && (
+                  <Button
+                    variant="outline"
+                    onPress={handleTouristSignUp}
+                    leftIcon={config.actionIcon}
+                    title={t(config.actionTitleKey || "")}
+                    subtitle={t(config.actionDescriptionKey || "")}
+                    className={`mb-4 border ${config.borderClass}`}
+                    testID={`role-button-${group.role.toLowerCase()}`}
+                  />
+                )}
                 {!env.USE_MOCKS &&
                   (group.role === UserRole.ENTREPRENEUR || group.role === UserRole.ADMIN) && (
                     <Button
@@ -227,7 +243,7 @@ export default function RoleSelectorScreen() {
                                 <View className="bg-primary/10 p-1.5 rounded-lg">
                                   <Icon
                                     name="storefront"
-                                    size={16}
+                                    size={ICON_SIZE_VENTURE}
                                     color={COLORS.primary}
                                     accessibilityLabel="venture"
                                   />
@@ -252,7 +268,7 @@ export default function RoleSelectorScreen() {
                                       title={formatUserDisplayName(
                                         user.firstName || user.email || "",
                                       )}
-                                      className={`flex-1 min-w-[45%] border ${config.borderClass} bg-white/60 px-3 py-2.5 rounded-xl`}
+                                      className={`flex-1 ${DEMO_BUTTON_MIN_WIDTH} border ${config.borderClass} ${DEMO_BUTTON_BG} px-3 py-2.5 rounded-xl`}
                                       textClassName={config.textClass}
                                       iconColor={COLORS.primary}
                                     />
@@ -277,7 +293,7 @@ export default function RoleSelectorScreen() {
                               testID={`demo-login-${user.alias || user.email}`}
                               leftIcon={config.userIcon}
                               title={displayName}
-                              className={`flex-1 min-w-[45%] border ${config.borderClass} ${config.accentClass} px-3 py-2.5 rounded-lg`}
+                              className={`flex-1 ${DEMO_BUTTON_MIN_WIDTH} border ${config.borderClass} ${config.accentClass} px-3 py-2.5 rounded-lg`}
                               textClassName={config.textClass}
                               iconColor={
                                 group.role === UserRole.ADMIN

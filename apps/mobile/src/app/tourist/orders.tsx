@@ -14,7 +14,7 @@ import LoadingView from "../../components/LoadingView";
 import { AppAlert } from "../../components/AppAlert";
 import { useReservationStore } from "../../stores/reservation.store";
 import { useAuthStore } from "../../stores/auth.store";
-import { useCatalogStore } from "../../stores/catalog.store";
+import { useCatalogStore } from "../../stores/product.store";
 import { getMomentConfig } from "../../constants/moments";
 import { type Order, type ServiceMoment, COLORS } from "@repo/shared";
 import {
@@ -26,6 +26,11 @@ import {
 } from "../../logic/formatters";
 import { formatMomentTimeRange } from "../../constants/moments";
 import ReservationCard from "../../components/entrepreneur/ReservationCard";
+
+const ICON_SIZE_EMPTY_STATE = 48;
+const ICON_SIZE_DATE_PICKER = 22;
+const ICON_SIZE_MOMENT_HEADER = 18;
+const ICON_SIZE_TIME_LABEL = 16;
 
 // Empty State Component
 interface EmptyStateProps {
@@ -50,7 +55,7 @@ function EmptyState({ type }: EmptyStateProps) {
     <View className="flex-1 items-center justify-center py-20">
       <Icon
         name={type === "active" ? "package-variant-closed" : "history"}
-        size={48}
+        size={ICON_SIZE_EMPTY_STATE}
         color={COLORS["on-surface"]}
         className="opacity-20 mb-4"
       />
@@ -152,8 +157,10 @@ export default function OrderScreen() {
   }, [filteredOrders]);
 
   // Render horizontal date selector like the agenda
+  const DATE_SELECTOR_DAYS = 7;
+  const DATE_TILE_CLASSES = "w-[58px] h-[82px]";
   const renderDateSelector = () => {
-    const days = [0, 1, 2, 3, 4, 5, 6].map((offset) => {
+    const days = Array.from({ length: DATE_SELECTOR_DAYS }, (_, i) => i).map((offset) => {
       const date = new Date();
       date.setDate(date.getDate() + offset);
       return date;
@@ -197,7 +204,7 @@ export default function OrderScreen() {
                   accessibilityHint={t("accessibility.date_selection_hint")}
                 >
                   <View
-                    className={`w-[58px] h-[82px] rounded-3xl border items-center justify-center overflow-hidden ${
+                    className={`${DATE_TILE_CLASSES} rounded-3xl border items-center justify-center overflow-hidden ${
                       isSelected
                         ? "bg-primary border-primary shadow-lg"
                         : isToday
@@ -213,7 +220,7 @@ export default function OrderScreen() {
                           >
                             <Icon
                               name={isToday ? "star" : "calendar-arrow-right"}
-                              size={22}
+                              size={ICON_SIZE_DATE_PICKER}
                               color={
                                 isSelected
                                   ? COLORS["on-primary"]
@@ -224,7 +231,7 @@ export default function OrderScreen() {
                             />
                           </View>
                           <Text
-                            className={`font-display-black text-[9px] uppercase tracking-[0.5px] ${
+                            className={`font-display-black text-[9px] uppercase tracking-wider ${
                               isSelected
                                 ? "text-white"
                                 : isToday
@@ -313,7 +320,11 @@ export default function OrderScreen() {
                           {/* Moment Header */}
                           <View className="flex-row items-center mb-4 px-2">
                             <View className={`p-1.5 rounded-lg mr-3 ${config.bgClass}/15`}>
-                              <Icon name={config.icon} size={18} color={config.hex} />
+                              <Icon
+                                name={config.icon}
+                                size={ICON_SIZE_MOMENT_HEADER}
+                                color={config.hex}
+                              />
                             </View>
                             <Text className="font-display-bold text-lg text-on-surface">
                               {formatMoment(moment as ServiceMoment, t)}
@@ -332,13 +343,15 @@ export default function OrderScreen() {
                                   <View className="flex-row justify-center items-center mb-2">
                                     {(() => {
                                       const momentConf = getMomentConfig(moment as ServiceMoment);
-                                      const momentColor = momentConf?.hex || COLORS.primary;
                                       return (
                                         <View
-                                          className="flex-row items-center px-3 py-1.5 rounded-full gap-1.5"
-                                          style={{ backgroundColor: momentColor }}
+                                          className={`flex-row items-center px-3 py-1.5 rounded-full gap-1.5 ${momentConf.bgClass}`}
                                         >
-                                          <Icon name="clock-outline" size={16} color="#FFFFFF" />
+                                          <Icon
+                                            name="clock-outline"
+                                            size={ICON_SIZE_TIME_LABEL}
+                                            color="#FFFFFF"
+                                          />
                                           <Text className="font-display-bold text-base text-white">
                                             {displayTime}
                                           </Text>

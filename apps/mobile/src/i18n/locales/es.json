@@ -195,7 +195,9 @@
     "resume_confirm_message": "¡Genial! Tu emprendimiento volverá a estar visible para todos los turistas y podrás recibir nuevos pedidos de inmediato.",
     "deactivate_warning": "ADVERTENCIA: Desactivar este emprendimiento cancelará su visibilidad en el catálogo de forma inmediata.",
     "status_toggle_label": "Interruptor de estado del emprendimiento",
-    "status_toggle_hint": "Doble tocada para activar o desactivar el emprendimiento"
+    "status_toggle_hint": "Doble tocada para activar o desactivar el emprendimiento",
+    "select_venture": "Seleccionar Emprendimiento",
+    "no_ventures": "Todavía no tenés emprendimientos"
   },
   "orders": {
     "title": "Mis Pedidos",

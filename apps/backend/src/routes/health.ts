@@ -5,6 +5,9 @@ import { logger } from "../services/logger.service";
 import type { GitHubRun } from "@repo/shared";
 import { getAppConfig, type AppEnv } from "../config/env";
 
+const GITHUB_RUNS_PER_PAGE = 5;
+const MAX_GITHUB_RUNS = 3;
+
 const health = new Hono<AppEnv>();
 
 /**
@@ -16,6 +19,11 @@ const checkAuth = (c: Context<AppEnv>) => {
   return !!(healthKey && healthKey === config.healthToken);
 };
 
+/**
+ * GET /health
+ * Public: returns { status: "ok" }.
+ * Authenticated (X-Health-Key): returns detailed health check with DB status, uptime, and GitHub runs.
+ */
 health.get("/", async (c) => {
   const config = getAppConfig(c);
   const isAuthorized = checkAuth(c);
@@ -45,7 +53,7 @@ health.get("/", async (c) => {
 
   if (GITHUB_REPO) {
     try {
-      const ghUrl = `https://api.github.com/repos/${GITHUB_REPO}/actions/runs?per_page=5`;
+      const ghUrl = `https://api.github.com/repos/${GITHUB_REPO}/actions/runs?per_page=${GITHUB_RUNS_PER_PAGE}`;
       const response = await fetch(ghUrl, {
         headers: {
           "User-Agent": "Hono-Backend",
@@ -54,7 +62,7 @@ health.get("/", async (c) => {
       });
       if (response.ok) {
         const data = (await response.json()) as { workflow_runs?: GitHubRun[] };
-        githubRuns = (data.workflow_runs || []).slice(0, 3);
+        githubRuns = (data.workflow_runs || []).slice(0, MAX_GITHUB_RUNS);
       }
     } catch (error) {
       logger.error("GitHub fetch failed in health check", error);
@@ -78,6 +86,12 @@ health.get("/", async (c) => {
   });
 });
 
+/**
+ * GET /health/check-runs/:ref
+ * Returns GitHub check runs and annotations for a given commit/branch ref.
+ * Requires X-Health-Key header.
+ * Param: ref (string) — commit SHA or branch name
+ */
 health.get("/check-runs/:ref", async (c) => {
   if (!checkAuth(c)) {
     return c.json({ error: "Unauthorized" }, 401);

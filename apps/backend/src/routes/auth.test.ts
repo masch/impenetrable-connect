@@ -2,7 +2,12 @@ import { describe, expect, it, beforeAll, afterAll, spyOn, type Mock } from "bun
 import { Hono } from "hono";
 import { authRouter } from "./auth";
 import { sign } from "hono/jwt";
-import { MOCK_USER_ADMIN, MOCK_USER_ENTREPRENEUR_WITH_ORDERS, UserRole } from "@repo/shared";
+import {
+  MOCK_USER_ADMIN,
+  MOCK_USER_ENTREPRENEUR_WITH_ORDERS,
+  MOCK_USER_TOURIST_WITH_ORDERS,
+  UserRole,
+} from "@repo/shared";
 import { authMiddleware, roleGuard } from "../middleware/auth";
 import { dbMiddleware } from "../middleware/db";
 import * as dbFactory from "../db/index";
@@ -27,6 +32,7 @@ describe("Auth API Integration", () => {
   let entrepreneurToken: string;
   let createDbSpy: Mock<typeof dbFactory.createDb>;
   let loginSpy: Mock<typeof AuthService.login>;
+  let createTouristSpy: Mock<typeof AuthService.createTourist>;
 
   beforeAll(async () => {
     // Mock createDb to avoid connection errors, although it won't be used by our mocked AuthService
@@ -51,9 +57,52 @@ describe("Auth API Integration", () => {
       return {
         user: { ...user, role } as unknown as typeof MOCK_USER_ADMIN,
         accessToken,
-        refreshToken: "11111111-2222-3333-4444-555555555555" as const,
+        refreshToken: "11111111-2222-3333-4444-555555555555",
       };
     });
+
+    createTouristSpy = spyOn(AuthService, "createTourist").mockImplementation(
+      async (...args: Parameters<typeof AuthService.createTourist>) => {
+        const [input] = args;
+        const createInput = input as { alias: string | null };
+        // Simulate find-or-create: return existing tourist or throw for error simulation
+        if (createInput.alias === MOCK_USER_TOURIST_WITH_ORDERS.alias) {
+          const accessToken = await sign(
+            {
+              sub: MOCK_USER_TOURIST_WITH_ORDERS.id,
+              role: UserRole.TOURIST,
+              exp: Math.floor(Date.now() / 1000) + 3600,
+            },
+            TEST_ENV.JWT_SECRET,
+          );
+          return {
+            user: MOCK_USER_TOURIST_WITH_ORDERS,
+            accessToken,
+            refreshToken: "11111111-2222-3333-4444-555555555555",
+          };
+        }
+        if (createInput.alias === "server-error") throw new Error("mock-server-error");
+
+        // New tourist created
+        const accessToken = await sign(
+          {
+            sub: "new-tourist-id",
+            role: UserRole.TOURIST,
+            exp: Math.floor(Date.now() / 1000) + 3600,
+          },
+          TEST_ENV.JWT_SECRET,
+        );
+        return {
+          user: {
+            ...MOCK_USER_TOURIST_WITH_ORDERS,
+            id: "new-tourist-id",
+            alias: createInput.alias ?? "unknown",
+          },
+          accessToken,
+          refreshToken: "11111111-2222-3333-4444-555555555555",
+        };
+      },
+    );
 
     // Login as Admin
     const adminRes = await testApp.request(
@@ -150,8 +199,103 @@ describe("Auth API Integration", () => {
     expect(body.message).toBe("errors.auth.invalid_credentials");
   });
 
+  describe("POST /v1/auth/tourist/create", () => {
+    it("should create a new tourist and return tokens", async () => {
+      const res = await testApp.request(
+        "/v1/auth/tourist/create",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            alias: "New Explorer",
+            role: "TOURIST",
+            email: null,
+            firstName: null,
+            lastName: null,
+            phoneNumber: null,
+          }),
+        },
+        TEST_ENV,
+      );
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as {
+        accessToken: string;
+        refreshToken: string;
+        user: { role: string; alias: string };
+      };
+      expect(body.accessToken).toBeDefined();
+      expect(body.refreshToken).toBeDefined();
+      expect(body.user.role).toBe("TOURIST");
+      expect(body.user.alias).toBe("New Explorer");
+    });
+
+    it("should login existing tourist when alias already exists", async () => {
+      const res = await testApp.request(
+        "/v1/auth/tourist/create",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            alias: MOCK_USER_TOURIST_WITH_ORDERS.alias,
+            role: "TOURIST",
+            email: null,
+            firstName: null,
+            lastName: null,
+            phoneNumber: null,
+          }),
+        },
+        TEST_ENV,
+      );
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { accessToken: string; user: { id: string } };
+      expect(body.accessToken).toBeDefined();
+      expect(body.user.id).toBe(MOCK_USER_TOURIST_WITH_ORDERS.id);
+    });
+
+    it("should return 400 for invalid input (missing role)", async () => {
+      const res = await testApp.request(
+        "/v1/auth/tourist/create",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            alias: "Missing Role",
+            email: null,
+          }),
+        },
+        TEST_ENV,
+      );
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 500 when creation fails", async () => {
+      const res = await testApp.request(
+        "/v1/auth/tourist/create",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            alias: "server-error",
+            role: "TOURIST",
+            email: null,
+            firstName: null,
+            lastName: null,
+            phoneNumber: null,
+          }),
+        },
+        TEST_ENV,
+      );
+
+      expect(res.status).toBe(500);
+    });
+  });
+
   afterAll(() => {
     createDbSpy.mockRestore();
     loginSpy.mockRestore();
+    createTouristSpy.mockRestore();
   });
 });

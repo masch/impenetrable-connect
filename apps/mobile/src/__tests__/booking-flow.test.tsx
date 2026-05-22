@@ -1,14 +1,14 @@
 import { render, screen, fireEvent, waitFor } from "./utils/test-utils";
 import BookingScreen from "../app/tourist/booking";
 import { useCartStore } from "../stores/cart.store";
-import { useCatalogStore } from "../stores/catalog.store";
+import { useCatalogStore } from "../stores/product.store";
 import { useReservationStore } from "../stores/reservation.store";
 import { useAuthStore } from "../stores/auth.store";
 import { router } from "expo-router";
 
 // Mocking all involved stores
 jest.mock("../stores/cart.store");
-jest.mock("../stores/catalog.store");
+jest.mock("../stores/product.store");
 jest.mock("../stores/reservation.store");
 jest.mock("../stores/auth.store");
 
@@ -18,7 +18,7 @@ const mockServices = [
     zzz_name_i18n: { es: "Empanadas", en: "Empanadas" },
     zzz_description_i18n: { es: "De carne", en: "Meat" },
     zzz_price: 1500,
-    zzz_catalog_category_id: 1, // GASTRONOMY
+    zzz_product_category_id: 1, // GASTRONOMY
     zzz_image_url: "test.jpg",
     zzz_service_moments: ["LUNCH", "DINNER"], // Moment-based filtering enabled
   },

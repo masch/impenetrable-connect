@@ -3,13 +3,13 @@ import { render } from "@testing-library/react-native";
 import OrderScreen from "../orders";
 import { useReservationStore, type ReservationState } from "../../../stores/reservation.store";
 import { useAuthStore, type AuthState } from "../../../stores/auth.store";
-import { useCatalogStore, type CatalogState } from "../../../stores/catalog.store";
+import { useCatalogStore, type CatalogState } from "../../../stores/product.store";
 import { type Order, UserRole } from "@repo/shared";
 
 // Mock the stores
 jest.mock("../../../stores/reservation.store");
 jest.mock("../../../stores/auth.store");
-jest.mock("../../../stores/catalog.store");
+jest.mock("../../../stores/product.store");
 
 const mockedUseReservationStore = jest.mocked(useReservationStore);
 const mockedUseAuthStore = jest.mocked(useAuthStore);
@@ -107,7 +107,7 @@ describe("OrderScreen (Tourist)", () => {
           zzz_price: 2000,
           zzz_catalog_item: {
             zzz_id: 2,
-            zzz_catalog_category_id: 1,
+            zzz_product_category_id: 1,
             zzz_name_i18n: { es: "Guiso", en: "Stew" },
             zzz_price: 1000,
             zzz_max_participants: 20,

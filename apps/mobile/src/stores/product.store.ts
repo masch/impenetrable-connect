@@ -6,14 +6,14 @@
 
 import { create } from "zustand";
 import type { ServiceMoment, HourMinute, Order } from "@repo/shared";
-import type { CatalogServiceItem } from "../services/catalog.service";
-import { CatalogService } from "../services/catalog.service";
+import type { ProductItem } from "../services/product.service";
+import { ProductService } from "../services/product.service";
 import { logger } from "../services/logger.service";
 
 export interface CatalogState {
   // Services data
-  services: CatalogServiceItem[];
-  selectedService: CatalogServiceItem | null;
+  services: ProductItem[];
+  selectedService: ProductItem | null;
 
   // Orders created during the session
   orders: Order[];
@@ -54,7 +54,7 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
   fetchServices: async () => {
     set({ isLoading: true, error: null });
     try {
-      const services = await CatalogService.getServices();
+      const services = await ProductService.getServices();
       set({ services, isLoading: false });
     } catch (err: unknown) {
       logger.error("Error fetching services", err);
@@ -66,7 +66,7 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
   fetchServicesByCategory: async (categoryId: number) => {
     set({ isLoading: true, error: null });
     try {
-      const services = await CatalogService.getServicesByCategory(categoryId);
+      const services = await ProductService.getServicesByCategory(categoryId);
       set({ services, isLoading: false });
     } catch (err: unknown) {
       logger.error(`Error fetching services for category: ${categoryId}`, err);
@@ -78,7 +78,7 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
   selectService: async (id: number) => {
     set({ isLoading: true, error: null });
     try {
-      const service = await CatalogService.getServiceById(id);
+      const service = await ProductService.getServiceById(id);
       set({ selectedService: service, isLoading: false });
     } catch (err: unknown) {
       logger.error(`Error fetching service with ID: ${id}`, err);
@@ -102,7 +102,7 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
   ) => {
     set({ isSaving: true, error: null });
     try {
-      const newOrder = await CatalogService.placeOrder(
+      const newOrder = await ProductService.placeOrder(
         date,
         moment,
         items,
@@ -129,7 +129,7 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
   fetchOrders: async () => {
     set({ isLoading: true, error: null });
     try {
-      const orders = await CatalogService.getOrders();
+      const orders = await ProductService.getOrders();
       set({ orders, isLoading: false });
     } catch (err: unknown) {
       logger.error("Error fetching orders", err);

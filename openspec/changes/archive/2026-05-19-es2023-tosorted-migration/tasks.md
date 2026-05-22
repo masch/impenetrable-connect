@@ -2,13 +2,13 @@
 
 ## Review Workload Forecast
 
-| Field | Value |
-|-------|-------|
-| Estimated changed lines | 2 |
-| 400-line budget risk | Low |
-| Chained PRs recommended | No |
-| Delivery strategy | ask-on-risk |
-| Chain strategy | N/A |
+| Field                   | Value       |
+| ----------------------- | ----------- |
+| Estimated changed lines | 2           |
+| 400-line budget risk    | Low         |
+| Chained PRs recommended | No          |
+| Delivery strategy       | ask-on-risk |
+| Chain strategy          | N/A         |
 
 Decision needed before apply: No
 Chained PRs recommended: No
@@ -17,9 +17,9 @@ Chain strategy: pending
 
 ### Suggested Work Units
 
-| Unit | Goal | Likely PR | Notes |
-|------|------|-----------|-------|
-| 1 | Replace `[...projects].sort()` with `projects.toSorted()` | PR 1 | Single file, 2 occurrences |
+| Unit | Goal                                                      | Likely PR | Notes                      |
+| ---- | --------------------------------------------------------- | --------- | -------------------------- |
+| 1    | Replace `[...projects].sort()` with `projects.toSorted()` | PR 1      | Single file, 2 occurrences |
 
 ## Phase 1: Implementation
 

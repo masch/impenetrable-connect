@@ -6,7 +6,7 @@ export const userRoleEnum = pgEnum("user_role", ["ADMIN", "ENTREPRENEUR", "TOURI
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: varchar("email", { length: 255 }).unique(), // Nullable for tourists
-  alias: varchar("alias", { length: 50 }), // For tourists
+  alias: varchar("alias", { length: 50 }).unique(), // For tourists
   passwordHash: varchar("password_hash", { length: 255 }), // Nullable for tourists
   firstName: varchar("first_name", { length: 100 }),
   lastName: varchar("last_name", { length: 100 }),

@@ -4,7 +4,8 @@ import VentureConfigScreen from "../venture-config";
 import { MockVentureService } from "../../../services/venture.service";
 import { useAuthStore } from "../../../stores/auth.store";
 import { useProjectStore } from "../../../stores/project.store";
-import { User, Project } from "@repo/shared";
+import { useVentureStore } from "../../../stores/venture.store";
+import { User, Project, Venture } from "@repo/shared";
 
 // Mock hooks and services
 jest.mock("../../../services/logger.service", () => ({
@@ -112,5 +113,128 @@ describe("VentureConfigScreen", () => {
 
     fireEvent.press(minusButton); // Back to 20
     expect(screen.getByTestId("save-button").props.accessibilityState.disabled).toBe(true);
+  });
+
+  it("should show empty state when user has no ventures", async () => {
+    useVentureStore.setState({
+      fetchVenturesByUserId: async () => {},
+      userVentures: [],
+      selectedVenture: null,
+      isLoading: false,
+    });
+
+    render(<VentureConfigScreen />);
+
+    await waitFor(() => {
+      expect(screen.getByText("venture.no_ventures")).toBeTruthy();
+    });
+  });
+
+  it("should show venture selector when user has multiple ventures", async () => {
+    useVentureStore.setState({
+      fetchVenturesByUserId: async () => {},
+      userVentures: [
+        {
+          id: 1,
+          name: "Parador Don Esteban",
+          ownerId: mariaId,
+          zzz_max_capacity: 20,
+          zzz_cascade_order: 0,
+          zzz_is_paused: false,
+          zzz_is_active: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          zzz_project_id: 1,
+        },
+        {
+          id: 2,
+          name: "Parador Campo Alegre",
+          ownerId: mariaId,
+          zzz_max_capacity: 30,
+          zzz_cascade_order: 0,
+          zzz_is_paused: false,
+          zzz_is_active: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          zzz_project_id: 1,
+        },
+      ] as Venture[],
+      selectedVenture: null,
+      isLoading: false,
+    });
+
+    render(<VentureConfigScreen />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("venture-selector-1")).toBeTruthy();
+      expect(screen.getByTestId("venture-selector-2")).toBeTruthy();
+    });
+
+    // No auto-select when >1 venture — user must pick one first
+  });
+
+  it("should update draft capacity when switching between ventures", async () => {
+    useVentureStore.setState({
+      fetchVenturesByUserId: async () => {},
+      userVentures: [
+        {
+          id: 1,
+          name: "Parador Don Esteban",
+          ownerId: mariaId,
+          zzz_max_capacity: 20,
+          zzz_cascade_order: 0,
+          zzz_is_paused: false,
+          zzz_is_active: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          zzz_project_id: 1,
+        },
+        {
+          id: 2,
+          name: "Parador Campo Alegre",
+          ownerId: mariaId,
+          zzz_max_capacity: 30,
+          zzz_cascade_order: 0,
+          zzz_is_paused: false,
+          zzz_is_active: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          zzz_project_id: 1,
+        },
+      ] as Venture[],
+      selectedVenture: {
+        id: 1,
+        name: "Parador Don Esteban",
+        ownerId: mariaId,
+        zzz_max_capacity: 20,
+        zzz_cascade_order: 0,
+        zzz_is_paused: false,
+        zzz_is_active: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        zzz_project_id: 1,
+      } as Venture,
+      isLoading: false,
+    });
+
+    render(<VentureConfigScreen />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("capacity-text").props.children).toBe(20);
+    });
+
+    // Switch to venture 2
+    fireEvent.press(screen.getByTestId("venture-selector-2"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("capacity-text").props.children).toBe(30);
+    });
+
+    // Switch back to venture 1
+    fireEvent.press(screen.getByTestId("venture-selector-1"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("capacity-text").props.children).toBe(20);
+    });
   });
 });

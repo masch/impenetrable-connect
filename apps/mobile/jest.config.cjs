@@ -7,6 +7,7 @@ module.exports = {
   testTimeout: 30000,
   moduleNameMapper: {
     "^@repo/shared$": path.resolve(__dirname, "../../packages/shared/src/index.ts"),
+    "^@babel/runtime/(.*)$": path.resolve(__dirname, "node_modules/@babel/runtime/$1"),
   },
   // Explicitly list extensions to ensure reliable implicit resolution for
   // monorepo aliases (@repo/shared) and TypeScript ESM.

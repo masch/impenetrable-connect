@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { useCatalogStore } from "../../../stores/catalog.store";
+import { useCatalogStore } from "../../../stores/product.store";
 import { useCartStore } from "../../../stores/cart.store";
 import { useAuthStore } from "../../../stores/auth.store";
 import { ServiceMoment, type CatalogItem, type HourMinute } from "@repo/shared";
@@ -88,7 +88,7 @@ function filterCatalogItemsByMoment(
 
   return items.filter((item) => {
     // Excursions (category_id = 2) are always visible - moment agnostic
-    if (item.zzz_catalog_category_id === 2) {
+    if (item.zzz_product_category_id === 2) {
       return true;
     }
 
@@ -107,7 +107,7 @@ describe("Moment-based Catalog Filtering", () => {
   const mockCatalogItems: CatalogItem[] = [
     {
       zzz_id: 1,
-      zzz_catalog_category_id: 1, // Gastronomy
+      zzz_product_category_id: 1, // Gastronomy
       zzz_name_i18n: { es: "Desayuno", en: "Breakfast" },
       zzz_description_i18n: { es: "Desayuno regional", en: "Regional breakfast" },
       zzz_price: 9000,
@@ -117,7 +117,7 @@ describe("Moment-based Catalog Filtering", () => {
     },
     {
       zzz_id: 2,
-      zzz_catalog_category_id: 1, // Gastronomy
+      zzz_product_category_id: 1, // Gastronomy
       zzz_name_i18n: { es: "Almuerzo", en: "Lunch" },
       zzz_description_i18n: { es: "Almuerzo chaqueño", en: "Chaco lunch" },
       zzz_price: 17000,
@@ -127,7 +127,7 @@ describe("Moment-based Catalog Filtering", () => {
     },
     {
       zzz_id: 3,
-      zzz_catalog_category_id: 1, // Gastronomy
+      zzz_product_category_id: 1, // Gastronomy
       zzz_name_i18n: { es: "Merienda", en: "Snack" },
       zzz_description_i18n: { es: "Merienda regional", en: "Regional snack" },
       zzz_price: 9000,
@@ -137,7 +137,7 @@ describe("Moment-based Catalog Filtering", () => {
     },
     {
       zzz_id: 4,
-      zzz_catalog_category_id: 1, // Gastronomy
+      zzz_product_category_id: 1, // Gastronomy
       zzz_name_i18n: { es: "Cena", en: "Dinner" },
       zzz_description_i18n: { es: "Cena tradicional", en: "Traditional dinner" },
       zzz_price: 20000,
@@ -147,7 +147,7 @@ describe("Moment-based Catalog Filtering", () => {
     },
     {
       zzz_id: 5,
-      zzz_catalog_category_id: 2, // Excursion
+      zzz_product_category_id: 2, // Excursion
       zzz_name_i18n: { es: "Paseo en lancha", en: "Boat trip" },
       zzz_description_i18n: { es: "Paseo por el río", en: "River trip" },
       zzz_price: 15000,
@@ -224,7 +224,7 @@ describe("Moment-based Catalog Filtering", () => {
       const edgeCaseItems: CatalogItem[] = [
         {
           zzz_id: 10,
-          zzz_catalog_category_id: 1, // Gastronomy
+          zzz_product_category_id: 1, // Gastronomy
           zzz_name_i18n: { es: "Item sin momentos", en: "Item without moments" },
           zzz_price: 1000,
           zzz_max_participants: 10,
@@ -233,7 +233,7 @@ describe("Moment-based Catalog Filtering", () => {
         },
         {
           zzz_id: 11,
-          zzz_catalog_category_id: 1, // Gastronomy
+          zzz_product_category_id: 1, // Gastronomy
           zzz_name_i18n: { es: "Item sin propiedad", en: "Item without property" },
           zzz_price: 1000,
           zzz_max_participants: 10,

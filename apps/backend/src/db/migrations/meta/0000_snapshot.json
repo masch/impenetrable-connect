@@ -1,5 +1,5 @@
 {
-  "id": "1658ae34-e9dc-4828-9777-0f1615ad52af",
+  "id": "66a73ccf-49ec-43a3-bbc0-2043ebf0f6d4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -188,6 +188,11 @@
           "name": "users_email_unique",
           "nullsNotDistinct": false,
           "columns": ["email"]
+        },
+        "users_alias_unique": {
+          "name": "users_alias_unique",
+          "nullsNotDistinct": false,
+          "columns": ["alias"]
         }
       },
       "policies": {},
@@ -213,6 +218,12 @@
         "owner_id": {
           "name": "owner_id",
           "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_project_id": {
+          "name": "zzz_project_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -273,6 +284,15 @@
           "tableTo": "users",
           "columnsFrom": ["owner_id"],
           "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ventures_zzz_project_id_projects_zzz_id_fk": {
+          "name": "ventures_zzz_project_id_projects_zzz_id_fk",
+          "tableFrom": "ventures",
+          "tableTo": "projects",
+          "columnsFrom": ["zzz_project_id"],
+          "columnsTo": ["zzz_id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -347,6 +367,255 @@
           "tableTo": "users",
           "columnsFrom": ["user_id"],
           "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.venture_members": {
+      "name": "venture_members",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "venture_id": {
+          "name": "venture_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'MANAGER'"
+        },
+        "zzz_created_at": {
+          "name": "zzz_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_updated_at": {
+          "name": "zzz_updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_deleted_at": {
+          "name": "zzz_deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "venture_members_venture_id_ventures_id_fk": {
+          "name": "venture_members_venture_id_ventures_id_fk",
+          "tableFrom": "venture_members",
+          "tableTo": "ventures",
+          "columnsFrom": ["venture_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "venture_members_user_id_users_id_fk": {
+          "name": "venture_members_user_id_users_id_fk",
+          "tableFrom": "venture_members",
+          "tableTo": "users",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.product_categories": {
+      "name": "product_categories",
+      "schema": "",
+      "columns": {
+        "zzz_id": {
+          "name": "zzz_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "zzz_project_id": {
+          "name": "zzz_project_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_name_i18n": {
+          "name": "zzz_name_i18n",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_description_i18n": {
+          "name": "zzz_description_i18n",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_is_active": {
+          "name": "zzz_is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "zzz_created_at": {
+          "name": "zzz_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_updated_at": {
+          "name": "zzz_updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_deleted_at": {
+          "name": "zzz_deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "product_categories_zzz_project_id_projects_zzz_id_fk": {
+          "name": "product_categories_zzz_project_id_projects_zzz_id_fk",
+          "tableFrom": "product_categories",
+          "tableTo": "projects",
+          "columnsFrom": ["zzz_project_id"],
+          "columnsTo": ["zzz_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.products": {
+      "name": "products",
+      "schema": "",
+      "columns": {
+        "zzz_id": {
+          "name": "zzz_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "zzz_product_category_id": {
+          "name": "zzz_product_category_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_name_i18n": {
+          "name": "zzz_name_i18n",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_description_i18n": {
+          "name": "zzz_description_i18n",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_price": {
+          "name": "zzz_price",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_max_participants": {
+          "name": "zzz_max_participants",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_image_url": {
+          "name": "zzz_image_url",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_global_pause": {
+          "name": "zzz_global_pause",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "zzz_service_moments": {
+          "name": "zzz_service_moments",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_created_at": {
+          "name": "zzz_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_updated_at": {
+          "name": "zzz_updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_deleted_at": {
+          "name": "zzz_deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "products_zzz_product_category_id_product_categories_zzz_id_fk": {
+          "name": "products_zzz_product_category_id_product_categories_zzz_id_fk",
+          "tableFrom": "products",
+          "tableTo": "product_categories",
+          "columnsFrom": ["zzz_product_category_id"],
+          "columnsTo": ["zzz_id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

@@ -8,13 +8,12 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { CatalogItem, COLORS } from "@repo/shared";
+import { CatalogItem, COLORS, PRODUCT_CATEGORY_IDS } from "@repo/shared";
 import { Icon } from "../Icon";
 import { useTranslations } from "../../hooks/useI18n";
 import { Button } from "../Button";
 import { useCartStore } from "../../stores/cart.store";
 import { getRelativeDateLabel, formatCurrency } from "../../logic/formatters";
-import { SERVICE_CATEGORY_IDS } from "../../mocks/catalog";
 
 interface ReservationModalProps {
   visible: boolean;
@@ -26,6 +25,11 @@ interface ReservationModalProps {
   initialNotes?: string;
   mode?: "add" | "edit";
 }
+
+const ICON_SIZE_MD = 24;
+const NOTES_VISIBLE_LINES = 4;
+const ALPHA_50_HEX = "80";
+const MIN_QUANTITY = 1;
 
 /**
  * ReservationModal - Context-aware booking modal
@@ -48,7 +52,7 @@ export const ReservationModal = ({
 
   if (!item) return null;
 
-  const isExcursion = item.zzz_catalog_category_id === SERVICE_CATEGORY_IDS.EXCURSION;
+  const isExcursion = item.zzz_product_category_id === PRODUCT_CATEGORY_IDS.EXCURSION;
   const quantityLabel = isExcursion
     ? t("catalog.reservation.guests")
     : t("catalog.reservation.quantity");
@@ -83,7 +87,7 @@ export const ReservationModal = ({
               <Button variant="ghost" onPress={onClose} className="p-2" testID="close-modal-button">
                 <Icon
                   name="close"
-                  size={24}
+                  size={ICON_SIZE_MD}
                   color={COLORS["on-surface"]}
                   accessibilityLabel={t("common.close")}
                 />
@@ -94,7 +98,7 @@ export const ReservationModal = ({
             <View className="flex-row items-center bg-primary/5 p-4 rounded-2xl border border-primary/10 mb-6">
               <Icon
                 name="calendar-clock"
-                size={24}
+                size={ICON_SIZE_MD}
                 color={COLORS.primary}
                 accessibilityLabel={t("common.scheduled")}
               />
@@ -117,13 +121,14 @@ export const ReservationModal = ({
               <View className="flex-row items-center justify-between bg-surface-container-low p-2 rounded-2xl border border-outline-variant/30">
                 <Button
                   variant="ghost"
-                  onPress={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                  onPress={() => setQuantity((prev) => Math.max(MIN_QUANTITY, prev - 1))}
                   className="size-12"
-                  disabled={quantity <= 1}
+                  disabled={quantity <= MIN_QUANTITY}
+                  testID="quantity-minus-button"
                 >
                   <Icon
                     name="minus"
-                    size={24}
+                    size={ICON_SIZE_MD}
                     color={COLORS.primary}
                     accessibilityLabel={t("common.decrease")}
                   />
@@ -149,7 +154,7 @@ export const ReservationModal = ({
                 >
                   <Icon
                     name="plus"
-                    size={24}
+                    size={ICON_SIZE_MD}
                     color={COLORS.primary}
                     accessibilityLabel={t("common.increase")}
                   />
@@ -164,13 +169,13 @@ export const ReservationModal = ({
               </Text>
               <TextInput
                 multiline
-                numberOfLines={4}
+                numberOfLines={NOTES_VISIBLE_LINES}
                 value={notes}
                 onChangeText={setNotes}
                 placeholder={t("catalog.reservation.notes_placeholder")}
                 className="bg-surface-container-low p-4 rounded-2xl text-on-surface font-body border border-outline-variant/30 text-base"
                 textAlignVertical="top"
-                placeholderTextColor={COLORS["on-surface-variant"] + "80"}
+                placeholderTextColor={COLORS["on-surface-variant"] + ALPHA_50_HEX}
               />
             </View>
 
@@ -182,6 +187,7 @@ export const ReservationModal = ({
               }
               onPress={handleConfirm}
               className="mb-4 h-14 rounded-2xl"
+              testID={mode === "edit" ? "update-order-button" : "add-to-selection-button"}
             />
 
             {mode === "edit" && onDelete && (
@@ -194,10 +200,11 @@ export const ReservationModal = ({
                 }}
                 className="mb-4 h-14 rounded-2xl"
                 leftIcon="trash-can-outline"
+                testID="remove-order-button"
               />
             )}
 
-            <Button title={t("common.cancel")} variant="ghost" onPress={onClose} className="mb-8" />
+            <Button title={t("common.cancel")} variant="ghost" onPress={onClose} className="mb-8" testID="cancel-order-button" />
           </ScrollView>
         </View>
       </KeyboardAvoidingView>

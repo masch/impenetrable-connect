@@ -24,3 +24,14 @@ export const CreateVentureSchema = VentureSchema.omit({
 });
 
 export type CreateVentureInput = z.infer<typeof CreateVentureSchema>;
+
+export const UpdateVentureSchema = VentureSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  zzz_project_id: true,
+  ownerId: true,
+  zzz_members: true,
+}).partial();
+
+export type UpdateVentureInput = z.infer<typeof UpdateVentureSchema>;

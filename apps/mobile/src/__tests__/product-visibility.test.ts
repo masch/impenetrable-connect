@@ -1,4 +1,4 @@
-import { CatalogService } from "../services/catalog.service";
+import { ProductService } from "../services/product.service";
 import { mockSetCurrentUser } from "../services/auth-state";
 import { MOCK_USERS } from "@repo/shared";
 
@@ -10,7 +10,7 @@ describe("Catalog Visibility Integration", () => {
   });
 
   it("should make a new order visible in the order list after placement", async () => {
-    const initialOrders = await CatalogService.getOrders();
+    const initialOrders = await ProductService.getOrders();
     const initialCount = initialOrders.length;
 
     // Place a new order
@@ -18,13 +18,13 @@ describe("Catalog Visibility Integration", () => {
     const moment = "BREAKFAST";
     const items = [{ zzz_catalog_item_id: 1, zzz_quantity: 1 }];
 
-    const newOrder = await CatalogService.placeOrder(date, moment, items, 2, "Test order");
+    const newOrder = await ProductService.placeOrder(date, moment, items, 2, "Test order");
 
     expect(newOrder).toBeDefined();
     expect(newOrder.zzz_id).toBeDefined();
 
     // Verify it appears in the orders list
-    const updatedOrders = await CatalogService.getOrders();
+    const updatedOrders = await ProductService.getOrders();
 
     // THIS IS EXPECTED TO FAIL BEFORE THE FIX
     const foundOrder = updatedOrders.find((o) => o.zzz_id === newOrder.zzz_id);
