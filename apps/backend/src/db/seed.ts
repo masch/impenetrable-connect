@@ -19,7 +19,7 @@ import { getAppConfig } from "../config/env";
 /** Resets the sequence for a table to the current max id. */
 async function resetSequence(db: Db, table: string, pkColumn: string) {
   await db.execute(
-    sql`SELECT setval(${sql.raw(`${table}_${pkColumn}_seq`)}, (SELECT MAX(${sql.identifier(pkColumn)}) FROM ${sql.identifier(table)}))`,
+    sql`SELECT setval(${`${table}_${pkColumn}_seq`}, (SELECT MAX(${sql.identifier(pkColumn)}) FROM ${sql.identifier(table)}))`,
   );
 }
 

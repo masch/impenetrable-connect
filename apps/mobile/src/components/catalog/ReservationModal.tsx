@@ -204,7 +204,13 @@ export const ReservationModal = ({
               />
             )}
 
-            <Button title={t("common.cancel")} variant="ghost" onPress={onClose} className="mb-8" testID="cancel-order-button" />
+            <Button
+              title={t("common.cancel")}
+              variant="ghost"
+              onPress={onClose}
+              className="mb-8"
+              testID="cancel-order-button"
+            />
           </ScrollView>
         </View>
       </KeyboardAvoidingView>
