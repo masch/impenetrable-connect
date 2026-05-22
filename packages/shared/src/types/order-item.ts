@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CatalogItemSchema, type CatalogItem } from "./catalog";
+import { CatalogItemSchema, type CatalogItem } from "./product";
 
 export const OrderItemSchema = z.object({
   zzz_id: z.number().int().positive(),

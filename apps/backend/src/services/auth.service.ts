@@ -1,18 +1,20 @@
 import { sign } from "hono/jwt";
 import { users, refreshTokens } from "../db/schema";
 import { eq } from "drizzle-orm";
-import { LoginInput, User, UserRole } from "@repo/shared";
+import { LoginInput, CreateUserInput, User, UserRole } from "@repo/shared";
 import { PasswordService } from "./password.service";
 import { type Db } from "../db";
 import { logger } from "./logger.service";
 
-export class AuthService {
-  static async login(input: LoginInput, db: Db, jwtSecret: string) {
-    const ACCESS_TOKEN_EXPIRY = 15 * 60; // 15 minutes
-    const REFRESH_TOKEN_EXPIRY_DAYS = 7;
+import { type UserSelect } from "../db/schema/users";
 
+export class AuthService {
+  private static readonly ACCESS_TOKEN_EXPIRY = 15 * 60; // 15 minutes
+  private static readonly REFRESH_TOKEN_EXPIRY_DAYS = 7;
+
+  static async login(input: LoginInput, db: Db, jwtSecret: string) {
     // 1. Find user by email or alias
-    let user;
+    let user: UserSelect | undefined;
     if ("email" in input) {
       [user] = await db.select().from(users).where(eq(users.email, input.email)).limit(1);
 
@@ -22,7 +24,11 @@ export class AuthService {
       }
 
       // 2. Verify password (Modern Unified Implementation)
-      const isPasswordValid = await this.verifyPassword(input.password, user.passwordHash!);
+      if (!user.passwordHash) {
+        logger.warn(`Failed login attempt for email: ${input.email} (No password set)`);
+        return null;
+      }
+      const isPasswordValid = await this.verifyPassword(input.password, user.passwordHash);
       if (!isPasswordValid) {
         logger.warn(`Failed login attempt for email: ${input.email} (Invalid password)`);
         return null;
@@ -37,23 +43,60 @@ export class AuthService {
       // Tourists don't have passwords in this version
     }
 
-    // 3. Generate Access Token
+    return this.generateAuthResponse(user, db, jwtSecret);
+  }
+
+  static async createTourist(input: CreateUserInput, db: Db, jwtSecret: string) {
+    // Check if alias already exists
+    let existingUser: UserSelect | undefined;
+    if (input.alias) {
+      [existingUser] = await db.select().from(users).where(eq(users.alias, input.alias)).limit(1);
+    }
+
+    if (existingUser) {
+      logger.info(`Existing tourist login for alias: ${input.alias}`);
+      return this.generateAuthResponse(existingUser, db, jwtSecret);
+    }
+
+    // Create new tourist user
+    const id = crypto.randomUUID();
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        id,
+        email: input.email, // null for tourists
+        alias: input.alias,
+        passwordHash: null,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        phoneNumber: input.phoneNumber,
+        role: "TOURIST",
+        isActive: true,
+      })
+      .returning();
+
+    logger.info(`Created new tourist user: ${input.alias} (${id})`);
+    return this.generateAuthResponse(newUser, db, jwtSecret);
+  }
+
+  private static async generateAuthResponse(user: UserSelect, db: Db, jwtSecret: string) {
+    // Generate Access Token
     const accessToken = await sign(
       {
         sub: user.id,
         role: user.role as UserRole,
-        exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_EXPIRY,
+        exp: Math.floor(Date.now() / 1000) + this.ACCESS_TOKEN_EXPIRY,
       },
       jwtSecret,
       "HS256",
     );
 
-    // 4. Generate Refresh Token
+    // Generate Refresh Token
     const refreshTokenStr = crypto.randomUUID();
     const refreshTokenHash = await this.hashPassword(refreshTokenStr);
 
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + REFRESH_TOKEN_EXPIRY_DAYS);
+    expiresAt.setDate(expiresAt.getDate() + this.REFRESH_TOKEN_EXPIRY_DAYS);
 
     await db.insert(refreshTokens).values({
       userId: user.id,
@@ -61,7 +104,7 @@ export class AuthService {
       expiresAt,
     });
 
-    // 5. Format user for response
+    // Format user for response
     const safeUser: User = {
       id: user.id,
       email: user.email,

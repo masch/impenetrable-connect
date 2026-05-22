@@ -12,7 +12,7 @@ describe("ReservationCard", () => {
     render(
       <ReservationCard
         order={order}
-        role="entrepreneur"
+        userRole="entrepreneur"
         onAccept={() => {}}
         onDecline={() => {}}
       />,
@@ -36,7 +36,7 @@ describe("ReservationCard", () => {
     render(
       <ReservationCard
         order={orderWithNotes}
-        role="entrepreneur"
+        userRole="entrepreneur"
         onAccept={() => {}}
         onDecline={() => {}}
       />,
@@ -58,7 +58,7 @@ describe("ReservationCard", () => {
     render(
       <ReservationCard
         order={orderWithTime}
-        role="entrepreneur"
+        userRole="entrepreneur"
         onAccept={() => {}}
         onDecline={() => {}}
       />,

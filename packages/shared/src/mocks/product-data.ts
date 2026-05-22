@@ -1,31 +1,26 @@
 /**
- * Mock data for tourist services catalog
- * Uses @repo/shared types aligned with OpenSpec Catalog_Item entity
+ * Pure catalog mock data — no React Native asset imports.
+ * Shared between mobile mock service and backend seed.
+ *
+ * Mobile app patches zzz_image_url with require() for local assets.
+ * Backend seed uses zzz_image_url as-is (Unsplash URLs or null).
  */
+import { ServiceCategory } from "../types/service-category";
+import { CatalogItem } from "../types/product";
+import { PROJECT_IDS, MOCK_PROJECTS } from "./projects";
 
-import { CatalogItem, ServiceCategory, Project, MOCK_PROJECTS, PROJECT_IDS } from "@repo/shared";
-
-// Local assets
-import empanadas12 from "../../assets/catalog/empanadas12.jpeg";
-import empanadas6 from "../../assets/catalog/empanadas6.jpeg";
-import repollo from "../../assets/catalog/repollo.jpeg";
-import pastelCalabaza from "../../assets/catalog/pastel_calabaza.jpeg";
-import chivoGuiso from "../../assets/catalog/chivo_guiso.jpeg";
-import chivoEstofado from "../../assets/catalog/chivo_estofado.jpeg";
-
-// Get the first active project for our mock catalog types
-const defaultProject = MOCK_PROJECTS.find((p: Project) => p.zzz_is_active) || MOCK_PROJECTS[0];
+const defaultProject = MOCK_PROJECTS.find((p) => p.zzz_is_active) || MOCK_PROJECTS[0];
 
 // Service category IDs - explicit constants for type safety
-export const SERVICE_CATEGORY_IDS = {
+export const PRODUCT_CATEGORY_IDS = {
   GASTRONOMY: 1,
   EXCURSION: 2,
 } as const;
 
-// Service Categories - referenced by catalog_category_id
-export const MOCK_SERVICE_CATEGORIES: ServiceCategory[] = [
+// Service Categories
+export const MOCK_PRODUCT_CATEGORIES: ServiceCategory[] = [
   {
-    zzz_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_project_id: PROJECT_IDS.IMPENETRABLE,
     zzz_project: defaultProject,
     zzz_name_i18n: { es: "Gastronomía", en: "Gastronomy" },
@@ -36,7 +31,7 @@ export const MOCK_SERVICE_CATEGORIES: ServiceCategory[] = [
     zzz_is_active: true,
   },
   {
-    zzz_id: SERVICE_CATEGORY_IDS.EXCURSION,
+    zzz_id: PRODUCT_CATEGORY_IDS.EXCURSION,
     zzz_project_id: PROJECT_IDS.IMPENETRABLE,
     zzz_project: defaultProject,
     zzz_name_i18n: { es: "Excursiones", en: "Excursions" },
@@ -48,10 +43,10 @@ export const MOCK_SERVICE_CATEGORIES: ServiceCategory[] = [
   },
 ];
 
-// Catalog Items as named exports (zzz_id is a number)
+// Individual catalog items (exported by name for direct access)
 export const EMPANADAS_CARNE_MEDIA_DOCENA: CatalogItem = {
   zzz_id: 1,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Empanadas de carne 1/2 docena", en: "Beef Empanadas 1/2 dozen" },
   zzz_description_i18n: {
     es: "Mínimo 6 empanadas. Empanadas de carne magra, masa casera",
@@ -59,14 +54,14 @@ export const EMPANADAS_CARNE_MEDIA_DOCENA: CatalogItem = {
   },
   zzz_price: 9500,
   zzz_max_participants: 20,
-  zzz_image_url: empanadas6,
+  zzz_image_url: undefined,
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const EMPANADAS_CARNE_DOCENA: CatalogItem = {
   zzz_id: 2,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Empanadas de carne 1 docena", en: "Beef Empanadas dozen" },
   zzz_description_i18n: {
     es: "Empanadas de carne magra, masa casera",
@@ -74,14 +69,14 @@ export const EMPANADAS_CARNE_DOCENA: CatalogItem = {
   },
   zzz_price: 18000,
   zzz_max_participants: 20,
-  zzz_image_url: empanadas12,
+  zzz_image_url: undefined,
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const EMPANADAS_CHARQUI_MEDIA_DOCENA: CatalogItem = {
   zzz_id: 3,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Empanadas de charqui 1/2 docena", en: "Charqui Empanadas 1/2 dozen" },
   zzz_description_i18n: {
     es: "Mínimo 6 empanadas. Empanadas de charqui artesanal",
@@ -89,26 +84,26 @@ export const EMPANADAS_CHARQUI_MEDIA_DOCENA: CatalogItem = {
   },
   zzz_price: 12500,
   zzz_max_participants: 20,
-  zzz_image_url: empanadas6,
+  zzz_image_url: undefined,
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const EMPANADAS_CHARQUI_DOCENA: CatalogItem = {
   zzz_id: 4,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Empanadas de charqui 1 docena", en: "Charqui Empanadas dozen" },
   zzz_description_i18n: { es: "Empanadas de charqui artesanal", en: "Artisan charqui empanadas" },
   zzz_price: 24000,
   zzz_max_participants: 20,
-  zzz_image_url: empanadas12,
+  zzz_image_url: undefined,
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const EMPANADAS_VERDURA_MEDIA_DOCENA: CatalogItem = {
   zzz_id: 5,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Empanadas de verdura 1/2 docena", en: "Vegetable Empanadas 1/2 dozen" },
   zzz_description_i18n: {
     es: "Mínimo 6 empanadas. Empanadas de verduras frescas de la huerta",
@@ -116,14 +111,14 @@ export const EMPANADAS_VERDURA_MEDIA_DOCENA: CatalogItem = {
   },
   zzz_price: 9000,
   zzz_max_participants: 20,
-  zzz_image_url: empanadas12,
+  zzz_image_url: undefined,
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const EMPANADAS_VERDURA_DOCENA: CatalogItem = {
   zzz_id: 6,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Empanadas de verdura 1 docena", en: "Vegetable Empanadas dozen" },
   zzz_description_i18n: {
     es: "Empanadas de verduras frescas de la huerta",
@@ -131,41 +126,41 @@ export const EMPANADAS_VERDURA_DOCENA: CatalogItem = {
   },
   zzz_price: 17000,
   zzz_max_participants: 20,
-  zzz_image_url: empanadas12,
+  zzz_image_url: undefined,
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const EMPANADAS_POLLO_MEDIA_DOCENA: CatalogItem = {
   zzz_id: 7,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Empanadas de pollo 1/2 docena", en: "Chicken Empanadas 1/2 dozen" },
   zzz_description_i18n: {
-    es: "Mínimo 6 empanadas. Empanadas de pollo deshilachado",
-    en: "Minimum 6 empanadas. Shredded chicken empanadas",
+    es: "Empanadas de pollo deshilachado",
+    en: "Shredded chicken empanadas",
   },
   zzz_price: 9000,
   zzz_max_participants: 20,
-  zzz_image_url: empanadas6,
+  zzz_image_url: undefined,
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const EMPANADAS_POLLO_DOCENA: CatalogItem = {
   zzz_id: 8,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Empanadas de pollo 1 docena", en: "Chicken Empanadas dozen" },
   zzz_description_i18n: { es: "Empanadas de pollo deshilachado", en: "Shredded chicken empanadas" },
   zzz_price: 17000,
   zzz_max_participants: 20,
-  zzz_image_url: empanadas12,
+  zzz_image_url: undefined,
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const ASADO_POLLO: CatalogItem = {
   zzz_id: 9,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Asado de pollo c/guarnición", en: "Roasted chicken with garnish" },
   zzz_description_i18n: {
     es: "Asado de pollo con guarnición de arroz y ensalada",
@@ -180,7 +175,7 @@ export const ASADO_POLLO: CatalogItem = {
 
 export const PASTEL_ZAPALLO_CHIVO: CatalogItem = {
   zzz_id: 10,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Pastel de zapallo o papa c/chivo", en: "Pumpkin or potato pie with goat" },
   zzz_description_i18n: {
     es: "Pastel de zapallo o papa con carne de chivo",
@@ -188,14 +183,14 @@ export const PASTEL_ZAPALLO_CHIVO: CatalogItem = {
   },
   zzz_price: 18000,
   zzz_max_participants: 20,
-  zzz_image_url: pastelCalabaza,
+  zzz_image_url: undefined,
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const ESTOFADO_CHIVO: CatalogItem = {
   zzz_id: 11,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Estofado de chivo", en: "Goat stew" },
   zzz_description_i18n: {
     es: "Estofado tradicional de chivo chaqueño",
@@ -203,14 +198,14 @@ export const ESTOFADO_CHIVO: CatalogItem = {
   },
   zzz_price: 20000,
   zzz_max_participants: 20,
-  zzz_image_url: chivoEstofado,
+  zzz_image_url: undefined,
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const GUISO_CHIVO: CatalogItem = {
   zzz_id: 12,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Guiso de Chivo", en: "Goat stew (Guiso)" },
   zzz_description_i18n: {
     es: "Guiso auténtica de chivo chaqueño",
@@ -218,14 +213,14 @@ export const GUISO_CHIVO: CatalogItem = {
   },
   zzz_price: 20000,
   zzz_max_participants: 20,
-  zzz_image_url: chivoGuiso,
+  zzz_image_url: undefined,
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const REPOLLO_ASADO: CatalogItem = {
   zzz_id: 13,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Repollo asado c/verduras", en: "Roasted cabbage with vegetables" },
   zzz_description_i18n: {
     es: "Repollo asado con mezcla de verduras de temporada",
@@ -233,14 +228,14 @@ export const REPOLLO_ASADO: CatalogItem = {
   },
   zzz_price: 18000,
   zzz_max_participants: 20,
-  zzz_image_url: repollo,
+  zzz_image_url: undefined,
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
 
 export const POSTRE_REGIONAL: CatalogItem = {
   zzz_id: 14,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Postre regional", en: "Regional dessert" },
   zzz_description_i18n: {
     es: "Postre típico de la región chaqueña",
@@ -255,7 +250,7 @@ export const POSTRE_REGIONAL: CatalogItem = {
 
 export const DESAYUNO: CatalogItem = {
   zzz_id: 15,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Desayuno", en: "Breakfast tea" },
   zzz_description_i18n: {
     es: "Desayuno con productos regionales",
@@ -270,7 +265,7 @@ export const DESAYUNO: CatalogItem = {
 
 export const MERIENDA: CatalogItem = {
   zzz_id: 16,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Merienda", en: "Snack" },
   zzz_description_i18n: {
     es: "Merienda con productos regionales",
@@ -285,7 +280,7 @@ export const MERIENDA: CatalogItem = {
 
 export const VIANDA: CatalogItem = {
   zzz_id: 17,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
   zzz_name_i18n: { es: "Vianda", en: "Packed lunch" },
   zzz_description_i18n: {
     es: "Vianda casera para llevar",
@@ -293,14 +288,14 @@ export const VIANDA: CatalogItem = {
   },
   zzz_price: 9500,
   zzz_max_participants: 20,
-  zzz_image_url: empanadas6,
+  zzz_image_url: undefined,
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH"],
 };
 
 export const PASEO_LANCHA: CatalogItem = {
   zzz_id: 18,
-  zzz_catalog_category_id: SERVICE_CATEGORY_IDS.EXCURSION,
+  zzz_product_category_id: PRODUCT_CATEGORY_IDS.EXCURSION,
   zzz_name_i18n: { es: "Paseo en lancha", en: "Boat trip" },
   zzz_description_i18n: {
     es: "Paseo guiado por el río Bermejito",
@@ -312,7 +307,8 @@ export const PASEO_LANCHA: CatalogItem = {
   zzz_global_pause: false,
 };
 
-export const MOCK_CATALOG_ITEMS: Record<number, CatalogItem> = {
+// Flat record and array for iteration
+export const CATALOG_ITEMS_MAP: Record<number, CatalogItem> = {
   [EMPANADAS_CARNE_MEDIA_DOCENA.zzz_id]: EMPANADAS_CARNE_MEDIA_DOCENA,
   [EMPANADAS_CARNE_DOCENA.zzz_id]: EMPANADAS_CARNE_DOCENA,
   [EMPANADAS_CHARQUI_MEDIA_DOCENA.zzz_id]: EMPANADAS_CHARQUI_MEDIA_DOCENA,
@@ -333,7 +329,4 @@ export const MOCK_CATALOG_ITEMS: Record<number, CatalogItem> = {
   [VIANDA.zzz_id]: VIANDA,
 };
 
-// Derive additional UI fields from CatalogItem
-export type CatalogServiceItem = CatalogItem;
-
-export const MOCK_CATALOG_SERVICES: CatalogServiceItem[] = Object.values(MOCK_CATALOG_ITEMS);
+export const MOCK_PRODUCTS: CatalogItem[] = Object.values(CATALOG_ITEMS_MAP);

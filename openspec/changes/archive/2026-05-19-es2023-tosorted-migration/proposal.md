@@ -7,40 +7,45 @@ Replace the spread pattern `[...projects].sort(...)` with the native ES2023 `toS
 ## Scope
 
 ### In Scope
+
 - Replace `[...projects].sort(...)` with `projects.toSorted(...)` in `apps/mobile/src/hooks/useProjectSelectors.ts`
 - Two functions affected:
   - `sortProjectsByActiveFirst()` (line 14)
   - `sortProjectsByName()` (line 26)
 
 ### Out of Scope
+
 - Other files or packages using similar patterns
 - Other ES2023 features (e.g., `toReversed()`, `toSpliced()`)
 
 ## Capabilities
 
 ### New Capabilities
+
 None — this is a refactor with no new functionality.
 
 ### Modified Capabilities
+
 None — existing behavior remains unchanged.
 
 ## Approach
 
 Direct 1:1 semantic replacement:
+
 - `[...projects].sort((a, b) => ...)` → `projects.toSorted((a, b) => ...)`
 - No logic changes, only syntax modernization
 
 ## Affected Areas
 
-| Area | Impact | Description |
-|------|--------|-------------|
+| Area                                           | Impact   | Description                                      |
+| ---------------------------------------------- | -------- | ------------------------------------------------ |
 | `apps/mobile/src/hooks/useProjectSelectors.ts` | Modified | 2 functions updated from spread+sort to toSorted |
 
 ## Risks
 
-| Risk | Likelihood | Mitigation |
-|------|------------|------------|
-| Runtime incompatibility | Low | TS target ESNext, Bun runtime, RN 0.83.4 all support toSorted |
+| Risk                    | Likelihood | Mitigation                                                    |
+| ----------------------- | ---------- | ------------------------------------------------------------- |
+| Runtime incompatibility | Low        | TS target ESNext, Bun runtime, RN 0.83.4 all support toSorted |
 
 ## Rollback Plan
 

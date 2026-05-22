@@ -26,7 +26,7 @@ const mockItem = {
   },
   zzz_price: 1200,
   zzz_image_url: "http://example.com/image.jpg",
-  zzz_catalog_category_id: 1,
+  zzz_product_category_id: 1,
   zzz_max_participants: 5,
   zzz_global_pause: false,
 };

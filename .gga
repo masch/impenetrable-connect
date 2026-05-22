@@ -31,7 +31,8 @@ FILE_PATTERNS="*.ts,*.tsx,*.js,*.jsx"
 #FILE_PATTERNS="apps/mobile/src/logic/*"
 #FILE_PATTERNS="apps/mobile/src/stores/*"
 #FILE_PATTERNS="apps/mobile/src/constants/*"
-
+#FILE_PATTERNS="apps/backend/src/*"
+#FILE_PATTERNS="packages/*"
 
 # File patterns to exclude from review (comma-separated)
 # Default: none

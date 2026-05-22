@@ -10,7 +10,9 @@ import { getMockAgendaOrders } from "../mocks/agenda";
 import { useAuthStore } from "./auth.store";
 import { getVentureIdsByUserId } from "../mocks/venture-members";
 import { toISODate } from "../logic/formatters";
-import { CatalogService } from "../services/catalog.service";
+import { ProductService } from "../services/product.service";
+
+const SIMULATED_DELAY_MS = 300;
 
 export interface AgendaState {
   // Data
@@ -46,7 +48,7 @@ export const useAgendaStore = create<AgendaState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       // Simulate API latency
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, SIMULATED_DELAY_MS));
 
       const currentUser = useAuthStore.getState().currentUser;
       const dateStr = toISODate(date);
@@ -80,7 +82,7 @@ export const useAgendaStore = create<AgendaState>((set, get) => ({
     set({ isLoadingPending: true, error: null });
     try {
       const currentUser = useAuthStore.getState().currentUser;
-      const allOrders = await CatalogService.getOrders(currentUser?.id);
+      const allOrders = await ProductService.getOrders(currentUser?.id);
       const ventureIds = currentUser ? getVentureIdsByUserId(currentUser.id) : [];
 
       const pending = allOrders.filter(
@@ -99,7 +101,7 @@ export const useAgendaStore = create<AgendaState>((set, get) => ({
 
   acceptOrder: async (orderId: number) => {
     try {
-      await CatalogService.updateOrderStatus(orderId, "CONFIRMED");
+      await ProductService.updateOrderStatus(orderId, "CONFIRMED");
       // Optimistic update or just re-fetch
       set((state) => ({
         pendingOrders: state.pendingOrders.filter((o) => Number(o.zzz_id) !== orderId),
@@ -114,7 +116,7 @@ export const useAgendaStore = create<AgendaState>((set, get) => ({
 
   declineOrder: async (orderId: number) => {
     try {
-      await CatalogService.updateOrderStatus(orderId, "CANCELLED");
+      await ProductService.updateOrderStatus(orderId, "CANCELLED");
       set((state) => ({
         pendingOrders: state.pendingOrders.filter((o) => Number(o.zzz_id) !== orderId),
         orders: state.orders.map((o) =>

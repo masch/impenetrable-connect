@@ -79,7 +79,7 @@ describe("AgendaScreen", () => {
           zzz_price: 1500,
           zzz_catalog_item: {
             zzz_id: 1,
-            zzz_catalog_category_id: 1,
+            zzz_product_category_id: 1,
             zzz_name_i18n: { es: "Empanadas", en: "Empanadas" },
             zzz_price: 1500,
             zzz_max_participants: 10,

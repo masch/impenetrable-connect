@@ -21,17 +21,22 @@ import { ServiceCard } from "../../components/catalog/ServiceCard";
 import { ReservationModal } from "../../components/catalog/ReservationModal";
 import { SectionHeader } from "../../components/catalog/SectionHeader";
 import { AppAlert, type AppAlertAction } from "../../components/AppAlert";
-import { useCatalogStore } from "../../stores/catalog.store";
+import { useCatalogStore } from "../../stores/product.store";
 import { useReservationStore } from "../../stores/reservation.store";
 import { useAuthStore } from "../../stores/auth.store";
-import { CatalogService } from "../../services/catalog.service";
+import { ProductService } from "../../services/product.service";
 import { logger } from "../../services/logger.service";
 import { COLORS, type Order, type ServiceMoment } from "@repo/shared";
-import { SERVICE_CATEGORY_IDS, type CatalogServiceItem } from "../../mocks/catalog";
+import { PRODUCT_CATEGORY_IDS, type ProductItem } from "../../mocks/product";
 import { useCartStore } from "../../stores/cart.store";
 import { Icon } from "../../components/Icon";
 import { SERVICE_MOMENTS } from "../../constants/moments";
 import { Button } from "../../components/Button";
+
+const ICON_SIZE_EDIT_CART = 14;
+const ICON_SIZE_REMOVE_CART = 18;
+const ICON_SIZE_TOGGLE_SUMMARY = 10;
+const ICON_SIZE_FOOTER_ICON = 12;
 
 export default function BookingScreen() {
   const { push, replace } = useRouter();
@@ -81,7 +86,7 @@ export default function BookingScreen() {
 
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedService, setSelectedService] = useState<CatalogServiceItem | null>(null);
+  const [selectedService, setSelectedService] = useState<ProductItem | null>(null);
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [alertConfig, setAlertConfig] = useState<{
     visible: boolean;
@@ -134,7 +139,7 @@ export default function BookingScreen() {
   }, []);
 
   const handleServicePress = useCallback(
-    (service: CatalogServiceItem) => {
+    (service: ProductItem) => {
       const existingOrder = activeOrders.find((order) => {
         const hasItem = order.zzz_items?.some(
           (item) => Number(item.zzz_catalog_item_id) === Number(service.zzz_id),
@@ -211,7 +216,7 @@ export default function BookingScreen() {
 
       try {
         if (orderId) {
-          const updatedOrder = await CatalogService.updateOrder(Number(orderId), {
+          const updatedOrder = await ProductService.updateOrder(Number(orderId), {
             zzz_quantity,
             zzz_notes,
           });
@@ -274,7 +279,7 @@ export default function BookingScreen() {
 
     return services.filter((service) => {
       // Excursions are always visible
-      if (service.zzz_catalog_category_id === SERVICE_CATEGORY_IDS.EXCURSION) {
+      if (service.zzz_product_category_id === PRODUCT_CATEGORY_IDS.EXCURSION) {
         return true;
       }
 
@@ -290,9 +295,13 @@ export default function BookingScreen() {
     });
   }, [services, selectedMoment]);
 
-  // Group filtered services by category: 1 = Gastronomy, 2 = Excursions
-  const gastronomyServices = filteredServices.filter((s) => s.zzz_catalog_category_id === 1);
-  const excursionServices = filteredServices.filter((s) => s.zzz_catalog_category_id === 2);
+  // Group filtered services by category
+  const gastronomyServices = filteredServices.filter(
+    (s) => s.zzz_product_category_id === PRODUCT_CATEGORY_IDS.GASTRONOMY,
+  );
+  const excursionServices = filteredServices.filter(
+    (s) => s.zzz_product_category_id === PRODUCT_CATEGORY_IDS.EXCURSION,
+  );
 
   return (
     <Screen>
@@ -474,7 +483,7 @@ export default function BookingScreen() {
                               <View className="size-7 bg-surface-container-high rounded-full items-center justify-center border border-outline-variant/20">
                                 <Icon
                                   name="pencil"
-                                  size={14}
+                                  size={ICON_SIZE_EDIT_CART}
                                   color={COLORS.primary}
                                   accessibilityLabel={t("common.edit")}
                                 />
@@ -512,7 +521,7 @@ export default function BookingScreen() {
                           >
                             <Icon
                               name="trash-can-outline"
-                              size={18}
+                              size={ICON_SIZE_REMOVE_CART}
                               color={COLORS.error}
                               accessibilityLabel={t("common.delete")}
                             />
@@ -541,7 +550,7 @@ export default function BookingScreen() {
                         </Text>
                         <Icon
                           name={showOrderSummary ? "chevron-down" : "chevron-up"}
-                          size={10}
+                          size={ICON_SIZE_TOGGLE_SUMMARY}
                           color={COLORS.primary}
                           accessibilityLabel={
                             showOrderSummary ? t("common.collapse") : t("common.expand")
@@ -566,7 +575,7 @@ export default function BookingScreen() {
                     >
                       <Icon
                         name="calendar-month-outline"
-                        size={12}
+                        size={ICON_SIZE_FOOTER_ICON}
                         color={COLORS.primary}
                         className="opacity-80"
                         accessibilityLabel={t("catalog.reservation.change_date")}
@@ -581,7 +590,7 @@ export default function BookingScreen() {
                         <View className="flex-row items-center">
                           <Icon
                             name={currentMoment.icon}
-                            size={12}
+                            size={ICON_SIZE_FOOTER_ICON}
                             color={currentMoment.hex}
                             accessibilityLabel={t("catalog.reservation.change_time")}
                           />

@@ -2,3 +2,6 @@ export * from "./projects";
 export * from "./users";
 export * from "./ventures";
 export * from "./refresh-tokens";
+export * from "./venture-members";
+export * from "./product-categories";
+export * from "./products";

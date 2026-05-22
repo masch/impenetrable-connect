@@ -48,6 +48,14 @@ rules:
     - Warn before merging destructive deltas (large removals)
 
 archived_changes:
+  - name: venture-store
+    archived_date: "2026-05-20"
+    status: completed
+    summary: "Created Zustand venture store with full CRUD, aligned service with backend (PUT, DELETE), 241 tests pass"
+  - name: add-ventures-crud
+    archived_date: "2026-05-20"
+    status: completed
+    summary: "Added PUT and DELETE endpoints for ventures CRUD with soft delete, 204 response, and 404 handling"
   - name: web-deployment-modes
     archived_date: "2026-05-13"
     status: completed

@@ -9,8 +9,8 @@ import {
   EMPANADAS_VERDURA_DOCENA,
   POSTRE_REGIONAL,
   REPOLLO_ASADO,
-  SERVICE_CATEGORY_IDS,
-} from "./catalog";
+  PRODUCT_CATEGORY_IDS,
+} from "./product";
 
 // Current date reference for order timestamps
 const today = new Date();
@@ -214,7 +214,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 1,
     zzz_reservation_id: MOCK_RESERVATION_TODAY_LUNCH_CREATED.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "SEARCHING",
     zzz_notes: "Una persona es hipertensa, por favor cocinar sin sal.",
     zzz_items: [
@@ -240,7 +240,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 2,
     zzz_reservation_id: MOCK_RESERVATION_TODAY_BREAKFAST_SEARCHING.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "OFFER_PENDING",
     zzz_confirmed_venture_id: null,
     zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
@@ -267,7 +267,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 3,
     zzz_reservation_id: MOCK_RESERVATION_TOMORROW_DINNER_CONFIRMED.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CONFIRMED",
     zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
@@ -286,7 +286,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 4,
     zzz_reservation_id: MOCK_RESERVATION_TOMORROW_BREAKFAST_CANCELLED.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CANCELLED",
     zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
@@ -305,7 +305,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 5,
     zzz_reservation_id: MOCK_RESERVATION_TODAY_LUNCH_CANCELLED.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CANCELLED",
     zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
@@ -324,7 +324,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 6,
     zzz_reservation_id: MOCK_RESERVATION_TOMORROW_DINNER_CANCELLED.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CANCELLED",
     zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
@@ -350,7 +350,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 7,
     zzz_reservation_id: MOCK_RESERVATION_TODAY_SNACK_CONFIRMED.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CONFIRMED",
     zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
@@ -369,7 +369,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 8,
     zzz_reservation_id: MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_2.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CONFIRMED",
     zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
@@ -388,7 +388,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 9,
     zzz_reservation_id: MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_3.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CONFIRMED",
     zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_notes: "Una persona es hipertensa, por favor cocinar sin sal.",
@@ -415,7 +415,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 10,
     zzz_reservation_id: MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_4.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CONFIRMED",
     zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_notes: "Alérgico a las nueces y frutos secos.",
@@ -442,7 +442,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 11,
     zzz_reservation_id: MOCK_RESERVATION_TODAY_DINNER_CONFIRMED_5.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "CONFIRMED",
     zzz_confirmed_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
@@ -468,7 +468,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 12,
     zzz_reservation_id: MOCK_RESERVATION_TOMORROW_LUNCH_PENDING_1.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "OFFER_PENDING",
     zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
@@ -486,7 +486,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 13,
     zzz_reservation_id: MOCK_RESERVATION_TOMORROW_LUNCH_PENDING_2.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "OFFER_PENDING",
     zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
@@ -504,7 +504,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 14,
     zzz_reservation_id: MOCK_RESERVATION_AFTER_TOMORROW_BREAKFAST_PENDING.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "OFFER_PENDING",
     zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_items: [
@@ -522,7 +522,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 15,
     zzz_reservation_id: MOCK_RESERVATION_TODAY_DINNER_PEND_RESTRICTION.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "OFFER_PENDING",
     zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_notes: "Una persona es Celíaca (por favor, sin gluten)",
@@ -541,7 +541,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 16,
     zzz_reservation_id: MOCK_RESERVATION_TODAY_DINNER_PEND_RESTRICTION.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "OFFER_PENDING",
     zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_notes: "Con mucha sal",
@@ -560,7 +560,7 @@ export const INITIAL_MOCK_ORDERS: Order[] = [
   {
     zzz_id: 17,
     zzz_reservation_id: MOCK_RESERVATION_TODAY_DINNER_2_PEND_RESTRICTION.zzz_id,
-    zzz_catalog_type_id: SERVICE_CATEGORY_IDS.GASTRONOMY,
+    zzz_catalog_type_id: PRODUCT_CATEGORY_IDS.GASTRONOMY,
     zzz_global_status: "OFFER_PENDING",
     zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
     zzz_notes: "Sin azucar",

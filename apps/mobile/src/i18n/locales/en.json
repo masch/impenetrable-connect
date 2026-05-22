@@ -195,7 +195,9 @@
     "resume_confirm_message": "Great! Your venture will be visible to all tourists again and you will be able to receive new orders immediately.",
     "deactivate_warning": "WARNING: Deactivating this venture will immediately cancel its visibility in the catalog.",
     "status_toggle_label": "Venture status toggle",
-    "status_toggle_hint": "Double tap to toggle venture active status"
+    "status_toggle_hint": "Double tap to toggle venture active status",
+    "select_venture": "Select Venture",
+    "no_ventures": "You don't have any ventures yet"
   },
   "orders": {
     "title": "My Orders",

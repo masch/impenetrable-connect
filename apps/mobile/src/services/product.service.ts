@@ -1,5 +1,5 @@
 /**
- * Catalog Service - Tourist Services
+ * Product Service — tourist products/catalog.
  * Follows the mock + REST switch pattern from project.service.ts
  *
  * Uses @repo/shared CatalogItem + Order types aligned with OpenSpec entities.
@@ -11,7 +11,7 @@ import { z } from "zod";
 import type { Order, Reservation, ServiceMoment, HourMinute } from "@repo/shared";
 import { ServiceMomentSchema } from "@repo/shared";
 import { combineDateAndTime } from "../logic/formatters";
-import { MOCK_CATALOG_SERVICES, type CatalogServiceItem } from "../mocks/catalog";
+import { MOCK_PRODUCTS, type ProductItem } from "../mocks/product";
 import {
   addMockOrder,
   addMockReservation,
@@ -20,12 +20,13 @@ import {
   updateMockReservation,
 } from "../mocks/orders";
 import { isMockUserLoggedIn, getMockUserId } from "../mocks/users";
+
 import { logger } from "./logger.service";
 import env from "../config/env";
 import { mapNetworkError, handleResponse } from "./api-utils";
 
 // Re-export for convenience
-export type { CatalogServiceItem };
+export type { ProductItem };
 
 // Validation schemas for booking operations
 export const BookingInputSchema = z.object({
@@ -39,12 +40,12 @@ export const BookingInputSchema = z.object({
 type BookingInput = z.infer<typeof BookingInputSchema>;
 
 /**
- * Common interface for catalog service implementations
+ * Common interface for product service implementations
  */
-export interface CatalogServiceInterface {
-  getServices(): Promise<CatalogServiceItem[]>;
-  getServiceById(id: number): Promise<CatalogServiceItem | null>;
-  getServicesByCategory(categoryId: number): Promise<CatalogServiceItem[]>;
+export interface ProductServiceInterface {
+  getServices(): Promise<ProductItem[]>;
+  getServiceById(id: number): Promise<ProductItem | null>;
+  getServicesByCategory(categoryId: number): Promise<ProductItem[]>;
   placeOrder(
     date: Date,
     moment: ServiceMoment,
@@ -61,22 +62,22 @@ export interface CatalogServiceInterface {
 /**
  * 🛠️ MOCK Implementation (Used during design/MVP phase)
  */
-const mockServices = [...MOCK_CATALOG_SERVICES];
+const mockProducts = [...MOCK_PRODUCTS];
 
-const MockCatalogService: CatalogServiceInterface = {
+const MockProductService: ProductServiceInterface = {
   getServices: async () => {
     await new Promise((r) => setTimeout(r, 800));
-    return [...mockServices];
+    return [...mockProducts];
   },
 
   getServiceById: async (id: number) => {
     await new Promise((r) => setTimeout(r, 500));
-    return mockServices.find((s) => s.zzz_id === id) || null;
+    return mockProducts.find((s) => s.zzz_id === id) || null;
   },
 
   getServicesByCategory: async (categoryId: number) => {
     await new Promise((r) => setTimeout(r, 600));
-    return mockServices.filter((s) => s.zzz_catalog_category_id === categoryId);
+    return mockProducts.filter((s) => s.zzz_product_category_id === categoryId);
   },
 
   placeOrder: async (
@@ -99,7 +100,7 @@ const MockCatalogService: CatalogServiceInterface = {
     }
 
     // Use the first item's category as the order's primary category (MVP constraint)
-    const firstService = mockServices.find((s) => s.zzz_id === items[0].zzz_catalog_item_id);
+    const firstService = mockProducts.find((s) => s.zzz_id === items[0].zzz_catalog_item_id);
     if (!firstService) throw new Error("Service not found");
 
     const orderId = Date.now();
@@ -116,13 +117,13 @@ const MockCatalogService: CatalogServiceInterface = {
     const newOrder: Order = {
       zzz_id: orderId,
       zzz_reservation_id: reservation.zzz_id,
-      zzz_catalog_type_id: firstService.zzz_catalog_category_id,
+      zzz_catalog_type_id: firstService.zzz_product_category_id,
       zzz_confirmed_venture_id: null,
       zzz_notes: notes ?? null,
       zzz_global_status: "SEARCHING",
       zzz_cancel_reason: null,
       zzz_items: items.map((item) => {
-        const s = mockServices.find((service) => service.zzz_id === item.zzz_catalog_item_id);
+        const s = mockProducts.find((service) => service.zzz_id === item.zzz_catalog_item_id);
         return {
           zzz_id: Math.floor(Math.random() * 100000),
           zzz_order_id: orderId,
@@ -209,11 +210,11 @@ const MockCatalogService: CatalogServiceInterface = {
 /**
  * 📡 REST API Implementation (Future)
  */
-const RestCatalogService: CatalogServiceInterface = {
+const RestProductService: ProductServiceInterface = {
   getServices: async () => {
     try {
       const response = await fetch(`${env.API_URL}/services`);
-      return handleResponse<CatalogServiceItem[]>(response, "errors.catalog_failed");
+      return handleResponse<ProductItem[]>(response, "errors.catalog_failed");
     } catch (error) {
       throw mapNetworkError(error);
     }
@@ -222,7 +223,7 @@ const RestCatalogService: CatalogServiceInterface = {
   getServiceById: async (id: number) => {
     try {
       const response = await fetch(`${env.API_URL}/services/${id}`);
-      return handleResponse<CatalogServiceItem | null>(response, "errors.no_venture_found");
+      return handleResponse<ProductItem | null>(response, "errors.no_venture_found");
     } catch (error) {
       throw mapNetworkError(error);
     }
@@ -231,7 +232,7 @@ const RestCatalogService: CatalogServiceInterface = {
   getServicesByCategory: async (categoryId: number) => {
     try {
       const response = await fetch(`${env.API_URL}/services?category_id=${categoryId}`);
-      return handleResponse<CatalogServiceItem[]>(response, "errors.catalog_failed");
+      return handleResponse<ProductItem[]>(response, "errors.catalog_failed");
     } catch (error) {
       throw mapNetworkError(error);
     }
@@ -300,4 +301,4 @@ const RestCatalogService: CatalogServiceInterface = {
 /**
  * EXPORT: The smart switch
  */
-export const CatalogService = env.USE_MOCKS ? MockCatalogService : RestCatalogService;
+export const ProductService = env.USE_MOCKS ? MockProductService : RestProductService;

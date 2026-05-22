@@ -2,7 +2,7 @@ import { Order, Reservation, MOCK_USERS, MOCK_VENTURES, UserRole } from "@repo/s
 import { getMockUserId } from "./users";
 import { logger } from "../services/logger.service";
 import { INITIAL_MOCK_ORDERS, MOCK_RESERVATIONS } from "./orders.data";
-import { MOCK_CATALOG_ITEMS } from "./catalog";
+import { MOCK_PRODUCTS_MAP } from "./product";
 import { mockGetCurrentUser } from "../services/auth-state";
 import { getVentureIdsByUserId } from "./venture-members";
 
@@ -53,7 +53,7 @@ export function getAllMockOrders(): Order[] {
 
     const enrichedItems = (order.zzz_items || []).map((item) => ({
       ...item,
-      zzz_catalog_item: MOCK_CATALOG_ITEMS[item.zzz_catalog_item_id],
+      zzz_catalog_item: MOCK_PRODUCTS_MAP[item.zzz_catalog_item_id],
     }));
 
     const confirmedVenture = order.zzz_confirmed_venture_id
@@ -120,7 +120,7 @@ export function getMockOrders(overrideUserId?: string): Order[] {
 
     const enrichedItems = (order.zzz_items || []).map((item) => ({
       ...item,
-      zzz_catalog_item: MOCK_CATALOG_ITEMS[item.zzz_catalog_item_id],
+      zzz_catalog_item: MOCK_PRODUCTS_MAP[item.zzz_catalog_item_id],
     }));
 
     const confirmedVenture = order.zzz_confirmed_venture_id

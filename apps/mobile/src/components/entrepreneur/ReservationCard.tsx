@@ -13,7 +13,7 @@ export interface ReservationCardProps {
   hideBorder?: boolean;
   hideShadow?: boolean;
   hideStatus?: boolean;
-  role: "entrepreneur" | "tourist";
+  userRole: "entrepreneur" | "tourist";
   onAccept?: () => void;
   onDecline?: () => void;
   onCancel?: () => void;
@@ -103,7 +103,7 @@ const getStatusConfig = (t: (key: string) => string, globalStatus: OrderStatus):
 
 export default function ReservationCard({
   order,
-  role,
+  userRole: role,
   title,
   hideBorder = false,
   hideShadow = false,

@@ -115,9 +115,9 @@ export const useReservationStore = create<ReservationState>((set, get) => ({
   moveOrders: async (orderIds: number[], newDate: Date, newMoment: ServiceMoment) => {
     set({ isLoading: true, error: null });
     try {
-      const { CatalogService } = await import("../services/catalog.service");
+      const { ProductService } = await import("../services/product.service");
       for (const id of orderIds) {
-        await CatalogService.updateOrder(id, {
+        await ProductService.updateOrder(id, {
           date: newDate,
           moment: newMoment,
         });

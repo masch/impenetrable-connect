@@ -27,13 +27,15 @@ CREATE TABLE "users" (
 	"zzz_created_at" timestamp DEFAULT now() NOT NULL,
 	"zzz_updated_at" timestamp DEFAULT now() NOT NULL,
 	"zzz_deleted_at" timestamp,
-	CONSTRAINT "users_email_unique" UNIQUE("email")
+	CONSTRAINT "users_email_unique" UNIQUE("email"),
+	CONSTRAINT "users_alias_unique" UNIQUE("alias")
 );
 --> statement-breakpoint
 CREATE TABLE "ventures" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"owner_id" uuid NOT NULL,
+	"zzz_project_id" integer NOT NULL,
 	"zzz_max_capacity" integer DEFAULT 0 NOT NULL,
 	"zzz_cascade_order" integer DEFAULT 0 NOT NULL,
 	"zzz_is_paused" boolean DEFAULT false NOT NULL,
@@ -54,5 +56,46 @@ CREATE TABLE "refresh_tokens" (
 	"zzz_deleted_at" timestamp
 );
 --> statement-breakpoint
+CREATE TABLE "venture_members" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"venture_id" integer NOT NULL,
+	"user_id" uuid NOT NULL,
+	"role" varchar(50) DEFAULT 'MANAGER' NOT NULL,
+	"zzz_created_at" timestamp DEFAULT now() NOT NULL,
+	"zzz_updated_at" timestamp DEFAULT now() NOT NULL,
+	"zzz_deleted_at" timestamp
+);
+--> statement-breakpoint
+CREATE TABLE "product_categories" (
+	"zzz_id" serial PRIMARY KEY NOT NULL,
+	"zzz_project_id" integer NOT NULL,
+	"zzz_name_i18n" jsonb NOT NULL,
+	"zzz_description_i18n" jsonb,
+	"zzz_is_active" boolean DEFAULT true NOT NULL,
+	"zzz_created_at" timestamp DEFAULT now() NOT NULL,
+	"zzz_updated_at" timestamp DEFAULT now() NOT NULL,
+	"zzz_deleted_at" timestamp
+);
+--> statement-breakpoint
+CREATE TABLE "products" (
+	"zzz_id" serial PRIMARY KEY NOT NULL,
+	"zzz_product_category_id" integer NOT NULL,
+	"zzz_name_i18n" jsonb NOT NULL,
+	"zzz_description_i18n" jsonb,
+	"zzz_price" numeric(10, 2) NOT NULL,
+	"zzz_max_participants" integer NOT NULL,
+	"zzz_image_url" varchar(500),
+	"zzz_global_pause" boolean DEFAULT false NOT NULL,
+	"zzz_service_moments" jsonb,
+	"zzz_created_at" timestamp DEFAULT now() NOT NULL,
+	"zzz_updated_at" timestamp DEFAULT now() NOT NULL,
+	"zzz_deleted_at" timestamp
+);
+--> statement-breakpoint
 ALTER TABLE "ventures" ADD CONSTRAINT "ventures_owner_id_users_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "ventures" ADD CONSTRAINT "ventures_zzz_project_id_projects_zzz_id_fk" FOREIGN KEY ("zzz_project_id") REFERENCES "public"."projects"("zzz_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "venture_members" ADD CONSTRAINT "venture_members_venture_id_ventures_id_fk" FOREIGN KEY ("venture_id") REFERENCES "public"."ventures"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "venture_members" ADD CONSTRAINT "venture_members_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "product_categories" ADD CONSTRAINT "product_categories_zzz_project_id_projects_zzz_id_fk" FOREIGN KEY ("zzz_project_id") REFERENCES "public"."projects"("zzz_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "products" ADD CONSTRAINT "products_zzz_product_category_id_product_categories_zzz_id_fk" FOREIGN KEY ("zzz_product_category_id") REFERENCES "public"."product_categories"("zzz_id") ON DELETE no action ON UPDATE no action;
