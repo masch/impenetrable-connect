@@ -26,8 +26,8 @@ export default function VentureConfigScreen() {
   const [isInitializing, setIsInitializing] = useState(true);
 
   // Draft state (dirty values before saving)
-  const [draftIsPaused, setDraftIsPaused] = useState(false);
-  const [draftCapacity, setDraftCapacity] = useState(0);
+  const [draftIsPaused, setDraftIsPaused] = useState(selectedVenture?.zzz_is_paused ?? false);
+  const [draftCapacity, setDraftCapacity] = useState(selectedVenture?.zzz_max_capacity ?? 0);
 
   useEffect(() => {
     if (currentUser?.id) {
@@ -37,23 +37,20 @@ export default function VentureConfigScreen() {
     }
   }, [currentUser?.id, fetchVenturesByUserId]);
 
-  // Auto-select when user ventures load and nothing is selected
+  // Auto-select and init drafts when user ventures load and nothing is selected
   useEffect(() => {
     if (userVentures.length === 1 && !selectedVenture) {
-      setSelectedVenture(userVentures[0]);
+      const venture = userVentures[0];
+      setSelectedVenture(venture);
+      setDraftIsPaused(venture.zzz_is_paused);
+      setDraftCapacity(venture.zzz_max_capacity);
     }
   }, [userVentures, selectedVenture, setSelectedVenture]);
 
-  // Sync drafts when selected venture changes
-  useEffect(() => {
-    if (selectedVenture) {
-      setDraftIsPaused(selectedVenture.zzz_is_paused);
-      setDraftCapacity(selectedVenture.zzz_max_capacity);
-    }
-  }, [selectedVenture]);
-
   const handleVentureSelect = (venture: (typeof userVentures)[number]) => {
     setSelectedVenture(venture);
+    setDraftIsPaused(venture.zzz_is_paused);
+    setDraftCapacity(venture.zzz_max_capacity);
   };
 
   const handleSave = async () => {
