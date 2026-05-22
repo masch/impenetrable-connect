@@ -177,7 +177,7 @@ export default function RequestScreen() {
                                   <View key={order.zzz_id}>
                                     <ReservationCard
                                       order={order}
-                                      role="entrepreneur"
+                                      userRole="entrepreneur"
                                       hideBorder
                                       hideShadow
                                       hideStatus

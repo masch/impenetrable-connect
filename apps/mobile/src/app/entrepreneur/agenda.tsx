@@ -170,7 +170,7 @@ export default function AgendaScreen() {
                             <View key={order.zzz_id}>
                               <ReservationCard
                                 order={order}
-                                role="entrepreneur"
+                                userRole="entrepreneur"
                                 hideBorder
                                 hideShadow
                                 hideStatus

@@ -372,7 +372,7 @@ export default function OrderScreen() {
                                   <View key={order.zzz_id}>
                                     <ReservationCard
                                       order={order}
-                                      role="tourist"
+                                      userRole="tourist"
                                       title={getVentureName(order)}
                                       hideBorder
                                       hideShadow
