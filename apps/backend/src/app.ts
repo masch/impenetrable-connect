@@ -16,6 +16,9 @@ const CORS_MAX_AGE_SECONDS = 600;
 const corsMiddleware = cors({
   origin: (origin, c) => {
     const config = getAppConfig(c);
+    if (config.isDevelopment && origin && /^https?:\/\/localhost(:\d+)?$/.test(origin)) {
+      return origin;
+    }
     if (config.allowedOrigins.length === 0) return null;
     if (config.allowedOrigins.includes("*")) return origin;
     if (config.allowedOrigins.includes(origin)) return origin;

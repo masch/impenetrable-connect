@@ -85,3 +85,93 @@ describe("CORS Security Guard", () => {
     expect(res.status).toBe(200);
   });
 });
+
+describe("CORS Dev Localhost", () => {
+  it("should echo back localhost origin in development mode", async () => {
+    const res = await app.request(
+      "/health",
+      {
+        headers: {
+          Origin: "http://localhost:8082",
+          "X-Health-Key": "test-health-key",
+        },
+      },
+      {
+        ENVIRONMENT: "development",
+        ALLOWED_ORIGINS: "",
+        DATABASE_URL: "postgres://localhost:5432/db",
+        HEALTH_TOKEN: "test-health-key",
+        JWT_SECRET: "test-secret",
+      },
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Access-Control-Allow-Origin")).toBe("http://localhost:8082");
+  });
+
+  it("should NOT echo back non-localhost origin even in development mode", async () => {
+    const res = await app.request(
+      "/health",
+      {
+        headers: {
+          Origin: "http://evil-site.com",
+          "X-Health-Key": "test-health-key",
+        },
+      },
+      {
+        ENVIRONMENT: "development",
+        ALLOWED_ORIGINS: "",
+        DATABASE_URL: "postgres://localhost:5432/db",
+        HEALTH_TOKEN: "test-health-key",
+        JWT_SECRET: "test-secret",
+      },
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Access-Control-Allow-Origin")).toBeNull();
+  });
+
+  it("should echo back localhost origin with explicit port", async () => {
+    const res = await app.request(
+      "/health",
+      {
+        headers: {
+          Origin: "http://localhost:3000",
+          "X-Health-Key": "test-health-key",
+        },
+      },
+      {
+        ENVIRONMENT: "development",
+        ALLOWED_ORIGINS: "",
+        DATABASE_URL: "postgres://localhost:5432/db",
+        HEALTH_TOKEN: "test-health-key",
+        JWT_SECRET: "test-secret",
+      },
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Access-Control-Allow-Origin")).toBe("http://localhost:3000");
+  });
+
+  it("should echo back localhost origin without explicit port", async () => {
+    const res = await app.request(
+      "/health",
+      {
+        headers: {
+          Origin: "http://localhost",
+          "X-Health-Key": "test-health-key",
+        },
+      },
+      {
+        ENVIRONMENT: "development",
+        ALLOWED_ORIGINS: "",
+        DATABASE_URL: "postgres://localhost:5432/db",
+        HEALTH_TOKEN: "test-health-key",
+        JWT_SECRET: "test-secret",
+      },
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Access-Control-Allow-Origin")).toBe("http://localhost");
+  });
+});

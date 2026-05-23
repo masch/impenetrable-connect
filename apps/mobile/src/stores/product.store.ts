@@ -57,7 +57,9 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
       const services = await ProductService.getServices();
       set({ services, isLoading: false });
     } catch (err: unknown) {
-      logger.error("Error fetching services", err);
+      logger.error("Error fetching services", {
+        error: err instanceof Error ? err.message : String(err),
+      });
       set({ error: "Failed to fetch services", isLoading: false });
     }
   },
@@ -69,7 +71,9 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
       const services = await ProductService.getServicesByCategory(categoryId);
       set({ services, isLoading: false });
     } catch (err: unknown) {
-      logger.error(`Error fetching services for category: ${categoryId}`, err);
+      logger.error(`Error fetching services for category: ${categoryId}`, {
+        error: err instanceof Error ? err.message : String(err),
+      });
       set({ error: "Failed to fetch services", isLoading: false });
     }
   },
@@ -81,7 +85,9 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
       const service = await ProductService.getServiceById(id);
       set({ selectedService: service, isLoading: false });
     } catch (err: unknown) {
-      logger.error(`Error fetching service with ID: ${id}`, err);
+      logger.error(`Error fetching service with ID: ${id}`, {
+        error: err instanceof Error ? err.message : String(err),
+      });
       set({ error: "Service not found", isLoading: false });
     }
   },

@@ -13,10 +13,17 @@ import {
 // Local assets
 import empanadas12 from "../../assets/catalog/empanadas12.jpeg";
 import empanadas6 from "../../assets/catalog/empanadas6.jpeg";
+import empanadasPollo from "../../assets/catalog/empanadas_pollo.jpeg";
 import repollo from "../../assets/catalog/repollo.jpeg";
 import pastelCalabaza from "../../assets/catalog/pastel_calabaza.jpeg";
 import chivoGuiso from "../../assets/catalog/chivo_guiso.jpeg";
 import chivoEstofado from "../../assets/catalog/chivo_estofado.jpeg";
+import viandaAssets from "../../assets/catalog/vianda.jpeg";
+import paseoLancha from "../../assets/catalog/paseo_lancha.jpeg";
+import asadoPollo from "../../assets/catalog/asado_pollo.jpeg";
+import postreRegional from "../../assets/catalog/postre_regional.jpeg";
+import desayuno from "../../assets/catalog/desayuno.jpeg";
+import merienda from "../../assets/catalog/merienda.jpeg";
 
 // Patch local image URLs onto items that use require() assets
 export const MOCK_PRODUCTS_MAP: Record<number, CatalogItem> = {
@@ -27,13 +34,18 @@ export const MOCK_PRODUCTS_MAP: Record<number, CatalogItem> = {
   4: { ...CATALOG_ITEMS_MAP[4], zzz_image_url: empanadas12 },
   5: { ...CATALOG_ITEMS_MAP[5], zzz_image_url: empanadas12 },
   6: { ...CATALOG_ITEMS_MAP[6], zzz_image_url: empanadas12 },
-  7: { ...CATALOG_ITEMS_MAP[7], zzz_image_url: empanadas6 },
-  8: { ...CATALOG_ITEMS_MAP[8], zzz_image_url: empanadas12 },
+  7: { ...CATALOG_ITEMS_MAP[7], zzz_image_url: empanadasPollo },
+  8: { ...CATALOG_ITEMS_MAP[8], zzz_image_url: empanadasPollo },
   10: { ...CATALOG_ITEMS_MAP[10], zzz_image_url: pastelCalabaza },
   11: { ...CATALOG_ITEMS_MAP[11], zzz_image_url: chivoEstofado },
   12: { ...CATALOG_ITEMS_MAP[12], zzz_image_url: chivoGuiso },
+  9: { ...CATALOG_ITEMS_MAP[9], zzz_image_url: asadoPollo },
   13: { ...CATALOG_ITEMS_MAP[13], zzz_image_url: repollo },
-  17: { ...CATALOG_ITEMS_MAP[17], zzz_image_url: empanadas6 },
+  14: { ...CATALOG_ITEMS_MAP[14], zzz_image_url: postreRegional },
+  15: { ...CATALOG_ITEMS_MAP[15], zzz_image_url: desayuno },
+  16: { ...CATALOG_ITEMS_MAP[16], zzz_image_url: merienda },
+  17: { ...CATALOG_ITEMS_MAP[17], zzz_image_url: viandaAssets },
+  18: { ...CATALOG_ITEMS_MAP[18], zzz_image_url: paseoLancha },
 };
 
 // Expose categories from shared (no RN-specific data)
