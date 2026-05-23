@@ -54,7 +54,7 @@ export const EMPANADAS_CARNE_MEDIA_DOCENA: CatalogItem = {
   },
   zzz_price: 9500,
   zzz_max_participants: 20,
-  zzz_image_url: undefined,
+  zzz_image_url: "empanadas6",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
@@ -69,7 +69,7 @@ export const EMPANADAS_CARNE_DOCENA: CatalogItem = {
   },
   zzz_price: 18000,
   zzz_max_participants: 20,
-  zzz_image_url: undefined,
+  zzz_image_url: "empanadas12",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
@@ -84,7 +84,7 @@ export const EMPANADAS_CHARQUI_MEDIA_DOCENA: CatalogItem = {
   },
   zzz_price: 12500,
   zzz_max_participants: 20,
-  zzz_image_url: undefined,
+  zzz_image_url: "empanadas6",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
@@ -96,7 +96,7 @@ export const EMPANADAS_CHARQUI_DOCENA: CatalogItem = {
   zzz_description_i18n: { es: "Empanadas de charqui artesanal", en: "Artisan charqui empanadas" },
   zzz_price: 24000,
   zzz_max_participants: 20,
-  zzz_image_url: undefined,
+  zzz_image_url: "empanadas12",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
@@ -111,7 +111,7 @@ export const EMPANADAS_VERDURA_MEDIA_DOCENA: CatalogItem = {
   },
   zzz_price: 9000,
   zzz_max_participants: 20,
-  zzz_image_url: undefined,
+  zzz_image_url: "empanadas6",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
@@ -126,7 +126,7 @@ export const EMPANADAS_VERDURA_DOCENA: CatalogItem = {
   },
   zzz_price: 17000,
   zzz_max_participants: 20,
-  zzz_image_url: undefined,
+  zzz_image_url: "empanadas12",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
@@ -141,7 +141,7 @@ export const EMPANADAS_POLLO_MEDIA_DOCENA: CatalogItem = {
   },
   zzz_price: 9000,
   zzz_max_participants: 20,
-  zzz_image_url: undefined,
+  zzz_image_url: "empanadas_pollo",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
@@ -153,7 +153,7 @@ export const EMPANADAS_POLLO_DOCENA: CatalogItem = {
   zzz_description_i18n: { es: "Empanadas de pollo deshilachado", en: "Shredded chicken empanadas" },
   zzz_price: 17000,
   zzz_max_participants: 20,
-  zzz_image_url: undefined,
+  zzz_image_url: "empanadas_pollo",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
@@ -168,7 +168,7 @@ export const ASADO_POLLO: CatalogItem = {
   },
   zzz_price: 17000,
   zzz_max_participants: 20,
-  zzz_image_url: "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400",
+  zzz_image_url: "asado_pollo",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
@@ -183,7 +183,7 @@ export const PASTEL_ZAPALLO_CHIVO: CatalogItem = {
   },
   zzz_price: 18000,
   zzz_max_participants: 20,
-  zzz_image_url: undefined,
+  zzz_image_url: "pastel_calabaza",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
@@ -198,7 +198,7 @@ export const ESTOFADO_CHIVO: CatalogItem = {
   },
   zzz_price: 20000,
   zzz_max_participants: 20,
-  zzz_image_url: undefined,
+  zzz_image_url: "chivo_estofado",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
@@ -213,7 +213,7 @@ export const GUISO_CHIVO: CatalogItem = {
   },
   zzz_price: 20000,
   zzz_max_participants: 20,
-  zzz_image_url: undefined,
+  zzz_image_url: "chivo_guiso",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
@@ -228,7 +228,7 @@ export const REPOLLO_ASADO: CatalogItem = {
   },
   zzz_price: 18000,
   zzz_max_participants: 20,
-  zzz_image_url: undefined,
+  zzz_image_url: "repollo",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
@@ -243,7 +243,7 @@ export const POSTRE_REGIONAL: CatalogItem = {
   },
   zzz_price: 7000,
   zzz_max_participants: 20,
-  zzz_image_url: "https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?w=400",
+  zzz_image_url: "postre_regional",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH", "DINNER"],
 };
@@ -258,7 +258,7 @@ export const DESAYUNO: CatalogItem = {
   },
   zzz_price: 9000,
   zzz_max_participants: 20,
-  zzz_image_url: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400",
+  zzz_image_url: "desayuno",
   zzz_global_pause: false,
   zzz_service_moments: ["BREAKFAST"],
 };
@@ -273,7 +273,7 @@ export const MERIENDA: CatalogItem = {
   },
   zzz_price: 9000,
   zzz_max_participants: 20,
-  zzz_image_url: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400",
+  zzz_image_url: "merienda",
   zzz_global_pause: false,
   zzz_service_moments: ["SNACK"],
 };
@@ -288,7 +288,7 @@ export const VIANDA: CatalogItem = {
   },
   zzz_price: 9500,
   zzz_max_participants: 20,
-  zzz_image_url: undefined,
+  zzz_image_url: "vianda",
   zzz_global_pause: false,
   zzz_service_moments: ["LUNCH"],
 };
@@ -303,7 +303,7 @@ export const PASEO_LANCHA: CatalogItem = {
   },
   zzz_price: 15000,
   zzz_max_participants: 6,
-  zzz_image_url: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400",
+  zzz_image_url: "paseo_lancha",
   zzz_global_pause: false,
 };
 

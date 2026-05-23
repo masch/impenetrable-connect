@@ -24,6 +24,9 @@ import { isMockUserLoggedIn, getMockUserId } from "../mocks/users";
 import { logger } from "./logger.service";
 import env from "../config/env";
 import { mapNetworkError, handleResponse } from "./api-utils";
+import { resolveImageUrl } from "./image-assets";
+
+const MOCK_DELAYS = { FAST: 500, NORMAL: 600, SLOW: 800 } as const;
 
 // Re-export for convenience
 export type { ProductItem };
@@ -66,17 +69,17 @@ const mockProducts = [...MOCK_PRODUCTS];
 
 const MockProductService: ProductServiceInterface = {
   getServices: async () => {
-    await new Promise((r) => setTimeout(r, 800));
+    await new Promise((r) => setTimeout(r, MOCK_DELAYS.SLOW));
     return [...mockProducts];
   },
 
   getServiceById: async (id: number) => {
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, MOCK_DELAYS.FAST));
     return mockProducts.find((s) => s.zzz_id === id) || null;
   },
 
   getServicesByCategory: async (categoryId: number) => {
-    await new Promise((r) => setTimeout(r, 600));
+    await new Promise((r) => setTimeout(r, MOCK_DELAYS.NORMAL));
     return mockProducts.filter((s) => s.zzz_product_category_id === categoryId);
   },
 
@@ -93,7 +96,7 @@ const MockProductService: ProductServiceInterface = {
       throw new Error("User must be logged in to place an order");
     }
 
-    await new Promise((r) => setTimeout(r, 800));
+    await new Promise((r) => setTimeout(r, MOCK_DELAYS.SLOW));
 
     if (items.length === 0) {
       throw new Error("Cannot place an order without items");
@@ -148,7 +151,7 @@ const MockProductService: ProductServiceInterface = {
   },
 
   updateOrder: async (id: number, input: Partial<BookingInput>) => {
-    await new Promise((r) => setTimeout(r, 600));
+    await new Promise((r) => setTimeout(r, MOCK_DELAYS.NORMAL));
 
     const existingOrders = getMockOrders();
     const order = existingOrders.find((o) => Number(o.zzz_id) === Number(id));
@@ -187,7 +190,7 @@ const MockProductService: ProductServiceInterface = {
   },
 
   updateOrderStatus: async (id: number, status: string) => {
-    await new Promise((r) => setTimeout(r, 600));
+    await new Promise((r) => setTimeout(r, MOCK_DELAYS.NORMAL));
     const existingOrders = getMockOrders();
     const order = existingOrders.find((o) => Number(o.zzz_id) === Number(id));
     if (!order) throw new Error("Order not found");
@@ -202,7 +205,7 @@ const MockProductService: ProductServiceInterface = {
   },
 
   getOrders: async (userId?: string) => {
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, MOCK_DELAYS.FAST));
     return getMockOrders(userId);
   },
 };
@@ -210,11 +213,17 @@ const MockProductService: ProductServiceInterface = {
 /**
  * 📡 REST API Implementation (Future)
  */
+const mapImage = (item: ProductItem): ProductItem => ({
+  ...item,
+  zzz_image_url: resolveImageUrl(item.zzz_image_url) as ProductItem["zzz_image_url"],
+});
+
 const RestProductService: ProductServiceInterface = {
   getServices: async () => {
     try {
       const response = await fetch(`${env.API_URL}/services`);
-      return handleResponse<ProductItem[]>(response, "errors.catalog_failed");
+      const items = await handleResponse<ProductItem[]>(response, "errors.catalog_failed");
+      return items.map(mapImage);
     } catch (error) {
       throw mapNetworkError(error);
     }
@@ -223,7 +232,8 @@ const RestProductService: ProductServiceInterface = {
   getServiceById: async (id: number) => {
     try {
       const response = await fetch(`${env.API_URL}/services/${id}`);
-      return handleResponse<ProductItem | null>(response, "errors.no_venture_found");
+      const item = await handleResponse<ProductItem | null>(response, "errors.no_venture_found");
+      return item ? mapImage(item) : null;
     } catch (error) {
       throw mapNetworkError(error);
     }
@@ -232,7 +242,8 @@ const RestProductService: ProductServiceInterface = {
   getServicesByCategory: async (categoryId: number) => {
     try {
       const response = await fetch(`${env.API_URL}/services?category_id=${categoryId}`);
-      return handleResponse<ProductItem[]>(response, "errors.catalog_failed");
+      const items = await handleResponse<ProductItem[]>(response, "errors.catalog_failed");
+      return items.map(mapImage);
     } catch (error) {
       throw mapNetworkError(error);
     }

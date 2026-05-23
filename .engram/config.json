@@ -4,5 +4,7 @@
   "strict_tdd": true,
   "test_command": "make test",
   "default_language": "en",
-  "delivery_strategy": "ask-on-risk"
+  "delivery_strategy": "ask-on-risk",
+  "execution_mode": "interactive",
+  "review_budget_lines": 400
 }

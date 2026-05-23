@@ -6,6 +6,8 @@ import { Icon } from "../Icon";
 import { useTranslations } from "../../hooks/useI18n";
 import { formatCurrency } from "../../logic/formatters";
 
+const ICON_SIZES = { LARGE: 48, SMALL: 14, MEDIUM: 16 } as const;
+
 interface ServiceCardProps {
   item: CatalogItem;
   onPress: () => void;
@@ -42,11 +44,16 @@ export const ServiceCard = ({ item, onPress, categoryName, className = "" }: Ser
                   ? { uri: item.zzz_image_url }
                   : item.zzz_image_url
               }
-              style={{ width: "100%", height: "100%" }}
+              className="w-full h-full object-cover"
+              accessibilityLabel={`${name} image`}
             />
           ) : (
             <View className="w-full h-full items-center justify-center">
-              <Icon name="image-off-outline" size={48} color={COLORS["outline-variant"]} />
+              <Icon
+                name="image-off-outline"
+                size={ICON_SIZES.LARGE}
+                color={COLORS["outline-variant"]}
+              />
             </View>
           )}
 
@@ -78,7 +85,7 @@ export const ServiceCard = ({ item, onPress, categoryName, className = "" }: Ser
             </Text>
             {item.zzz_max_participants && (
               <View className="flex-row items-center bg-secondary/10 px-2 py-1 rounded-lg">
-                <Icon name="account-group" size={14} color={COLORS.secondary} />
+                <Icon name="account-group" size={ICON_SIZES.SMALL} color={COLORS.secondary} />
                 <Text className="text-[10px] font-bold text-secondary ml-1">
                   {item.zzz_max_participants}
                 </Text>
@@ -97,7 +104,7 @@ export const ServiceCard = ({ item, onPress, categoryName, className = "" }: Ser
             <Text className="text-[10px] font-display font-bold text-primary uppercase tracking-tighter">
               {t("catalog.book_now")}
             </Text>
-            <Icon name="chevron-right" size={16} color={COLORS.primary} />
+            <Icon name="chevron-right" size={ICON_SIZES.MEDIUM} color={COLORS.primary} />
           </View>
         </View>
       </View>
