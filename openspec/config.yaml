@@ -48,6 +48,10 @@ rules:
     - Warn before merging destructive deltas (large removals)
 
 archived_changes:
+  - name: en-modo-dev-web-api-no-se-cargan-las-imagenes-de-los-productos
+    archived_date: "2026-05-23"
+    status: completed
+    summary: "Fixed product images not rendering in dev-web-api mode on web, relaxed CORS for dynamic localhost ports in development, and populated missing image URLs in seed data."
   - name: remediate-spread-vulnerabilities
     archived_date: "2026-05-23"
     status: completed
