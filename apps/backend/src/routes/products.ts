@@ -1,10 +1,11 @@
 import { Hono } from "hono";
-import { eq, and, inArray } from "drizzle-orm";
-import { products, productCategories } from "../db/schema";
 import { type AppEnv } from "../config/env";
 import { authMiddleware } from "../middleware/auth";
 import { logger } from "../services/logger.service";
-import { mapProductsWithCategories } from "../services/product.service";
+import { ProductService } from "../services/product.service";
+import { HTTP_OK, HTTP_BAD_REQUEST, HTTP_INTERNAL_ERROR } from "../constants/http-status";
+
+const MIN_VALID_PROJECT_ID = 1;
 
 const router = new Hono<AppEnv>();
 
@@ -21,42 +22,27 @@ router.get("/", async (c) => {
     const db = c.var.db;
     const projectId = Number(c.req.query("projectId"));
 
-    if (Number.isNaN(projectId) || projectId < 1) {
-      return c.json({ error: "Invalid project ID" }, 400);
+    if (Number.isNaN(projectId) || projectId < MIN_VALID_PROJECT_ID) {
+      return c.json({ error: "Invalid project ID" }, HTTP_BAD_REQUEST);
     }
 
-    // Get categories for this project
-    const categories = await db
-      .select()
-      .from(productCategories)
-      .where(
-        and(
-          eq(productCategories.zzz_project_id, projectId),
-          eq(productCategories.zzz_is_active, true),
-        ),
-      );
+    // Get categories for this project using service
+    const categories = await ProductService.getCategoriesByProject(db, projectId);
 
     if (categories.length === 0) {
-      return c.json([]);
+      return c.json([], HTTP_OK);
     }
 
     const categoryIds = categories.map((cat) => cat.zzz_id);
 
-    // Get products for those categories
-    const items = await db
-      .select()
-      .from(products)
-      .where(
-        and(
-          inArray(products.zzz_product_category_id, categoryIds),
-          eq(products.zzz_global_pause, false),
-        ),
-      );
+    // Get products for those categories using service
+    const items = await ProductService.getProductsByCategoryIds(db, categoryIds);
 
-    return c.json(mapProductsWithCategories(items, categories, projectId));
+    const mapped = ProductService.mapProductsWithCategories(items, categories, projectId);
+    return c.json(mapped, HTTP_OK);
   } catch (error) {
     logger.error("Error fetching products", error);
-    return c.json({ error: "Internal Server Error" }, 500);
+    return c.json({ error: "Internal Server Error" }, HTTP_INTERNAL_ERROR);
   }
 });
 
