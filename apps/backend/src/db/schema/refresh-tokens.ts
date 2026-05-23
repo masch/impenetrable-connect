@@ -1,8 +1,8 @@
-import { pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
-import { auditColumns } from "./base";
+import { uuid, text, timestamp } from "drizzle-orm/pg-core";
+import { auditColumns, impenetrableSchema } from "./base";
 import { users } from "./users";
 
-export const refreshTokens = pgTable("refresh_tokens", {
+export const refreshTokens = impenetrableSchema.table("refresh_tokens", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id")
     .notNull()

@@ -1,8 +1,8 @@
-import { pgTable, serial, integer, boolean, jsonb, varchar, numeric } from "drizzle-orm/pg-core";
-import { auditColumns } from "./base";
+import { serial, integer, boolean, jsonb, varchar, numeric } from "drizzle-orm/pg-core";
+import { auditColumns, impenetrableSchema } from "./base";
 import { productCategories } from "./product-categories";
 
-export const products = pgTable("products", {
+export const products = impenetrableSchema.table("products", {
   zzz_id: serial("zzz_id").primaryKey(),
   zzz_product_category_id: integer("zzz_product_category_id")
     .references(() => productCategories.zzz_id)

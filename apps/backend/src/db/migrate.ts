@@ -4,6 +4,7 @@ import postgres from "postgres";
 import path from "path";
 import { logger } from "../services/logger.service";
 import { getAppConfig } from "../config/env";
+import { SCHEMA_NAME } from "./schema/base";
 
 /**
  * Database Migration Script
@@ -23,6 +24,9 @@ async function runMigration() {
   const db = drizzle(migrationClient);
 
   try {
+    // Explicitly create the custom schema if it doesn't exist
+    await migrationClient.unsafe(`CREATE SCHEMA IF NOT EXISTS ${SCHEMA_NAME};`);
+
     await migrate(db, {
       migrationsFolder: path.join(__dirname, "migrations"),
     });

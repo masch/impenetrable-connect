@@ -1,9 +1,9 @@
-import { pgTable, serial, varchar, uuid, boolean, integer } from "drizzle-orm/pg-core";
-import { auditColumns } from "./base";
+import { serial, varchar, uuid, boolean, integer } from "drizzle-orm/pg-core";
+import { auditColumns, impenetrableSchema } from "./base";
 import { users } from "./users";
 import { projects } from "./projects";
 
-export const ventures = pgTable("ventures", {
+export const ventures = impenetrableSchema.table("ventures", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   ownerId: uuid("owner_id")
