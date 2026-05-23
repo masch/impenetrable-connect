@@ -152,4 +152,4 @@ router.delete("/:id", async (c) => {
   }
 });
 
-export default router;
+export { router as venturesRouter };

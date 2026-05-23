@@ -64,6 +64,7 @@
 ### Styling (NativeWind v4 + Tailwind v3)
 
 - **Utilities Only**: NEVER use inline `style={...}`.
+  - **Exception — CatalogImage component**: `apps/mobile/src/components/catalog/CatalogImage.tsx` MAY use `style` prop. Style MUST be a named module-level constant (`const STYLE = {...} as const`), never inline.
 - **Design Tokens**: NEVER hardcode colors/spacing.
 - **Mobile Footer**: Use compact single-row layout.
 - **Image Overflow**: When using `require()` in fixed-height container, add `overflow-hidden` to container.
@@ -120,7 +121,7 @@
 - **GPG Signing**: ALWAYS use `git commit -S`. NEVER commit without signing.
   1. Complete work + run `make check`
   2. `git add` files
-  3. STOP and request user to execute `git commit -S`
+  3. Execute `git commit -S` directly — the GPG agent prompts the user for the key password via pinentry if not cached. The AI runs the command, the user types the password in the pinentry popup.
 - **PR Body**: MUST include `✅ PASS: X total tests, make check successful`.
 - **PR Template**: MUST read `.github/PULL_REQUEST_TEMPLATE.md` before creating PR.
 - **Labels**: Run `gh label list` to verify project-specific naming (e.g., `type:feature` vs `type:feat`).

@@ -60,6 +60,7 @@
     "empty": "No hay servicios disponibles",
     "empty_selection_hint": "Elegí tus platos en el catálogo de abajo",
     "no_name": "Servicio sin nombre",
+    "no_image": "Sin imagen disponible",
     "service_image_alt": "Imagen del servicio",
     "participants": "personas",
     "no_description": "Sin descripción disponible",

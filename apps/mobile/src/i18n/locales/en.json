@@ -60,6 +60,7 @@
     "empty": "No services available",
     "empty_selection_hint": "Select your dishes from the catalog below",
     "no_name": "Unnamed service",
+    "no_image": "No image available",
     "service_image_alt": "Service image",
     "participants": "people",
     "no_description": "No description available",

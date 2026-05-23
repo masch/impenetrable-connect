@@ -60,4 +60,4 @@ router.get("/", async (c) => {
   }
 });
 
-export default router;
+export { router as productsRouter };
