@@ -22,6 +22,7 @@ import { AppAlert } from "../../../components/AppAlert";
 import { ComponentProps } from "react";
 
 const AVAILABLE_LANGUAGES = SUPPORTED_LANGUAGES;
+const RADIX_DECIMAL = 10;
 
 interface FormData {
   zzz_name: string;
@@ -79,7 +80,7 @@ export default function ProjectFormScreen() {
   // Load project data in edit mode
   useEffect(() => {
     if (isEditMode && id) {
-      const numericId = parseInt(id, 10);
+      const numericId = parseInt(id, RADIX_DECIMAL);
       if (!isNaN(numericId)) {
         selectProject(numericId);
       }
@@ -145,14 +146,14 @@ export default function ProjectFormScreen() {
       zzz_name: formData.zzz_name.trim(),
       zzz_default_language: formData.zzz_default_language,
       zzz_supported_languages: formData.zzz_supported_languages,
-      zzz_cascade_timeout_minutes: parseInt(formData.zzz_cascade_timeout_minutes, 10),
-      zzz_max_cascade_attempts: parseInt(formData.zzz_max_cascade_attempts, 10),
+      zzz_cascade_timeout_minutes: parseInt(formData.zzz_cascade_timeout_minutes, RADIX_DECIMAL),
+      zzz_max_cascade_attempts: parseInt(formData.zzz_max_cascade_attempts, RADIX_DECIMAL),
       zzz_is_active: formData.zzz_is_active,
     };
 
     try {
       if (isEditMode && id) {
-        const numericId = parseInt(id, 10);
+        const numericId = parseInt(id, RADIX_DECIMAL);
         await updateProject(numericId, projectData);
       } else {
         await createProject(projectData);
@@ -364,13 +365,19 @@ export default function ProjectFormScreen() {
               {/* Action Buttons */}
               <View className="pt-6 flex-row gap-4">
                 <View className="flex-1">
-                  <Button title={t("cancel")} variant="secondary" onPress={() => back()} />
+                  <Button
+                    title={t("cancel")}
+                    variant="secondary"
+                    onPress={() => back()}
+                    testID="project-cancel-button"
+                  />
                 </View>
                 <View className="flex-1">
                   <Button
                     title={isEditMode ? t("save") : t("create")}
                     onPress={handleSubmit}
                     disabled={isSaving}
+                    testID="project-submit-button"
                   />
                 </View>
               </View>
@@ -381,7 +388,11 @@ export default function ProjectFormScreen() {
 
       <StatusBar style="auto" />
       <AppAlert
-        {...alertConfig}
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        actions={alertConfig.actions}
         onClose={() => setAlertConfig((prev) => ({ ...prev, visible: false }))}
       />
     </Screen>

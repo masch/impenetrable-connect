@@ -158,7 +158,7 @@ export default function OrderScreen() {
 
   // Render horizontal date selector like the agenda
   const DATE_SELECTOR_DAYS = 7;
-  const DATE_TILE_CLASSES = "w-[58px] h-[82px]";
+  const DATE_TILE_CLASSES = "w-14 h-20";
   const renderDateSelector = () => {
     const days = Array.from({ length: DATE_SELECTOR_DAYS }, (_, i) => i).map((offset) => {
       const date = new Date();
@@ -350,7 +350,7 @@ export default function OrderScreen() {
                                           <Icon
                                             name="clock-outline"
                                             size={ICON_SIZE_TIME_LABEL}
-                                            color="#FFFFFF"
+                                            color={COLORS["on-primary"]}
                                           />
                                           <Text className="font-display-bold text-base text-white">
                                             {displayTime}
@@ -414,7 +414,11 @@ export default function OrderScreen() {
         )}
       </ScreenContent>
       <AppAlert
-        {...alertConfig}
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        actions={alertConfig.actions}
         onClose={() => setAlertConfig({ ...alertConfig, visible: false })}
       />
     </Screen>

@@ -43,7 +43,7 @@ EXCLUDE_PATTERNS="*.test.ts,*.spec.ts,*.test.tsx,*.spec.tsx,*.d.ts"
 
 # File containing code review rules
 # Default: AGENTS.md
-RULES_FILE=".atl/skill-registry.md"
+RULES_FILE="AGENTS.md"
 
 # Strict mode: fail if AI response is ambiguous
 # Default: true

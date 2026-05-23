@@ -48,6 +48,10 @@ rules:
     - Warn before merging destructive deltas (large removals)
 
 archived_changes:
+  - name: remediate-spread-vulnerabilities
+    archived_date: "2026-05-23"
+    status: completed
+    summary: "Remediated 4 React props-spreading vulnerabilities, suppressed 3 false-positive object-injection findings, and passed all Gentleman Guardian Angel pre-commit checks."
   - name: venture-store
     archived_date: "2026-05-20"
     status: completed
