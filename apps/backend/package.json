@@ -8,7 +8,7 @@
     "test": "bun test --preload ./test-setup.ts",
     "lint": "bunx eslint src",
     "typecheck": "bunx tsc --noEmit",
-    "db:push": "drizzle-kit push",
+    "db:push": "bun run src/db/pre-push.ts && drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun run src/db/migrate.ts && bun run src/db/db-setup-advanced.ts",
     "db:seed": "bun run src/db/seed.ts",
