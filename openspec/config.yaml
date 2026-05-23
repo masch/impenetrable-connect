@@ -52,6 +52,10 @@ archived_changes:
     archived_date: "2026-05-23"
     status: completed
     summary: "Extracted database logic from routes (projects, ventures, products, services) into dedicated ProjectService, VentureService, and ProductService, centralized HTTP status codes, converted to named exports, and verified all 369 tests pass."
+  - name: en-modo-dev-web-api-no-se-cargan-las-imagenes-de-los-productos
+    archived_date: "2026-05-23"
+    status: completed
+    summary: "Fixed product images not rendering in dev-web-api mode on web, relaxed CORS for dynamic localhost ports in development, and populated missing image URLs in seed data."
   - name: remediate-spread-vulnerabilities
     archived_date: "2026-05-23"
     status: completed
