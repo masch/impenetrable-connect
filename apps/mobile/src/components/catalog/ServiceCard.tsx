@@ -1,12 +1,14 @@
-import React from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text } from "react-native";
 import { Button } from "../Button";
 import { CatalogItem, COLORS } from "@repo/shared";
 import { Icon } from "../Icon";
 import { useTranslations } from "../../hooks/useI18n";
 import { formatCurrency } from "../../logic/formatters";
+import { CatalogImage } from "./CatalogImage";
 
 const ICON_SIZES = { LARGE: 48, SMALL: 14, MEDIUM: 16 } as const;
+const TITLE_MAX_LINES = 2;
+const DESCRIPTION_MAX_LINES = 3;
 
 interface ServiceCardProps {
   item: CatalogItem;
@@ -30,7 +32,7 @@ export const ServiceCard = ({ item, onPress, categoryName, className = "" }: Ser
     <Button
       variant="ghost"
       onPress={onPress}
-      className={`p-0 bg-surface-container-low rounded-[24px] overflow-hidden border border-outline-variant/30 shadow-sm mb-4 ${className}`}
+      className={`p-0 bg-surface-container-low rounded-3xl overflow-hidden border border-outline-variant/30 shadow-sm mb-4 ${className}`}
       accessibilityLabel={`${name}, ${item.zzz_price} pesos`}
       testID={`service-card-${item.zzz_id}`}
     >
@@ -38,13 +40,12 @@ export const ServiceCard = ({ item, onPress, categoryName, className = "" }: Ser
         {/* Image Container */}
         <View className="h-48 w-full bg-surface-container-highest relative overflow-hidden">
           {item.zzz_image_url ? (
-            <Image
+            <CatalogImage
               source={
                 typeof item.zzz_image_url === "string"
                   ? { uri: item.zzz_image_url }
                   : item.zzz_image_url
               }
-              className="w-full h-full object-cover"
               accessibilityLabel={`${name} image`}
             />
           ) : (
@@ -53,6 +54,7 @@ export const ServiceCard = ({ item, onPress, categoryName, className = "" }: Ser
                 name="image-off-outline"
                 size={ICON_SIZES.LARGE}
                 color={COLORS["outline-variant"]}
+                accessibilityLabel={t("catalog.no_image")}
               />
             </View>
           )}
@@ -79,13 +81,18 @@ export const ServiceCard = ({ item, onPress, categoryName, className = "" }: Ser
           <View className="flex-row justify-between items-start mb-2">
             <Text
               className="text-lg font-display font-bold text-on-surface flex-1 mr-2"
-              numberOfLines={2}
+              numberOfLines={TITLE_MAX_LINES}
             >
               {name}
             </Text>
             {item.zzz_max_participants && (
               <View className="flex-row items-center bg-secondary/10 px-2 py-1 rounded-lg">
-                <Icon name="account-group" size={ICON_SIZES.SMALL} color={COLORS.secondary} />
+                <Icon
+                  name="account-group"
+                  size={ICON_SIZES.SMALL}
+                  color={COLORS.secondary}
+                  accessibilityLabel={t("catalog.participants")}
+                />
                 <Text className="text-[10px] font-bold text-secondary ml-1">
                   {item.zzz_max_participants}
                 </Text>
@@ -95,7 +102,7 @@ export const ServiceCard = ({ item, onPress, categoryName, className = "" }: Ser
 
           <Text
             className="text-sm font-body text-on-surface-variant/80 leading-5"
-            numberOfLines={3}
+            numberOfLines={DESCRIPTION_MAX_LINES}
           >
             {description}
           </Text>
@@ -104,7 +111,12 @@ export const ServiceCard = ({ item, onPress, categoryName, className = "" }: Ser
             <Text className="text-[10px] font-display font-bold text-primary uppercase tracking-tighter">
               {t("catalog.book_now")}
             </Text>
-            <Icon name="chevron-right" size={ICON_SIZES.MEDIUM} color={COLORS.primary} />
+            <Icon
+              name="chevron-right"
+              size={ICON_SIZES.MEDIUM}
+              color={COLORS.primary}
+              accessibilityLabel={t("catalog.book_now")}
+            />
           </View>
         </View>
       </View>

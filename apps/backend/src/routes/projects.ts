@@ -72,4 +72,4 @@ router.post("/", async (c) => {
   }
 });
 
-export default router;
+export { router as projectsRouter };

@@ -1,24 +1,22 @@
 import { Hono } from "hono";
 import { healthRouter } from "./routes/health";
 import { requestLogger } from "./middleware/logger";
-import projectsRouter from "./routes/projects";
-import venturesRouter from "./routes/ventures";
+import { projectsRouter } from "./routes/projects";
+import { venturesRouter } from "./routes/ventures";
 import { authRouter } from "./routes/auth";
-import productsRouter from "./routes/products";
-import servicesRouter from "./routes/services";
+import { productsRouter } from "./routes/products";
+import { servicesRouter } from "./routes/services";
 import { cors } from "hono/cors";
 import { dbMiddleware } from "./middleware/db";
 import { logger } from "./services/logger.service";
 import { getAppConfig, type AppEnv } from "./config/env";
 
 const CORS_MAX_AGE_SECONDS = 600;
+const HTTP_INTERNAL_ERROR = 500;
 
 const corsMiddleware = cors({
   origin: (origin, c) => {
     const config = getAppConfig(c);
-    if (config.isDevelopment && origin && /^https?:\/\/localhost(:\d+)?$/.test(origin)) {
-      return origin;
-    }
     if (config.allowedOrigins.length === 0) return null;
     if (config.allowedOrigins.includes("*")) return origin;
     if (config.allowedOrigins.includes(origin)) return origin;
@@ -40,7 +38,7 @@ app.use("*", async (c, next) => {
       "SECURITY ALERT: ALLOWED_ORIGINS is not defined in production!",
       new Error("Missing CORS configuration"),
     );
-    return c.json({ message: "errors.common.security_cors_required" }, 500);
+    return c.json({ message: "errors.common.security_cors_required" }, HTTP_INTERNAL_ERROR);
   }
 
   return next();
