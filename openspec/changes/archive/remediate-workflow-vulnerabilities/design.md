@@ -11,8 +11,8 @@ To maintain human readability and enable tools like Dependabot to detect updates
 | Action                   | Old Reference | Pinned SHA Reference                        | Target Version    |
 | ------------------------ | ------------- | ------------------------------------------- | ----------------- |
 | `actions/checkout`       | `@v6` / `@v5` | `@de0fac2e4500dabe0009e67214ff5f5447ce83dd` | v6.0.2            |
-| `actions/setup-node`     | `@v4`         | `@7f8c1b2c8fb0920412802db167476e197c55d38a` | v4.2.0            |
-| `oven-sh/setup-bun`      | `@v2`         | `@0c5077e685f02c6136a53f0907e59c253d717ec2` | v2.2.0            |
+| `actions/setup-node`     | `@v4`         | `@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a` | v4.2.0            |
+| `oven-sh/setup-bun`      | `@v2`         | `@0c5077e51419868618aeaa5fe8019c62421857d6` | v2.2.0            |
 | `millionco/react-doctor` | `@main`       | `@241444d35287f1b4551cca921a65fb2fa67949b6` | HEAD (2026-05-23) |
 
 ## Rollback Plan

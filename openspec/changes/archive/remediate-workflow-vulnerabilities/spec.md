@@ -10,16 +10,16 @@ Remediation of mutable action references across three GitHub Actions workflows i
 
 - Location: `.github/workflows/deploy-backend.yml`
 - Line 40: `uses: actions/checkout@v6` must be replaced with `uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd` (v6.0.2).
-- Line 54: `uses: actions/setup-node@v4` must be replaced with `uses: actions/setup-node@7f8c1b2c8fb0920412802db167476e197c55d38a` (v4.2.0).
-- Line 59: `uses: oven-sh/setup-bun@v2` must be replaced with `uses: oven-sh/setup-bun@0c5077e685f02c6136a53f0907e59c253d717ec2` (v2.2.0).
+- Line 54: `uses: actions/setup-node@v4` must be replaced with `uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a` (v4.2.0).
+- Line 59: `uses: oven-sh/setup-bun@v2` must be replaced with `uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6` (v2.2.0).
 
 ### 2. deploy-web.yml
 
 - Location: `.github/workflows/deploy-web.yml`
 - Line 30: `uses: actions/checkout@v6` must be replaced with `uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd` (v6.0.2).
-- Line 33: `uses: oven-sh/setup-bun@v2` must be replaced with `uses: oven-sh/setup-bun@0c5077e685f02c6136a53f0907e59c253d717ec2` (v2.2.0).
+- Line 33: `uses: oven-sh/setup-bun@v2` must be replaced with `uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6` (v2.2.0).
 - Line 49: `uses: actions/checkout@v6` must be replaced with `uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd` (v6.0.2).
-- Line 52: `uses: oven-sh/setup-bun@v2` must be replaced with `uses: oven-sh/setup-bun@0c5077e685f02c6136a53f0907e59c253d717ec2` (v2.2.0).
+- Line 52: `uses: oven-sh/setup-bun@v2` must be replaced with `uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6` (v2.2.0).
 
 ### 3. react-doctor.yml
 

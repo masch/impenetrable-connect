@@ -74,13 +74,13 @@ The CI/CD workflows (`deploy-backend.yml`, `deploy-web.yml`, `react-doctor.yml`)
 #### [MODIFY] [deploy-backend.yml](file:///home/masch/dev/js/impenetrable-connect/.github/workflows/deploy-backend.yml)
 
 - Pin `actions/checkout@v6` to `actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd` (v6.0.2)
-- Pin `actions/setup-node@v4` to `actions/setup-node@7f8c1b2c8fb0920412802db167476e197c55d38a` (v4.2.0)
-- Pin `oven-sh/setup-bun@v2` to `oven-sh/setup-bun@0c5077e685f02c6136a53f0907e59c253d717ec2` (v2.2.0)
+- Pin `actions/setup-node@v4` to `actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a` (v4.2.0)
+- Pin `oven-sh/setup-bun@v2` to `oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6` (v2.2.0)
 
 #### [MODIFY] [deploy-web.yml](file:///home/masch/dev/js/impenetrable-connect/.github/workflows/deploy-web.yml)
 
 - Pin both `actions/checkout@v6` to `actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd` (v6.0.2)
-- Pin both `oven-sh/setup-bun@v2` to `oven-sh/setup-bun@0c5077e685f02c6136a53f0907e59c253d717ec2` (v2.2.0)
+- Pin both `oven-sh/setup-bun@v2` to `oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6` (v2.2.0)
 
 #### [MODIFY] [react-doctor.yml](file:///home/masch/dev/js/impenetrable-connect/.github/workflows/react-doctor.yml)
 
