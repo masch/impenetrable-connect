@@ -1,12 +1,18 @@
 import { Hono } from "hono";
-import { eq, inArray } from "drizzle-orm";
-import { ventures, ventureMembers } from "../db/schema";
-import { asc, desc } from "drizzle-orm";
 import { ZodError } from "zod";
 import { CreateVentureSchema, UpdateVentureSchema } from "@repo/shared";
 import { logger } from "../services/logger.service";
 import { type AppEnv } from "../config/env";
 import { authMiddleware } from "../middleware/auth";
+import { VentureService } from "../services/venture.service";
+import {
+  HTTP_OK,
+  HTTP_CREATED,
+  HTTP_NO_CONTENT,
+  HTTP_BAD_REQUEST,
+  HTTP_NOT_FOUND,
+  HTTP_INTERNAL_ERROR,
+} from "../constants/http-status";
 
 const router = new Hono<AppEnv>();
 
@@ -24,34 +30,15 @@ router.get("/", async (c) => {
     const userId = c.req.query("userId");
 
     if (userId) {
-      const memberships = await db
-        .select({ ventureId: ventureMembers.ventureId })
-        .from(ventureMembers)
-        .where(eq(ventureMembers.userId, userId));
-
-      if (memberships.length === 0) {
-        return c.json([]);
-      }
-
-      const ventureIds = memberships.map((m) => m.ventureId);
-
-      const result = await db
-        .select()
-        .from(ventures)
-        .where(inArray(ventures.id, ventureIds))
-        .orderBy(desc(ventures.zzz_is_active), asc(ventures.name));
-
-      return c.json(result);
+      const result = await VentureService.getByUserId(db, userId);
+      return c.json(result, HTTP_OK);
     }
 
-    const result = await db
-      .select()
-      .from(ventures)
-      .orderBy(desc(ventures.zzz_is_active), asc(ventures.name));
-    return c.json(result);
+    const result = await VentureService.getAll(db);
+    return c.json(result, HTTP_OK);
   } catch (error) {
     logger.error("Error fetching ventures", error);
-    return c.json({ error: "Internal Server Error" }, 500);
+    return c.json({ error: "Internal Server Error" }, HTTP_INTERNAL_ERROR);
   }
 });
 
@@ -67,16 +54,16 @@ router.post("/", async (c) => {
     const body = await c.req.json();
     const validated = CreateVentureSchema.parse(body);
 
-    const [newVenture] = await db.insert(ventures).values(validated).returning();
+    const newVenture = await VentureService.create(db, validated);
 
-    return c.json(newVenture, 201);
+    return c.json(newVenture, HTTP_CREATED);
   } catch (error) {
     if (error instanceof ZodError) {
       logger.warn("Venture validation failed", { error: error.message });
-      return c.json({ error: "Validation failed", details: error.flatten() }, 400);
+      return c.json({ error: "Validation failed", details: error.flatten() }, HTTP_BAD_REQUEST);
     }
     logger.error("Error creating venture", error);
-    return c.json({ error: "Internal Server Error" }, 500);
+    return c.json({ error: "Internal Server Error" }, HTTP_INTERNAL_ERROR);
   }
 });
 
@@ -93,30 +80,26 @@ router.put("/:id", async (c) => {
     const id = Number(c.req.param("id"));
 
     if (isNaN(id)) {
-      return c.json({ error: "Invalid ID" }, 400);
+      return c.json({ error: "Invalid ID" }, HTTP_BAD_REQUEST);
     }
 
     const body = await c.req.json();
     const validated = UpdateVentureSchema.parse(body);
 
-    const [updated] = await db
-      .update(ventures)
-      .set(validated)
-      .where(eq(ventures.id, id))
-      .returning();
+    const updated = await VentureService.update(db, id, validated);
 
     if (!updated) {
-      return c.json({ error: "Not Found" }, 404);
+      return c.json({ error: "Not Found" }, HTTP_NOT_FOUND);
     }
 
-    return c.json(updated, 200);
+    return c.json(updated, HTTP_OK);
   } catch (error) {
     if (error instanceof ZodError) {
       logger.warn("Venture update validation failed", { error: error.message });
-      return c.json({ error: "Validation failed", details: error.flatten() }, 400);
+      return c.json({ error: "Validation failed", details: error.flatten() }, HTTP_BAD_REQUEST);
     }
     logger.error("Error updating venture", error);
-    return c.json({ error: "Internal Server Error" }, 500);
+    return c.json({ error: "Internal Server Error" }, HTTP_INTERNAL_ERROR);
   }
 });
 
@@ -132,23 +115,19 @@ router.delete("/:id", async (c) => {
     const id = Number(c.req.param("id"));
 
     if (isNaN(id)) {
-      return c.json({ error: "Invalid ID" }, 400);
+      return c.json({ error: "Invalid ID" }, HTTP_BAD_REQUEST);
     }
 
-    const [deleted] = await db
-      .update(ventures)
-      .set({ zzz_is_active: false, zzzDeletedAt: new Date() })
-      .where(eq(ventures.id, id))
-      .returning();
+    const deleted = await VentureService.softDelete(db, id);
 
     if (!deleted) {
-      return c.json({ error: "Not Found" }, 404);
+      return c.json({ error: "Not Found" }, HTTP_NOT_FOUND);
     }
 
-    return c.body(null, 204);
+    return c.body(null, HTTP_NO_CONTENT);
   } catch (error) {
     logger.error("Error deleting venture", error);
-    return c.json({ error: "Internal Server Error" }, 500);
+    return c.json({ error: "Internal Server Error" }, HTTP_INTERNAL_ERROR);
   }
 });
 
