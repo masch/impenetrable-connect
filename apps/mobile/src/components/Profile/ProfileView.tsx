@@ -7,6 +7,8 @@ import { Button } from "../Button";
 import { useTranslations } from "../../hooks/useI18n";
 import { useAuthStore } from "../../stores/auth.store";
 
+const ICON_SIZE_ACTION = 24;
+
 interface ProfileViewProps {
   userType: UserRole;
 }
@@ -84,7 +86,14 @@ export default function ProfileView({ userType }: ProfileViewProps) {
               {section.title}
             </Text>
             {section.actions.map((action) => (
-              <ProfileActionButton key={action.id} {...action} />
+              <ProfileActionButton
+                key={action.id}
+                title={action.title}
+                description={action.description}
+                icon={action.icon}
+                onPress={action.onPress}
+                id={action.id}
+              />
             ))}
           </View>
         ))}
@@ -104,7 +113,12 @@ function ProfileActionButton({ title, description, icon, onPress }: ProfileActio
       testID={`profile-action-${title.toLowerCase().replace(/\s+/g, "-")}`}
     >
       <View className="size-12 rounded-2xl bg-primary/10 items-center justify-center mr-4">
-        <Icon name={icon} size={24} color={COLORS.primary} accessibilityLabel={title} />
+        <Icon
+          name={icon}
+          size={ICON_SIZE_ACTION}
+          color={COLORS.primary}
+          accessibilityLabel={title}
+        />
       </View>
       <View className="flex-1">
         <Text className="text-lg font-display font-bold text-on-surface">{title}</Text>
@@ -112,7 +126,7 @@ function ProfileActionButton({ title, description, icon, onPress }: ProfileActio
       </View>
       <Icon
         name="chevron-right"
-        size={24}
+        size={ICON_SIZE_ACTION}
         color={COLORS["on-surface-variant"]}
         accessibilityLabel={t("common.more")}
       />
