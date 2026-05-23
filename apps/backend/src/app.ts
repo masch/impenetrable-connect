@@ -10,9 +10,9 @@ import { cors } from "hono/cors";
 import { dbMiddleware } from "./middleware/db";
 import { logger } from "./services/logger.service";
 import { getAppConfig, type AppEnv } from "./config/env";
+import { HTTP_INTERNAL_ERROR } from "./constants/http-status";
 
 const CORS_MAX_AGE_SECONDS = 600;
-const HTTP_INTERNAL_ERROR = 500;
 
 const corsMiddleware = cors({
   origin: (origin, c) => {

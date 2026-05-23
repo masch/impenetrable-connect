@@ -1,3 +1,6 @@
+import { and, eq, inArray } from "drizzle-orm";
+import { type Db } from "../db";
+import { products, productCategories } from "../db/schema";
 import { type ProductSelect } from "../db/schema/products";
 import { type ProductCategorySelect } from "../db/schema/product-categories";
 
@@ -52,4 +55,41 @@ export function mapProductsWithCategories(
         }
       : undefined,
   }));
+}
+
+export class ProductService {
+  /**
+   * Retrieves active categories for a project.
+   */
+  static async getCategoriesByProject(db: Db, projectId: number) {
+    return db
+      .select()
+      .from(productCategories)
+      .where(
+        and(
+          eq(productCategories.zzz_project_id, projectId),
+          eq(productCategories.zzz_is_active, true),
+        ),
+      );
+  }
+
+  /**
+   * Retrieves active products for a list of category IDs.
+   */
+  static async getProductsByCategoryIds(db: Db, categoryIds: number[]) {
+    return db
+      .select()
+      .from(products)
+      .where(
+        and(
+          inArray(products.zzz_product_category_id, categoryIds),
+          eq(products.zzz_global_pause, false),
+        ),
+      );
+  }
+
+  /**
+   * Static exposure of mapProductsWithCategories.
+   */
+  static mapProductsWithCategories = mapProductsWithCategories;
 }

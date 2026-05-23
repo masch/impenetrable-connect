@@ -48,6 +48,10 @@ rules:
     - Warn before merging destructive deltas (large removals)
 
 archived_changes:
+  - name: refactor-backend-services-and-constants
+    archived_date: "2026-05-23"
+    status: completed
+    summary: "Extracted database logic from routes (projects, ventures, products, services) into dedicated ProjectService, VentureService, and ProductService, centralized HTTP status codes, converted to named exports, and verified all 369 tests pass."
   - name: remediate-spread-vulnerabilities
     archived_date: "2026-05-23"
     status: completed
