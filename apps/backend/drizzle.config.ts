@@ -1,5 +1,6 @@
 import { defineConfig } from "drizzle-kit";
 import { getCLIConfig } from "./src/config/env";
+import { SCHEMA_NAME } from "./src/db/schema/base";
 
 const config = getCLIConfig();
 
@@ -10,4 +11,5 @@ export default defineConfig({
   dbCredentials: {
     url: config.directUrl,
   },
+  schemaFilter: [SCHEMA_NAME],
 });
