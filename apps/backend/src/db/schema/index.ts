@@ -5,4 +5,7 @@ export * from "./refresh-tokens";
 export * from "./venture-members";
 export * from "./product-categories";
 export * from "./products";
+export * from "./reservations";
+export * from "./orders";
+export * from "./order-items";
 export * from "./base";

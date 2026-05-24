@@ -2,13 +2,24 @@ import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
 import { drizzle as drizzleNeon } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
 import postgres from "postgres";
-import { projects, users, ventures, refreshTokens } from "./schema";
+import {
+  projects,
+  users,
+  ventures,
+  refreshTokens,
+  reservations,
+  orders,
+  orderItems,
+} from "./schema";
 
 const schema = {
   projects,
   users,
   ventures,
   refreshTokens,
+  reservations,
+  orders,
+  orderItems,
 };
 
 /**

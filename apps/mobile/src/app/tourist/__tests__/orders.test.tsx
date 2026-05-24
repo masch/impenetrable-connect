@@ -90,18 +90,19 @@ describe("OrderScreen (Tourist)", () => {
   });
 
   it("should render reservation notes in active orders", () => {
+    const mockId = (n: number): string => `00000000-0000-0000-0000-${String(n).padStart(12, "0")}`;
     const mockNotes = "Alérgico a las nueces y frutos secos.";
     const mockOrder: Order = {
-      zzz_id: 10,
-      zzz_reservation_id: 2,
+      zzz_id: mockId(10),
+      zzz_reservation_id: mockId(2),
       zzz_catalog_type_id: 1,
       zzz_global_status: "CONFIRMED",
       zzz_confirmed_venture_id: 1,
       zzz_notes: mockNotes,
       zzz_items: [
         {
-          zzz_id: 15,
-          zzz_order_id: 10,
+          zzz_id: mockId(15),
+          zzz_order_id: mockId(10),
           zzz_catalog_item_id: 2,
           zzz_quantity: 2,
           zzz_price: 2000,
@@ -119,7 +120,7 @@ describe("OrderScreen (Tourist)", () => {
       zzz_created_at: new Date(),
       zzz_notify_whatsapp: false,
       zzz_reservation: {
-        zzz_id: 2,
+        zzz_id: mockId(2),
         zzz_user_id: "tourist_1",
         zzz_service_at: "2099-06-15T13:30:00-03:00", // Always future date
         zzz_time_of_day: "LUNCH",

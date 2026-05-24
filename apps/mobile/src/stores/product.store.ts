@@ -33,7 +33,7 @@ export interface CatalogState {
   placeOrder: (
     date: Date,
     moment: ServiceMoment,
-    items: Array<{ zzz_catalog_item_id: number; zzz_quantity: number }>,
+    items: Array<{ zzz_catalog_item_id: number; zzz_quantity: number; zzz_notes?: string }>,
     guestCount: number,
     time: HourMinute,
     notes?: string,
@@ -101,7 +101,7 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
   placeOrder: async (
     date: Date,
     moment: ServiceMoment,
-    items: Array<{ zzz_catalog_item_id: number; zzz_quantity: number }>,
+    items: Array<{ zzz_catalog_item_id: number; zzz_quantity: number; zzz_notes?: string }>,
     guestCount: number,
     time: HourMinute,
     notes?: string,

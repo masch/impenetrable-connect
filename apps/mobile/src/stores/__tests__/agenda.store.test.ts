@@ -68,23 +68,57 @@ describe("Agenda Store", () => {
   });
 
   it("should calculate occupation based on zzz_guest_count and ignore CANCELLED orders", () => {
-    const mockOrders = [
+    const mockId = (n: number): string => `00000000-0000-0000-0000-${String(n).padStart(12, "0")}`;
+    const mockOrders: Order[] = [
       {
-        zzz_id: 1,
+        zzz_id: mockId(1),
+        zzz_reservation_id: mockId(1),
+        zzz_catalog_type_id: 1,
         zzz_global_status: "CONFIRMED",
-        zzz_reservation: { zzz_guest_count: 5 },
+        zzz_items: [],
+        zzz_notify_whatsapp: false,
+        zzz_reservation: {
+          zzz_id: mockId(1),
+          zzz_user_id: "u1",
+          zzz_service_at: new Date().toISOString(),
+          zzz_time_of_day: "LUNCH",
+          zzz_status: "CONFIRMED",
+          zzz_guest_count: 5,
+        },
       },
       {
-        zzz_id: 2,
+        zzz_id: mockId(2),
+        zzz_reservation_id: mockId(2),
+        zzz_catalog_type_id: 1,
         zzz_global_status: "CONFIRMED",
-        zzz_reservation: { zzz_guest_count: 3 },
+        zzz_items: [],
+        zzz_notify_whatsapp: false,
+        zzz_reservation: {
+          zzz_id: mockId(2),
+          zzz_user_id: "u1",
+          zzz_service_at: new Date().toISOString(),
+          zzz_time_of_day: "LUNCH",
+          zzz_status: "CONFIRMED",
+          zzz_guest_count: 3,
+        },
       },
       {
-        zzz_id: 3,
+        zzz_id: mockId(3),
+        zzz_reservation_id: mockId(3),
+        zzz_catalog_type_id: 1,
         zzz_global_status: "CANCELLED",
-        zzz_reservation: { zzz_guest_count: 10 },
+        zzz_items: [],
+        zzz_notify_whatsapp: false,
+        zzz_reservation: {
+          zzz_id: mockId(3),
+          zzz_user_id: "u1",
+          zzz_service_at: new Date().toISOString(),
+          zzz_time_of_day: "LUNCH",
+          zzz_status: "CANCELLED",
+          zzz_guest_count: 10,
+        },
       },
-    ] as Order[];
+    ];
 
     useAgendaStore.setState({ orders: mockOrders });
 

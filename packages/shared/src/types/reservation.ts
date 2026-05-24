@@ -8,7 +8,7 @@ import { OrderSchema } from "./order";
  * Mapped to 'reservations' table.
  */
 export const ReservationDbSchema = z.object({
-  zzz_id: z.number().int().positive(),
+  zzz_id: z.string().uuid(),
   zzz_user_id: z.string().uuid(),
   /**
    * Service datetime with timezone in ISO 8601 format
@@ -46,6 +46,33 @@ export const ReservationSchema: z.ZodType<Reservation, z.ZodTypeDef, unknown> =
   ReservationDbSchema.extend({
     zzz_orders: z.array(z.lazy(() => OrderSchema)).optional(),
   });
+
+/**
+ * CreateReservationInputSchema
+ * Input DTO for creating a new reservation.
+ */
+export const CreateReservationInputSchema = z.object({
+  zzz_service_at: z.string().datetime({ message: "ISO 8601 datetime with timezone required" }),
+  zzz_time_of_day: ServiceMomentSchema,
+  zzz_guest_count: z.number().int().positive("Guest count must be positive").default(1),
+});
+export type CreateReservationInput = z.infer<typeof CreateReservationInputSchema>;
+
+/**
+ * UpdateReservationInputSchema
+ * Input DTO for updating reservation metadata.
+ */
+export const UpdateReservationInputSchema = z
+  .object({
+    zzz_service_at: z.string().datetime().optional(),
+    zzz_time_of_day: ServiceMomentSchema.optional(),
+    zzz_guest_count: z.number().int().positive().optional(),
+  })
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided",
+  });
+export type UpdateReservationInput = z.infer<typeof UpdateReservationInputSchema>;
 
 export type ReservationRow = z.infer<typeof ReservationDbSchema>;
 

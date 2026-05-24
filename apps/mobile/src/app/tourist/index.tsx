@@ -12,7 +12,7 @@ import { DatePicker } from "../../components/DatePicker";
 import { Button } from "../../components/Button";
 import { AppDateTimePicker } from "../../components/AppDateTimePicker";
 import LoadingView from "../../components/LoadingView";
-import { COLORS, ServiceMoment, Order } from "@repo/shared";
+import { COLORS, ICON_SIZES, FONT_SIZES, ServiceMoment, Order } from "@repo/shared";
 import { isSameDay, formatDateToTime, parseTimeToDate } from "../../logic/formatters";
 import { isTimeInRange } from "../../hooks/useTimeValidation";
 import Screen, { ScreenContent } from "../../components/Screen";
@@ -67,7 +67,7 @@ export default function OrderSetupScreen() {
     return (
       <Screen>
         <ScreenContent className="items-center justify-center p-6">
-          <Icon name="alert-circle-outline" size={64} color={COLORS.error} />
+          <Icon name="alert-circle-outline" size={ICON_SIZES.MASSIVE} color={COLORS.error} />
           <Text className="text-xl font-display font-bold text-on-surface mt-4 text-center">
             {error ? t("common.error") : t("errors.no_project_found")}
           </Text>
@@ -154,7 +154,7 @@ export default function OrderSetupScreen() {
 
       if (itemsToMove.length > 0) {
         await moveOrders(
-          itemsToMove.map((o: Order) => Number(o.zzz_id)),
+          itemsToMove.map((o: Order) => o.zzz_id),
           date,
           moment,
         );
@@ -182,7 +182,7 @@ export default function OrderSetupScreen() {
           {/* Date Selection */}
           <View className="px-2 mb-6">
             <View className="flex-row items-center mb-4">
-              <Icon name="calendar-clock" size={20} color={COLORS.primary} />
+              <Icon name="calendar-clock" size={ICON_SIZES.LARGE} color={COLORS.primary} />
               <Text className="text-lg font-display font-bold text-on-surface ml-2">
                 {t("order_setup.date_label")}
               </Text>
@@ -198,7 +198,7 @@ export default function OrderSetupScreen() {
           {/* Guest Count Selection */}
           <View className="px-2 mb-6">
             <View className="flex-row items-center mb-4">
-              <Icon name="account-group-outline" size={20} color={COLORS.primary} />
+              <Icon name="account-group-outline" size={ICON_SIZES.LARGE} color={COLORS.primary} />
               <Text className="text-lg font-display font-bold text-on-surface ml-2">
                 {t("order_setup.guests_label")}
               </Text>
@@ -207,19 +207,22 @@ export default function OrderSetupScreen() {
             <View className="bg-surface-container-low/30 border border-outline-variant/20 rounded-3xl p-6 flex-row items-center justify-between">
               <Button
                 variant="ghost"
+                testID="guest-minus-button"
                 onPress={() => setGuestCount(Math.max(1, guestCount - 1))}
                 className="size-14 rounded-2xl bg-surface-container-high items-center justify-center border border-outline-variant/10"
                 accessibilityLabel={t("accessibility.decrement_guests")}
                 accessibilityHint={t("accessibility.decrement_guests_hint")}
               >
-                <Icon name="minus" size={24} color={COLORS.primary} />
+                <Icon name="minus" size={ICON_SIZES.XXLARGE} color={COLORS.primary} />
               </Button>
 
               <View className="items-center">
                 <Text className="text-4xl font-display font-bold text-on-surface">
                   {guestCount}
                 </Text>
-                <Text className="text-[10px] font-display font-bold text-on-surface-variant uppercase tracking-widest mt-1">
+                <Text
+                  className={`${FONT_SIZES.DAY_NUM} font-display font-bold text-on-surface-variant uppercase tracking-widest mt-1`}
+                >
                   {t("common.pax")}
                 </Text>
               </View>
@@ -232,7 +235,7 @@ export default function OrderSetupScreen() {
                 accessibilityLabel={t("accessibility.increment_guests")}
                 accessibilityHint={t("accessibility.increment_guests_hint")}
               >
-                <Icon name="plus" size={24} color={COLORS.primary} />
+                <Icon name="plus" size={ICON_SIZES.XXLARGE} color={COLORS.primary} />
               </Button>
             </View>
           </View>
@@ -240,7 +243,7 @@ export default function OrderSetupScreen() {
           {/* Moment Selection */}
           <View className="px-2 mb-8">
             <View className="flex-row items-center mb-4">
-              <Icon name="clock-outline" size={20} color={COLORS.primary} />
+              <Icon name="clock-outline" size={ICON_SIZES.LARGE} color={COLORS.primary} />
               <Text className="text-lg font-display font-bold text-on-surface ml-2">
                 {t("order_setup.moment_label")}
               </Text>
@@ -268,7 +271,7 @@ export default function OrderSetupScreen() {
                     <View className="items-center justify-center mb-3">
                       <Icon
                         name={m.icon}
-                        size={42}
+                        size={ICON_SIZES.HUGE}
                         color={isSelected ? m.hex : COLORS["on-surface-variant"]}
                         className={!isSelected ? "opacity-40" : ""}
                       />
@@ -287,7 +290,7 @@ export default function OrderSetupScreen() {
                       <View
                         className={`absolute top-3 right-3 size-5 rounded-full items-center justify-center ${m.bgClass}`}
                       >
-                        <Icon name="check" size={14} color={COLORS["on-primary"]} />
+                        <Icon name="check" size={ICON_SIZES.XSMALL} color={COLORS["on-primary"]} />
                       </View>
                     )}
                   </Button>
@@ -299,7 +302,7 @@ export default function OrderSetupScreen() {
             {moment && (
               <View className="mt-4">
                 <View className="flex-row items-center mb-3">
-                  <Icon name="clock-edit-outline" size={20} color={COLORS.primary} />
+                  <Icon name="clock-edit-outline" size={ICON_SIZES.LARGE} color={COLORS.primary} />
                   <Text className="text-base font-display font-bold text-on-surface ml-2">
                     {t("order_setup.time_label")}
                   </Text>
@@ -321,7 +324,7 @@ export default function OrderSetupScreen() {
 
                 {timeError && (
                   <View className="flex-row items-center mt-2">
-                    <Icon name="alert-circle" size={16} color={COLORS.error} />
+                    <Icon name="alert-circle" size={ICON_SIZES.SMALL} color={COLORS.error} />
                     <Text className="text-sm text-error ml-1">{timeError}</Text>
                   </View>
                 )}
@@ -343,8 +346,10 @@ export default function OrderSetupScreen() {
                         const [startHour] = config.startTime.split(":").map(Number);
                         const [endHour] = config.endTime.split(":").map(Number);
                         const hours = [];
+                        const MINUTES_PER_HOUR = 60;
+                        const SLOT_INTERVAL_MINUTES = 30;
                         for (let h = startHour; h < endHour; h++) {
-                          for (let m = 0; m < 60; m += 30) {
+                          for (let m = 0; m < MINUTES_PER_HOUR; m += SLOT_INTERVAL_MINUTES) {
                             hours.push(
                               `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`,
                             );

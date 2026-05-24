@@ -237,6 +237,8 @@
     "registeredTourist": "Registered Tourist",
     "registeredVenture": "Registered Venture",
     "notes": "Restrictions / clarification",
+    "notes_general": "General note (optional)",
+    "notes_general_placeholder": "Any special request for the whole order...",
     "pending_requests_count": "You have {{count}} requests awaiting confirmation",
     "no_pending_requests": "No pending requests",
     "empty_inbox_title": "All caught up!",

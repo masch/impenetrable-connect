@@ -15,7 +15,7 @@ import { getMockOrders } from "../mocks/orders";
  */
 export interface OrderServiceInterface {
   getOrders(status?: OrderStatus): Promise<Order[]>;
-  cancelOrder(id: number): Promise<void>;
+  cancelOrder(id: string): Promise<void>;
 }
 
 /**
@@ -31,7 +31,7 @@ const MockOrderService: OrderServiceInterface = {
     return orders;
   },
 
-  cancelOrder: async (id: number) => {
+  cancelOrder: async (id: string) => {
     await new Promise((r) => setTimeout(r, 500));
     const orders = getMockOrders();
     const order = orders.find((o) => o.zzz_id === id);
@@ -66,7 +66,7 @@ const RestOrderService: OrderServiceInterface = {
     }
   },
 
-  cancelOrder: async (id: number) => {
+  cancelOrder: async (id: string) => {
     try {
       const res = await fetch(`${env.API_URL}/orders/${id}`, {
         method: "DELETE",

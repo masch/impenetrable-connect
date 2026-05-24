@@ -62,18 +62,19 @@ describe("AgendaScreen", () => {
   });
 
   it("should render reservation notes in orders", () => {
+    const mockId = (n: number): string => `00000000-0000-0000-0000-${String(n).padStart(12, "0")}`;
     const mockNotes = "Una persona es hipertensa, por favor cocinar sin sal.";
     const mockOrder: Order = {
-      zzz_id: 9,
-      zzz_reservation_id: 1,
+      zzz_id: mockId(9),
+      zzz_reservation_id: mockId(1),
       zzz_catalog_type_id: 1,
       zzz_global_status: "CONFIRMED",
       zzz_confirmed_venture_id: 1,
       zzz_notes: mockNotes,
       zzz_items: [
         {
-          zzz_id: 12,
-          zzz_order_id: 9,
+          zzz_id: mockId(12),
+          zzz_order_id: mockId(9),
           zzz_catalog_item_id: 1,
           zzz_quantity: 1,
           zzz_price: 1500,
@@ -91,7 +92,7 @@ describe("AgendaScreen", () => {
       zzz_created_at: new Date(),
       zzz_notify_whatsapp: false,
       zzz_reservation: {
-        zzz_id: 1,
+        zzz_id: mockId(1),
         zzz_user_id: "user-1",
         zzz_service_at: "2024-01-15T20:30:00-03:00",
         zzz_time_of_day: "DINNER",
