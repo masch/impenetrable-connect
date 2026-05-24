@@ -4,7 +4,11 @@ import { CreateReservationInputSchema, UpdateReservationInputSchema, UserRole } 
 import { logger } from "../services/logger.service";
 import { type AppEnv } from "../config/env";
 import { authMiddleware, roleGuard } from "../middleware/auth";
-import { ReservationService, ReservationValidationError } from "../services/reservation.service";
+import {
+  ReservationService,
+  ReservationValidationError,
+  ReservationAccessError,
+} from "../services/reservation.service";
 import {
   HTTP_OK,
   HTTP_CREATED,
@@ -13,8 +17,7 @@ import {
   HTTP_FORBIDDEN,
   HTTP_INTERNAL_ERROR,
 } from "../constants/http-status";
-
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+import { UUID_REGEX } from "../constants/patterns";
 
 const router = new Hono<AppEnv>();
 router.use("*", authMiddleware);
@@ -87,18 +90,16 @@ router.get("/:id", async (c) => {
       return c.json({ error: "Invalid ID format" }, HTTP_BAD_REQUEST);
     }
 
-    const reservation = await ReservationService.getById(db, id);
+    const reservation = await ReservationService.getById(db, id, payload.role, payload.sub);
     if (!reservation) {
       return c.json({ error: "Not Found" }, HTTP_NOT_FOUND);
     }
 
-    // Scoping check at route level for single-resource access
-    if (payload.role === UserRole.TOURIST && reservation.zzz_user_id !== payload.sub) {
-      return c.json({ error: "Forbidden" }, HTTP_FORBIDDEN);
-    }
-
     return c.json(reservation, HTTP_OK);
   } catch (error) {
+    if (error instanceof ReservationAccessError) {
+      return c.json({ error: error.message }, HTTP_FORBIDDEN);
+    }
     logger.error("Error fetching reservation", error);
     return c.json({ error: "Internal Server Error" }, HTTP_INTERNAL_ERROR);
   }
@@ -123,15 +124,10 @@ router.patch("/:id", async (c) => {
     const body = (await c.req.json()) as unknown;
     const validated = UpdateReservationInputSchema.parse(body);
 
-    // Fetch current state for scoping check
-    const current = await ReservationService.getById(db, id);
+    // Fetch current state for scoping check (handled inside service)
+    const current = await ReservationService.getById(db, id, payload.role, payload.sub);
     if (!current) {
       return c.json({ error: "Not Found" }, HTTP_NOT_FOUND);
-    }
-
-    // Scoping check
-    if (payload.role === UserRole.TOURIST && current.zzz_user_id !== payload.sub) {
-      return c.json({ error: "Forbidden" }, HTTP_FORBIDDEN);
     }
 
     const updated = await ReservationService.update(db, id, validated);
@@ -144,6 +140,9 @@ router.patch("/:id", async (c) => {
     if (error instanceof ReservationValidationError) {
       logger.warn("Reservation business rule violation", { error: error.message });
       return c.json({ error: error.message }, HTTP_BAD_REQUEST);
+    }
+    if (error instanceof ReservationAccessError) {
+      return c.json({ error: error.message }, HTTP_FORBIDDEN);
     }
     logger.error("Error updating reservation", error);
     return c.json({ error: "Internal Server Error" }, HTTP_INTERNAL_ERROR);

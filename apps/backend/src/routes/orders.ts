@@ -17,8 +17,7 @@ import {
   HTTP_NOT_FOUND,
   HTTP_INTERNAL_ERROR,
 } from "../constants/http-status";
-
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+import { UUID_REGEX } from "../constants/patterns";
 
 const router = new Hono<AppEnv>();
 router.use("*", authMiddleware);
