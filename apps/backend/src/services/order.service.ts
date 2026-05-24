@@ -16,7 +16,7 @@ import {
   HTTP_CONFLICT,
 } from "../constants/http-status";
 
-const ORDER_STATUS_TRANSITIONS: Record<string, string[]> = {
+const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, readonly OrderStatus[]> = {
   SEARCHING: ["OFFER_PENDING", "EXPIRED", "CANCELLED"],
   OFFER_PENDING: ["CONFIRMED", "CANCELLED", "EXPIRED"],
   CONFIRMED: ["COMPLETED", "NO_SHOW", "CANCELLED"],
@@ -26,7 +26,12 @@ const ORDER_STATUS_TRANSITIONS: Record<string, string[]> = {
   EXPIRED: [],
 } as const;
 
-const TERMINAL_STATUSES = new Set(["COMPLETED", "NO_SHOW", "CANCELLED", "EXPIRED"]);
+const TERMINAL_STATUSES: Set<OrderStatus> = new Set([
+  "COMPLETED",
+  "NO_SHOW",
+  "CANCELLED",
+  "EXPIRED",
+]);
 
 const PAGINATION = {
   DEFAULT_LIMIT: 20,
@@ -37,12 +42,12 @@ const SINGLE_RESULT_LIMIT = 1;
 
 export class OrderService {
   // -- TRANSITION VALIDATION (stateless utility) --
-  static isValidTransition(from: string, to: string): boolean {
+  static isValidTransition(from: OrderStatus, to: OrderStatus): boolean {
     const allowed = ORDER_STATUS_TRANSITIONS[from];
     return allowed ? allowed.includes(to) : false;
   }
 
-  static isTerminal(status: string): boolean {
+  static isTerminal(status: OrderStatus): boolean {
     return TERMINAL_STATUSES.has(status);
   }
 
@@ -131,7 +136,7 @@ export class OrderService {
   // -- LIST (with role-scoped filters) --
   static async getAll(
     db: Db,
-    filters: { status?: string; reservation_id?: string; limit?: number; offset?: number },
+    filters: { status?: OrderStatus; reservation_id?: string; limit?: number; offset?: number },
     userRole: UserRole,
     userId: string,
   ) {
@@ -171,7 +176,7 @@ export class OrderService {
 
     // Optional filters
     if (filters.status) {
-      conditions.push(eq(orders.zzz_global_status, filters.status as OrderStatus));
+      conditions.push(eq(orders.zzz_global_status, filters.status));
     }
     if (filters.reservation_id) {
       conditions.push(eq(orders.zzz_reservation_id, filters.reservation_id));
