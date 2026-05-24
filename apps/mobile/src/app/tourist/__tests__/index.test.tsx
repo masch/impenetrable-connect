@@ -106,10 +106,13 @@ describe("OrderSetupScreen", () => {
   });
 
   it("should set context and navigate to booking when form is valid and submitted", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2024-01-15T10:00:00-03:00"));
+
     const setContextSpy = jest.spyOn(useCartStore.getState(), "setContext");
 
     useCartStore.setState({
-      selectedDate: new Date(),
+      selectedDate: new Date("2024-01-15T00:00:00-03:00"),
       selectedMoment: "LUNCH" as ServiceMoment,
       selectedTime: createHourMinute("13:00"),
       guestCount: 2,
@@ -133,5 +136,7 @@ describe("OrderSetupScreen", () => {
       expect(setContextSpy).toHaveBeenCalled();
       expect(mockPush).toHaveBeenCalledWith("/tourist/booking");
     });
+
+    jest.useRealTimers();
   });
 });

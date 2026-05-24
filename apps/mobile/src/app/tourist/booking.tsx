@@ -655,7 +655,7 @@ export default function BookingScreen() {
                               onPress: async () => {
                                 if (!selectedDate || !selectedMoment || !selectedTime) return;
                                 try {
-                                  const newOrder = await placeOrder(
+                                  const newOrder: Order | null = await placeOrder(
                                     selectedDate,
                                     selectedMoment,
                                     cartItems.map((i) => ({
@@ -667,6 +667,7 @@ export default function BookingScreen() {
                                     selectedTime,
                                     generalNotes || undefined,
                                   );
+
                                   if (newOrder) {
                                     addOrderToStore(newOrder);
                                     clearCart();
@@ -676,6 +677,21 @@ export default function BookingScreen() {
                                   }
                                 } catch (err) {
                                   logger.error("Final confirmation failed", err);
+                                  const message =
+                                    err instanceof Error ? err.message : "Unknown error";
+                                  setAlertConfig({
+                                    visible: true,
+                                    title: t("errors.reservation_failed"),
+                                    message,
+                                    type: "error",
+                                    actions: [
+                                      {
+                                        text: t("common.ok"),
+                                        variant: "primary",
+                                        onPress: () => {},
+                                      },
+                                    ],
+                                  });
                                 }
                               },
                             },

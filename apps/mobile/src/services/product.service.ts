@@ -9,7 +9,7 @@
 import { z } from "zod";
 
 import type { Order, Reservation, ServiceMoment, HourMinute } from "@repo/shared";
-import { ServiceMomentSchema } from "@repo/shared";
+import { ServiceMomentSchema, MOCK_VENTURE_WITH_ORDERS } from "@repo/shared";
 import { combineDateAndTime } from "../logic/formatters";
 import { MOCK_PRODUCTS, type ProductItem } from "../mocks/product";
 import {
@@ -23,10 +23,14 @@ import { isMockUserLoggedIn, getMockUserId } from "../mocks/users";
 
 import { logger } from "./logger.service";
 import env from "../config/env";
-import { mapNetworkError, handleResponse } from "./api-utils";
+import { mapNetworkError } from "./api-utils";
 import { resolveImageUrl } from "./image-assets";
+import { apiClient } from "./api-client";
 
 const MOCK_DELAYS = { FAST: 500, NORMAL: 600, SLOW: 800 } as const;
+const MAX_ORDER_QUANTITY = 20;
+const UUID_PAD_LENGTH = 12;
+const MOCK_ID_RANGE = 100000;
 
 // Re-export for convenience
 export type { ProductItem };
@@ -35,7 +39,7 @@ export type { ProductItem };
 export const BookingInputSchema = z.object({
   serviceId: z.number(),
   moment: ServiceMomentSchema,
-  zzz_quantity: z.number().min(1).max(20),
+  zzz_quantity: z.number().min(1).max(MAX_ORDER_QUANTITY),
   date: z.date(),
   zzz_notes: z.string().optional(),
 });
@@ -45,7 +49,8 @@ type BookingInput = z.infer<typeof BookingInputSchema>;
 /**
  * Common interface for product service implementations
  */
-const mockId = (n: number): string => `00000000-0000-0000-0000-${String(n).padStart(12, "0")}`;
+const mockId = (n: number): string =>
+  `00000000-0000-0000-0000-${String(n).padStart(UUID_PAD_LENGTH, "0")}`;
 
 export interface ProductServiceInterface {
   getServices(): Promise<ProductItem[]>;
@@ -124,13 +129,14 @@ const MockProductService: ProductServiceInterface = {
       zzz_reservation_id: reservation.zzz_id,
       zzz_catalog_type_id: firstService.zzz_product_category_id,
       zzz_confirmed_venture_id: null,
+      zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
       zzz_notes: notes ?? null,
-      zzz_global_status: "SEARCHING",
+      zzz_global_status: "OFFER_PENDING",
       zzz_cancel_reason: null,
       zzz_items: items.map((item) => {
         const s = mockProducts.find((service) => service.zzz_id === item.zzz_catalog_item_id);
         return {
-          zzz_id: mockId(Math.floor(Math.random() * 100000)),
+          zzz_id: mockId(Math.floor(Math.random() * MOCK_ID_RANGE)),
           zzz_order_id: orderId,
           zzz_catalog_item_id: item.zzz_catalog_item_id,
           zzz_quantity: item.zzz_quantity,
@@ -224,8 +230,7 @@ const mapImage = (item: ProductItem): ProductItem => ({
 const RestProductService: ProductServiceInterface = {
   getServices: async () => {
     try {
-      const response = await fetch(`${env.API_URL}/services`);
-      const items = await handleResponse<ProductItem[]>(response, "errors.catalog_failed");
+      const items = await apiClient.get<ProductItem[]>("/services");
       return items.map(mapImage);
     } catch (error) {
       throw mapNetworkError(error);
@@ -234,8 +239,7 @@ const RestProductService: ProductServiceInterface = {
 
   getServiceById: async (id: number) => {
     try {
-      const response = await fetch(`${env.API_URL}/services/${id}`);
-      const item = await handleResponse<ProductItem | null>(response, "errors.no_venture_found");
+      const item = await apiClient.get<ProductItem | null>(`/services/${id}`);
       return item ? mapImage(item) : null;
     } catch (error) {
       throw mapNetworkError(error);
@@ -244,30 +248,54 @@ const RestProductService: ProductServiceInterface = {
 
   getServicesByCategory: async (categoryId: number) => {
     try {
-      const response = await fetch(`${env.API_URL}/services?category_id=${categoryId}`);
-      const items = await handleResponse<ProductItem[]>(response, "errors.catalog_failed");
+      const items = await apiClient.get<ProductItem[]>(`/services?category_id=${categoryId}`);
       return items.map(mapImage);
     } catch (error) {
       throw mapNetworkError(error);
     }
   },
 
-  placeOrder: async (date, moment, items, guestCount, notes, time) => {
+  placeOrder: async (
+    date: Date,
+    moment: ServiceMoment,
+    items: Array<{ zzz_catalog_item_id: number; zzz_quantity: number; zzz_notes?: string }>,
+    guestCount: number,
+    notes?: string,
+    time?: HourMinute,
+  ) => {
     try {
       const serviceAt = time ? combineDateAndTime(date, time) : date.toISOString();
-      const response = await fetch(`${env.API_URL}/orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          zzz_reservation_id: 0,
-          zzz_guest_count: guestCount,
-          zzz_time_of_day: moment,
-          zzz_service_at: serviceAt,
-          zzz_notes: notes ?? null,
-          zzz_items: items,
-        }),
+      const reservation = await apiClient.post<{ zzz_id: string }>("/reservations", {
+        zzz_service_at: serviceAt,
+        zzz_time_of_day: moment,
+        zzz_guest_count: guestCount,
       });
-      return handleResponse<Order>(response, "errors.reservation_failed");
+
+      // Fetch services to find the catalog type from the first item
+      const services = await apiClient.get<ProductItem[]>("/services");
+      const firstService = services.find((s) => s.zzz_id === items[0]?.zzz_catalog_item_id);
+      if (!firstService) throw new Error("Service not found for order");
+
+      try {
+        const newOrder = await apiClient.post<Order>("/orders", {
+          zzz_reservation_id: reservation.zzz_id,
+          zzz_catalog_type_id: firstService.zzz_product_category_id,
+          zzz_notes: notes || undefined,
+          zzz_items: items.map((i) => ({
+            zzz_catalog_item_id: i.zzz_catalog_item_id,
+            zzz_quantity: i.zzz_quantity,
+            zzz_notes: i.zzz_notes,
+          })),
+        });
+        return newOrder;
+      } catch (err) {
+        // Rollback: cancel the reservation
+        logger.error("Order creation failed, rolling back reservation", err);
+        await apiClient.patch(`/reservations/${reservation.zzz_id}`, {
+          zzz_status: "CANCELLED",
+        });
+        throw err;
+      }
     } catch (error) {
       throw mapNetworkError(error);
     }
@@ -275,14 +303,7 @@ const RestProductService: ProductServiceInterface = {
 
   updateOrder: async (id: string, input: Partial<BookingInput>) => {
     try {
-      const response = await fetch(`${env.API_URL}/orders/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          zzz_notes: input.zzz_notes,
-        }),
-      });
-      return handleResponse<Order>(response, "errors.reservation_failed");
+      return await apiClient.patch<Order>(`/orders/${id}`, { zzz_notes: input.zzz_notes });
     } catch (error) {
       throw mapNetworkError(error);
     }
@@ -290,12 +311,7 @@ const RestProductService: ProductServiceInterface = {
 
   updateOrderStatus: async (id: string, status: string) => {
     try {
-      const response = await fetch(`${env.API_URL}/orders/${id}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-      return handleResponse<Order>(response, "errors.reservation_failed");
+      return await apiClient.patch<Order>(`/orders/${id}/status`, { status });
     } catch (error) {
       throw mapNetworkError(error);
     }
@@ -303,9 +319,8 @@ const RestProductService: ProductServiceInterface = {
 
   getOrders: async (userId?: string) => {
     try {
-      const url = userId ? `${env.API_URL}/orders?userId=${userId}` : `${env.API_URL}/orders`;
-      const response = await fetch(url);
-      return handleResponse<Order[]>(response, "errors.catalog_failed");
+      const path = userId ? `/orders?userId=${userId}` : "/orders";
+      return await apiClient.get<Order[]>(path);
     } catch (error) {
       throw mapNetworkError(error);
     }

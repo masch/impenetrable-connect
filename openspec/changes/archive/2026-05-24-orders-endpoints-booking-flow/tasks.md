@@ -50,10 +50,10 @@ Chain strategy: pending
 - [x] **T-005** — Implement `ReservationService` (create, getById, getAll with role-scoped subqueries, update) + unit tests (100% method coverage, role-scoping branches, empty/not-found cases)  
        _Files_: `apps/backend/src/services/reservation.service.ts`, `apps/backend/src/services/reservation.service.test.ts` | _Est_: 160 lines | _Dep_: T-002, T-004 | _TDD_: yes
 
-- [ ] **T-006** — Implement `OrderService` core (status machine map, isValidTransition, isTerminal, getById, getAll with role-scoped filters, update with terminal-status guard, getByReservationId) + unit tests  
+- [x] **T-006** — Implement `OrderService` core (status machine map, isValidTransition, isTerminal, getById, getAll with role-scoped filters, update with terminal-status guard, getByReservationId) + unit tests  
        _Files_: `apps/backend/src/services/order.service.ts`, `apps/backend/src/services/order.service.test.ts` | _Est_: 200 lines | _Dep_: T-002, T-004 | _TDD_: yes
 
-- [ ] **T-007** — Implement `OrderService` transactional methods (create with price snapshot + item validation + reservation checks, updateStatus with transition validation + timestamp side effects + race-condition prevention) + `OrderServiceError` class + unit tests  
+- [x] **T-007** — Implement `OrderService` transactional methods (create with price snapshot + item validation + reservation checks, updateStatus with transition validation + timestamp side effects + race-condition prevention) + `OrderServiceError` class + unit tests  
        _Files_: `apps/backend/src/services/order.service.ts`, `apps/backend/src/services/order.service.test.ts` | _Est_: 190 lines | _Dep_: T-006 | _TDD_: yes
 
 ## Phase 3: Routes & Wiring

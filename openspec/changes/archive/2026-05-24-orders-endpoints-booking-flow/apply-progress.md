@@ -5,6 +5,8 @@
 
 ## Completed Tasks
 
+- [x] **T-006** — OrderService core methods + unit tests
+- [x] **T-007** — OrderService transactional methods + OrderServiceError + unit tests
 - [x] **T-009** — Implement order routes + route tests
   - POST /v1/orders (TOURIST roleGuard)
   - GET /v1/orders (any authenticated, service-layer scoping)
@@ -49,8 +51,7 @@ None.
 
 ## Remaining Tasks
 
-- T-006 — OrderService core methods + unit tests
-- T-007 — OrderService transactional methods + OrderServiceError + unit tests
+None.
 
 ## Workload / PR Boundary
 

@@ -2,7 +2,7 @@
   "project_name": "impenetrable-connect",
   "artifact_store": "hybrid",
   "strict_tdd": true,
-  "test_command": "make test",
+  "test_command": "make validate",
   "default_language": "en",
   "delivery_strategy": "ask-on-risk",
   "execution_mode": "interactive",
