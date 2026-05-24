@@ -21,10 +21,10 @@
 
 **Dependency**: Backend `orders-endpoints-booking-flow` PR 3 + PR 4 merged
 
-- [ ] **T-001** — Create `api-client.ts` with `get`, `post`, `patch`, `delete` methods that inject auth token from `useAuthStore` and use `env.API_URL` as base  
+- [x] **T-001** — Create `api-client.ts` with `get`, `post`, `patch`, `delete` methods that inject auth token from `useAuthStore` and use `env.API_URL` as base  
        _Files_: `apps/mobile/src/services/api-client.ts` | _Est_: 40 lines | _Dep_: — | _TDD_: no
 
-- [ ] **T-002** — Add `createOrder()` and `updateOrder()` to `OrderServiceInterface`; implement in `RestOrderService` using `apiClient`; fix `cancelOrder` from DELETE to PATCH with cancel body; add `?status=` filter to `getOrders`  
+- [x] **T-002** — Add `createOrder()` and `updateOrder()` to `OrderServiceInterface`; implement in `RestOrderService` using `apiClient`; fix `cancelOrder` from DELETE to PATCH with cancel body; add `?status=` filter to `getOrders`  
        _Files_: `apps/mobile/src/services/order.service.ts` | _Est_: 55 lines | _Dep_: T-001 | _TDD_: no
 
 ---
@@ -33,10 +33,10 @@
 
 **Dependency**: T-002
 
-- [ ] **T-003** — Remove `RestProductService.placeOrder()`; refactor remaining REST methods to use `apiClient` for auth headers; keep `MockProductService.placeOrder()` unchanged  
+- [x] **T-003** — Remove `RestProductService.placeOrder()`; refactor remaining REST methods to use `apiClient` for auth headers; keep `MockProductService.placeOrder()` unchanged  
        _Files_: `apps/mobile/src/services/product.service.ts` | _Est_: 30 lines | _Dep_: T-001 | _TDD_: no
 
-- [ ] **T-004** — Integrate 2-step booking flow in REST mode: `POST /v1/reservations` then `POST /v1/orders` with rollback on failure; mock mode uses existing `ProductService.placeOrder()` unchanged  
+- [x] **T-004** — Integrate 2-step booking flow in REST mode: `POST /v1/reservations` then `POST /v1/orders` with rollback on failure; mock mode uses existing `ProductService.placeOrder()` unchanged  
        _Files_: `apps/mobile/src/app/tourist/booking.tsx`, `apps/mobile/src/stores/cart.store.ts` | _Est_: 70 lines | _Dep_: T-002 | _TDD_: no
 
 ---

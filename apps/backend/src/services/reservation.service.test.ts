@@ -1,5 +1,9 @@
 import { describe, expect, it } from "bun:test";
-import { ReservationService, ReservationValidationError, ReservationAccessError } from "./reservation.service";
+import {
+  ReservationService,
+  ReservationValidationError,
+  ReservationAccessError,
+} from "./reservation.service";
 import { type Db } from "../db";
 
 describe("ReservationService", () => {
@@ -138,7 +142,12 @@ describe("ReservationService", () => {
 
       it("should throw ReservationAccessError when TOURIST accesses another's reservation", async () => {
         await expect(
-          ReservationService.getById(mockDb, mockReservation.zzz_id, "TOURIST" as never, "other-user"),
+          ReservationService.getById(
+            mockDb,
+            mockReservation.zzz_id,
+            "TOURIST" as never,
+            "other-user",
+          ),
         ).rejects.toThrow(ReservationAccessError);
       });
 

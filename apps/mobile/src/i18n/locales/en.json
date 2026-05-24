@@ -346,6 +346,8 @@
     "saving": "Saving...",
     "max_capacity_limit": "Capacity Limit (Project)",
     "open_external_link": "Open external link",
+    "unavailable": "Unavailable",
+    "expired": "Expired",
     "done": "Done"
   },
   "role_selector": {
@@ -384,6 +386,7 @@
     "select_time": "Select time",
     "time_error_invalid": "Invalid time",
     "time_error_outside_range": "Time outside allowed range ({{start}} - {{end}})",
+    "time_error_past": "This time has already passed for today",
     "select_time_option": "Select time {{time}}"
   },
   "status": {
@@ -435,6 +438,7 @@
     "select_date": "Select {{date}}",
     "date_picker_hint": "Double tap to select a date",
     "moment_selection_hint": "Double tap to select meal time",
+    "moment_expired_hint": "This meal time has already passed for today",
     "submit_order_hint": "Double tap to proceed to menu",
     "date_selection_hint": "Double tap to view orders for this day",
     "decrement_guests": "Decrease guest count",

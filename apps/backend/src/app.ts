@@ -6,6 +6,7 @@ import { venturesRouter } from "./routes/ventures";
 import { authRouter } from "./routes/auth";
 import { productsRouter } from "./routes/products";
 import { servicesRouter } from "./routes/services";
+import { reservationsRouter } from "./routes/reservations";
 import { ordersRouter } from "./routes/orders";
 import { cors } from "hono/cors";
 import { dbMiddleware } from "./middleware/db";
@@ -56,6 +57,7 @@ app.route("/v1/ventures", venturesRouter);
 app.route("/v1/auth", authRouter);
 app.route("/v1/products", productsRouter);
 app.route("/v1/services", servicesRouter);
+app.route("/v1/reservations", reservationsRouter);
 app.route("/v1/orders", ordersRouter);
 
 export default app;

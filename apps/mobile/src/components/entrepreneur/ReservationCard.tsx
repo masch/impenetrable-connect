@@ -7,6 +7,13 @@ import { getOrderActions } from "../../logic/order-actions";
 import { formatCurrency, extractTimeFromISO } from "../../logic/formatters";
 import { getMomentConfig } from "../../constants/moments";
 
+const ICON_SIZE_STATUS_BADGE = 14;
+const ICON_SIZE_HEADER = 14;
+const ICON_SIZE_HEADER_LARGE = 18;
+const ICON_SIZE_TIME_BADGE = 12;
+const ICON_SIZE_NOTES = 12;
+const ICON_SIZE_META_BADGE = 14;
+
 export interface ReservationCardProps {
   order: Order;
   title?: string;
@@ -162,7 +169,7 @@ export default function ReservationCard({
             <View className={`flex-row items-center px-3 py-1.5 rounded-full ${status.bgClass}/15`}>
               <Icon
                 name={status.icon}
-                size={14}
+                size={ICON_SIZE_STATUS_BADGE}
                 color={status.color}
                 accessibilityLabel={status.label}
               />
@@ -181,7 +188,7 @@ export default function ReservationCard({
           >
             <Icon
               name={headerIcon}
-              size={hideStatus ? 18 : 14}
+              size={hideStatus ? ICON_SIZE_HEADER_LARGE : ICON_SIZE_HEADER}
               color={hideStatus ? COLORS.primary : COLORS["on-surface-variant"]}
               accessibilityLabel={headerTitle}
             />
@@ -193,18 +200,22 @@ export default function ReservationCard({
             >
               {headerTitle}
             </Text>
-            {orderTime && (
+            {orderTime ? (
               <View
                 className={`ml-2 px-2.5 py-1 rounded-lg flex-row items-center gap-1 ${momentConfig?.bgClass ?? "bg-primary"}/20`}
               >
-                <Icon name="clock-outline" size={12} color={momentConfig?.hex ?? COLORS.primary} />
+                <Icon
+                  name="clock-outline"
+                  size={ICON_SIZE_TIME_BADGE}
+                  color={momentConfig?.hex ?? COLORS.primary}
+                />
                 <Text
                   className={`font-display-bold text-[11px] ${momentConfig?.textClass ?? "text-primary"}`}
                 >
                   {orderTime}
                 </Text>
               </View>
-            )}
+            ) : null}
           </View>
         </View>
 
@@ -218,14 +229,14 @@ export default function ReservationCard({
                     {getLocalizedName(item.zzz_catalog_item?.zzz_name_i18n) ||
                       `${t("orders.itemNumber")}${item.zzz_catalog_item_id}`}
                   </Text>
-                  {item.zzz_notes && (
+                  {item.zzz_notes ? (
                     <Text
                       className="text-on-surface-variant font-body-medium text-[11px] mt-1 italic leading-tight"
                       numberOfLines={2}
                     >
                       {item.zzz_notes}
                     </Text>
-                  )}
+                  ) : null}
                 </View>
 
                 <View className="flex-row items-center">
@@ -249,12 +260,12 @@ export default function ReservationCard({
         </View>
 
         {/* Notes Section */}
-        {order.zzz_notes && (
+        {order.zzz_notes ? (
           <View className="bg-surface-container-low/50 p-3 rounded-2xl mb-4 border border-outline-variant/20">
             <View className="flex-row items-center mb-1">
               <Icon
                 name="comment-text-outline"
-                size={12}
+                size={ICON_SIZE_NOTES}
                 color={COLORS["on-surface-variant"]}
                 accessibilityLabel={t("orders.notes")}
               />
@@ -266,7 +277,7 @@ export default function ReservationCard({
               {order.zzz_notes}
             </Text>
           </View>
-        )}
+        ) : null}
 
         {/* Footer: Actions or Details */}
         <View className="pt-3 border-t border-outline-variant/10">
@@ -275,7 +286,7 @@ export default function ReservationCard({
               <View className="flex-row items-center bg-surface-container-low px-3 py-1.5 rounded-xl">
                 <Icon
                   name="silverware-variant"
-                  size={14}
+                  size={ICON_SIZE_META_BADGE}
                   color={COLORS["on-surface-variant"]}
                   accessibilityLabel={t("common.dishes_other")}
                 />
@@ -288,7 +299,7 @@ export default function ReservationCard({
               <View className="flex-row items-center bg-surface-container-low px-3 py-1.5 rounded-xl border border-primary/10">
                 <Icon
                   name="account-group-outline"
-                  size={14}
+                  size={ICON_SIZE_META_BADGE}
                   color={COLORS.primary}
                   accessibilityLabel={t("common.pax")}
                 />

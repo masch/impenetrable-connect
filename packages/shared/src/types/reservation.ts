@@ -52,7 +52,9 @@ export const ReservationSchema: z.ZodType<Reservation, z.ZodTypeDef, unknown> =
  * Input DTO for creating a new reservation.
  */
 export const CreateReservationInputSchema = z.object({
-  zzz_service_at: z.string().datetime({ message: "ISO 8601 datetime with timezone required" }),
+  zzz_service_at: z
+    .string()
+    .datetime({ offset: true, message: "ISO 8601 datetime with timezone required" }),
   zzz_time_of_day: ServiceMomentSchema,
   zzz_guest_count: z.number().int().positive("Guest count must be positive").default(1),
 });
@@ -64,7 +66,7 @@ export type CreateReservationInput = z.infer<typeof CreateReservationInputSchema
  */
 export const UpdateReservationInputSchema = z
   .object({
-    zzz_service_at: z.string().datetime().optional(),
+    zzz_service_at: z.string().datetime({ offset: true }).optional(),
     zzz_time_of_day: ServiceMomentSchema.optional(),
     zzz_guest_count: z.number().int().positive().optional(),
   })

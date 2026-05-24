@@ -346,7 +346,9 @@
     "saving": "Guardando...",
     "max_capacity_limit": "Límite de Capacidad (Proyecto)",
     "open_external_link": "Abrir enlace externo",
-    "done": "Listo"
+    "unavailable": "No disponible",
+    "expired": "Expirado",
+    "done": "Hecho"
   },
   "role_selector": {
     "welcome": "Bienvenido",
@@ -384,6 +386,7 @@
     "select_time": "Seleccionar hora",
     "time_error_invalid": "Hora inválida",
     "time_error_outside_range": "Hora fuera del rango permitido ({{start}} - {{end}})",
+    "time_error_past": "Esta hora ya pasó para hoy",
     "select_time_option": "Seleccionar hora {{time}}"
   },
   "status": {
@@ -435,6 +438,7 @@
     "select_date": "Seleccionar {{date}}",
     "date_picker_hint": "Doble toque para seleccionar una fecha",
     "moment_selection_hint": "Doble toque para seleccionar el horario de comida",
+    "moment_expired_hint": "Este horario ya pasó para hoy",
     "submit_order_hint": "Doble toque para ver el menú",
     "date_selection_hint": "Doble toque para ver pedidos de este día",
     "decrement_guests": "Reducir cantidad de comensales",

@@ -1,4 +1,4 @@
-.PHONY: help setup install clean lint gga format check test test-shared test-coverage \
+.PHONY: help setup install clean lint gga format check test validate test-shared test-coverage \
 	dev dev-api dev-mock dev-web-api \
 	mobile mobile-mock mobile-mock-web mobile-api mobile-native mobile-clean mobile-web-mock mobile-web-api \
 	mobile-android mobile-android-native mobile-ios mobile-ios-native mobile-dev \
@@ -85,6 +85,7 @@ help:
 	@echo "    make typecheck                    - Run TypeScript check"
 	@echo "    make gga                          - Run Gentleman Guardian Angel"
 	@echo "    make check                        - Run all checks (mobile + backend + gga)"
+	@echo "    make validate                     - Run all checks and tests"
 	@echo "    make db-reset                     - Full database reset and seed"
 	@echo ""
 	@echo "  🤖 ANDROID EMULATOR"
@@ -412,6 +413,8 @@ gga:
 	gga run
 
 check: check-static gga
+
+validate: check test
 
 check-static: format check-static-mobile check-static-backend
 

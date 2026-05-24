@@ -7,14 +7,19 @@ import { useCartStore } from "../../stores/cart.store";
 import { createHourMinute } from "@repo/shared";
 import { useReservationStore } from "../../stores/reservation.store";
 import { useProjectStore } from "../../stores/project.store";
-import { SERVICE_MOMENTS, getMomentConfig, getDefaultTimeForMoment } from "../../constants/moments";
+import {
+  SERVICE_MOMENTS,
+  getMomentConfig,
+  getDefaultTimeForMoment,
+  isMomentExpired,
+} from "../../constants/moments";
 import { DatePicker } from "../../components/DatePicker";
 import { Button } from "../../components/Button";
 import { AppDateTimePicker } from "../../components/AppDateTimePicker";
 import LoadingView from "../../components/LoadingView";
 import { COLORS, ICON_SIZES, FONT_SIZES, ServiceMoment, Order } from "@repo/shared";
 import { isSameDay, formatDateToTime, parseTimeToDate } from "../../logic/formatters";
-import { isTimeInRange } from "../../hooks/useTimeValidation";
+import { isTimeInRange, isTimeInPast } from "../../hooks/useTimeValidation";
 import Screen, { ScreenContent } from "../../components/Screen";
 
 export default function OrderSetupScreen() {
@@ -115,9 +120,13 @@ export default function OrderSetupScreen() {
               end: config.endTime,
             }),
           );
+        } else if (isTimeInPast(date, selectedDate)) {
+          setTimeError(t("order_setup.time_error_past"));
         } else {
           setTimeError(null);
         }
+      } else {
+        setTimeError(null);
       }
     }
   };
@@ -136,6 +145,12 @@ export default function OrderSetupScreen() {
     if (!date || !moment) return;
     // Prevent proceeding if time is outside valid range
     if (timeError) return;
+
+    // Prevent proceeding if selected time is in the past (only for today)
+    if (time && isTimeInPast(date, time)) {
+      setTimeError(t("order_setup.time_error_past"));
+      return;
+    }
 
     // Detect if we need to move existing items to a new context
     const hasContextChanged =
@@ -252,33 +267,49 @@ export default function OrderSetupScreen() {
             <View className="flex-row flex-wrap justify-between gap-y-4">
               {SERVICE_MOMENTS.map((m) => {
                 const isSelected = moment === m.zzz_id;
+                const expired = isMomentExpired(m.zzz_id, date);
                 const label = t(m.labelKey);
                 return (
                   <Button
                     key={m.zzz_id}
                     variant="ghost"
-                    onPress={() => handleMomentChange(m.zzz_id)}
-                    accessibilityLabel={`${label}${isSelected ? `, ${t("common.selected")}` : ""}`}
-                    accessibilityHint={t("accessibility.moment_selection_hint")}
+                    onPress={() => {
+                      if (!expired) handleMomentChange(m.zzz_id);
+                    }}
+                    disabled={expired}
+                    accessibilityLabel={`${label}${expired ? `, ${t("common.unavailable")}` : ""}${isSelected ? `, ${t("common.selected")}` : ""}`}
+                    accessibilityHint={
+                      expired
+                        ? t("accessibility.moment_expired_hint")
+                        : t("accessibility.moment_selection_hint")
+                    }
                     accessibilityRole="radio"
-                    accessibilityState={{ selected: isSelected }}
+                    accessibilityState={{ selected: isSelected, disabled: expired }}
                     className={`w-[48%] items-center justify-center p-5 border rounded-3xl transition-all ${
-                      isSelected
-                        ? `shadow-lg border-${m.color} ${m.bgClass}/15`
-                        : "bg-surface-container-low/30 border-outline-variant/20"
+                      expired
+                        ? "bg-surface-container-low/10 border-outline-variant/10 opacity-30"
+                        : isSelected
+                          ? `shadow-lg border-${m.color} ${m.bgClass}/15`
+                          : "bg-surface-container-low/30 border-outline-variant/20"
                     }`}
                   >
                     <View className="items-center justify-center mb-3">
                       <Icon
                         name={m.icon}
                         size={ICON_SIZES.HUGE}
-                        color={isSelected ? m.hex : COLORS["on-surface-variant"]}
-                        className={!isSelected ? "opacity-40" : ""}
+                        color={
+                          expired
+                            ? COLORS["on-surface-variant"]
+                            : isSelected
+                              ? m.hex
+                              : COLORS["on-surface-variant"]
+                        }
+                        className={!isSelected || expired ? "opacity-40" : ""}
                       />
                     </View>
                     <Text
                       className={`text-lg font-display transition-colors ${
-                        isSelected
+                        isSelected && !expired
                           ? "text-on-surface font-bold"
                           : "text-on-surface-variant font-medium opacity-60"
                       }`}
@@ -286,7 +317,13 @@ export default function OrderSetupScreen() {
                       {label}
                     </Text>
 
-                    {isSelected && (
+                    {expired && (
+                      <Text className="text-[10px] font-display-bold text-on-surface-variant uppercase tracking-wider mt-1">
+                        {t("common.expired")}
+                      </Text>
+                    )}
+
+                    {isSelected && !expired && (
                       <View
                         className={`absolute top-3 right-3 size-5 rounded-full items-center justify-center ${m.bgClass}`}
                       >

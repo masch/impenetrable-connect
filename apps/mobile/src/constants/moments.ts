@@ -128,3 +128,36 @@ export function formatMomentTimeRange(moment: ServiceMoment): string {
   const config = getMomentConfig(moment);
   return `${config.startTime} - ${config.endTime}`;
 }
+
+/**
+ * Checks if a moment has already expired (end time passed) for today.
+ * Only applies when the selected date is today.
+ *
+ * @param moment - The service moment ID (e.g., "BREAKFAST", "LUNCH")
+ * @param selectedDate - The date the user is booking for
+ * @returns true if the moment's end time has passed for today
+ */
+export function isMomentExpired(moment: ServiceMoment, selectedDate: Date | null): boolean {
+  const config = getMomentConfig(moment);
+
+  if (!selectedDate) return false;
+
+  // Only validate for today
+  const now = new Date();
+  const isToday =
+    selectedDate.getFullYear() === now.getFullYear() &&
+    selectedDate.getMonth() === now.getMonth() &&
+    selectedDate.getDate() === now.getDate();
+
+  if (!isToday) return false;
+
+  // Compare current time in Argentina TZ against moment's end time
+  const [endHours, endMinutes] = config.endTime.split(":").map(Number);
+  const currentHours = now.getHours();
+  const currentMinutes = now.getMinutes();
+
+  if (currentHours > endHours) return true;
+  if (currentHours === endHours && currentMinutes >= endMinutes) return true;
+
+  return false;
+}

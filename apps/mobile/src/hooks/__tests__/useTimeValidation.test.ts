@@ -1,4 +1,4 @@
-import { isTimeInRange } from "../useTimeValidation";
+import { isTimeInRange, isTimeInPast } from "../useTimeValidation";
 
 describe("useTimeValidation", () => {
   describe("isTimeInRange", () => {
@@ -61,6 +61,54 @@ describe("useTimeValidation", () => {
       const result = isTimeInRange("18:30", "SNACK");
       expect(result.valid).toBe(false);
       expect(result.error).toBe("Time outside allowed range for SNACK");
+    });
+  });
+
+  describe("isTimeInPast", () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it("should return false when selectedDate is null", () => {
+      jest.setSystemTime(new Date("2024-01-15T10:00:00-03:00"));
+      expect(isTimeInPast(null, new Date("2024-01-15T09:00:00-03:00"))).toBe(false);
+    });
+
+    it("should return false when selectedTime is null", () => {
+      jest.setSystemTime(new Date("2024-01-15T10:00:00-03:00"));
+      expect(isTimeInPast(new Date("2024-01-15T00:00:00-03:00"), null)).toBe(false);
+    });
+
+    it("should return false when selectedDate is a future date", () => {
+      jest.setSystemTime(new Date("2024-01-15T10:00:00-03:00"));
+      const tomorrow = new Date("2024-01-16T00:00:00-03:00");
+      // Even a "past" time like 08:00 on a future date is not expired
+      expect(isTimeInPast(tomorrow, new Date("2024-01-16T08:00:00-03:00"))).toBe(false);
+    });
+
+    it("should return false when selected time is in the future", () => {
+      jest.setSystemTime(new Date("2024-01-15T10:00:00-03:00"));
+      const today = new Date("2024-01-15T00:00:00-03:00");
+      // 11:00 is in the future when now is 10:00
+      expect(isTimeInPast(today, new Date("2024-01-15T11:00:00-03:00"))).toBe(false);
+    });
+
+    it("should return true when selected time is in the past", () => {
+      jest.setSystemTime(new Date("2024-01-15T10:00:00-03:00"));
+      const today = new Date("2024-01-15T00:00:00-03:00");
+      // 09:00 is in the past when now is 10:00
+      expect(isTimeInPast(today, new Date("2024-01-15T09:00:00-03:00"))).toBe(true);
+    });
+
+    it("should return true when selected time equals now (boundary)", () => {
+      jest.setSystemTime(new Date("2024-01-15T10:00:00-03:00"));
+      const today = new Date("2024-01-15T00:00:00-03:00");
+      // 10:00 is now — it's already passing
+      expect(isTimeInPast(today, new Date("2024-01-15T10:00:00-03:00"))).toBe(true);
     });
   });
 });
