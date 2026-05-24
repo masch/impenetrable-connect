@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { Text, View, ScrollView, RefreshControl, Platform } from "react-native";
+import { Text, View, ScrollView, RefreshControl, Platform, TextInput } from "react-native";
 import {
   impactAsync,
   notificationAsync,
@@ -88,6 +88,7 @@ export default function BookingScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedService, setSelectedService] = useState<ProductItem | null>(null);
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
+  const [generalNotes, setGeneralNotes] = useState("");
   const [alertConfig, setAlertConfig] = useState<{
     visible: boolean;
     title: string;
@@ -166,7 +167,7 @@ export default function BookingScreen() {
   );
 
   const handleDeleteOrder = useCallback(
-    async (orderId?: number) => {
+    async (orderId?: string) => {
       // If no orderId, it's a cart item
       if (!orderId) {
         if (selectedService) {
@@ -216,7 +217,7 @@ export default function BookingScreen() {
 
       try {
         if (orderId) {
-          const updatedOrder = await ProductService.updateOrder(Number(orderId), {
+          const updatedOrder = await ProductService.updateOrder(orderId, {
             zzz_quantity,
             zzz_notes,
           });
@@ -227,6 +228,7 @@ export default function BookingScreen() {
             zzz_catalog_item_id: selectedService.zzz_id,
             zzz_quantity,
             zzz_price: selectedService.zzz_price,
+            zzz_notes,
           });
           impactAsync(ImpactFeedbackStyle.Medium);
         }
@@ -532,6 +534,28 @@ export default function BookingScreen() {
                   </ScrollView>
                 )}
 
+                {/* General order notes */}
+                {cartItems.length > 0 && (
+                  <View className="mt-3">
+                    <Text className="text-[10px] font-display font-bold text-on-surface-variant uppercase tracking-wider mb-1.5 ml-1">
+                      {t("orders.notes_general")}
+                    </Text>
+                    <View className="bg-surface-container-highest rounded-2xl px-4 py-3">
+                      <TextInput
+                        className="text-sm font-body text-on-surface min-h-[24px] p-0"
+                        value={generalNotes}
+                        onChangeText={setGeneralNotes}
+                        placeholder={t("orders.notes_general_placeholder")}
+                        placeholderTextColor={COLORS["on-surface-variant"]}
+                        multiline
+                        numberOfLines={2}
+                        textAlignVertical="top"
+                        testID="general-notes-input"
+                      />
+                    </View>
+                  </View>
+                )}
+
                 <View className="flex-row items-center justify-between mt-1 py-1">
                   <Button
                     variant="ghost"
@@ -637,13 +661,16 @@ export default function BookingScreen() {
                                     cartItems.map((i) => ({
                                       zzz_catalog_item_id: i.zzz_catalog_item_id,
                                       zzz_quantity: i.zzz_quantity,
+                                      zzz_notes: i.zzz_notes,
                                     })),
                                     useCartStore.getState().guestCount,
                                     selectedTime,
+                                    generalNotes || undefined,
                                   );
                                   if (newOrder) {
                                     addOrderToStore(newOrder);
                                     clearCart();
+                                    setGeneralNotes("");
                                     notificationAsync(NotificationFeedbackType.Success);
                                     push("/tourist/orders");
                                   }

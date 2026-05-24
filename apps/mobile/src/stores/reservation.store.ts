@@ -21,10 +21,10 @@ export interface ReservationState {
 
   // Actions
   fetchOrders: () => Promise<void>;
-  cancelOrder: (orderId: number) => Promise<void>;
+  cancelOrder: (orderId: string) => Promise<void>;
   addOrder: (order: Order) => void;
   updateOrder: (order: Order) => void;
-  moveOrders: (orderIds: number[], newDate: Date, newMoment: ServiceMoment) => Promise<void>;
+  moveOrders: (orderIds: string[], newDate: Date, newMoment: ServiceMoment) => Promise<void>;
   setTab: (tab: "active" | "history") => void;
 }
 
@@ -73,7 +73,7 @@ export const useReservationStore = create<ReservationState>((set, get) => ({
   },
 
   // Cancel an order
-  cancelOrder: async (orderId: number) => {
+  cancelOrder: async (orderId: string) => {
     set({ isLoading: true, error: null });
     try {
       await orderService.cancelOrder(orderId);
@@ -98,10 +98,10 @@ export const useReservationStore = create<ReservationState>((set, get) => ({
   updateOrder: (order: Order) => {
     set((state) => ({
       activeOrders: state.activeOrders.map((o) =>
-        Number(o.zzz_id) === Number(order.zzz_id) ? { ...o, ...order } : o,
+        o.zzz_id === order.zzz_id ? { ...o, ...order } : o,
       ),
       historyOrders: state.historyOrders.map((o) =>
-        Number(o.zzz_id) === Number(order.zzz_id) ? { ...o, ...order } : o,
+        o.zzz_id === order.zzz_id ? { ...o, ...order } : o,
       ),
     }));
   },
@@ -112,7 +112,7 @@ export const useReservationStore = create<ReservationState>((set, get) => ({
   },
 
   // Move orders to a new context
-  moveOrders: async (orderIds: number[], newDate: Date, newMoment: ServiceMoment) => {
+  moveOrders: async (orderIds: string[], newDate: Date, newMoment: ServiceMoment) => {
     set({ isLoading: true, error: null });
     try {
       const { ProductService } = await import("../services/product.service");

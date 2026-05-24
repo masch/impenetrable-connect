@@ -14,6 +14,7 @@ export * from "./types/cascade";
 export * from "./types/status";
 export * from "./types/timezone";
 export * from "./theme/colors";
+export * from "./theme/sizes";
 
 export * from "./mocks/projects";
 export * from "./mocks/users";

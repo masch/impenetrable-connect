@@ -5,7 +5,7 @@ import { type Order, type OrderStatus, COLORS } from "@repo/shared";
 import { useTranslations } from "../../hooks/useI18n";
 import { getOrderActions } from "../../logic/order-actions";
 import { formatCurrency, extractTimeFromISO } from "../../logic/formatters";
-import { getMomentColor } from "../../constants/moments";
+import { getMomentConfig } from "../../constants/moments";
 
 export interface ReservationCardProps {
   order: Order;
@@ -136,7 +136,7 @@ export default function ReservationCard({
 
   // Get moment color for indicator
   const momentId = order.zzz_reservation?.zzz_time_of_day;
-  const momentColor = momentId ? getMomentColor(momentId) : COLORS.primary;
+  const momentConfig = momentId ? getMomentConfig(momentId) : undefined;
 
   // Calculate available actions using the logic layer
   const actions = getOrderActions(order, role, t, {
@@ -151,7 +151,7 @@ export default function ReservationCard({
       className={`${containerClass} ${!hideShadow ? "shadow-md" : ""}`}
     >
       {/* Status Color Bar with moment color */}
-      <View className="h-1.5 w-full" style={{ backgroundColor: momentColor }} />
+      <View className={`h-1.5 w-full ${momentConfig?.bgClass ?? "bg-primary"}`} />
 
       <View className="p-3">
         {/* Header: Status and Items Count */}
@@ -195,11 +195,12 @@ export default function ReservationCard({
             </Text>
             {orderTime && (
               <View
-                className="ml-2 px-2.5 py-1 rounded-lg flex-row items-center gap-1"
-                style={{ backgroundColor: momentColor + "20" }}
+                className={`ml-2 px-2.5 py-1 rounded-lg flex-row items-center gap-1 ${momentConfig?.bgClass ?? "bg-primary"}/20`}
               >
-                <Icon name="clock-outline" size={12} color={momentColor} />
-                <Text className="font-display-bold text-[11px]" style={{ color: momentColor }}>
+                <Icon name="clock-outline" size={12} color={momentConfig?.hex ?? COLORS.primary} />
+                <Text
+                  className={`font-display-bold text-[11px] ${momentConfig?.textClass ?? "text-primary"}`}
+                >
                   {orderTime}
                 </Text>
               </View>
@@ -211,12 +212,20 @@ export default function ReservationCard({
         <View className="mb-4">
           {order.zzz_items && order.zzz_items.length > 0 ? (
             order.zzz_items.map((item, idx) => (
-              <View key={item.zzz_id} className={`flex-row items-center ${idx > 0 ? "mt-4" : ""}`}>
+              <View key={item.zzz_id} className={`flex-row items-start ${idx > 0 ? "mt-4" : ""}`}>
                 <View className="flex-1 mr-2">
                   <Text className="text-on-surface font-display-bold text-[15px]" numberOfLines={2}>
                     {getLocalizedName(item.zzz_catalog_item?.zzz_name_i18n) ||
                       `${t("orders.itemNumber")}${item.zzz_catalog_item_id}`}
                   </Text>
+                  {item.zzz_notes && (
+                    <Text
+                      className="text-on-surface-variant font-body-medium text-[11px] mt-1 italic leading-tight"
+                      numberOfLines={2}
+                    >
+                      {item.zzz_notes}
+                    </Text>
+                  )}
                 </View>
 
                 <View className="flex-row items-center">

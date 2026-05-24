@@ -6,7 +6,7 @@ import { useTranslations } from "../../hooks/useI18n";
 import { useAgendaStore } from "../../stores/agenda.store";
 import ReservationCard from "../../components/entrepreneur/ReservationCard";
 import { Icon } from "../../components/Icon";
-import { COLORS } from "@repo/shared";
+import { COLORS, ICON_SIZES } from "@repo/shared";
 import {
   formatDate,
   toISODate,
@@ -95,7 +95,7 @@ export default function RequestScreen() {
                     <View className="size-12 rounded-2xl items-center justify-center mr-5 shadow-lg shadow-primary/20 bg-primary">
                       <Icon
                         name="calendar-multiselect"
-                        size={24}
+                        size={ICON_SIZES.XXLARGE}
                         color={COLORS["on-primary"]}
                         accessibilityLabel={t("common.date")}
                       />
@@ -107,7 +107,7 @@ export default function RequestScreen() {
                           : getRelativeDateLabel(parseISODate(dateKey), t)}
                       </Text>
                       {dateKey !== "no_date" && (
-                        <Text className="text-on-surface-variant font-display-bold text-xs uppercase tracking-[3px] opacity-50">
+                        <Text className="text-on-surface-variant font-display-bold text-xs uppercase tracking-widest opacity-50">
                           {formatDate(parseISODate(dateKey), {
                             weekday: "long",
                             day: "numeric",
@@ -132,7 +132,7 @@ export default function RequestScreen() {
                           <View className={`p-1.5 rounded-lg mr-2.5 ${config.bgClass}/10`}>
                             <Icon
                               name={config.icon}
-                              size={16}
+                              size={ICON_SIZES.SMALL}
                               color={config.hex}
                               accessibilityLabel={config.labelKey}
                             />
@@ -161,7 +161,7 @@ export default function RequestScreen() {
                                     >
                                       <Icon
                                         name="clock-outline"
-                                        size={14}
+                                        size={ICON_SIZES.XSMALL}
                                         color={COLORS["on-primary"]}
                                         accessibilityLabel={t("common.time")}
                                       />
@@ -181,8 +181,8 @@ export default function RequestScreen() {
                                       hideBorder
                                       hideShadow
                                       hideStatus
-                                      onAccept={() => acceptOrder(Number(order.zzz_id))}
-                                      onDecline={() => declineOrder(Number(order.zzz_id))}
+                                      onAccept={() => acceptOrder(order.zzz_id)}
+                                      onDecline={() => declineOrder(order.zzz_id)}
                                     />
                                     {orderIdx < ordersForTime.length - 1 && (
                                       <View className="h-[1px] mx-4 bg-outline-variant/10" />
@@ -208,7 +208,7 @@ export default function RequestScreen() {
                 <View className="size-20 rounded-full bg-secondary/10 items-center justify-center mb-6">
                   <Icon
                     name="tray-full"
-                    size={40}
+                    size={ICON_SIZES.XXXLARGE}
                     color={COLORS.secondary}
                     className="opacity-50"
                     accessibilityLabel="empty"

@@ -45,6 +45,8 @@ type BookingInput = z.infer<typeof BookingInputSchema>;
 /**
  * Common interface for product service implementations
  */
+const mockId = (n: number): string => `00000000-0000-0000-0000-${String(n).padStart(12, "0")}`;
+
 export interface ProductServiceInterface {
   getServices(): Promise<ProductItem[]>;
   getServiceById(id: number): Promise<ProductItem | null>;
@@ -57,8 +59,8 @@ export interface ProductServiceInterface {
     notes?: string,
     time?: HourMinute,
   ): Promise<Order>;
-  updateOrder(id: number, input: Partial<BookingInput>): Promise<Order>;
-  updateOrderStatus(id: number, status: string): Promise<Order>;
+  updateOrder(id: string, input: Partial<BookingInput>): Promise<Order>;
+  updateOrderStatus(id: string, status: string): Promise<Order>;
   getOrders(userId?: string): Promise<Order[]>;
 }
 
@@ -86,7 +88,7 @@ const MockProductService: ProductServiceInterface = {
   placeOrder: async (
     date: Date,
     moment: ServiceMoment,
-    items: Array<{ zzz_catalog_item_id: number; zzz_quantity: number }>,
+    items: Array<{ zzz_catalog_item_id: number; zzz_quantity: number; zzz_notes?: string }>,
     guestCount: number,
     notes?: string,
     time?: HourMinute,
@@ -106,7 +108,7 @@ const MockProductService: ProductServiceInterface = {
     const firstService = mockProducts.find((s) => s.zzz_id === items[0].zzz_catalog_item_id);
     if (!firstService) throw new Error("Service not found");
 
-    const orderId = Date.now();
+    const orderId = mockId(Date.now());
     const serviceAt = time ? combineDateAndTime(date, time) : date.toISOString();
     const reservation = addMockReservation({
       zzz_user_id: isMockUserLoggedIn() ? getMockUserId() : "unknown",
@@ -128,11 +130,12 @@ const MockProductService: ProductServiceInterface = {
       zzz_items: items.map((item) => {
         const s = mockProducts.find((service) => service.zzz_id === item.zzz_catalog_item_id);
         return {
-          zzz_id: Math.floor(Math.random() * 100000),
+          zzz_id: mockId(Math.floor(Math.random() * 100000)),
           zzz_order_id: orderId,
           zzz_catalog_item_id: item.zzz_catalog_item_id,
           zzz_quantity: item.zzz_quantity,
           zzz_price: s?.zzz_price || 0,
+          zzz_notes: item.zzz_notes ?? undefined,
         };
       }),
       zzz_cancelled_at: null,
@@ -150,11 +153,11 @@ const MockProductService: ProductServiceInterface = {
     return newOrder;
   },
 
-  updateOrder: async (id: number, input: Partial<BookingInput>) => {
+  updateOrder: async (id: string, input: Partial<BookingInput>) => {
     await new Promise((r) => setTimeout(r, MOCK_DELAYS.NORMAL));
 
     const existingOrders = getMockOrders();
-    const order = existingOrders.find((o) => Number(o.zzz_id) === Number(id));
+    const order = existingOrders.find((o) => o.zzz_id === id);
     if (!order) throw new Error("Order not found");
 
     const updates: Partial<Order> = {};
@@ -174,7 +177,7 @@ const MockProductService: ProductServiceInterface = {
       // In a real system, we might move the order to a different reservation
       // or update the existing one. For mocks, we'll handle this by updating the reservation.
       const { getMockOrderById } = await import("../mocks/orders");
-      const foundOrder = getMockOrderById(Number(id));
+      const foundOrder = getMockOrderById(id);
       if (foundOrder?.zzz_reservation_id) {
         // This is a bit of a shortcut for the mock, updating the reservation in state
         const reservationUpdates: Partial<Reservation> = {};
@@ -185,14 +188,14 @@ const MockProductService: ProductServiceInterface = {
       }
     }
 
-    updateMockOrder(Number(id), updates);
+    updateMockOrder(id, updates);
     return { ...order, ...updates };
   },
 
-  updateOrderStatus: async (id: number, status: string) => {
+  updateOrderStatus: async (id: string, status: string) => {
     await new Promise((r) => setTimeout(r, MOCK_DELAYS.NORMAL));
     const existingOrders = getMockOrders();
-    const order = existingOrders.find((o) => Number(o.zzz_id) === Number(id));
+    const order = existingOrders.find((o) => o.zzz_id === id);
     if (!order) throw new Error("Order not found");
 
     const updates: Partial<Order> = { zzz_global_status: status as Order["zzz_global_status"] };
@@ -200,7 +203,7 @@ const MockProductService: ProductServiceInterface = {
       updates.zzz_confirmed_at = new Date();
     }
 
-    updateMockOrder(Number(id), updates);
+    updateMockOrder(id, updates);
     return { ...order, ...updates };
   },
 
@@ -270,7 +273,7 @@ const RestProductService: ProductServiceInterface = {
     }
   },
 
-  updateOrder: async (id: number, input: Partial<BookingInput>) => {
+  updateOrder: async (id: string, input: Partial<BookingInput>) => {
     try {
       const response = await fetch(`${env.API_URL}/orders/${id}`, {
         method: "PATCH",
@@ -285,7 +288,7 @@ const RestProductService: ProductServiceInterface = {
     }
   },
 
-  updateOrderStatus: async (id: number, status: string) => {
+  updateOrderStatus: async (id: string, status: string) => {
     try {
       const response = await fetch(`${env.API_URL}/orders/${id}/status`, {
         method: "PATCH",

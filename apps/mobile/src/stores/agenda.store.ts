@@ -27,8 +27,8 @@ export interface AgendaState {
 
   fetchAgenda: (date: Date) => Promise<void>;
   fetchPendingOrders: () => Promise<void>;
-  acceptOrder: (orderId: number) => Promise<void>;
-  declineOrder: (orderId: number) => Promise<void>;
+  acceptOrder: (orderId: string) => Promise<void>;
+  declineOrder: (orderId: string) => Promise<void>;
   getOccupationStats: (maxCapacity: number) => { occupied: number; total: number };
   getDayCount: (date: Date) => number;
   reset: () => void;
@@ -99,14 +99,14 @@ export const useAgendaStore = create<AgendaState>((set, get) => ({
     }
   },
 
-  acceptOrder: async (orderId: number) => {
+  acceptOrder: async (orderId: string) => {
     try {
       await ProductService.updateOrderStatus(orderId, "CONFIRMED");
       // Optimistic update or just re-fetch
       set((state) => ({
-        pendingOrders: state.pendingOrders.filter((o) => Number(o.zzz_id) !== orderId),
+        pendingOrders: state.pendingOrders.filter((o) => o.zzz_id !== orderId),
         orders: state.orders.map((o) =>
-          Number(o.zzz_id) === orderId ? { ...o, zzz_global_status: "CONFIRMED" } : o,
+          o.zzz_id === orderId ? { ...o, zzz_global_status: "CONFIRMED" } : o,
         ),
       }));
     } catch (err: unknown) {
@@ -114,13 +114,13 @@ export const useAgendaStore = create<AgendaState>((set, get) => ({
     }
   },
 
-  declineOrder: async (orderId: number) => {
+  declineOrder: async (orderId: string) => {
     try {
       await ProductService.updateOrderStatus(orderId, "CANCELLED");
       set((state) => ({
-        pendingOrders: state.pendingOrders.filter((o) => Number(o.zzz_id) !== orderId),
+        pendingOrders: state.pendingOrders.filter((o) => o.zzz_id !== orderId),
         orders: state.orders.map((o) =>
-          Number(o.zzz_id) === orderId ? { ...o, zzz_global_status: "CANCELLED" } : o,
+          o.zzz_id === orderId ? { ...o, zzz_global_status: "CANCELLED" } : o,
         ),
       }));
     } catch (err: unknown) {

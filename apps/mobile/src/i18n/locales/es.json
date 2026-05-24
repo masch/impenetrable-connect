@@ -237,6 +237,8 @@
     "registeredTourist": "Turista Registrado",
     "registeredVenture": "Emprendimiento Registrado",
     "notes": "Restricciones / aclaración",
+    "notes_general": "Nota general (opcional)",
+    "notes_general_placeholder": "Algún pedido especial para toda la orden...",
     "pending_requests_count": "Tenés {{count}} solicitudes esperando respuesta",
     "no_pending_requests": "No hay solicitudes pendientes",
     "empty_inbox_title": "¡Todo al día!",

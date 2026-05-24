@@ -1,10 +1,13 @@
 import { create } from "zustand";
 import type { ServiceMoment, HourMinute } from "@repo/shared";
 
+const DEFAULT_GUEST_COUNT = 2;
+
 interface CartItem {
   zzz_catalog_item_id: number;
   zzz_quantity: number;
   zzz_price: number;
+  zzz_notes?: string;
 }
 
 interface CartState {
@@ -32,7 +35,7 @@ export const useCartStore = create<CartState>((set, get) => ({
   selectedDate: null,
   selectedMoment: null,
   selectedTime: undefined,
-  guestCount: 2, // Default to 2 people
+  guestCount: DEFAULT_GUEST_COUNT, // Default to 2 people
   cartItems: [],
 
   setContext: (selectedDate, selectedMoment, selectedTime) =>
@@ -47,7 +50,7 @@ export const useCartStore = create<CartState>((set, get) => ({
       selectedDate: null,
       selectedMoment: null,
       selectedTime: undefined,
-      guestCount: 2,
+      guestCount: DEFAULT_GUEST_COUNT,
       cartItems: [],
     }),
 

@@ -9,7 +9,7 @@ import { type DateTimePickerEvent } from "@react-native-community/datetimepicker
 import ReservationCard from "../../components/entrepreneur/ReservationCard";
 import { Icon } from "../../components/Icon";
 import { getMomentConfig, MOMENTS } from "../../constants/moments";
-import { COLORS } from "@repo/shared";
+import { COLORS, ICON_SIZES, FONT_SIZES } from "@repo/shared";
 import {
   formatDate,
   isSameDay,
@@ -58,7 +58,7 @@ export default function AgendaScreen() {
         ) : (
           <ScrollView
             className="flex-1 px-2 bg-surface-container-low"
-            contentContainerClassName="pt-[10px] pb-4"
+            contentContainerClassName="pt-2.5 pb-4"
             showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl
@@ -125,17 +125,17 @@ export default function AgendaScreen() {
                     <View className={`p-2 rounded-xl mr-3 ${config.bgClass}/15`}>
                       <Icon
                         name={config.icon}
-                        size={18}
+                        size={ICON_SIZES.MEDIUM}
                         color={config.hex}
                         accessibilityLabel={formatMoment(moment, t)}
                       />
                     </View>
                     <Text
-                      className={`font-display-black text-[14px] uppercase tracking-[1.5px] ${config.textClass}`}
+                      className={`font-display-black text-sm uppercase tracking-widest ${config.textClass}`}
                     >
                       {formatMoment(moment, t)}
                     </Text>
-                    <View className={`h-[0.8px] flex-1 ml-4 opacity-20 ${config.bgClass}`} />
+                    <View className={`h-px flex-1 ml-4 opacity-20 ${config.bgClass}`} />
                   </View>
 
                   {/* Orders grouped by time */}
@@ -154,7 +154,7 @@ export default function AgendaScreen() {
                               >
                                 <Icon
                                   name="clock-outline"
-                                  size={14}
+                                  size={ICON_SIZES.XSMALL}
                                   color={COLORS["on-primary"]}
                                   accessibilityLabel="Time"
                                 />
@@ -174,8 +174,8 @@ export default function AgendaScreen() {
                                 hideBorder
                                 hideShadow
                                 hideStatus
-                                onAccept={() => acceptOrder(Number(order.zzz_id))}
-                                onDecline={() => declineOrder(Number(order.zzz_id))}
+                                onAccept={() => acceptOrder(order.zzz_id)}
+                                onDecline={() => declineOrder(order.zzz_id)}
                               />
                               {orderIndex < ordersForTime.length - 1 && (
                                 <View className={`h-[1px] mx-2 ${config.bgClass}/40`} />
@@ -202,6 +202,10 @@ export default function AgendaScreen() {
 }
 
 // Separate component to fix react-doctor/no-render-in-render warning
+const DATE_CELL_WIDTH = "w-[58px]";
+const DATE_CELL_HEIGHT = "h-[82px]";
+const DAY_NUM_MIN_WIDTH = "min-w-[18px]";
+
 function DateSelector({
   selectedDate,
   onSelectDate,
@@ -217,7 +221,8 @@ function DateSelector({
   tomorrow: Date;
   getDayCount: (date: Date) => number;
 }) {
-  const days = [0, 1, 2, 3, 4, 5, 6].map((offset) => {
+  const DAY_OFFSETS = [0, 1, 2, 3, 4, 5, 6] as const;
+  const days = DAY_OFFSETS.map((offset) => {
     const date = new Date();
     date.setDate(date.getDate() + offset);
     return date;
@@ -244,7 +249,7 @@ function DateSelector({
                 <Button
                   onPress={() => onSelectDate(date)}
                   testID={`date-selector-${toISODate(date)}`}
-                  className={`w-[58px] h-[82px] rounded-3xl border items-center justify-center ${
+                  className={`${DATE_CELL_WIDTH} ${DATE_CELL_HEIGHT} rounded-3xl border items-center justify-center ${
                     isSelected
                       ? "bg-primary border-primary shadow-lg shadow-primary/30"
                       : isToday
@@ -260,7 +265,7 @@ function DateSelector({
                         >
                           <Icon
                             name={isToday ? "star" : "calendar-arrow-right"}
-                            size={22}
+                            size={ICON_SIZES.XLARGE}
                             accessibilityLabel={isToday ? t("orders.today") : t("orders.tomorrow")}
                             color={
                               isSelected
@@ -272,7 +277,7 @@ function DateSelector({
                           />
                         </View>
                         <Text
-                          className={`font-display-black text-[9px] uppercase tracking-[0.5px] ${
+                          className={`font-display-black ${FONT_SIZES.DATE_LABEL} uppercase tracking-wider ${
                             isSelected
                               ? "text-white"
                               : isToday
@@ -286,7 +291,7 @@ function DateSelector({
                     ) : (
                       <>
                         <Text
-                          className={`font-display-bold text-[9px] uppercase tracking-tighter mb-1.5 ${
+                          className={`font-display-bold ${FONT_SIZES.DATE_LABEL} uppercase tracking-tighter mb-1.5 ${
                             isSelected ? "text-white/70" : "text-on-surface-variant"
                           }`}
                         >
@@ -311,12 +316,12 @@ function DateSelector({
 
                 {count > 0 && (
                   <View
-                    className={`absolute top-1 right-1 min-w-[18px] h-4 px-1 rounded-md items-center justify-center border ${
+                    className={`absolute top-1 right-1 ${DAY_NUM_MIN_WIDTH} h-4 px-1 rounded-md items-center justify-center border ${
                       isSelected ? "bg-white border-primary/20" : "bg-primary border-primary"
                     }`}
                   >
                     <Text
-                      className={`text-[10px] font-display-black leading-none mt-[-1px] ${
+                      className={`${FONT_SIZES.DAY_NUM} font-display-black leading-none -mt-px ${
                         isSelected ? "text-primary" : "text-white"
                       }`}
                     >

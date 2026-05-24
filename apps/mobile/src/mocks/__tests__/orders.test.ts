@@ -5,6 +5,8 @@ import {
   MOCK_USER_ENTREPRENEUR_WITHOUT_ORDERS,
 } from "@repo/shared";
 
+const mockId = (n: number): string => `00000000-0000-0000-0000-${String(n).padStart(12, "0")}`;
+
 describe("Order Mocks Filtering", () => {
   it("should return pending orders only for the owner venture (Maria)", async () => {
     // Maria owns Parador Don Esteban (ID 1)
@@ -14,7 +16,7 @@ describe("Order Mocks Filtering", () => {
     });
 
     const orders = getMockOrders();
-    const pendingOrder = orders.find((o) => o.zzz_id === 2);
+    const pendingOrder = orders.find((o) => o.zzz_id === mockId(2));
 
     expect(pendingOrder).toBeDefined();
     expect(pendingOrder?.zzz_global_status).toBe("OFFER_PENDING");
@@ -28,7 +30,7 @@ describe("Order Mocks Filtering", () => {
     });
 
     const orders = getMockOrders();
-    const pendingOrder = orders.find((o) => o.zzz_id === 2);
+    const pendingOrder = orders.find((o) => o.zzz_id === mockId(2));
 
     // This is the moment of truth
     expect(pendingOrder).toBeUndefined();
@@ -41,7 +43,7 @@ describe("Order Mocks Filtering", () => {
       password: "password123",
     });
     const mariaOrders = getMockOrders();
-    expect(mariaOrders.some((o) => o.zzz_id === 2)).toBe(true);
+    expect(mariaOrders.some((o) => o.zzz_id === mockId(2))).toBe(true);
 
     // José (Venture 2) should NOT see Maria's orders
     await authService.login({
@@ -49,7 +51,7 @@ describe("Order Mocks Filtering", () => {
       password: "password123",
     });
     const joseOrders = getMockOrders();
-    expect(joseOrders.some((o) => o.zzz_id === 2)).toBe(false);
+    expect(joseOrders.some((o) => o.zzz_id === mockId(2))).toBe(false);
   });
 
   it("should allow a second owner of the same venture (Pedro) to see the same orders", async () => {
@@ -57,7 +59,7 @@ describe("Order Mocks Filtering", () => {
     await authService.login({ email: "pedro@don-esteban.com", password: "password123" });
 
     const orders = getMockOrders();
-    const pendingOrder = orders.find((o) => o.zzz_id === 2);
+    const pendingOrder = orders.find((o) => o.zzz_id === mockId(2));
 
     expect(pendingOrder).toBeDefined();
     expect(pendingOrder?.zzz_global_status).toBe("OFFER_PENDING");
