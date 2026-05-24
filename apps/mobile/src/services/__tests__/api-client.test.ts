@@ -45,6 +45,24 @@ describe("apiClient", () => {
       expect(mockHandleResponse).toHaveBeenCalledWith(mockResponse, "errors.catalog_failed");
       expect(result).toEqual([{ id: "1" }]);
     });
+
+    it("should send request without Authorization header if token is not present", async () => {
+      (useAuthStore as unknown as { getState: () => { accessToken: string | null } }).getState =
+        () => ({ accessToken: null });
+
+      const mockResponse = { ok: true, json: jest.fn() };
+      mockFetch.mockResolvedValue(mockResponse);
+      mockHandleResponse.mockResolvedValue([]);
+
+      await apiClient.get("/orders");
+
+      expect(mockFetch).toHaveBeenCalledWith("http://test.api/v1/orders", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    });
   });
 
   describe("post", () => {
