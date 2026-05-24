@@ -6,6 +6,7 @@ import { venturesRouter } from "./routes/ventures";
 import { authRouter } from "./routes/auth";
 import { productsRouter } from "./routes/products";
 import { servicesRouter } from "./routes/services";
+import { ordersRouter } from "./routes/orders";
 import { cors } from "hono/cors";
 import { dbMiddleware } from "./middleware/db";
 import { logger } from "./services/logger.service";
@@ -55,6 +56,7 @@ app.route("/v1/ventures", venturesRouter);
 app.route("/v1/auth", authRouter);
 app.route("/v1/products", productsRouter);
 app.route("/v1/services", servicesRouter);
+app.route("/v1/orders", ordersRouter);
 
 export default app;
 export { type AppEnv };
