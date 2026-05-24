@@ -15,6 +15,13 @@ export class ReservationValidationError extends Error {
   }
 }
 
+export class ReservationAccessError extends Error {
+  constructor(message: string = "Forbidden") {
+    super(message);
+    this.name = "ReservationAccessError";
+  }
+}
+
 const PAGINATION = {
   DEFAULT_LIMIT: 20,
   MAX_LIMIT: 100,
@@ -47,12 +54,22 @@ export class ReservationService {
     return reservation;
   }
 
-  static async getById(db: Db, id: string) {
+  static async getById(db: Db, id: string, userRole?: UserRole, userId?: string) {
     const [reservation] = await db
       .select()
       .from(reservations)
       .where(eq(reservations.zzz_id, id))
       .limit(SINGLE_RESULT_LIMIT);
+
+    if (!reservation || !userRole) {
+      return reservation;
+    }
+
+    // Role-based scoping for single-resource access
+    if (userRole === UserRole.TOURIST && reservation.zzz_user_id !== userId) {
+      throw new ReservationAccessError();
+    }
+
     return reservation;
   }
 

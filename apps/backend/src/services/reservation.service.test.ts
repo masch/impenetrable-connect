@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { ReservationService, ReservationValidationError } from "./reservation.service";
+import { ReservationService, ReservationValidationError, ReservationAccessError } from "./reservation.service";
 import { type Db } from "../db";
 
 describe("ReservationService", () => {
@@ -90,23 +90,23 @@ describe("ReservationService", () => {
   });
 
   describe("getById", () => {
-    it("should return a reservation by UUID", async () => {
-      const mockDb = {
-        select: () => ({
-          from: () => ({
-            where: () => ({
-              limit: () => Promise.resolve([mockReservation]),
-            }),
+    const mockDb = {
+      select: () => ({
+        from: () => ({
+          where: () => ({
+            limit: () => Promise.resolve([mockReservation]),
           }),
         }),
-      } as unknown as Db;
+      }),
+    } as unknown as Db;
 
+    it("should return a reservation by UUID", async () => {
       const result = await ReservationService.getById(mockDb, mockReservation.zzz_id);
       expect(result).toEqual(mockReservation);
     });
 
     it("should return undefined when not found", async () => {
-      const mockDb = {
+      const emptyDb = {
         select: () => ({
           from: () => ({
             where: () => ({
@@ -116,8 +116,59 @@ describe("ReservationService", () => {
         }),
       } as unknown as Db;
 
-      const result = await ReservationService.getById(mockDb, "nonexistent-uuid");
+      const result = await ReservationService.getById(emptyDb, "nonexistent-uuid");
       expect(result).toBeUndefined();
+    });
+
+    describe("scoping", () => {
+      it("should skip scoping when no userRole provided", async () => {
+        const result = await ReservationService.getById(mockDb, mockReservation.zzz_id);
+        expect(result).toEqual(mockReservation);
+      });
+
+      it("should allow TOURIST to access own reservation", async () => {
+        const result = await ReservationService.getById(
+          mockDb,
+          mockReservation.zzz_id,
+          "TOURIST" as never,
+          mockReservation.zzz_user_id,
+        );
+        expect(result).toEqual(mockReservation);
+      });
+
+      it("should throw ReservationAccessError when TOURIST accesses another's reservation", async () => {
+        await expect(
+          ReservationService.getById(mockDb, mockReservation.zzz_id, "TOURIST" as never, "other-user"),
+        ).rejects.toThrow(ReservationAccessError);
+      });
+
+      it("should allow ADMIN to access any reservation", async () => {
+        const result = await ReservationService.getById(
+          mockDb,
+          mockReservation.zzz_id,
+          "ADMIN" as never,
+          "other-user",
+        );
+        expect(result).toEqual(mockReservation);
+      });
+
+      it("should throw ReservationAccessError with default 'Forbidden' message", async () => {
+        try {
+          await ReservationService.getById(
+            mockDb,
+            mockReservation.zzz_id,
+            "TOURIST" as never,
+            "other-user",
+          );
+          expect.unreachable();
+        } catch (error) {
+          if (error instanceof ReservationAccessError) {
+            expect(error.message).toBe("Forbidden");
+          } else {
+            throw error;
+          }
+        }
+      });
     });
   });
 

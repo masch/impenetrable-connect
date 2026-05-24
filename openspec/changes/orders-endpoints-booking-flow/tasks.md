@@ -63,11 +63,11 @@ Chain strategy: pending
 - [x] **T-008** — Implement reservation routes (POST `/` with roleGuard TOURIST, GET `/`, GET `/:id`, PATCH `/:id` with future-date + non-cancelled checks) + route tests (each endpoint: 200, 400, 401, 404, 500; PATCH: 403)  
        _Files_: `apps/backend/src/routes/reservations.ts`, `apps/backend/src/routes/reservations.test.ts` | _Est_: 280 lines | _Dep_: T-001, T-005 | _TDD_: yes
 
-- [ ] **T-009** — Implement order routes (POST `/` with roleGuard TOURIST + OrderServiceError mapping, GET `/` with filters, PATCH `/:id` with terminal-check, PATCH `/:id/status` with roleGuard ENTREPRENEUR/ADMIN) + route tests  
+- [x] **T-009** — Implement order routes (POST `/` with roleGuard TOURIST + OrderServiceError mapping, GET `/` with filters, PATCH `/:id` with terminal-check, PATCH `/:id/status` with roleGuard ENTREPRENEUR/ADMIN) + route tests  
        _Files_: `apps/backend/src/routes/orders.ts`, `apps/backend/src/routes/orders.test.ts` | _Est_: 320 lines | _Dep_: T-001, T-007 | _TDD_: yes
 
-- [ ] **T-010** — Mount `reservationsRouter` at `/v1/reservations` and `ordersRouter` at `/v1/orders` in `app.ts`  
-       _Files_: `apps/backend/src/app.ts` | _Est_: 5 lines | _Dep_: T-008, T-009 | _TDD_: no
+- [x] **T-010** — Mount `ordersRouter` at `/v1/orders` in `app.ts`  
+       _Files_: `apps/backend/src/app.ts` | _Est_: 5 lines | _Dep_: T-009 | _TDD_: no
 
 ---
 
