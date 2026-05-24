@@ -5,3 +5,4 @@ export * from "./refresh-tokens";
 export * from "./venture-members";
 export * from "./product-categories";
 export * from "./products";
+export * from "./base";

@@ -1,7 +1,7 @@
-import { pgTable, serial, varchar, integer, boolean, jsonb } from "drizzle-orm/pg-core";
-import { auditColumns } from "./base";
+import { serial, varchar, integer, boolean, jsonb } from "drizzle-orm/pg-core";
+import { auditColumns, impenetrableSchema } from "./base";
 
-export const projects = pgTable("projects", {
+export const projects = impenetrableSchema.table("projects", {
   zzz_id: serial("zzz_id").primaryKey(),
   zzz_name: varchar("zzz_name", { length: 100 }).notNull(),
   zzz_default_language: varchar("zzz_default_language", { length: 10 }).notNull().default("es"),

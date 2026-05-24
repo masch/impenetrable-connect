@@ -1,6 +1,6 @@
 import { sql, eq } from "drizzle-orm";
 import { createDb, type Db } from "./index";
-import { projects, users, ventures, productCategories, products } from "./schema";
+import { projects, users, ventures, productCategories, products, SCHEMA_NAME } from "./schema";
 import {
   MOCK_PROJECTS,
   MOCK_USERS,
@@ -16,10 +16,11 @@ import { getAppConfig } from "../config/env";
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Resets the sequence for a table to the current max id. */
+/** Resets the sequence for a table to the current max id in custom schema. */
 async function resetSequence(db: Db, table: string, pkColumn: string) {
+  const seqName = `"${SCHEMA_NAME}"."${table}_${pkColumn}_seq"`;
   await db.execute(
-    sql`SELECT setval(${`${table}_${pkColumn}_seq`}, (SELECT MAX(${sql.identifier(pkColumn)}) FROM ${sql.identifier(table)}))`,
+    sql`SELECT setval(${seqName}, (SELECT MAX(${sql.identifier(pkColumn)}) FROM ${sql.identifier(SCHEMA_NAME)}.${sql.identifier(table)}))`,
   );
 }
 

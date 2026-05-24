@@ -1,9 +1,13 @@
-import { pgTable, uuid, varchar, timestamp, pgEnum, integer, boolean } from "drizzle-orm/pg-core";
-import { auditColumns } from "./base";
+import { uuid, varchar, timestamp, integer, boolean } from "drizzle-orm/pg-core";
+import { auditColumns, impenetrableSchema } from "./base";
 
-export const userRoleEnum = pgEnum("user_role", ["ADMIN", "ENTREPRENEUR", "TOURIST"]);
+export const userRoleEnum = impenetrableSchema.enum("user_role", [
+  "ADMIN",
+  "ENTREPRENEUR",
+  "TOURIST",
+]);
 
-export const users = pgTable("users", {
+export const users = impenetrableSchema.table("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: varchar("email", { length: 255 }).unique(), // Nullable for tourists
   alias: varchar("alias", { length: 50 }).unique(), // For tourists

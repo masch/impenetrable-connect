@@ -1,12 +1,12 @@
 {
-  "id": "66a73ccf-49ec-43a3-bbc0-2043ebf0f6d4",
+  "id": "4a2c51c9-8740-4c5a-a671-c95fbdd9cdc2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.projects": {
+    "impenetrable_connect.projects": {
       "name": "projects",
-      "schema": "",
+      "schema": "impenetrable_connect",
       "columns": {
         "zzz_id": {
           "name": "zzz_id",
@@ -84,9 +84,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.users": {
+    "impenetrable_connect.users": {
       "name": "users",
-      "schema": "",
+      "schema": "impenetrable_connect",
       "columns": {
         "id": {
           "name": "id",
@@ -134,7 +134,7 @@
         "role": {
           "name": "role",
           "type": "user_role",
-          "typeSchema": "public",
+          "typeSchema": "impenetrable_connect",
           "primaryKey": false,
           "notNull": true,
           "default": "'ENTREPRENEUR'"
@@ -199,9 +199,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.ventures": {
+    "impenetrable_connect.ventures": {
       "name": "ventures",
-      "schema": "",
+      "schema": "impenetrable_connect",
       "columns": {
         "id": {
           "name": "id",
@@ -282,6 +282,7 @@
           "name": "ventures_owner_id_users_id_fk",
           "tableFrom": "ventures",
           "tableTo": "users",
+          "schemaTo": "impenetrable_connect",
           "columnsFrom": ["owner_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
@@ -291,6 +292,7 @@
           "name": "ventures_zzz_project_id_projects_zzz_id_fk",
           "tableFrom": "ventures",
           "tableTo": "projects",
+          "schemaTo": "impenetrable_connect",
           "columnsFrom": ["zzz_project_id"],
           "columnsTo": ["zzz_id"],
           "onDelete": "no action",
@@ -303,9 +305,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.refresh_tokens": {
+    "impenetrable_connect.refresh_tokens": {
       "name": "refresh_tokens",
-      "schema": "",
+      "schema": "impenetrable_connect",
       "columns": {
         "id": {
           "name": "id",
@@ -365,6 +367,7 @@
           "name": "refresh_tokens_user_id_users_id_fk",
           "tableFrom": "refresh_tokens",
           "tableTo": "users",
+          "schemaTo": "impenetrable_connect",
           "columnsFrom": ["user_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
@@ -377,9 +380,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.venture_members": {
+    "impenetrable_connect.venture_members": {
       "name": "venture_members",
-      "schema": "",
+      "schema": "impenetrable_connect",
       "columns": {
         "id": {
           "name": "id",
@@ -433,6 +436,7 @@
           "name": "venture_members_venture_id_ventures_id_fk",
           "tableFrom": "venture_members",
           "tableTo": "ventures",
+          "schemaTo": "impenetrable_connect",
           "columnsFrom": ["venture_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
@@ -442,6 +446,7 @@
           "name": "venture_members_user_id_users_id_fk",
           "tableFrom": "venture_members",
           "tableTo": "users",
+          "schemaTo": "impenetrable_connect",
           "columnsFrom": ["user_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
@@ -454,9 +459,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.product_categories": {
+    "impenetrable_connect.product_categories": {
       "name": "product_categories",
-      "schema": "",
+      "schema": "impenetrable_connect",
       "columns": {
         "zzz_id": {
           "name": "zzz_id",
@@ -516,6 +521,7 @@
           "name": "product_categories_zzz_project_id_projects_zzz_id_fk",
           "tableFrom": "product_categories",
           "tableTo": "projects",
+          "schemaTo": "impenetrable_connect",
           "columnsFrom": ["zzz_project_id"],
           "columnsTo": ["zzz_id"],
           "onDelete": "no action",
@@ -528,9 +534,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.products": {
+    "impenetrable_connect.products": {
       "name": "products",
-      "schema": "",
+      "schema": "impenetrable_connect",
       "columns": {
         "zzz_id": {
           "name": "zzz_id",
@@ -614,6 +620,7 @@
           "name": "products_zzz_product_category_id_product_categories_zzz_id_fk",
           "tableFrom": "products",
           "tableTo": "product_categories",
+          "schemaTo": "impenetrable_connect",
           "columnsFrom": ["zzz_product_category_id"],
           "columnsTo": ["zzz_id"],
           "onDelete": "no action",
@@ -628,9 +635,9 @@
     }
   },
   "enums": {
-    "public.user_role": {
+    "impenetrable_connect.user_role": {
       "name": "user_role",
-      "schema": "public",
+      "schema": "impenetrable_connect",
       "values": ["ADMIN", "ENTREPRENEUR", "TOURIST"]
     }
   },
