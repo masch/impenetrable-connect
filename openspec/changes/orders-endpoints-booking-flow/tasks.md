@@ -47,7 +47,7 @@ Chain strategy: pending
 
 **Dependency**: T-002, T-004
 
-- [ ] **T-005** — Implement `ReservationService` (create, getById, getAll with role-scoped subqueries, update) + unit tests (100% method coverage, role-scoping branches, empty/not-found cases)  
+- [x] **T-005** — Implement `ReservationService` (create, getById, getAll with role-scoped subqueries, update) + unit tests (100% method coverage, role-scoping branches, empty/not-found cases)  
        _Files_: `apps/backend/src/services/reservation.service.ts`, `apps/backend/src/services/reservation.service.test.ts` | _Est_: 160 lines | _Dep_: T-002, T-004 | _TDD_: yes
 
 - [ ] **T-006** — Implement `OrderService` core (status machine map, isValidTransition, isTerminal, getById, getAll with role-scoped filters, update with terminal-status guard, getByReservationId) + unit tests  
@@ -60,7 +60,7 @@ Chain strategy: pending
 
 **Dependency**: T-001, T-005, T-007
 
-- [ ] **T-008** — Implement reservation routes (POST `/` with roleGuard TOURIST, GET `/`, GET `/:id`, PATCH `/:id` with future-date + non-cancelled checks) + route tests (each endpoint: 200, 400, 401, 404, 500; PATCH: 403)  
+- [x] **T-008** — Implement reservation routes (POST `/` with roleGuard TOURIST, GET `/`, GET `/:id`, PATCH `/:id` with future-date + non-cancelled checks) + route tests (each endpoint: 200, 400, 401, 404, 500; PATCH: 403)  
        _Files_: `apps/backend/src/routes/reservations.ts`, `apps/backend/src/routes/reservations.test.ts` | _Est_: 280 lines | _Dep_: T-001, T-005 | _TDD_: yes
 
 - [ ] **T-009** — Implement order routes (POST `/` with roleGuard TOURIST + OrderServiceError mapping, GET `/` with filters, PATCH `/:id` with terminal-check, PATCH `/:id/status` with roleGuard ENTREPRENEUR/ADMIN) + route tests  
