@@ -8,7 +8,10 @@ const VENTURE_CONSTRAINTS = {
 
 export const VentureSchema = z.object({
   id: z.number().int(),
-  name: z.string().min(VENTURE_CONSTRAINTS.NAME_MIN_LENGTH).max(VENTURE_CONSTRAINTS.NAME_MAX_LENGTH),
+  name: z
+    .string()
+    .min(VENTURE_CONSTRAINTS.NAME_MIN_LENGTH)
+    .max(VENTURE_CONSTRAINTS.NAME_MAX_LENGTH),
   ownerId: z.string().uuid(),
   zzz_max_capacity: z.number().int().default(0),
   zzz_cascade_order: z.number().int().default(0),

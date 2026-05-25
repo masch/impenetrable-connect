@@ -69,7 +69,8 @@ describe("Agenda Store", () => {
 
   it("should calculate occupation based on zzz_guest_count and ignore CANCELLED orders", () => {
     const UUID_PAD_LENGTH = 12;
-    const mockId = (n: number): string => `00000000-0000-0000-0000-${String(n).padStart(UUID_PAD_LENGTH, "0")}`;
+    const mockId = (n: number): string =>
+      `00000000-0000-0000-0000-${String(n).padStart(UUID_PAD_LENGTH, "0")}`;
     const mockOrders: Order[] = [
       {
         zzz_id: mockId(1),
