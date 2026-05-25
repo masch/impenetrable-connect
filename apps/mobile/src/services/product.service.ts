@@ -127,6 +127,7 @@ const MockProductService: ProductServiceInterface = {
     const newOrder: Order = {
       zzz_id: orderId,
       zzz_reservation_id: reservation.zzz_id,
+      zzz_reservation: reservation,
       zzz_product_category_id: firstService.zzz_product_category_id,
       zzz_confirmed_venture_id: null,
       zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
@@ -135,13 +136,15 @@ const MockProductService: ProductServiceInterface = {
       zzz_cancel_reason: null,
       zzz_items: items.map((item) => {
         const s = mockProducts.find((service) => service.zzz_id === item.zzz_catalog_item_id);
+        if (!s) throw new Error(`Service not found: ${item.zzz_catalog_item_id}`);
         return {
           zzz_id: mockId(Math.floor(Math.random() * MOCK_ID_RANGE)),
           zzz_order_id: orderId,
           zzz_catalog_item_id: item.zzz_catalog_item_id,
           zzz_quantity: item.zzz_quantity,
-          zzz_price: s?.zzz_price || 0,
+          zzz_price: s.zzz_price,
           zzz_notes: item.zzz_notes ?? undefined,
+          zzz_catalog_item: s,
         };
       }),
       zzz_cancelled_at: null,
@@ -331,3 +334,9 @@ const RestProductService: ProductServiceInterface = {
  * EXPORT: The smart switch
  */
 export const ProductService = env.USE_MOCKS ? MockProductService : RestProductService;
+
+/**
+ * Exported for testing — allows direct verification of mock behavior
+ * without re-importing with USE_MOCKS=true.
+ */
+export { MockProductService };

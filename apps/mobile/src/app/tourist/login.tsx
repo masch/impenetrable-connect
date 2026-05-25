@@ -5,11 +5,17 @@ import { useRouter } from "expo-router";
 import Screen from "../../components/Screen";
 import { Button } from "../../components/Button";
 import { FormInput } from "../../components/FormInput";
+import { Icon } from "../../components/Icon";
+import LoadingView from "../../components/LoadingView";
 import { useTranslations } from "../../hooks/useI18n";
 import { useAuthStore } from "../../stores/auth.store";
-import { CreateUserInput, UserRole } from "@repo/shared";
+import { COLORS, CreateUserInput, UserRole } from "@repo/shared";
 import jaguarHero from "../../../assets/jaguar-hero.png";
-import { logger } from "../../services/logger.service";
+
+const IMAGE_TRANSITION_DURATION = 200;
+const ICON_SIZE_ALERT = 20;
+
+const toNullable = (v: string | undefined): string | null => (v ? v : null);
 
 interface LoginFormData {
   alias: string;
@@ -32,6 +38,8 @@ export default function LoginScreen() {
     lastName: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -39,19 +47,21 @@ export default function LoginScreen() {
       newErrors.alias = t("login.alias_required");
     }
     setErrors(newErrors);
+    setSubmissionError(null);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = () => {
-    if (!validateForm()) {
+    if (!validateForm() || isLoading) {
       return;
     }
-    const toNullable = (v: string | undefined) => (v ? v : null);
+    setSubmissionError(null);
+    setIsLoading(true);
     const userData: CreateUserInput = {
       alias: formData.alias.trim(),
-      firstName: toNullable(formData.firstName.trim()) || null,
-      lastName: toNullable(formData.lastName.trim()) || null,
-      phoneNumber: toNullable(formData.phoneNumber.trim()) || null,
+      firstName: toNullable(formData.firstName.trim()),
+      lastName: toNullable(formData.lastName.trim()),
+      phoneNumber: toNullable(formData.phoneNumber.trim()),
       role: UserRole.TOURIST,
       email: null,
     };
@@ -60,8 +70,11 @@ export default function LoginScreen() {
       .then(() => {
         replace("/tourist");
       })
-      .catch((error) => {
-        logger.error("Registration failed", error);
+      .catch(() => {
+        setSubmissionError(t("login.errors.registration_failed"));
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -70,10 +83,15 @@ export default function LoginScreen() {
     if (errors[field as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
+    // Clear submission error when user starts typing again
+    if (submissionError) {
+      setSubmissionError(null);
+    }
   };
 
   return (
     <Screen>
+      {isLoading && <LoadingView />}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
@@ -84,13 +102,13 @@ export default function LoginScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View className="max-w-md mx-auto w-full">
-            <View className="relative w-full h-40 bg-surface-container-low">
+            <View className="relative w-full h-40 bg-surface-container-low overflow-hidden">
               <Image
                 source={jaguarHero}
                 accessibilityLabel="Yaguareté in the Chaco"
                 className="w-full h-full flex-1"
                 contentFit="cover"
-                transition={200}
+                transition={IMAGE_TRANSITION_DURATION}
               />
             </View>
 
@@ -151,10 +169,22 @@ export default function LoginScreen() {
         </ScrollView>
 
         <View className="p-5 bg-surface/85 backdrop-blur-sm max-w-md mx-auto w-full">
+          {submissionError && (
+            <View
+              className="flex-row items-center gap-2 mb-3 px-4 py-3 rounded-xl bg-error-container border border-error/20"
+              accessibilityRole="alert"
+              accessibilityLabel={submissionError}
+              testID="registration-error"
+            >
+              <Icon name="alert-circle" size={ICON_SIZE_ALERT} color={COLORS.error} />
+              <Text className="text-sm font-body text-error flex-1">{submissionError}</Text>
+            </View>
+          )}
           <Button
             title={t("login.submit_button")}
             onPress={handleSubmit}
             icon="→"
+            testID="login-submit"
             accessibilityLabel={t("login.submit_button")}
             accessibilityHint={t("accessibility.login_submit_hint")}
           />

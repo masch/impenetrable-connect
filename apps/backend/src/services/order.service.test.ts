@@ -1,7 +1,14 @@
 import { describe, expect, it } from "bun:test";
 import { OrderService, OrderServiceError } from "./order.service";
 import { type Db } from "../db";
-import { reservations, productCategories, ventures, products, orders } from "../db/schema";
+import {
+  reservations,
+  productCategories,
+  ventures,
+  products,
+  orders,
+  orderItems,
+} from "../db/schema";
 
 describe("OrderService", () => {
   const mockOrder = {
@@ -28,6 +35,10 @@ describe("OrderService", () => {
     zzz_status: "CREATED" as const,
     zzz_guest_count: 2,
     zzz_service_at: new Date("2026-05-25T12:00:00.000Z"),
+    zzz_time_of_day: "LUNCH" as const,
+    zzzCreatedAt: new Date("2026-05-24T00:00:00.000Z"),
+    zzzUpdatedAt: new Date("2026-05-24T00:00:00.000Z"),
+    zzzDeletedAt: null as Date | null,
   };
 
   // --- Helpers ---
@@ -139,69 +150,182 @@ describe("OrderService", () => {
   });
 
   describe("getAll", () => {
-    it("should return all orders for ADMIN", async () => {
-      const mockDb = {
-        select: () => ({
-          from: () => createListBuilder([mockOrder]),
-        }),
-      } as unknown as Db;
+    // Shared mockDB factory for getAll tests.
+    // Returns a mock that handles:
+    //  - orders table → [mockOrder]
+    //  - reservations table → [mockReservation]
+    //  - orderItems table → [mockOrderItem]
+    //  - products table → [mockCatalogProduct]
+    const mockCatalogProduct = {
+      zzz_id: 1,
+      zzz_product_category_id: 1,
+      zzz_name_i18n: { en: "Test Product", es: "Producto de Prueba" },
+      zzz_description_i18n: null as Record<string, string> | null,
+      zzz_price: 25_000,
+      zzz_max_participants: 4,
+      zzz_image_url: null as string | null,
+      zzz_global_pause: false,
+      zzz_service_moments: null as string[] | null,
+      zzzCreatedAt: new Date("2026-05-24T00:00:00.000Z"),
+      zzzUpdatedAt: new Date("2026-05-24T00:00:00.000Z"),
+      zzzDeletedAt: null as Date | null,
+    };
 
-      const result = await OrderService.getAll(mockDb, {}, "ADMIN" as never, "user-1");
-      expect(result).toEqual([mockOrder]);
+    const mockOrderItem = {
+      zzz_id: "item-1",
+      zzz_order_id: mockOrder.zzz_id,
+      zzz_catalog_item_id: 1,
+      zzz_quantity: 2,
+      zzz_price: 25_000,
+      zzz_notes: null as string | null,
+      zzzCreatedAt: new Date("2026-05-24T00:00:00.000Z"),
+      zzzUpdatedAt: new Date("2026-05-24T00:00:00.000Z"),
+      zzzDeletedAt: null as Date | null,
+    };
+
+    const mockDbFactory = () =>
+      ({
+        select: () => ({
+          from: (table: unknown) => {
+            if (table === orderItems) {
+              return createListBuilder([mockOrderItem]);
+            }
+            if (table === products) {
+              return createListBuilder([mockCatalogProduct]);
+            }
+            if (table === reservations) {
+              return createListBuilder([mockReservation]);
+            }
+            return createListBuilder([mockOrder]);
+          },
+        }),
+      }) as unknown as Db;
+
+    const enrichedItem = {
+      ...mockOrderItem,
+      zzz_price: 25_000,
+      zzz_catalog_item: {
+        zzz_id: mockCatalogProduct.zzz_id,
+        zzz_product_category_id: mockCatalogProduct.zzz_product_category_id,
+        zzz_name_i18n: mockCatalogProduct.zzz_name_i18n,
+        zzz_description_i18n: mockCatalogProduct.zzz_description_i18n,
+        zzz_price: mockCatalogProduct.zzz_price,
+        zzz_max_participants: mockCatalogProduct.zzz_max_participants,
+        zzz_image_url: mockCatalogProduct.zzz_image_url,
+        zzz_global_pause: mockCatalogProduct.zzz_global_pause,
+        zzz_service_moments: mockCatalogProduct.zzz_service_moments,
+      },
+    };
+
+    const expectedOrder = {
+      ...mockOrder,
+      zzz_reservation: mockReservation,
+      zzz_items: [enrichedItem],
+    };
+
+    it("should return all orders for ADMIN", async () => {
+      const result = await OrderService.getAll(mockDbFactory(), {}, "ADMIN" as never, "user-1");
+      expect(result).toEqual([expectedOrder]);
     });
 
     it("should filter by reservation for TOURIST", async () => {
-      const mockDb = {
-        select: () => ({
-          from: () => createListBuilder([mockOrder]),
-        }),
-      } as unknown as Db;
-
-      const result = await OrderService.getAll(mockDb, {}, "TOURIST" as never, "user-1");
-      expect(result).toEqual([mockOrder]);
+      const result = await OrderService.getAll(mockDbFactory(), {}, "TOURIST" as never, "user-1");
+      expect(result).toEqual([expectedOrder]);
     });
 
     it("should filter by venture for ENTREPRENEUR", async () => {
-      const mockDb = {
-        select: () => ({
-          from: () => createListBuilder([mockOrder]),
-        }),
-      } as unknown as Db;
-
-      const result = await OrderService.getAll(mockDb, {}, "ENTREPRENEUR" as never, "user-1");
-      expect(result).toEqual([mockOrder]);
+      const result = await OrderService.getAll(
+        mockDbFactory(),
+        {},
+        "ENTREPRENEUR" as never,
+        "user-1",
+      );
+      expect(result).toEqual([expectedOrder]);
     });
 
     it("should apply status filter", async () => {
-      const mockDb = {
-        select: () => ({
-          from: () => createListBuilder([mockOrder]),
-        }),
-      } as unknown as Db;
-
       const result = await OrderService.getAll(
-        mockDb,
+        mockDbFactory(),
         { status: "SEARCHING" },
         "ADMIN" as never,
         "user-1",
       );
-      expect(result).toEqual([mockOrder]);
+      expect(result).toEqual([expectedOrder]);
     });
 
     it("should apply reservation_id filter", async () => {
-      const mockDb = {
-        select: () => ({
-          from: () => createListBuilder([mockOrder]),
-        }),
-      } as unknown as Db;
-
       const result = await OrderService.getAll(
-        mockDb,
+        mockDbFactory(),
         { reservation_id: "res-1" },
         "ADMIN" as never,
         "user-1",
       );
-      expect(result).toEqual([mockOrder]);
+      expect(result).toEqual([expectedOrder]);
+    });
+
+    it("should return empty array when no orders match", async () => {
+      const emptyDb = {
+        select: () => ({
+          from: () => createListBuilder([]),
+        }),
+      } as unknown as Db;
+
+      const result = await OrderService.getAll(emptyDb, {}, "ADMIN" as never, "user-1");
+      expect(result).toEqual([]);
+    });
+
+    it("should return order with empty zzz_items when no order_items exist", async () => {
+      const noItemsDb = {
+        select: () => ({
+          from: (table: unknown) => {
+            if (table === orderItems) {
+              return createListBuilder([]);
+            }
+            if (table === products) {
+              return createListBuilder([]);
+            }
+            if (table === reservations) {
+              return createListBuilder([mockReservation]);
+            }
+            return createListBuilder([mockOrder]);
+          },
+        }),
+      } as unknown as Db;
+
+      const result = await OrderService.getAll(noItemsDb, {}, "ADMIN" as never, "user-1");
+      expect(result).toHaveLength(1);
+      expect(result[0].zzz_items).toEqual([]);
+      expect(result[0].zzz_reservation).toEqual(mockReservation);
+    });
+
+    it("should set zzz_catalog_item to undefined when product not found in catalog", async () => {
+      const unknownProductItem = {
+        ...mockOrderItem,
+        zzz_catalog_item_id: 999,
+      };
+
+      const missingProductDb = {
+        select: () => ({
+          from: (table: unknown) => {
+            if (table === orderItems) {
+              return createListBuilder([unknownProductItem]);
+            }
+            if (table === products) {
+              return createListBuilder([]);
+            }
+            if (table === reservations) {
+              return createListBuilder([mockReservation]);
+            }
+            return createListBuilder([mockOrder]);
+          },
+        }),
+      } as unknown as Db;
+
+      const result = await OrderService.getAll(missingProductDb, {}, "ADMIN" as never, "user-1");
+      expect(result).toHaveLength(1);
+      expect(result[0].zzz_items).toHaveLength(1);
+      expect(result[0].zzz_items[0].zzz_catalog_item_id).toBe(999);
+      expect(result[0].zzz_items[0].zzz_catalog_item).toBeUndefined();
     });
   });
 
@@ -406,6 +530,24 @@ describe("OrderService", () => {
       expect(result.zzz_global_status).toBe("OFFER_PENDING");
       expect(result.zzz_current_offer_venture_id).toBe(1);
       expect(result.zzz_items).toHaveLength(2);
+    });
+
+    it("should preserve zzz_notes on each item when creating an order", async () => {
+      const inputWithNotes = {
+        ...validInput,
+        zzz_items: [
+          { zzz_catalog_item_id: 1, zzz_quantity: 2, zzz_notes: "Sin cebolla" },
+          { zzz_catalog_item_id: 2, zzz_quantity: 1, zzz_notes: "Bien cocida" },
+        ],
+      };
+
+      const mockDb = createTxDb([mockReservation], [mockProduct1, mockProduct2]);
+
+      const result = await OrderService.create(mockDb, "user-1", inputWithNotes);
+
+      expect(result.zzz_items).toHaveLength(2);
+      expect(result.zzz_items[0].zzz_notes).toBe("Sin cebolla");
+      expect(result.zzz_items[1].zzz_notes).toBe("Bien cocida");
     });
 
     it("should reject if reservation does not exist", async () => {

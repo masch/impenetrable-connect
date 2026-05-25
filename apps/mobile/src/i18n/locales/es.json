@@ -41,7 +41,10 @@
     "email_label": "Email",
     "password_label": "Contraseña",
     "admin_portal": "Portal de Administrador",
-    "entrepreneur_panel": "Panel de Emprendedor"
+    "entrepreneur_panel": "Panel de Emprendedor",
+    "errors": {
+      "registration_failed": "Error al registrarse. Revisá tu conexión e intentá de nuevo."
+    }
   },
   "validation": {
     "name_required": "El nombre es requerido",

@@ -1,4 +1,6 @@
 import { apiClient } from "../api-client";
+import { mockSetCurrentUser } from "../auth-state";
+import { UserRole } from "@repo/shared";
 
 jest.mock("../api-client", () => ({
   apiClient: {
@@ -15,7 +17,7 @@ jest.mock("../../config/env", () => ({
 }));
 
 import { createHourMinute } from "@repo/shared";
-import { ProductService } from "../product.service";
+import { ProductService, MockProductService } from "../product.service";
 
 describe("RestProductService", () => {
   beforeEach(() => {
@@ -214,6 +216,61 @@ describe("RestProductService", () => {
       expect(apiClient.patch).toHaveBeenCalledWith("/reservations/res-uuid-rollback", {
         zzz_status: "CANCELLED",
       });
+    });
+  });
+
+  describe("MockProductService.placeOrder", () => {
+    beforeAll(() => {
+      // Ensure the mock auth state has a logged-in user so
+      // isMockUserLoggedIn() / getMockUserId() work for the mock path.
+      mockSetCurrentUser({ id: "test-user-1", role: UserRole.TOURIST } as never);
+    });
+
+    it("should return an order with zzz_reservation and zzz_catalog_item on items", async () => {
+      const date = new Date("2026-05-28T12:00:00.000Z");
+
+      const result = await MockProductService.placeOrder(
+        date,
+        "LUNCH",
+        [{ zzz_catalog_item_id: 1, zzz_quantity: 2 }],
+        2,
+        "Test notes for mock",
+        createHourMinute("12:00"),
+      );
+
+      // Verify the reservation was attached
+      expect(result.zzz_reservation).toBeDefined();
+      expect(result.zzz_reservation?.zzz_id).toBeDefined();
+      // combineDateAndTime returns local ISO string (e.g. -03:00), not UTC Z
+      expect(result.zzz_reservation?.zzz_service_at).toMatch(/^2026-05-28T(12:00:00|15:00:00)/);
+      expect(result.zzz_reservation?.zzz_time_of_day).toBe("LUNCH");
+      expect(result.zzz_reservation?.zzz_guest_count).toBe(2);
+
+      // Verify items have catalog enrichment
+      expect(result.zzz_items).toHaveLength(1);
+      const item = result.zzz_items[0];
+      expect(item.zzz_catalog_item_id).toBe(1);
+      expect(item.zzz_quantity).toBe(2);
+      expect(item.zzz_catalog_item).toBeDefined();
+      expect(item.zzz_catalog_item?.zzz_name_i18n).toBeDefined();
+      expect(item.zzz_catalog_item?.zzz_price).toBeGreaterThan(0);
+    });
+
+    it("should include zzz_reservation on the order", async () => {
+      const date = new Date("2026-05-28T14:00:00.000Z");
+
+      const result = await MockProductService.placeOrder(
+        date,
+        "DINNER",
+        [{ zzz_catalog_item_id: 2, zzz_quantity: 1 }],
+        1,
+        undefined,
+        createHourMinute("14:00"),
+      );
+
+      expect(result.zzz_reservation).toBeDefined();
+      expect(result.zzz_reservation!.zzz_id).toBe(result.zzz_reservation_id);
+      expect(result.zzz_reservation!.zzz_service_at).toMatch(/^2026-05-28T14:00:00/);
     });
   });
 });
