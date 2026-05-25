@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Project } from "@repo/shared";
+import { Project, CreateProjectInput, UpdateProjectInput } from "@repo/shared";
 import { ProjectService } from "../services/project.service";
 import { logger } from "../services/logger.service";
 import { mapNetworkError } from "../services/api-utils";
@@ -14,8 +14,8 @@ interface ProjectState {
   // Actions
   fetchProjects: () => Promise<void>;
   selectProject: (id: number) => Promise<void>;
-  createProject: (project: Omit<Project, "zzz_id">) => Promise<Project | null>;
-  updateProject: (id: number, project: Partial<Project>) => Promise<Project | null>;
+  createProject: (project: CreateProjectInput) => Promise<Project | null>;
+  updateProject: (id: number, project: UpdateProjectInput) => Promise<Project | null>;
   deleteProject: (id: number) => Promise<boolean>;
   setSelectedProject: (project: Project | null) => void;
 }
@@ -54,7 +54,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     }
   },
 
-  createProject: async (project: Omit<Project, "zzz_id">) => {
+  createProject: async (project: CreateProjectInput) => {
     set({ isSaving: true, error: null });
     try {
       const newProject = await ProjectService.createProject(project);
@@ -68,7 +68,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     }
   },
 
-  updateProject: async (id: number, project: Partial<Project>) => {
+  updateProject: async (id: number, project: UpdateProjectInput) => {
     set({ isSaving: true, error: null });
     try {
       const updatedProject = await ProjectService.updateProject(id, project);

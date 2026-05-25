@@ -12,6 +12,7 @@ describe("ProjectCard", () => {
     zzz_cascade_timeout_minutes: 30,
     zzz_max_cascade_attempts: 10,
     zzz_is_active: true,
+    zzz_timezone: "America/Argentina/Buenos_Aires",
   };
 
   it("should render project name", () => {

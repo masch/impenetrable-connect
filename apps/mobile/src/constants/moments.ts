@@ -4,8 +4,11 @@ import {
   type Timezone,
   type HourMinute,
   createHourMinute,
+  getDefaultProject,
 } from "@repo/shared";
 import { COLORS } from "@repo/shared";
+import { useProjectStore } from "../stores/project.store";
+import { getDatePartsInTimezone } from "../utils/date";
 
 /**
  * Service moment definitions with icons, colors, and time ranges
@@ -142,22 +145,26 @@ export function isMomentExpired(moment: ServiceMoment, selectedDate: Date | null
 
   if (!selectedDate) return false;
 
-  // Only validate for today
   const now = new Date();
+
+  // Retrieve active project timezone dynamically, falling back to active project default
+  const timezone =
+    useProjectStore.getState().selectedProject?.zzz_timezone || getDefaultProject().zzz_timezone;
+
+  const nowParts = getDatePartsInTimezone(now, timezone);
+  const selectedParts = getDatePartsInTimezone(selectedDate, timezone);
+
   const isToday =
-    selectedDate.getFullYear() === now.getFullYear() &&
-    selectedDate.getMonth() === now.getMonth() &&
-    selectedDate.getDate() === now.getDate();
+    selectedParts.year === nowParts.year &&
+    selectedParts.month === nowParts.month &&
+    selectedParts.day === nowParts.day;
 
   if (!isToday) return false;
 
-  // Compare current time in Argentina TZ against moment's end time
   const [endHours, endMinutes] = config.endTime.split(":").map(Number);
-  const currentHours = now.getHours();
-  const currentMinutes = now.getMinutes();
 
-  if (currentHours > endHours) return true;
-  if (currentHours === endHours && currentMinutes >= endMinutes) return true;
+  if (nowParts.hours > endHours) return true;
+  if (nowParts.hours === endHours && nowParts.minutes >= endMinutes) return true;
 
   return false;
 }

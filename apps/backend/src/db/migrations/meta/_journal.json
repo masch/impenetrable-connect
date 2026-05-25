@@ -8,6 +8,20 @@
       "when": 1779579550800,
       "tag": "0000_initial-schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779657051252,
+      "tag": "0001_add_project_timezone",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779659142551,
+      "tag": "0002_remove_project_timezone_default",
+      "breakpoints": true
     }
   ]
 }

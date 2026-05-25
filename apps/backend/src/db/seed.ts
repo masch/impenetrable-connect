@@ -42,6 +42,7 @@ async function seedProjects(db: Db) {
         zzz_cascade_timeout_minutes: project.zzz_cascade_timeout_minutes,
         zzz_max_cascade_attempts: project.zzz_max_cascade_attempts,
         zzz_is_active: project.zzz_is_active,
+        zzz_timezone: project.zzz_timezone,
       })
       .onConflictDoUpdate({
         target: projects.zzz_id,
@@ -52,6 +53,7 @@ async function seedProjects(db: Db) {
           zzz_cascade_timeout_minutes: project.zzz_cascade_timeout_minutes,
           zzz_max_cascade_attempts: project.zzz_max_cascade_attempts,
           zzz_is_active: project.zzz_is_active,
+          zzz_timezone: project.zzz_timezone,
         },
       });
   }

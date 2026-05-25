@@ -22,6 +22,7 @@ const mockProject = {
   zzz_supported_languages: ["es"],
   zzz_cascade_timeout_minutes: 30,
   zzz_max_cascade_attempts: 10,
+  zzz_timezone: "America/Argentina/Buenos_Aires",
 };
 
 const mockUpdateProject = jest.fn();
