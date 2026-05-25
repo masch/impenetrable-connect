@@ -91,7 +91,8 @@ describe("OrderScreen (Tourist)", () => {
 
   it("should render reservation notes in active orders", () => {
     const UUID_PAD_LENGTH = 12;
-    const mockId = (n: number): string => `00000000-0000-0000-0000-${String(n).padStart(UUID_PAD_LENGTH, "0")}`;
+    const mockId = (n: number): string =>
+      `00000000-0000-0000-0000-${String(n).padStart(UUID_PAD_LENGTH, "0")}`;
     const mockNotes = "Alérgico a las nueces y frutos secos.";
     const mockOrder: Order = {
       zzz_id: mockId(10),
