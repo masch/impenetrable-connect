@@ -90,12 +90,13 @@ describe("OrderScreen (Tourist)", () => {
   });
 
   it("should render reservation notes in active orders", () => {
-    const mockId = (n: number): string => `00000000-0000-0000-0000-${String(n).padStart(12, "0")}`;
+    const UUID_PAD_LENGTH = 12;
+    const mockId = (n: number): string => `00000000-0000-0000-0000-${String(n).padStart(UUID_PAD_LENGTH, "0")}`;
     const mockNotes = "Alérgico a las nueces y frutos secos.";
     const mockOrder: Order = {
       zzz_id: mockId(10),
       zzz_reservation_id: mockId(2),
-      zzz_catalog_type_id: 1,
+      zzz_product_category_id: 1,
       zzz_global_status: "CONFIRMED",
       zzz_confirmed_venture_id: 1,
       zzz_notes: mockNotes,
@@ -138,6 +139,7 @@ describe("OrderScreen (Tourist)", () => {
         zzz_is_paused: false,
         zzz_is_active: true,
         zzz_project_id: 1,
+        zzz_product_category_id: 1,
       },
     };
 

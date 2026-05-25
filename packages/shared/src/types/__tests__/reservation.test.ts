@@ -23,7 +23,7 @@ describe("ReservationSchema", () => {
         {
           zzz_id: UUID_B,
           zzz_reservation_id: UUID_A,
-          zzz_catalog_type_id: 1,
+          zzz_product_category_id: 1,
           zzz_global_status: "SEARCHING",
           zzz_items: [
             {

@@ -12,6 +12,7 @@ describe("VentureSchema", () => {
       zzz_is_paused: false,
       zzz_is_active: true,
       zzz_project_id: 1,
+      zzz_product_category_id: 1,
       createdAt: now,
       updatedAt: now,
       zzz_members: [
@@ -37,6 +38,7 @@ describe("VentureSchema", () => {
       zzz_is_paused: false,
       zzz_is_active: true,
       zzz_project_id: 1,
+      zzz_product_category_id: 1,
       createdAt: now,
       updatedAt: now,
       zzz_members: [],

@@ -74,6 +74,7 @@ describe("VentureService", () => {
           zzz_is_paused: false,
           zzz_is_active: true,
           zzz_project_id: 1,
+          zzz_product_category_id: 1,
         };
 
         const created = await MockVentureService.createVenture(newVenture);
@@ -91,6 +92,7 @@ describe("VentureService", () => {
           zzz_is_paused: false,
           zzz_is_active: true,
           zzz_project_id: 1,
+          zzz_product_category_id: 1,
         };
 
         await MockVentureService.createVenture(newVenture);
@@ -111,6 +113,7 @@ describe("VentureService", () => {
           zzz_is_paused: false,
           zzz_is_active: true,
           zzz_project_id: 1,
+          zzz_product_category_id: 1,
         };
 
         const created = await MockVentureService.createVenture(newVenture);
@@ -133,6 +136,7 @@ describe("VentureService", () => {
           zzz_is_paused: false,
           zzz_is_active: true,
           zzz_project_id: 1,
+          zzz_product_category_id: 1,
         };
 
         const created = await MockVentureService.createVenture(newVenture);
@@ -231,6 +235,7 @@ describe("VentureService", () => {
           zzz_is_paused: false,
           zzz_is_active: true,
           zzz_project_id: 1,
+          zzz_product_category_id: 1,
         });
 
         expect(globalThis.fetch).toHaveBeenCalledWith(

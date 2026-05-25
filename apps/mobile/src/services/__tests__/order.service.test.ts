@@ -50,7 +50,7 @@ describe("RestOrderService", () => {
     it("should call apiClient.post with the input body", async () => {
       const input = {
         zzz_reservation_id: "res-1",
-        zzz_catalog_type_id: 2,
+        zzz_product_category_id: 2,
         zzz_notify_whatsapp: false,
         zzz_items: [{ zzz_catalog_item_id: 5, zzz_quantity: 2 }],
       };

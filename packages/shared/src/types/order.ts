@@ -23,7 +23,7 @@ const ORDER_CONSTRAINTS = {
 export const OrderDbSchema = z.object({
   zzz_id: z.string().uuid(),
   zzz_reservation_id: z.string().uuid(),
-  zzz_catalog_type_id: z.number().int().positive(),
+  zzz_product_category_id: z.number().int().positive(),
   zzz_confirmed_venture_id: z.number().int().positive().nullable().optional(),
   zzz_notes: z.string().nullable().optional(),
   /**
@@ -73,7 +73,7 @@ const OrderItemInputSchema = z.object({
 
 export const CreateOrderInputSchema = z.object({
   zzz_reservation_id: z.string().uuid("Reservation ID must be a valid UUID"),
-  zzz_catalog_type_id: z.number().int().positive("Catalog type ID must be positive"),
+  zzz_product_category_id: z.number().int().positive("Product category ID must be positive"),
   zzz_notes: z
     .string()
     .max(ORDER_CONSTRAINTS.NOTES_MAX_LENGTH, "Notes must be under 1000 characters")

@@ -88,6 +88,7 @@ describe("Ventures API", () => {
       zzz_project_id: 1,
       zzz_max_capacity: 10,
       zzz_is_active: true,
+      zzz_product_category_id: 1,
     };
 
     const res = await app.request(
@@ -148,6 +149,7 @@ describe("Ventures API", () => {
       name: "Failing Venture",
       ownerId: "123e4567-e89b-12d3-a456-426614174000",
       zzz_project_id: 1,
+      zzz_product_category_id: 1,
     };
 
     const res = await app.request(
