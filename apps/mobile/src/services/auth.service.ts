@@ -14,6 +14,9 @@ import { findUserByAlias, findUserByEmail } from "../mocks/users";
 import { getAuthState } from "./auth-state";
 import { mapNetworkError, handleResponse } from "./api-utils";
 
+const MOCK_DELAY_MS = 500;
+const MOCK_SHORT_DELAY_MS = 200;
+
 /**
  * Validate data using Zod schemas
  */
@@ -37,7 +40,7 @@ interface AuthServiceInterface {
 
 const MockAuthService: AuthServiceInterface = {
   login: async (input: LoginInput) => {
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, MOCK_DELAY_MS));
     // Validate input using Zod
     const validated = validateData(input, LoginInputSchema);
     const state = getAuthState();
@@ -67,7 +70,7 @@ const MockAuthService: AuthServiceInterface = {
   },
 
   createTourist: async (input: CreateUserInput) => {
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, MOCK_DELAY_MS));
     const validated = validateData(input, CreateUserInputSchema);
     const state = getAuthState();
 
@@ -93,12 +96,12 @@ const MockAuthService: AuthServiceInterface = {
   },
 
   getCurrentUser: async () => {
-    await new Promise((r) => setTimeout(r, 200));
+    await new Promise((r) => setTimeout(r, MOCK_SHORT_DELAY_MS));
     return getAuthState().currentUser;
   },
 
   logout: async () => {
-    await new Promise((r) => setTimeout(r, 200));
+    await new Promise((r) => setTimeout(r, MOCK_SHORT_DELAY_MS));
     getAuthState().currentUser = null;
   },
 };
@@ -124,7 +127,7 @@ const RestAuthService: AuthServiceInterface = {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
       });
-      return handleResponse<AuthResponse>(response, "errors.reservation_failed");
+      return handleResponse<AuthResponse>(response, "login.errors.registration_failed");
     } catch (error) {
       throw mapNetworkError(error);
     }

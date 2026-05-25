@@ -1,7 +1,13 @@
 import { eq, and, desc, inArray, sql, type SQL } from "drizzle-orm";
 import { type Db } from "../db";
-import { orders, orderItems, reservations, ventures, productCategories } from "../db/schema";
-import { products } from "../db/schema/products";
+import {
+  orders,
+  orderItems,
+  reservations,
+  ventures,
+  productCategories,
+  products,
+} from "../db/schema";
 import type {
   CreateOrderInput,
   UpdateOrderInput,
@@ -169,12 +175,13 @@ export class OrderService {
         zzz_catalog_item_id: item.zzz_catalog_item_id,
         zzz_quantity: item.zzz_quantity,
         zzz_price: priceMap.get(item.zzz_catalog_item_id)!,
+        zzz_notes: item.zzz_notes ?? null,
       }));
 
       // 4. Insert order items
       const insertedItems = await tx.insert(orderItems).values(itemsToInsert).returning();
 
-      return { ...order, zzz_items: insertedItems };
+      return { ...order, zzz_items: insertedItems, zzz_reservation: reservation };
     });
   }
 
@@ -239,7 +246,83 @@ export class OrderService {
 
     const query = db.select().from(orders);
     const finalQuery = conditions.length > 0 ? query.where(and(...conditions)) : query;
-    return finalQuery.orderBy(desc(orders.zzzCreatedAt)).limit(limit).offset(offset);
+    const results = await finalQuery.orderBy(desc(orders.zzzCreatedAt)).limit(limit).offset(offset);
+
+    // Populate zzz_reservation for each order so the mobile app can filter
+    // by zzz_service_at and group by moment without extra API calls.
+    const reservationIds = results
+      .map((o) => o.zzz_reservation_id)
+      .filter((id): id is string => !!id);
+
+    const reservationMap = new Map<string, typeof reservations.$inferSelect>();
+    if (reservationIds.length > 0) {
+      const reservationRows = await db
+        .select()
+        .from(reservations)
+        .where(inArray(reservations.zzz_id, reservationIds));
+      for (const r of reservationRows) {
+        reservationMap.set(r.zzz_id, r);
+      }
+    }
+
+    // Populate zzz_items with product catalog data for the ReservartionCard display.
+    const orderIds = results.map((o) => o.zzz_id);
+    const itemsByOrderId = new Map<string, (typeof orderItems.$inferSelect)[]>();
+    const productMap = new Map<number, typeof products.$inferSelect>();
+
+    if (orderIds.length > 0) {
+      const itemRows = await db
+        .select()
+        .from(orderItems)
+        .where(inArray(orderItems.zzz_order_id, orderIds));
+
+      const catalogIds = [...new Set(itemRows.map((i) => i.zzz_catalog_item_id))];
+      if (catalogIds.length > 0) {
+        const productRows = await db
+          .select()
+          .from(products)
+          .where(inArray(products.zzz_id, catalogIds));
+        for (const p of productRows) {
+          productMap.set(p.zzz_id, p);
+        }
+      }
+
+      for (const item of itemRows) {
+        const existing = itemsByOrderId.get(item.zzz_order_id) ?? [];
+        existing.push(item);
+        itemsByOrderId.set(item.zzz_order_id, existing);
+      }
+    }
+
+    return results.map((order) => {
+      const rawItems = itemsByOrderId.get(order.zzz_id) ?? [];
+      const enrichedItems = rawItems.map((item) => {
+        const product = productMap.get(item.zzz_catalog_item_id);
+        return {
+          ...item,
+          zzz_price: Number(item.zzz_price),
+          zzz_catalog_item: product
+            ? {
+                zzz_id: product.zzz_id,
+                zzz_product_category_id: product.zzz_product_category_id,
+                zzz_name_i18n: product.zzz_name_i18n,
+                zzz_description_i18n: product.zzz_description_i18n,
+                zzz_price: Number(product.zzz_price),
+                zzz_max_participants: product.zzz_max_participants,
+                zzz_image_url: product.zzz_image_url,
+                zzz_global_pause: product.zzz_global_pause,
+                zzz_service_moments: product.zzz_service_moments,
+              }
+            : undefined,
+        };
+      });
+
+      return {
+        ...order,
+        zzz_items: enrichedItems,
+        zzz_reservation: reservationMap.get(order.zzz_reservation_id) ?? null,
+      };
+    });
   }
 
   // -- UPDATE metadata --
