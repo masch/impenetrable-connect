@@ -6,6 +6,14 @@ import { Project, ServiceMoment, createHourMinute } from "@repo/shared";
 import { useCartStore } from "../../../stores/cart.store";
 
 // Mock hooks and stores
+jest.mock("../../../constants/moments", () => {
+  const actual = jest.requireActual("../../../constants/moments");
+  return {
+    ...actual,
+    isMomentExpired: jest.fn().mockReturnValue(false),
+  };
+});
+
 jest.mock("../../../hooks/useI18n", () => ({
   useTranslations: () => ({
     t: (key: string) => key,
@@ -25,6 +33,10 @@ jest.mock("expo-router", () => ({
 describe("OrderSetupScreen", () => {
   beforeEach(() => {
     useCartStore.setState({ guestCount: 1 });
+    const momentsMock = require("../../../constants/moments");
+    // Reset isMomentExpired to default (not expired) in case a test overrode it
+    momentsMock.isMomentExpired.mockReset();
+    momentsMock.isMomentExpired.mockReturnValue(false);
   });
 
   afterEach(() => {
@@ -120,7 +132,7 @@ describe("OrderSetupScreen", () => {
 
     render(<OrderSetupScreen />);
 
-    const submitButton = screen.getByLabelText("order_setup.submit");
+    const submitButton = screen.getByTestId("order-setup-submit");
 
     // Verify the button is not disabled
     expect(submitButton.props.accessibilityState?.disabled).toBeFalsy();
@@ -132,6 +144,36 @@ describe("OrderSetupScreen", () => {
       expect(state.selectedDate).toEqual(expect.any(Date));
       expect(state.selectedMoment).toBe("LUNCH");
       expect(mockPush).toHaveBeenCalledWith("/tourist/booking");
+    });
+  });
+
+  it("should not submit when the selected moment has expired", async () => {
+    useCartStore.setState({
+      selectedDate: new Date("2024-01-15T00:00:00-03:00"),
+      selectedMoment: "BREAKFAST" as ServiceMoment,
+      selectedTime: createHourMinute("10:00"),
+      guestCount: 2,
+    });
+
+    useProjectStore.setState({
+      selectedProject: { zzz_id: 1, zzz_name: "Test" } as Project,
+      isLoading: false,
+    });
+
+    render(<OrderSetupScreen />);
+
+    const submitButton = screen.getByTestId("order-setup-submit");
+    expect(submitButton.props.accessibilityState?.disabled).toBeFalsy();
+
+    // Override isMomentExpired to simulate the moment becoming expired
+    const momentsMock = require("../../../constants/moments");
+    momentsMock.isMomentExpired.mockReturnValue(true);
+
+    fireEvent.press(submitButton);
+
+    await waitFor(() => {
+      expect(mockPush).not.toHaveBeenCalled();
+      expect(screen.getByText("order_setup.time_error_expired")).toBeTruthy();
     });
   });
 });

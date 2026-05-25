@@ -22,6 +22,10 @@ import { isSameDay, formatDateToTime, parseTimeToDate } from "../../logic/format
 import { isTimeInRange, isTimeInPast } from "../../hooks/useTimeValidation";
 import Screen, { ScreenContent } from "../../components/Screen";
 
+const EPOCH_TIMESTAMP = 0;
+const MIN_GUEST_COUNT = 1;
+const TIME_PAD_WIDTH = 2;
+
 export default function OrderSetupScreen() {
   const { push, back } = useRouter();
   const { t } = useTranslations();
@@ -86,6 +90,7 @@ export default function OrderSetupScreen() {
             onPress={() => (error ? fetchProjects() : back())}
             variant={error ? "primary" : "ghost"}
             className="mt-6 w-full"
+            testID="error-retry-back"
           />
         </ScreenContent>
       </Screen>
@@ -146,6 +151,12 @@ export default function OrderSetupScreen() {
     // Prevent proceeding if time is outside valid range
     if (timeError) return;
 
+    // Prevent proceeding if the selected moment has already expired for today
+    if (isMomentExpired(moment, date)) {
+      setTimeError(t("order_setup.time_error_expired"));
+      return;
+    }
+
     // Prevent proceeding if selected time is in the past (only for today)
     if (time && isTimeInPast(date, time)) {
       setTimeError(t("order_setup.time_error_past"));
@@ -160,7 +171,7 @@ export default function OrderSetupScreen() {
     if (hasContextChanged && selectedDate && selectedMoment) {
       // Find orders in the PREVIOUS context to move them
       const itemsToMove = activeOrders.filter((o: Order) => {
-        const oDate = new Date(o.zzz_reservation?.zzz_service_at || 0);
+        const oDate = new Date(o.zzz_reservation?.zzz_service_at || EPOCH_TIMESTAMP);
         const isSameDayResult = isSameDay(oDate, selectedDate);
         const isSameMoment = o.zzz_reservation?.zzz_time_of_day === selectedMoment;
 
@@ -203,6 +214,7 @@ export default function OrderSetupScreen() {
               </Text>
             </View>
             <DatePicker
+              testID="order-setup-date"
               value={date}
               onChange={setDate}
               accessibilityLabel={t("order_setup.date_label")}
@@ -223,7 +235,7 @@ export default function OrderSetupScreen() {
               <Button
                 variant="ghost"
                 testID="guest-minus-button"
-                onPress={() => setGuestCount(Math.max(1, guestCount - 1))}
+                onPress={() => setGuestCount(Math.max(MIN_GUEST_COUNT, guestCount - 1))}
                 className="size-14 rounded-2xl bg-surface-container-high items-center justify-center border border-outline-variant/10"
                 accessibilityLabel={t("accessibility.decrement_guests")}
                 accessibilityHint={t("accessibility.decrement_guests_hint")}
@@ -272,6 +284,7 @@ export default function OrderSetupScreen() {
                 return (
                   <Button
                     key={m.zzz_id}
+                    testID={`moment-${m.zzz_id}`}
                     variant="ghost"
                     onPress={() => {
                       if (!expired) handleMomentChange(m.zzz_id);
@@ -349,6 +362,7 @@ export default function OrderSetupScreen() {
                 </View>
 
                 <Button
+                  testID="select-time"
                   variant={time ? "secondary" : "outline"}
                   onPress={() => {
                     // Don't auto-select - user must explicitly pick a time
@@ -388,13 +402,14 @@ export default function OrderSetupScreen() {
                         for (let h = startHour; h < endHour; h++) {
                           for (let m = 0; m < MINUTES_PER_HOUR; m += SLOT_INTERVAL_MINUTES) {
                             hours.push(
-                              `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`,
+                              `${String(h).padStart(TIME_PAD_WIDTH, "0")}:${String(m).padStart(TIME_PAD_WIDTH, "0")}`,
                             );
                           }
                         }
                         return hours.map((h) => (
                           <Button
                             key={h}
+                            testID={`time-slot-${h}`}
                             variant={selectedTime === h ? "secondary" : "outline"}
                             title={h}
                             onPress={() => {
@@ -426,6 +441,7 @@ export default function OrderSetupScreen() {
                   /* Native picker for iOS/Android */
                   <>
                     <AppDateTimePicker
+                      testID="time-picker-native"
                       value={time || getDefaultTimeForMoment(moment!)}
                       onChange={handleTimeChange}
                       mode="time"
@@ -433,6 +449,7 @@ export default function OrderSetupScreen() {
                     />
                     {Platform.OS === "ios" && (
                       <Button
+                        testID="ios-done"
                         variant="ghost"
                         title={t("common.done")}
                         onPress={handleTimePickerClose}
@@ -454,6 +471,7 @@ export default function OrderSetupScreen() {
               disabled={!date || !moment || !time || !!timeError}
               rightIcon="arrow-right"
               className="py-5 rounded-2xl shadow-lg"
+              testID="order-setup-submit"
               accessibilityLabel={t("order_setup.submit")}
               accessibilityHint={t("accessibility.submit_order_hint")}
             />
