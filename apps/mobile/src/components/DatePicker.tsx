@@ -14,12 +14,16 @@ import { COLORS } from "@repo/shared";
 import { formatDate as formatDisplayDate } from "../logic/formatters";
 
 const isWeb = Platform.OS === "web";
+const DEFAULT_HOUR = 12;
+const CALENDAR_ICON_SIZE = 18;
+const PENCIL_ICON_SIZE = 14;
 
 interface DatePickerProps {
   value: Date | null;
   onChange: (date: Date) => void;
   minimumDate?: Date;
   maximumDate?: Date;
+  testID?: string;
   accessibilityLabel?: string;
   accessibilityHint?: string;
 }
@@ -29,6 +33,7 @@ export function DatePicker({
   onChange,
   minimumDate,
   maximumDate,
+  testID,
   accessibilityLabel,
   accessibilityHint,
 }: DatePickerProps) {
@@ -58,7 +63,7 @@ export function DatePicker({
 
   const handleQuickSelect = (daysFromNow: number) => {
     const targetDate = new Date();
-    targetDate.setHours(12, 0, 0, 0);
+    targetDate.setHours(DEFAULT_HOUR, 0, 0, 0);
     targetDate.setDate(targetDate.getDate() + daysFromNow);
     onChange(targetDate);
   };
@@ -97,7 +102,7 @@ export function DatePicker({
   const adjustDate = (days: number) => {
     const newDate = new Date(currentValue);
     newDate.setDate(newDate.getDate() + days);
-    newDate.setHours(12, 0, 0, 0);
+    newDate.setHours(DEFAULT_HOUR, 0, 0, 0);
     onChange(newDate);
   };
 
@@ -107,7 +112,11 @@ export function DatePicker({
 
   if (isWeb) {
     return (
-      <View accessibilityLabel={accessibilityLabel} accessibilityHint={accessibilityHint}>
+      <View
+        testID={testID}
+        accessibilityLabel={accessibilityLabel}
+        accessibilityHint={accessibilityHint}
+      >
         {/* Quick select in single line */}
         <View className="flex-row gap-2">
           <Button
@@ -182,7 +191,11 @@ export function DatePicker({
   }
 
   return (
-    <View accessibilityLabel={accessibilityLabel} accessibilityHint={accessibilityHint}>
+    <View
+      testID={testID}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
+    >
       {/* Quick select in single line */}
       <View className="flex-row gap-3">
         <Button
@@ -242,7 +255,7 @@ export function DatePicker({
             {!isCustomDate() && (
               <Icon
                 name="calendar-month-outline"
-                size={18}
+                size={CALENDAR_ICON_SIZE}
                 color={COLORS["on-surface-variant"]}
                 className="opacity-40"
               />
@@ -256,7 +269,9 @@ export function DatePicker({
             >
               {isCustomDate() ? formatDate(currentValue) : t("orders.choose")}
             </Text>
-            {isCustomDate() && <Icon name="pencil" size={14} color={COLORS.secondary} />}
+            {isCustomDate() && (
+              <Icon name="pencil" size={PENCIL_ICON_SIZE} color={COLORS.secondary} />
+            )}
           </View>
         </Button>
       </View>

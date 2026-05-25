@@ -393,6 +393,7 @@
     "time_error_invalid": "Invalid time",
     "time_error_outside_range": "Time outside allowed range ({{start}} - {{end}})",
     "time_error_past": "This time has already passed for today",
+    "time_error_expired": "This time slot has expired for today",
     "select_time_option": "Select time {{time}}"
   },
   "status": {

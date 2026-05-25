@@ -393,6 +393,7 @@
     "time_error_invalid": "Hora inválida",
     "time_error_outside_range": "Hora fuera del rango permitido ({{start}} - {{end}})",
     "time_error_past": "Esta hora ya pasó para hoy",
+    "time_error_expired": "Este horario ya expiró para hoy",
     "select_time_option": "Seleccionar hora {{time}}"
   },
   "status": {
