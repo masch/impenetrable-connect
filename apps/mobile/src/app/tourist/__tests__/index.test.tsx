@@ -109,8 +109,6 @@ describe("OrderSetupScreen", () => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date("2024-01-15T10:00:00-03:00"));
 
-    const setContextSpy = jest.spyOn(useCartStore.getState(), "setContext");
-
     useCartStore.setState({
       selectedDate: new Date("2024-01-15T00:00:00-03:00"),
       selectedMoment: "LUNCH" as ServiceMoment,
@@ -125,15 +123,14 @@ describe("OrderSetupScreen", () => {
 
     render(<OrderSetupScreen />);
 
-    // Note: Date and Moment are usually pre-selected or selected via UI.
-    // In our component, handleProceed depends on date and moment states.
-    // For the test, we'll ensure they are valid.
     const submitButton = screen.getByLabelText("order_setup.submit");
 
     fireEvent.press(submitButton);
 
     await waitFor(() => {
-      expect(setContextSpy).toHaveBeenCalled();
+      const state = useCartStore.getState();
+      expect(state.selectedDate).toEqual(expect.any(Date));
+      expect(state.selectedMoment).toBe("LUNCH");
       expect(mockPush).toHaveBeenCalledWith("/tourist/booking");
     });
 
