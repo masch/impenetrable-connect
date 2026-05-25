@@ -9,10 +9,11 @@ import {
   UserRole,
 } from "@repo/shared";
 import { authMiddleware, roleGuard } from "../middleware/auth";
-import { dbMiddleware } from "../middleware/db";
+import { dbMiddleware, resetDbCache } from "../middleware/db";
 import * as dbFactory from "../db/index";
 import { AuthService } from "../services/auth.service";
 import { type AppEnv } from "../config/env";
+import { users } from "../db/schema";
 
 const testApp = new Hono<AppEnv>();
 
@@ -290,6 +291,78 @@ describe("Auth API Integration", () => {
       );
 
       expect(res.status).toBe(500);
+    });
+
+    it("should successfully run the real AuthService.createTourist with mock DB", async () => {
+      createTouristSpy.mockRestore();
+      resetDbCache();
+      const mockDbForTourist = {
+        select: () => ({
+          from: () => ({
+            where: () => ({
+              limit: () => Promise.resolve([]),
+            }),
+          }),
+        }),
+        insert: (table: unknown) => ({
+          values: () => {
+            if (table === users) {
+              return {
+                returning: () =>
+                  Promise.resolve([
+                    {
+                      id: "new-user-uuid",
+                      email: null,
+                      alias: "New Explorer",
+                      role: "TOURIST",
+                      isActive: true,
+                      zzz_failed_login_attempts: 0,
+                      zzz_last_login_at: null,
+                      zzzCreatedAt: new Date(),
+                      zzzUpdatedAt: new Date(),
+                    },
+                  ]),
+              };
+            } else {
+              return Promise.resolve();
+            }
+          },
+        }),
+      } as unknown as ReturnType<typeof dbFactory.createDb>;
+
+      createDbSpy.mockReturnValue(mockDbForTourist);
+
+      const res = await testApp.request(
+        "/v1/auth/tourist/create",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            alias: "New Explorer",
+            role: "TOURIST",
+            email: null,
+            firstName: null,
+            lastName: null,
+            phoneNumber: null,
+          }),
+        },
+        TEST_ENV,
+      );
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as {
+        accessToken: string;
+        refreshToken: string;
+        user: { role: string; alias: string };
+      };
+      expect(body.accessToken).toBeDefined();
+      expect(body.refreshToken).toBeDefined();
+      expect(body.user.role).toBe("TOURIST");
+      expect(body.user.alias).toBe("New Explorer");
+
+      // Restore standard mocks for subsequent tests/hooks
+      createDbSpy.mockReturnValue({} as unknown as ReturnType<typeof dbFactory.createDb>);
+      resetDbCache();
     });
   });
 
