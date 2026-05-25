@@ -25,6 +25,7 @@ export const MOCK_PROJECTS: Project[] = [
     zzz_cascade_timeout_minutes: 30,
     zzz_max_cascade_attempts: 10,
     zzz_is_active: true,
+    zzz_timezone: "America/Argentina/Buenos_Aires",
   },
   {
     zzz_id: PROJECT_IDS.IBERA,
@@ -34,6 +35,7 @@ export const MOCK_PROJECTS: Project[] = [
     zzz_cascade_timeout_minutes: 60,
     zzz_max_cascade_attempts: 5,
     zzz_is_active: false,
+    zzz_timezone: "America/Argentina/Buenos_Aires",
   },
   {
     zzz_id: PROJECT_IDS.PATAGONIA,
@@ -43,6 +45,7 @@ export const MOCK_PROJECTS: Project[] = [
     zzz_cascade_timeout_minutes: 45,
     zzz_max_cascade_attempts: 8,
     zzz_is_active: false,
+    zzz_timezone: "America/Argentina/Buenos_Aires",
   },
   {
     zzz_id: PROJECT_IDS.PATAGONIA_AZUL,
@@ -52,5 +55,6 @@ export const MOCK_PROJECTS: Project[] = [
     zzz_cascade_timeout_minutes: 45,
     zzz_max_cascade_attempts: 8,
     zzz_is_active: false,
+    zzz_timezone: "America/Argentina/Buenos_Aires",
   },
 ];

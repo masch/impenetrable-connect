@@ -1,0 +1,1 @@
+ALTER TABLE "impenetrable_connect"."projects" ALTER COLUMN "zzz_timezone" DROP DEFAULT;

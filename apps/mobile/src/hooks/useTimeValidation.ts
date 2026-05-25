@@ -1,5 +1,7 @@
-import type { ServiceMoment } from "@repo/shared";
+import { type ServiceMoment, getDefaultProject } from "@repo/shared";
 import { getMomentConfig } from "../constants/moments";
+import { useProjectStore } from "../stores/project.store";
+import { getDatePartsInTimezone } from "../utils/date";
 
 const MINUTES_PER_HOUR = 60;
 
@@ -31,17 +33,24 @@ export const isTimeInPast = (selectedDate: Date | null, selectedTime: Date | nul
 
   const now = new Date();
 
-  // Only validate for today
+  // Retrieve active project timezone dynamically, falling back to active project default
+  const timezone =
+    useProjectStore.getState().selectedProject?.zzz_timezone || getDefaultProject().zzz_timezone;
+
+  const nowParts = getDatePartsInTimezone(now, timezone);
+  const selectedParts = getDatePartsInTimezone(selectedDate, timezone);
+  const timeParts = getDatePartsInTimezone(selectedTime, timezone);
+
   const isToday =
-    selectedDate.getFullYear() === now.getFullYear() &&
-    selectedDate.getMonth() === now.getMonth() &&
-    selectedDate.getDate() === now.getDate();
+    selectedParts.year === nowParts.year &&
+    selectedParts.month === nowParts.month &&
+    selectedParts.day === nowParts.day;
 
   if (!isToday) return false;
 
   // Compare total minutes since midnight, ignoring the date part of selectedTime
-  const selectedMins = selectedTime.getHours() * MINUTES_PER_HOUR + selectedTime.getMinutes();
-  const currentMins = now.getHours() * MINUTES_PER_HOUR + now.getMinutes();
+  const selectedMins = timeParts.hours * MINUTES_PER_HOUR + timeParts.minutes;
+  const currentMins = nowParts.hours * MINUTES_PER_HOUR + nowParts.minutes;
 
   return selectedMins <= currentMins;
 };

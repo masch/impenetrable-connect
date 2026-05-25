@@ -11,6 +11,7 @@ describe("ProjectService", () => {
     zzz_cascade_timeout_minutes: 30,
     zzz_max_cascade_attempts: 10,
     zzz_is_active: true,
+    zzz_timezone: "America/Argentina/Buenos_Aires",
     zzzCreatedAt: new Date(),
     zzzUpdatedAt: new Date(),
     zzzDeletedAt: null as Date | null,
@@ -74,6 +75,7 @@ describe("ProjectService", () => {
       zzz_name: "Test Project",
       zzz_default_language: "es",
       zzz_supported_languages: ["es"],
+      zzz_timezone: "America/Argentina/Buenos_Aires",
     });
     expect(result).toEqual(mockProject);
   });

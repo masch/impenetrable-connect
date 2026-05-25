@@ -1,0 +1,998 @@
+{
+  "id": "ffd4e42e-bbfd-40a6-ae31-6d61240c2527",
+  "prevId": "4a2c51c9-8740-4c5a-a671-c95fbdd9cdc2",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "impenetrable_connect.projects": {
+      "name": "projects",
+      "schema": "impenetrable_connect",
+      "columns": {
+        "zzz_id": {
+          "name": "zzz_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "zzz_name": {
+          "name": "zzz_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_default_language": {
+          "name": "zzz_default_language",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'es'"
+        },
+        "zzz_supported_languages": {
+          "name": "zzz_supported_languages",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[\"es\"]'::jsonb"
+        },
+        "zzz_cascade_timeout_minutes": {
+          "name": "zzz_cascade_timeout_minutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 30
+        },
+        "zzz_max_cascade_attempts": {
+          "name": "zzz_max_cascade_attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 10
+        },
+        "zzz_is_active": {
+          "name": "zzz_is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "zzz_timezone": {
+          "name": "zzz_timezone",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'America/Argentina/Buenos_Aires'"
+        },
+        "zzz_created_at": {
+          "name": "zzz_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_updated_at": {
+          "name": "zzz_updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_deleted_at": {
+          "name": "zzz_deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "impenetrable_connect.users": {
+      "name": "users",
+      "schema": "impenetrable_connect",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alias": {
+          "name": "alias",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "password_hash": {
+          "name": "password_hash",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone_number": {
+          "name": "phone_number",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "user_role",
+          "typeSchema": "impenetrable_connect",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ENTREPRENEUR'"
+        },
+        "zzz_failed_login_attempts": {
+          "name": "zzz_failed_login_attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "zzz_last_login_at": {
+          "name": "zzz_last_login_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "zzz_created_at": {
+          "name": "zzz_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_updated_at": {
+          "name": "zzz_updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_deleted_at": {
+          "name": "zzz_deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": ["email"]
+        },
+        "users_alias_unique": {
+          "name": "users_alias_unique",
+          "nullsNotDistinct": false,
+          "columns": ["alias"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "impenetrable_connect.ventures": {
+      "name": "ventures",
+      "schema": "impenetrable_connect",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_project_id": {
+          "name": "zzz_project_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_max_capacity": {
+          "name": "zzz_max_capacity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "zzz_cascade_order": {
+          "name": "zzz_cascade_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "zzz_is_paused": {
+          "name": "zzz_is_paused",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "zzz_is_active": {
+          "name": "zzz_is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "zzz_created_at": {
+          "name": "zzz_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_updated_at": {
+          "name": "zzz_updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_deleted_at": {
+          "name": "zzz_deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ventures_owner_id_users_id_fk": {
+          "name": "ventures_owner_id_users_id_fk",
+          "tableFrom": "ventures",
+          "tableTo": "users",
+          "schemaTo": "impenetrable_connect",
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ventures_zzz_project_id_projects_zzz_id_fk": {
+          "name": "ventures_zzz_project_id_projects_zzz_id_fk",
+          "tableFrom": "ventures",
+          "tableTo": "projects",
+          "schemaTo": "impenetrable_connect",
+          "columnsFrom": ["zzz_project_id"],
+          "columnsTo": ["zzz_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "impenetrable_connect.refresh_tokens": {
+      "name": "refresh_tokens",
+      "schema": "impenetrable_connect",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_hash": {
+          "name": "token_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_created_at": {
+          "name": "zzz_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_updated_at": {
+          "name": "zzz_updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_deleted_at": {
+          "name": "zzz_deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "refresh_tokens_user_id_users_id_fk": {
+          "name": "refresh_tokens_user_id_users_id_fk",
+          "tableFrom": "refresh_tokens",
+          "tableTo": "users",
+          "schemaTo": "impenetrable_connect",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "impenetrable_connect.venture_members": {
+      "name": "venture_members",
+      "schema": "impenetrable_connect",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "venture_id": {
+          "name": "venture_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'MANAGER'"
+        },
+        "zzz_created_at": {
+          "name": "zzz_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_updated_at": {
+          "name": "zzz_updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_deleted_at": {
+          "name": "zzz_deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "venture_members_venture_id_ventures_id_fk": {
+          "name": "venture_members_venture_id_ventures_id_fk",
+          "tableFrom": "venture_members",
+          "tableTo": "ventures",
+          "schemaTo": "impenetrable_connect",
+          "columnsFrom": ["venture_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "venture_members_user_id_users_id_fk": {
+          "name": "venture_members_user_id_users_id_fk",
+          "tableFrom": "venture_members",
+          "tableTo": "users",
+          "schemaTo": "impenetrable_connect",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "impenetrable_connect.product_categories": {
+      "name": "product_categories",
+      "schema": "impenetrable_connect",
+      "columns": {
+        "zzz_id": {
+          "name": "zzz_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "zzz_project_id": {
+          "name": "zzz_project_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_name_i18n": {
+          "name": "zzz_name_i18n",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_description_i18n": {
+          "name": "zzz_description_i18n",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_is_active": {
+          "name": "zzz_is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "zzz_created_at": {
+          "name": "zzz_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_updated_at": {
+          "name": "zzz_updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_deleted_at": {
+          "name": "zzz_deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "product_categories_zzz_project_id_projects_zzz_id_fk": {
+          "name": "product_categories_zzz_project_id_projects_zzz_id_fk",
+          "tableFrom": "product_categories",
+          "tableTo": "projects",
+          "schemaTo": "impenetrable_connect",
+          "columnsFrom": ["zzz_project_id"],
+          "columnsTo": ["zzz_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "impenetrable_connect.products": {
+      "name": "products",
+      "schema": "impenetrable_connect",
+      "columns": {
+        "zzz_id": {
+          "name": "zzz_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "zzz_product_category_id": {
+          "name": "zzz_product_category_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_name_i18n": {
+          "name": "zzz_name_i18n",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_description_i18n": {
+          "name": "zzz_description_i18n",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_price": {
+          "name": "zzz_price",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_max_participants": {
+          "name": "zzz_max_participants",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_image_url": {
+          "name": "zzz_image_url",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_global_pause": {
+          "name": "zzz_global_pause",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "zzz_service_moments": {
+          "name": "zzz_service_moments",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_created_at": {
+          "name": "zzz_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_updated_at": {
+          "name": "zzz_updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_deleted_at": {
+          "name": "zzz_deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "products_zzz_product_category_id_product_categories_zzz_id_fk": {
+          "name": "products_zzz_product_category_id_product_categories_zzz_id_fk",
+          "tableFrom": "products",
+          "tableTo": "product_categories",
+          "schemaTo": "impenetrable_connect",
+          "columnsFrom": ["zzz_product_category_id"],
+          "columnsTo": ["zzz_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "impenetrable_connect.reservations": {
+      "name": "reservations",
+      "schema": "impenetrable_connect",
+      "columns": {
+        "zzz_id": {
+          "name": "zzz_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "zzz_user_id": {
+          "name": "zzz_user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_service_at": {
+          "name": "zzz_service_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_time_of_day": {
+          "name": "zzz_time_of_day",
+          "type": "service_moment",
+          "typeSchema": "impenetrable_connect",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_status": {
+          "name": "zzz_status",
+          "type": "reservation_status",
+          "typeSchema": "impenetrable_connect",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'CREATED'"
+        },
+        "zzz_guest_count": {
+          "name": "zzz_guest_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "zzz_created_at": {
+          "name": "zzz_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_updated_at": {
+          "name": "zzz_updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_deleted_at": {
+          "name": "zzz_deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "reservations_zzz_user_id_users_id_fk": {
+          "name": "reservations_zzz_user_id_users_id_fk",
+          "tableFrom": "reservations",
+          "tableTo": "users",
+          "schemaTo": "impenetrable_connect",
+          "columnsFrom": ["zzz_user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "impenetrable_connect.orders": {
+      "name": "orders",
+      "schema": "impenetrable_connect",
+      "columns": {
+        "zzz_id": {
+          "name": "zzz_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "zzz_reservation_id": {
+          "name": "zzz_reservation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_catalog_type_id": {
+          "name": "zzz_catalog_type_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_confirmed_venture_id": {
+          "name": "zzz_confirmed_venture_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_notes": {
+          "name": "zzz_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_global_status": {
+          "name": "zzz_global_status",
+          "type": "order_status",
+          "typeSchema": "impenetrable_connect",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'SEARCHING'"
+        },
+        "zzz_cancel_reason": {
+          "name": "zzz_cancel_reason",
+          "type": "cancel_reason",
+          "typeSchema": "impenetrable_connect",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_cancelled_at": {
+          "name": "zzz_cancelled_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_completed_at": {
+          "name": "zzz_completed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_confirmed_at": {
+          "name": "zzz_confirmed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_current_offer_venture_id": {
+          "name": "zzz_current_offer_venture_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_notify_whatsapp": {
+          "name": "zzz_notify_whatsapp",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "zzz_created_at": {
+          "name": "zzz_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_updated_at": {
+          "name": "zzz_updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_deleted_at": {
+          "name": "zzz_deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "orders_zzz_reservation_id_reservations_zzz_id_fk": {
+          "name": "orders_zzz_reservation_id_reservations_zzz_id_fk",
+          "tableFrom": "orders",
+          "tableTo": "reservations",
+          "schemaTo": "impenetrable_connect",
+          "columnsFrom": ["zzz_reservation_id"],
+          "columnsTo": ["zzz_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "orders_zzz_confirmed_venture_id_ventures_id_fk": {
+          "name": "orders_zzz_confirmed_venture_id_ventures_id_fk",
+          "tableFrom": "orders",
+          "tableTo": "ventures",
+          "schemaTo": "impenetrable_connect",
+          "columnsFrom": ["zzz_confirmed_venture_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "orders_zzz_current_offer_venture_id_ventures_id_fk": {
+          "name": "orders_zzz_current_offer_venture_id_ventures_id_fk",
+          "tableFrom": "orders",
+          "tableTo": "ventures",
+          "schemaTo": "impenetrable_connect",
+          "columnsFrom": ["zzz_current_offer_venture_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "impenetrable_connect.order_items": {
+      "name": "order_items",
+      "schema": "impenetrable_connect",
+      "columns": {
+        "zzz_id": {
+          "name": "zzz_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "zzz_order_id": {
+          "name": "zzz_order_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_catalog_item_id": {
+          "name": "zzz_catalog_item_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_quantity": {
+          "name": "zzz_quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_price": {
+          "name": "zzz_price",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zzz_notes": {
+          "name": "zzz_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zzz_created_at": {
+          "name": "zzz_created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_updated_at": {
+          "name": "zzz_updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "zzz_deleted_at": {
+          "name": "zzz_deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "order_items_zzz_order_id_orders_zzz_id_fk": {
+          "name": "order_items_zzz_order_id_orders_zzz_id_fk",
+          "tableFrom": "order_items",
+          "tableTo": "orders",
+          "schemaTo": "impenetrable_connect",
+          "columnsFrom": ["zzz_order_id"],
+          "columnsTo": ["zzz_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "impenetrable_connect.user_role": {
+      "name": "user_role",
+      "schema": "impenetrable_connect",
+      "values": ["ADMIN", "ENTREPRENEUR", "TOURIST"]
+    },
+    "impenetrable_connect.reservation_status": {
+      "name": "reservation_status",
+      "schema": "impenetrable_connect",
+      "values": ["CREATED", "SEARCHING", "CONFIRMED", "CANCELLED"]
+    },
+    "impenetrable_connect.service_moment": {
+      "name": "service_moment",
+      "schema": "impenetrable_connect",
+      "values": ["BREAKFAST", "LUNCH", "SNACK", "DINNER"]
+    },
+    "impenetrable_connect.cancel_reason": {
+      "name": "cancel_reason",
+      "schema": "impenetrable_connect",
+      "values": ["BY_TOURIST", "BY_ENTREPRENEUR", "NO_VENTURE_AVAILABLE", "SYSTEM_ERROR"]
+    },
+    "impenetrable_connect.order_status": {
+      "name": "order_status",
+      "schema": "impenetrable_connect",
+      "values": [
+        "SEARCHING",
+        "OFFER_PENDING",
+        "CONFIRMED",
+        "COMPLETED",
+        "NO_SHOW",
+        "CANCELLED",
+        "EXPIRED"
+      ]
+    }
+  },
+  "schemas": {
+    "impenetrable_connect": "impenetrable_connect"
+  },
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

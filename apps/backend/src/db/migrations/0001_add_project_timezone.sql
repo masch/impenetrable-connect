@@ -1,0 +1,1 @@
+ALTER TABLE "impenetrable_connect"."projects" ADD COLUMN "zzz_timezone" varchar(50) DEFAULT 'America/Argentina/Buenos_Aires' NOT NULL;

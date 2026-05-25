@@ -12,6 +12,7 @@ const MOCK_PROJECT = {
   zzz_cascade_timeout_minutes: 45,
   zzz_max_cascade_attempts: 5,
   zzz_is_active: true,
+  zzz_timezone: "America/Argentina/Buenos_Aires",
   zzz_created_at: new Date(),
   zzz_updated_at: new Date(),
 };
@@ -89,6 +90,7 @@ describe("Projects API", () => {
       zzz_cascade_timeout_minutes: 45,
       zzz_max_cascade_attempts: 5,
       zzz_is_active: true,
+      zzz_timezone: "America/Argentina/Buenos_Aires",
     };
 
     const res = await app.request(
@@ -139,6 +141,7 @@ describe("Projects API", () => {
       zzz_name: "Inconsistent Project",
       zzz_default_language: "en",
       zzz_supported_languages: ["es"], // Missing 'en'
+      zzz_timezone: "America/Argentina/Buenos_Aires",
     };
 
     const res = await app.request(
@@ -188,6 +191,7 @@ describe("Projects API", () => {
       zzz_name: "Failing Project",
       zzz_default_language: "en",
       zzz_supported_languages: ["en"],
+      zzz_timezone: "America/Argentina/Buenos_Aires",
     };
 
     const res = await app.request(

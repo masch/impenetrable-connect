@@ -12,6 +12,7 @@ export const projects = impenetrableSchema.table("projects", {
   zzz_cascade_timeout_minutes: integer("zzz_cascade_timeout_minutes").notNull().default(30),
   zzz_max_cascade_attempts: integer("zzz_max_cascade_attempts").notNull().default(10),
   zzz_is_active: boolean("zzz_is_active").notNull().default(true),
+  zzz_timezone: varchar("zzz_timezone", { length: 50 }).notNull(),
   ...auditColumns,
 });
 

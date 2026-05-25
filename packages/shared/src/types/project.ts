@@ -10,6 +10,15 @@ export const PROJECT_CONSTRAINTS = {
   NAME_MAX_LENGTH: 100,
 } as const;
 
+export const isValidTimezone = (tz: string): boolean => {
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone: tz });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 // Define the core project fields without ID
 const projectFields = {
   zzz_name: z
@@ -31,6 +40,9 @@ const projectFields = {
     .max(PROJECT_CONSTRAINTS.MAX_CASCADE_ATTEMPTS_MAX)
     .default(10),
   zzz_is_active: z.boolean().default(true),
+  zzz_timezone: z.string().refine(isValidTimezone, {
+    message: "Invalid IANA timezone identifier",
+  }),
 };
 
 // Common validation logic for languages

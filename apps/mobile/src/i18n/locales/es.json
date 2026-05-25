@@ -7,7 +7,9 @@
   "default_language": "Idioma predeterminado",
   "supported_languages": "Idiomas soportados",
   "cascade_timeout": "Tiempo de espera (min)",
+  "cascade_timeout_helper": "1-120 minutos",
   "max_attempts": "Intentos máximos",
+  "max_attempts_helper": "1-10 intentos",
   "active": "Activo",
   "inactive": "Inactivo",
   "add_project": "Agregar Proyecto",
@@ -15,6 +17,9 @@
   "edit_project": "Editar Proyecto",
   "project_name": "Nombre del Proyecto",
   "project_name_placeholder": "Nombre del Proyecto",
+  "project_timezone": "Zona Horaria",
+  "project_timezone_placeholder": "Ej: America/Argentina/Buenos_Aires",
+  "project_timezone_helper": "Ej: America/Argentina/Buenos_Aires",
   "save": "Guardar",
   "cancel": "Cancelar",
   "delete": "Eliminar",
@@ -48,7 +53,8 @@
     "timeout_required": "El timeout es requerido",
     "timeout_min": "El timeout debe ser de al menos 1 minuto",
     "timeout_max": "El timeout debe ser como máximo 120 minutos",
-    "supported_languages_required": "Se requiere al menos un idioma"
+    "supported_languages_required": "Se requiere al menos un idioma",
+    "timezone_required": "La zona horaria es requerida"
   },
   "catalog": {
     "title": "Explorar",

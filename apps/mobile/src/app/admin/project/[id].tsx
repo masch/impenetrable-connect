@@ -31,6 +31,7 @@ interface FormData {
   zzz_cascade_timeout_minutes: string;
   zzz_max_cascade_attempts: string;
   zzz_is_active: boolean;
+  zzz_timezone: string;
 }
 
 interface FormErrors {
@@ -38,6 +39,7 @@ interface FormErrors {
   zzz_supported_languages?: string;
   zzz_cascade_timeout_minutes?: string;
   zzz_max_cascade_attempts?: string;
+  zzz_timezone?: string;
 }
 
 const initialFormData: FormData = {
@@ -47,6 +49,7 @@ const initialFormData: FormData = {
   zzz_cascade_timeout_minutes: String(PROJECT_CONSTRAINTS.CASCADE_TIMEOUT_MINUTES_MAX),
   zzz_max_cascade_attempts: String(PROJECT_CONSTRAINTS.MAX_CASCADE_ATTEMPTS_MAX),
   zzz_is_active: true,
+  zzz_timezone: "America/Argentina/Buenos_Aires",
 };
 
 export default function ProjectFormScreen() {
@@ -97,6 +100,7 @@ export default function ProjectFormScreen() {
         zzz_cascade_timeout_minutes: selectedProject.zzz_cascade_timeout_minutes.toString(),
         zzz_max_cascade_attempts: selectedProject.zzz_max_cascade_attempts.toString(),
         zzz_is_active: selectedProject.zzz_is_active,
+        zzz_timezone: selectedProject.zzz_timezone,
       });
     }
   }, [isEditMode, selectedProject]);
@@ -107,6 +111,7 @@ export default function ProjectFormScreen() {
     zzz_supported_languages: "validation.supported_languages_required",
     zzz_cascade_timeout_minutes: "validation.timeout_range",
     zzz_max_cascade_attempts: "validation.attempts_range",
+    zzz_timezone: "validation.timezone_required",
   };
 
   const validateForm = (): boolean => {
@@ -117,6 +122,7 @@ export default function ProjectFormScreen() {
       zzz_cascade_timeout_minutes: Number(formData.zzz_cascade_timeout_minutes),
       zzz_max_cascade_attempts: Number(formData.zzz_max_cascade_attempts),
       zzz_is_active: formData.zzz_is_active,
+      zzz_timezone: formData.zzz_timezone.trim(),
     };
 
     const schema = isEditMode ? UpdateProjectSchema : CreateProjectSchema;
@@ -149,6 +155,7 @@ export default function ProjectFormScreen() {
       zzz_cascade_timeout_minutes: parseInt(formData.zzz_cascade_timeout_minutes, RADIX_DECIMAL),
       zzz_max_cascade_attempts: parseInt(formData.zzz_max_cascade_attempts, RADIX_DECIMAL),
       zzz_is_active: formData.zzz_is_active,
+      zzz_timezone: formData.zzz_timezone.trim(),
     };
 
     try {
@@ -337,7 +344,7 @@ export default function ProjectFormScreen() {
                 error={errors.zzz_cascade_timeout_minutes}
                 keyboardType="number-pad"
                 placeholder="30"
-                helperText="1-120 minutes"
+                helperText={t("cascade_timeout_helper")}
               />
 
               {/* Max Cascade Attempts */}
@@ -349,7 +356,19 @@ export default function ProjectFormScreen() {
                 error={errors.zzz_max_cascade_attempts}
                 keyboardType="number-pad"
                 placeholder="10"
-                helperText="1-10 attempts"
+                helperText={t("max_attempts_helper")}
+              />
+
+              {/* Timezone */}
+              <FormInput
+                testID="project-timezone-input"
+                label={t("project_timezone")}
+                value={formData.zzz_timezone}
+                onChangeText={(value) => updateField("zzz_timezone", value)}
+                error={errors.zzz_timezone}
+                required
+                placeholder={t("project_timezone_placeholder")}
+                helperText={t("project_timezone_helper")}
               />
 
               {/* Is Active */}
