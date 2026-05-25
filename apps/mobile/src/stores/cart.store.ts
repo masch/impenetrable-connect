@@ -19,7 +19,7 @@ interface CartState {
 
   // Actions
   setContext: (date: Date, moment: ServiceMoment, time?: HourMinute) => void;
-  setGuestCount: (count: number) => void;
+  setGuestCount: (count: number | ((prev: number) => number)) => void;
   setSelectedTime: (time: HourMinute | undefined) => void;
   resetContext: () => void;
   isValid: () => boolean;
@@ -41,7 +41,12 @@ export const useCartStore = create<CartState>((set, get) => ({
   setContext: (selectedDate, selectedMoment, selectedTime) =>
     set({ selectedDate, selectedMoment, selectedTime }),
 
-  setGuestCount: (guestCount) => set({ guestCount }),
+  setGuestCount: (guestCount) =>
+    set(
+      typeof guestCount === "function"
+        ? (state) => ({ guestCount: guestCount(state.guestCount) })
+        : { guestCount },
+    ),
 
   setSelectedTime: (selectedTime) => set({ selectedTime }),
 
