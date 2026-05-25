@@ -106,9 +106,6 @@ describe("OrderSetupScreen", () => {
   });
 
   it("should set context and navigate to booking when form is valid and submitted", async () => {
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date("2024-01-15T10:00:00-03:00"));
-
     useCartStore.setState({
       selectedDate: new Date("2024-01-15T00:00:00-03:00"),
       selectedMoment: "LUNCH" as ServiceMoment,
@@ -125,6 +122,9 @@ describe("OrderSetupScreen", () => {
 
     const submitButton = screen.getByLabelText("order_setup.submit");
 
+    // Verify the button is not disabled
+    expect(submitButton.props.accessibilityState?.disabled).toBeFalsy();
+
     fireEvent.press(submitButton);
 
     await waitFor(() => {
@@ -133,7 +133,5 @@ describe("OrderSetupScreen", () => {
       expect(state.selectedMoment).toBe("LUNCH");
       expect(mockPush).toHaveBeenCalledWith("/tourist/booking");
     });
-
-    jest.useRealTimers();
   });
 });
