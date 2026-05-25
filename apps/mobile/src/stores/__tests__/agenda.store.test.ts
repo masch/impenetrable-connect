@@ -68,12 +68,13 @@ describe("Agenda Store", () => {
   });
 
   it("should calculate occupation based on zzz_guest_count and ignore CANCELLED orders", () => {
-    const mockId = (n: number): string => `00000000-0000-0000-0000-${String(n).padStart(12, "0")}`;
+    const UUID_PAD_LENGTH = 12;
+    const mockId = (n: number): string => `00000000-0000-0000-0000-${String(n).padStart(UUID_PAD_LENGTH, "0")}`;
     const mockOrders: Order[] = [
       {
         zzz_id: mockId(1),
         zzz_reservation_id: mockId(1),
-        zzz_catalog_type_id: 1,
+        zzz_product_category_id: 1,
         zzz_global_status: "CONFIRMED",
         zzz_items: [],
         zzz_notify_whatsapp: false,
@@ -89,7 +90,7 @@ describe("Agenda Store", () => {
       {
         zzz_id: mockId(2),
         zzz_reservation_id: mockId(2),
-        zzz_catalog_type_id: 1,
+        zzz_product_category_id: 1,
         zzz_global_status: "CONFIRMED",
         zzz_items: [],
         zzz_notify_whatsapp: false,
@@ -105,7 +106,7 @@ describe("Agenda Store", () => {
       {
         zzz_id: mockId(3),
         zzz_reservation_id: mockId(3),
-        zzz_catalog_type_id: 1,
+        zzz_product_category_id: 1,
         zzz_global_status: "CANCELLED",
         zzz_items: [],
         zzz_notify_whatsapp: false,

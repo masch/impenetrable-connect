@@ -16,7 +16,7 @@ describe("OrderSchema", () => {
     const validOrder = {
       zzz_id: UUID_A,
       zzz_reservation_id: UUID_B,
-      zzz_catalog_type_id: 100,
+      zzz_product_category_id: 100,
       zzz_global_status: "SEARCHING",
       zzz_items: [
         {
@@ -47,7 +47,7 @@ describe("OrderSchema", () => {
       zzz_reservation_id: UUID_B,
       zzz_catalog_item_id: 200,
       zzz_quantity: 1,
-      zzz_catalog_type_id: 100,
+      zzz_product_category_id: 100,
       zzz_global_status: "SEARCHING",
       zzz_items: [],
       zzz_created_at: new Date(),
@@ -59,7 +59,7 @@ describe("OrderSchema", () => {
   it("should fail if reservation_id is missing", () => {
     const invalidOrder = {
       zzz_id: UUID_A,
-      zzz_catalog_type_id: 100,
+      zzz_product_category_id: 100,
       zzz_global_status: "SEARCHING",
       zzz_items: [],
       zzz_created_at: new Date(),
@@ -72,7 +72,7 @@ describe("CreateOrderInputSchema", () => {
   it("should validate a valid create order input", () => {
     const input = {
       zzz_reservation_id: UUID_A,
-      zzz_catalog_type_id: 1,
+      zzz_product_category_id: 1,
       zzz_items: [{ zzz_catalog_item_id: 100, zzz_quantity: 2 }],
     };
     const result = CreateOrderInputSchema.parse(input);
@@ -84,7 +84,7 @@ describe("CreateOrderInputSchema", () => {
   it("should reject when items array is empty", () => {
     const input = {
       zzz_reservation_id: UUID_A,
-      zzz_catalog_type_id: 1,
+      zzz_product_category_id: 1,
       zzz_items: [],
     };
     expect(() => CreateOrderInputSchema.parse(input)).toThrow();
@@ -93,7 +93,7 @@ describe("CreateOrderInputSchema", () => {
   it("should reject when reservation_id is not a UUID", () => {
     const input = {
       zzz_reservation_id: "not-a-uuid",
-      zzz_catalog_type_id: 1,
+      zzz_product_category_id: 1,
       zzz_items: [{ zzz_catalog_item_id: 100, zzz_quantity: 2 }],
     };
     expect(() => CreateOrderInputSchema.parse(input)).toThrow();
@@ -102,7 +102,7 @@ describe("CreateOrderInputSchema", () => {
   it("should accept optional notes and notify_whatsapp", () => {
     const input = {
       zzz_reservation_id: UUID_A,
-      zzz_catalog_type_id: 1,
+      zzz_product_category_id: 1,
       zzz_notes: "Please prepare vegan options",
       zzz_notify_whatsapp: true,
       zzz_items: [{ zzz_catalog_item_id: 100, zzz_quantity: 2 }],
@@ -119,7 +119,7 @@ describe("CreateOrderInputSchema", () => {
     }));
     const input = {
       zzz_reservation_id: UUID_A,
-      zzz_catalog_type_id: 1,
+      zzz_product_category_id: 1,
       zzz_items: items,
     };
     expect(() => CreateOrderInputSchema.parse(input)).toThrow();

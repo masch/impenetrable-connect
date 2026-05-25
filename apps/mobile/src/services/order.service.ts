@@ -65,7 +65,7 @@ const MockOrderService: OrderServiceInterface = {
     const orderId = `00000000-0000-0000-0000-${String(Date.now()).padStart(UUID_PAD_LENGTH, "0")}`;
     const newOrder: Omit<Order, "zzz_id"> = {
       zzz_reservation_id: input.zzz_reservation_id,
-      zzz_catalog_type_id: input.zzz_catalog_type_id,
+      zzz_product_category_id: input.zzz_product_category_id,
       zzz_notes: input.zzz_notes ?? null,
       zzz_notify_whatsapp: input.zzz_notify_whatsapp ?? false,
       zzz_global_status: "SEARCHING",

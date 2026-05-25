@@ -102,6 +102,7 @@ async function seedVentures(db: Db) {
     zzz_cascade_order: v.zzz_cascade_order,
     zzz_is_paused: v.zzz_is_paused,
     zzz_is_active: v.zzz_is_active,
+    zzz_product_category_id: v.zzz_product_category_id,
   }));
 
   await db.insert(ventures).values(venturesToInsert).onConflictDoNothing();
@@ -159,8 +160,8 @@ async function seed() {
 
     await seedProjects(db);
     await seedUsers(db);
-    await seedVentures(db);
     await seedProductCategories(db);
+    await seedVentures(db);
     await seedProducts(db);
 
     logger.info("✅ Seeding completed!");

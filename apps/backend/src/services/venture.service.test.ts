@@ -12,6 +12,7 @@ describe("VentureService", () => {
     zzz_cascade_order: 1,
     zzz_is_paused: false,
     zzz_is_active: true,
+    zzz_product_category_id: 1,
     zzzCreatedAt: new Date(),
     zzzUpdatedAt: new Date(),
     zzzDeletedAt: null as Date | null,
@@ -72,6 +73,7 @@ describe("VentureService", () => {
       zzz_cascade_order: 1,
       zzz_is_paused: false,
       zzz_is_active: true,
+      zzz_product_category_id: 1,
     });
     expect(result).toEqual(mockVenture);
   });

@@ -127,7 +127,7 @@ const MockProductService: ProductServiceInterface = {
     const newOrder: Order = {
       zzz_id: orderId,
       zzz_reservation_id: reservation.zzz_id,
-      zzz_catalog_type_id: firstService.zzz_product_category_id,
+      zzz_product_category_id: firstService.zzz_product_category_id,
       zzz_confirmed_venture_id: null,
       zzz_current_offer_venture_id: MOCK_VENTURE_WITH_ORDERS.id,
       zzz_notes: notes ?? null,
@@ -279,7 +279,7 @@ const RestProductService: ProductServiceInterface = {
       try {
         const newOrder = await apiClient.post<Order>("/orders", {
           zzz_reservation_id: reservation.zzz_id,
-          zzz_catalog_type_id: firstService.zzz_product_category_id,
+          zzz_product_category_id: firstService.zzz_product_category_id,
           zzz_notes: notes || undefined,
           zzz_items: items.map((i) => ({
             zzz_catalog_item_id: i.zzz_catalog_item_id,

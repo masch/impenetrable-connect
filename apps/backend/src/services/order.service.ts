@@ -1,6 +1,6 @@
 import { eq, and, desc, inArray, sql, type SQL } from "drizzle-orm";
 import { type Db } from "../db";
-import { orders, orderItems, reservations } from "../db/schema";
+import { orders, orderItems, reservations, ventures, productCategories } from "../db/schema";
 import { products } from "../db/schema/products";
 import type {
   CreateOrderInput,
@@ -79,15 +79,70 @@ export class OrderService {
         );
       }
 
+      // 1.5 Validate category exists
+      const [category] = await tx
+        .select()
+        .from(productCategories)
+        .where(eq(productCategories.zzz_id, input.zzz_product_category_id))
+        .limit(SINGLE_RESULT_LIMIT);
+
+      if (!category) {
+        throw new OrderServiceError("Not Found", "Product category not found", HTTP_NOT_FOUND);
+      }
+
+      // Fetch active, unpaused ventures for categoryId ordered by cascade_order ASC
+      const availableVentures = await tx
+        .select()
+        .from(ventures)
+        .where(
+          and(
+            eq(ventures.zzz_product_category_id, input.zzz_product_category_id),
+            eq(ventures.zzz_project_id, category.zzz_project_id),
+            eq(ventures.zzz_is_active, true),
+            eq(ventures.zzz_is_paused, false),
+          ),
+        )
+        .orderBy(ventures.zzz_cascade_order);
+
+      // Find matching venture based on capacity
+      let matchedVentureId: number | null = null;
+      for (const venture of availableVentures) {
+        const [occupationRow] = await tx
+          .select({
+            occupied: sql<number>`COALESCE(SUM(${reservations.zzz_guest_count}), 0)::int`,
+          })
+          .from(orders)
+          .innerJoin(reservations, eq(orders.zzz_reservation_id, reservations.zzz_id))
+          .where(
+            and(
+              eq(orders.zzz_confirmed_venture_id, venture.id),
+              eq(reservations.zzz_service_at, reservation.zzz_service_at),
+              eq(orders.zzz_global_status, "CONFIRMED"),
+            ),
+          );
+
+        const occupied = occupationRow?.occupied ?? 0;
+        if (occupied + reservation.zzz_guest_count <= venture.zzz_max_capacity) {
+          matchedVentureId = venture.id;
+          break;
+        }
+      }
+
+      // Determine initial order fields
+      const status: OrderStatus = matchedVentureId !== null ? "OFFER_PENDING" : "EXPIRED";
+      const cancelReason = matchedVentureId === null ? ("NO_VENTURE_AVAILABLE" as const) : null;
+
       // 2. Insert the order row
       const [order] = await tx
         .insert(orders)
         .values({
           zzz_reservation_id: input.zzz_reservation_id,
-          zzz_catalog_type_id: input.zzz_catalog_type_id,
+          zzz_product_category_id: input.zzz_product_category_id,
           zzz_notes: input.zzz_notes ?? null,
           zzz_notify_whatsapp: input.zzz_notify_whatsapp ?? false,
-          zzz_global_status: "SEARCHING",
+          zzz_global_status: status,
+          zzz_current_offer_venture_id: matchedVentureId,
+          zzz_cancel_reason: cancelReason,
         })
         .returning();
 

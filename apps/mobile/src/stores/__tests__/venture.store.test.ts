@@ -60,6 +60,8 @@ describe("VentureStore", () => {
           zzz_cascade_order: 0,
           zzz_is_paused: false,
           zzz_is_active: true,
+
+          zzz_product_category_id: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -72,6 +74,8 @@ describe("VentureStore", () => {
           zzz_cascade_order: 0,
           zzz_is_paused: false,
           zzz_is_active: true,
+
+          zzz_product_category_id: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -129,6 +133,8 @@ describe("VentureStore", () => {
           zzz_cascade_order: 0,
           zzz_is_paused: false,
           zzz_is_active: true,
+
+          zzz_product_category_id: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -186,6 +192,8 @@ describe("VentureStore", () => {
         zzz_cascade_order: 0,
         zzz_is_paused: false,
         zzz_is_active: true,
+
+        zzz_product_category_id: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -221,6 +229,8 @@ describe("VentureStore", () => {
         zzz_cascade_order: 0,
         zzz_is_paused: false,
         zzz_is_active: true,
+
+        zzz_product_category_id: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -244,6 +254,8 @@ describe("VentureStore", () => {
           zzz_cascade_order: 0,
           zzz_is_paused: false,
           zzz_is_active: true,
+
+          zzz_product_category_id: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -265,6 +277,8 @@ describe("VentureStore", () => {
         zzz_cascade_order: 0,
         zzz_is_paused: false,
         zzz_is_active: true,
+
+        zzz_product_category_id: 1,
       };
 
       const createdVenture = {
@@ -295,6 +309,8 @@ describe("VentureStore", () => {
         zzz_cascade_order: 0,
         zzz_is_paused: false,
         zzz_is_active: true,
+
+        zzz_product_category_id: 1,
       });
 
       const state = useVentureStore.getState();
@@ -319,6 +335,8 @@ describe("VentureStore", () => {
         zzz_cascade_order: 0,
         zzz_is_paused: false,
         zzz_is_active: true,
+
+        zzz_product_category_id: 1,
       });
 
       expect(useVentureStore.getState().isSaving).toBe(true);
@@ -343,6 +361,8 @@ describe("VentureStore", () => {
             zzz_cascade_order: 0,
             zzz_is_paused: false,
             zzz_is_active: true,
+
+            zzz_product_category_id: 1,
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -356,6 +376,8 @@ describe("VentureStore", () => {
           zzz_cascade_order: 0,
           zzz_is_paused: false,
           zzz_is_active: true,
+
+          zzz_product_category_id: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -375,6 +397,8 @@ describe("VentureStore", () => {
         zzz_cascade_order: 0,
         zzz_is_paused: false,
         zzz_is_active: true,
+
+        zzz_product_category_id: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -415,6 +439,8 @@ describe("VentureStore", () => {
             zzz_cascade_order: 0,
             zzz_is_paused: false,
             zzz_is_active: true,
+
+            zzz_product_category_id: 1,
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -427,6 +453,8 @@ describe("VentureStore", () => {
             zzz_cascade_order: 0,
             zzz_is_paused: false,
             zzz_is_active: true,
+
+            zzz_product_category_id: 1,
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -440,6 +468,8 @@ describe("VentureStore", () => {
           zzz_cascade_order: 0,
           zzz_is_paused: false,
           zzz_is_active: true,
+
+          zzz_product_category_id: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -483,6 +513,8 @@ describe("VentureStore", () => {
             zzz_cascade_order: 0,
             zzz_is_paused: false,
             zzz_is_active: true,
+
+            zzz_product_category_id: 1,
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -496,6 +528,8 @@ describe("VentureStore", () => {
           zzz_cascade_order: 0,
           zzz_is_paused: false,
           zzz_is_active: true,
+
+          zzz_product_category_id: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },

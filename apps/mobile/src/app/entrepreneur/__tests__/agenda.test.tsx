@@ -62,12 +62,13 @@ describe("AgendaScreen", () => {
   });
 
   it("should render reservation notes in orders", () => {
-    const mockId = (n: number): string => `00000000-0000-0000-0000-${String(n).padStart(12, "0")}`;
+    const UUID_PAD_LENGTH = 12;
+    const mockId = (n: number): string => `00000000-0000-0000-0000-${String(n).padStart(UUID_PAD_LENGTH, "0")}`;
     const mockNotes = "Una persona es hipertensa, por favor cocinar sin sal.";
     const mockOrder: Order = {
       zzz_id: mockId(9),
       zzz_reservation_id: mockId(1),
-      zzz_catalog_type_id: 1,
+      zzz_product_category_id: 1,
       zzz_global_status: "CONFIRMED",
       zzz_confirmed_venture_id: 1,
       zzz_notes: mockNotes,

@@ -108,7 +108,7 @@ describe("RestProductService", () => {
       const mockOrder = {
         zzz_id: "order-uuid-456",
         zzz_reservation_id: "res-uuid-123",
-        zzz_catalog_type_id: 1,
+        zzz_product_category_id: 1,
         zzz_global_status: "SEARCHING",
         zzz_items: [
           {
@@ -176,7 +176,7 @@ describe("RestProductService", () => {
         "/orders",
         expect.objectContaining({
           zzz_reservation_id: "res-uuid-123",
-          zzz_catalog_type_id: 1,
+          zzz_product_category_id: 1,
           zzz_notes: "Test notes",
         }),
       );

@@ -1,12 +1,13 @@
 import { describe, expect, it } from "bun:test";
 import { OrderService, OrderServiceError } from "./order.service";
 import { type Db } from "../db";
+import { reservations, productCategories, ventures, products, orders } from "../db/schema";
 
 describe("OrderService", () => {
   const mockOrder = {
     zzz_id: "550e8400-e29b-41d4-a716-446655440000",
     zzz_reservation_id: "550e8400-e29b-41d4-a716-446655440001",
-    zzz_catalog_type_id: 1,
+    zzz_product_category_id: 1,
     zzz_confirmed_venture_id: null,
     zzz_notes: null,
     zzz_global_status: "SEARCHING" as const,
@@ -25,6 +26,8 @@ describe("OrderService", () => {
     zzz_id: "550e8400-e29b-41d4-a716-446655440001",
     zzz_user_id: "user-1",
     zzz_status: "CREATED" as const,
+    zzz_guest_count: 2,
+    zzz_service_at: new Date("2026-05-25T12:00:00.000Z"),
   };
 
   // --- Helpers ---
@@ -297,7 +300,7 @@ describe("OrderService", () => {
   describe("create", () => {
     const validInput = {
       zzz_reservation_id: "550e8400-e29b-41d4-a716-446655440001",
-      zzz_catalog_type_id: 1,
+      zzz_product_category_id: 1,
       zzz_notify_whatsapp: false,
       zzz_items: [
         { zzz_catalog_item_id: 1, zzz_quantity: 2 },
@@ -308,53 +311,84 @@ describe("OrderService", () => {
     const mockProduct1 = { zzz_id: 1, zzz_price: 25.0 };
     const mockProduct2 = { zzz_id: 2, zzz_price: 15.0 };
 
-    const mockCreatedItems = [
-      {
-        zzz_id: "item-1",
-        zzz_order_id: mockOrder.zzz_id,
-        zzz_catalog_item_id: 1,
-        zzz_quantity: 2,
-        zzz_price: 25.0,
-      },
-      {
-        zzz_id: "item-2",
-        zzz_order_id: mockOrder.zzz_id,
-        zzz_catalog_item_id: 2,
-        zzz_quantity: 1,
-        zzz_price: 15.0,
-      },
-    ];
-
     const createTxDb = (
       reservationResult: unknown[],
       productResult: unknown[],
-      options?: { orderResult?: unknown[]; itemResult?: unknown[] },
+      options?: {
+        orderResult?: unknown[];
+        itemResult?: unknown[];
+        categoryResult?: unknown[];
+        venturesResult?: unknown[];
+        occupiedCount?: number;
+      },
     ) => {
-      const selectResults = [reservationResult, productResult];
-      const insertResults = [
-        options?.orderResult ?? [mockOrder],
-        options?.itemResult ?? mockCreatedItems,
-      ];
-      let selectIdx = 0;
-      let insertIdx = 0;
-
       const mockTx = {
-        select: () => ({
-          from: () => ({
-            where: () => {
-              const result = selectResults[selectIdx] ?? [];
-              selectIdx++;
-              return createWhereChain(result);
-            },
-          }),
-        }),
-        insert: () => {
-          const idx = insertIdx;
-          insertIdx++;
+        select: (_fields?: unknown) => {
           return {
-            values: () => ({
-              returning: () => Promise.resolve(insertResults[idx] ?? []),
-            }),
+            from: (table: unknown) => {
+              return {
+                innerJoin: (_joinTable: unknown, _joinCond: unknown) => {
+                  return {
+                    where: () => {
+                      return Promise.resolve([{ occupied: options?.occupiedCount ?? 0 }]);
+                    },
+                  };
+                },
+                where: () => {
+                  let result: unknown[] = [];
+                  if (table === reservations) {
+                    result = reservationResult;
+                  } else if (table === productCategories) {
+                    result = options?.categoryResult ?? [{ zzz_id: 1, zzz_project_id: 1 }];
+                  } else if (table === ventures) {
+                    const list = (options?.venturesResult as Record<string, unknown>[]) ?? [
+                      {
+                        id: 1,
+                        name: "Venture 1",
+                        zzz_max_capacity: 10,
+                        zzz_cascade_order: 0,
+                        zzz_is_active: true,
+                        zzz_is_paused: false,
+                        zzz_product_category_id: 1,
+                        zzz_project_id: 1,
+                      },
+                    ];
+                    result = list.filter(
+                      (v: Record<string, unknown>) =>
+                        v.zzz_is_active === true && v.zzz_is_paused === false,
+                    );
+                  } else if (table === products) {
+                    result = productResult;
+                  }
+                  return createWhereChain(result);
+                },
+              };
+            },
+          };
+        },
+        insert: (insertTable: unknown) => {
+          return {
+            values: (vals: unknown) => {
+              return {
+                returning: () => {
+                  if (insertTable === orders) {
+                    const createdOrder = {
+                      ...mockOrder,
+                      ...(vals as Record<string, unknown>),
+                      zzz_id: mockOrder.zzz_id,
+                    };
+                    return Promise.resolve([createdOrder]);
+                  } else {
+                    const items = Array.isArray(vals) ? (vals as unknown[]) : [vals];
+                    const createdItems = items.map((item: unknown, i: number) => ({
+                      ...(item as Record<string, unknown>),
+                      zzz_id: `item-${i}`,
+                    }));
+                    return Promise.resolve(createdItems);
+                  }
+                },
+              };
+            },
           };
         },
       };
@@ -364,12 +398,13 @@ describe("OrderService", () => {
       } as unknown as Db;
     };
 
-    it("should create order + items in a transaction", async () => {
+    it("should create order + items in a transaction and assign to available venture", async () => {
       const mockDb = createTxDb([mockReservation], [mockProduct1, mockProduct2]);
 
       const result = await OrderService.create(mockDb, "user-1", validInput);
       expect(result).toBeDefined();
-      expect(result.zzz_global_status).toBe("SEARCHING");
+      expect(result.zzz_global_status).toBe("OFFER_PENDING");
+      expect(result.zzz_current_offer_venture_id).toBe(1);
       expect(result.zzz_items).toHaveLength(2);
     });
 
@@ -404,46 +439,7 @@ describe("OrderService", () => {
         { zzz_id: 1, zzz_price: 25.0 },
         { zzz_id: 2, zzz_price: 15.0 },
       ];
-      let capturedItemValues: unknown[] = [];
-      let insertCounter = 0;
-
-      const mockTx = {
-        select: () => ({
-          from: () => ({
-            where: () => {
-              // First call returns reservation, second returns products
-              const result = insertCounter === 0 ? [mockReservation] : priceProducts;
-              insertCounter++;
-              return createWhereChain(result);
-            },
-          }),
-        }),
-        insert: () => {
-          const isFirstInsert = insertCounter < 2; // After 2 selects, first insert
-          return {
-            values: (vals: unknown) => {
-              if (!isFirstInsert) {
-                capturedItemValues = Array.isArray(vals) ? vals : [];
-              }
-              return {
-                returning: () =>
-                  Promise.resolve(
-                    isFirstInsert
-                      ? [mockOrder]
-                      : capturedItemValues.map((v: unknown, i: number) => ({
-                          ...(v as object),
-                          zzz_id: `item-${i}`,
-                        })),
-                  ),
-              };
-            },
-          };
-        },
-      };
-
-      const mockDb = {
-        transaction: async (fn: (tx: typeof mockTx) => Promise<unknown>) => fn(mockTx),
-      } as unknown as Db;
+      const mockDb = createTxDb([mockReservation], priceProducts);
 
       const result = await OrderService.create(mockDb, "user-1", validInput);
 
@@ -458,6 +454,67 @@ describe("OrderService", () => {
       await expect(OrderService.create(mockDb, "user-1", validInput)).rejects.toThrow(
         "Catalog items not found",
       );
+    });
+
+    it("should auto-expire order if no ventures are found", async () => {
+      const mockDb = createTxDb([mockReservation], [mockProduct1, mockProduct2], {
+        venturesResult: [],
+      });
+
+      const result = await OrderService.create(mockDb, "user-1", validInput);
+      expect(result.zzz_global_status).toBe("EXPIRED");
+      expect(result.zzz_cancel_reason).toBe("NO_VENTURE_AVAILABLE");
+      expect(result.zzz_current_offer_venture_id).toBeNull();
+    });
+
+    it("should skip paused/inactive ventures and match active ones", async () => {
+      const customVentures = [
+        {
+          id: 1,
+          name: "Venture 1 (Paused)",
+          zzz_max_capacity: 10,
+          zzz_cascade_order: 0,
+          zzz_is_active: true,
+          zzz_is_paused: true,
+          zzz_product_category_id: 1,
+          zzz_project_id: 1,
+        },
+        {
+          id: 2,
+          name: "Venture 2 (Active)",
+          zzz_max_capacity: 10,
+          zzz_cascade_order: 1,
+          zzz_is_active: true,
+          zzz_is_paused: false,
+          zzz_product_category_id: 1,
+          zzz_project_id: 1,
+        },
+      ];
+      const mockDb = createTxDb([mockReservation], [mockProduct1, mockProduct2], {
+        venturesResult: customVentures,
+      });
+
+      const result = await OrderService.create(mockDb, "user-1", validInput);
+      expect(result.zzz_global_status).toBe("OFFER_PENDING");
+      // Should match venture 2 since venture 1 is paused
+      expect(result.zzz_current_offer_venture_id).toBe(2);
+    });
+
+    it("should auto-expire order if venture is over capacity", async () => {
+      const customReservation = {
+        ...mockReservation,
+        zzz_guest_count: 5,
+      };
+      // Guest count is 5, venture capacity is 10.
+      // If occupied count is 6, total is 11 > 10, so capacity check fails!
+      const mockDb = createTxDb([customReservation], [mockProduct1, mockProduct2], {
+        occupiedCount: 6,
+      });
+
+      const result = await OrderService.create(mockDb, "user-1", validInput);
+      expect(result.zzz_global_status).toBe("EXPIRED");
+      expect(result.zzz_cancel_reason).toBe("NO_VENTURE_AVAILABLE");
+      expect(result.zzz_current_offer_venture_id).toBeNull();
     });
   });
 

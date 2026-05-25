@@ -6,6 +6,7 @@ import { resetDbCache, dbMiddleware } from "../middleware/db";
 import { authMiddleware } from "../middleware/auth";
 import { ordersRouter } from "./orders";
 import type { AppEnv } from "../config/env";
+import { reservations, productCategories, ventures, products, orders } from "../db/schema";
 
 const TEST_ENV = {
   DATABASE_URL: "postgres://localhost:5432/db",
@@ -29,7 +30,7 @@ describe("Orders API", () => {
   const mockOrder = {
     zzz_id: "550e8400-e29b-41d4-a716-446655440000",
     zzz_reservation_id: "550e8400-e29b-41d4-a716-446655440001",
-    zzz_catalog_type_id: 1,
+    zzz_product_category_id: 1,
     zzz_confirmed_venture_id: null,
     zzz_notes: null,
     zzz_global_status: "SEARCHING",
@@ -48,6 +49,8 @@ describe("Orders API", () => {
     zzz_id: "550e8400-e29b-41d4-a716-446655440001",
     zzz_user_id: "test-user-id",
     zzz_status: "CREATED",
+    zzz_guest_count: 2,
+    zzz_service_at: new Date("2026-05-25T12:00:00.000Z"),
   };
 
   const createListBuilder = (result: unknown[]) => {
@@ -76,33 +79,73 @@ describe("Orders API", () => {
    * Creates a mock Db object that wraps transaction for OrderService.create/updateStatus.
    * Uses call-count-based response switching for select/insert chains.
    */
-  const createTxDb = (selectResults: unknown[][], insertResults?: unknown[][]) => {
-    let selectIdx = 0;
-    let insertIdx = 0;
-
+  const createTxDb = (selectResults: unknown[][], _insertResults?: unknown[][]) => {
     const mockTx = {
-      select: () => ({
-        from: () => ({
-          where: () => {
-            const result = selectResults[selectIdx] ?? [];
-            if (selectIdx < selectResults.length - 1) selectIdx++;
-            return createWhereChain(result);
-          },
-          // For calls without .where() (e.g., select from products before inArray)
-          then: (resolve: (v: unknown) => unknown) => resolve(selectResults[selectIdx] ?? []),
-        }),
+      select: (_fields?: unknown) => ({
+        from: (table: unknown) => {
+          return {
+            innerJoin: (_joinTable: unknown, _joinCond: unknown) => {
+              return {
+                where: () => {
+                  return Promise.resolve([{ occupied: 0 }]);
+                },
+              };
+            },
+            where: () => {
+              let result: unknown[] = [];
+              if (table === reservations) {
+                result = selectResults[0] ?? [mockReservation];
+              } else if (table === productCategories) {
+                result = [{ zzz_id: 1, zzz_project_id: 1 }];
+              } else if (table === ventures) {
+                result = [
+                  {
+                    id: 1,
+                    name: "Venture 1",
+                    zzz_max_capacity: 10,
+                    zzz_cascade_order: 0,
+                    zzz_is_active: true,
+                    zzz_is_paused: false,
+                    zzz_product_category_id: 1,
+                    zzz_project_id: 1,
+                  },
+                ];
+              } else if (table === products) {
+                result = selectResults[1] ?? [{ zzz_id: 1, zzz_price: 25.0 }];
+              } else {
+                result = selectResults[0] ?? [mockOrder];
+              }
+              return createWhereChain(result);
+            },
+            orderBy: () => createWhereChain(selectResults[0] ?? [mockOrder]),
+            limit: () => createWhereChain(selectResults[0] ?? [mockOrder]),
+            then: (resolve: (v: unknown) => unknown) => resolve(selectResults[0] ?? []),
+          };
+        },
       }),
-      insert: () => ({
-        values: () => ({
+      insert: (insertTable: unknown) => ({
+        values: (vals: unknown) => ({
           returning: () => {
-            const result = insertResults?.[insertIdx] ?? [mockOrder];
-            if (insertIdx < (insertResults?.length ?? 1) - 1) insertIdx++;
-            return Promise.resolve(result);
+            if (insertTable === orders) {
+              const createdOrder = {
+                ...mockOrder,
+                ...(vals as Record<string, unknown>),
+                zzz_id: mockOrder.zzz_id,
+              };
+              return Promise.resolve([createdOrder]);
+            } else {
+              const items = Array.isArray(vals) ? (vals as unknown[]) : [vals];
+              const createdItems = items.map((item: unknown, i: number) => ({
+                ...(item as Record<string, unknown>),
+                zzz_id: `item-${i}`,
+              }));
+              return Promise.resolve(createdItems);
+            }
           },
         }),
       }),
       update: () => ({
-        set: () => ({
+        set: (_vals: unknown) => ({
           where: () => ({
             returning: () => {
               const result = selectResults[0] ?? [mockOrder];
@@ -141,7 +184,7 @@ describe("Orders API", () => {
   describe("POST /v1/orders", () => {
     const validBody = {
       zzz_reservation_id: "550e8400-e29b-41d4-a716-446655440001",
-      zzz_catalog_type_id: 1,
+      zzz_product_category_id: 1,
       zzz_notify_whatsapp: false,
       zzz_items: [{ zzz_catalog_item_id: 1, zzz_quantity: 2 }],
     };
@@ -181,7 +224,7 @@ describe("Orders API", () => {
 
       expect(res.status).toBe(201);
       const body = await res.json();
-      expect(body.zzz_global_status).toBe("SEARCHING");
+      expect(body.zzz_global_status).toBe("OFFER_PENDING");
       expect(body.zzz_items).toHaveLength(1);
     });
 

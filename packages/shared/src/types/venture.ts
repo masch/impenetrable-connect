@@ -1,9 +1,14 @@
 import { z } from "zod";
 import { VentureMemberSchema } from "./venture-member";
 
+const VENTURE_CONSTRAINTS = {
+  NAME_MIN_LENGTH: 1,
+  NAME_MAX_LENGTH: 255,
+} as const;
+
 export const VentureSchema = z.object({
   id: z.number().int(),
-  name: z.string().min(1).max(255),
+  name: z.string().min(VENTURE_CONSTRAINTS.NAME_MIN_LENGTH).max(VENTURE_CONSTRAINTS.NAME_MAX_LENGTH),
   ownerId: z.string().uuid(),
   zzz_max_capacity: z.number().int().default(0),
   zzz_cascade_order: z.number().int().default(0),
@@ -12,10 +17,11 @@ export const VentureSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   zzz_project_id: z.number().int(),
+  zzz_product_category_id: z.number().int().positive(),
   zzz_members: z.array(VentureMemberSchema).optional(),
 });
 
-export type Venture = z.infer<typeof VentureSchema>;
+export interface Venture extends z.infer<typeof VentureSchema> {}
 
 export const CreateVentureSchema = VentureSchema.omit({
   id: true,
@@ -23,7 +29,7 @@ export const CreateVentureSchema = VentureSchema.omit({
   updatedAt: true,
 });
 
-export type CreateVentureInput = z.infer<typeof CreateVentureSchema>;
+export interface CreateVentureInput extends z.infer<typeof CreateVentureSchema> {}
 
 export const UpdateVentureSchema = VentureSchema.omit({
   id: true,
@@ -34,4 +40,4 @@ export const UpdateVentureSchema = VentureSchema.omit({
   zzz_members: true,
 }).partial();
 
-export type UpdateVentureInput = z.infer<typeof UpdateVentureSchema>;
+export interface UpdateVentureInput extends z.infer<typeof UpdateVentureSchema> {}

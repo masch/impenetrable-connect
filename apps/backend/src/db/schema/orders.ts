@@ -25,7 +25,7 @@ export const orders = impenetrableSchema.table("orders", {
   zzz_reservation_id: uuid("zzz_reservation_id")
     .references(() => reservations.zzz_id)
     .notNull(),
-  zzz_catalog_type_id: integer("zzz_catalog_type_id").notNull(),
+  zzz_product_category_id: integer("zzz_product_category_id").notNull(),
   zzz_confirmed_venture_id: integer("zzz_confirmed_venture_id").references(() => ventures.id),
   zzz_notes: text("zzz_notes"),
   zzz_global_status: orderStatusEnum("zzz_global_status").notNull().default("SEARCHING"),
