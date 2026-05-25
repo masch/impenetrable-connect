@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { View, Text, ScrollView, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { Icon } from "../../components/Icon";
@@ -63,6 +63,12 @@ export default function OrderSetupScreen() {
       }
     }
   }, [selectedProject, projects, isLoading, error, fetchProjects, selectProject]);
+
+  // Stable default time to avoid hydration mismatch from new Date() in render
+  const defaultTimeForMoment = useMemo(
+    () => getDefaultTimeForMoment(moment ?? "BREAKFAST"),
+    [moment],
+  );
 
   if (isLoading || (!selectedProject && !error)) {
     return (
@@ -235,7 +241,7 @@ export default function OrderSetupScreen() {
               <Button
                 variant="ghost"
                 testID="guest-minus-button"
-                onPress={() => setGuestCount(Math.max(MIN_GUEST_COUNT, guestCount - 1))}
+                onPress={() => setGuestCount((prev) => Math.max(MIN_GUEST_COUNT, prev - 1))}
                 className="size-14 rounded-2xl bg-surface-container-high items-center justify-center border border-outline-variant/10"
                 accessibilityLabel={t("accessibility.decrement_guests")}
                 accessibilityHint={t("accessibility.decrement_guests_hint")}
@@ -257,7 +263,7 @@ export default function OrderSetupScreen() {
               <Button
                 variant="ghost"
                 testID="guest-plus-button"
-                onPress={() => setGuestCount(guestCount + 1)}
+                onPress={() => setGuestCount((prev) => prev + 1)}
                 className="size-14 rounded-2xl bg-surface-container-high items-center justify-center border border-outline-variant/10"
                 accessibilityLabel={t("accessibility.increment_guests")}
                 accessibilityHint={t("accessibility.increment_guests_hint")}
@@ -442,7 +448,7 @@ export default function OrderSetupScreen() {
                   <>
                     <AppDateTimePicker
                       testID="time-picker-native"
-                      value={time || getDefaultTimeForMoment(moment!)}
+                      value={time || defaultTimeForMoment}
                       onChange={handleTimeChange}
                       mode="time"
                       display={Platform.OS === "ios" ? "spinner" : "default"}
