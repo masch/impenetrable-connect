@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -38,7 +38,7 @@ export default function LoginScreen() {
     lastName: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
 
   const validateForm = (): boolean => {
@@ -52,11 +52,10 @@ export default function LoginScreen() {
   };
 
   const handleSubmit = () => {
-    if (!validateForm() || isLoading) {
+    if (!validateForm() || isPending) {
       return;
     }
     setSubmissionError(null);
-    setIsLoading(true);
     const userData: CreateUserInput = {
       alias: formData.alias.trim(),
       firstName: toNullable(formData.firstName.trim()),
@@ -66,16 +65,14 @@ export default function LoginScreen() {
       email: null,
     };
     const register = useAuthStore.getState().register;
-    register(userData)
-      .then(() => {
+    startTransition(async () => {
+      try {
+        await register(userData);
         replace("/tourist");
-      })
-      .catch(() => {
+      } catch {
         setSubmissionError(t("login.errors.registration_failed"));
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      }
+    });
   };
 
   const updateField = (field: keyof LoginFormData, value: string) => {
@@ -91,7 +88,7 @@ export default function LoginScreen() {
 
   return (
     <Screen>
-      {isLoading && <LoadingView />}
+      {isPending && <LoadingView />}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
